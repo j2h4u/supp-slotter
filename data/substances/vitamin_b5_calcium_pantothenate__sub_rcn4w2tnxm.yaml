@@ -1,0 +1,12 @@
+name: Vitamin B5
+form: calcium pantothenate
+notes: Calcium pantothenate; stereochemistry unavailable from the available label,
+  which does not establish D or other stereochemistry.
+knowledge:
+  context:
+  - mitochondrial_health
+  kind:
+  - vitamin
+  pathway:
+  - coa_metabolism
+id: sub_rcn4w2tnxm

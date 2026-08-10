@@ -4,9 +4,6 @@ notes: Generic elemental manganese contribution. Product cards keep the concrete
   NIH ODS describes manganese as a cofactor for enzymes including manganese superoxide dismutase, arginase, and pyruvate carboxylase,
   with roles in reactive oxygen species scavenging, bone formation, amino-acid/cholesterol/glucose/carbohydrate metabolism,
   and immune response.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - antioxidant_enzyme_cofactor

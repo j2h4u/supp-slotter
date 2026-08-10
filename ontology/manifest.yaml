@@ -71,6 +71,7 @@ repository_projection:
       root_class: Substance
       document_shape: mapping
       identity: {source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
+      maintenance: {role: substance, label: Substance, schema_artifact: card.schema.json}
       instructions:
         - {kind: slot, source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
         - {kind: alias, source: name, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/label}
@@ -97,6 +98,7 @@ repository_projection:
       root_class: Product
       document_shape: mapping
       identity: {source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
+      maintenance: {role: product, label: Product, schema_artifact: product.schema.json}
       instructions:
         - {kind: slot, source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
         - {kind: alias, source: name, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/label}
@@ -107,7 +109,6 @@ repository_projection:
         - {kind: slot, source: "components[].amount", subject: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/amount}
         - {kind: slot, source: "components[].label", subject: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/label}
         - {kind: slot, source: "components[].notes", subject: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/notes}
-        - {kind: slot, source: "components[].primary", subject: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/primary}
         - {kind: slot, source: notes, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/notes}
         - {kind: inlined-node, source: "concerns[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/concerns, target: Concern}
         - {kind: slot, source: "concerns[].kind", subject: "concerns[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/concern_kind}
@@ -130,6 +131,7 @@ repository_projection:
       root_class: Stack
       document_shape: keyed-map
       identity: {source: "<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
+      maintenance: {role: stack, label: Stack, schema_artifact: stacks.schema.json}
       instructions:
         - {kind: inlined-node, source: "<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/entries, target: StackEntry}
         - {kind: reference, source: "<key>[]", subject: "<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/product, target: Product}
@@ -138,6 +140,7 @@ repository_projection:
       document_shape: keyed-map
       identity: {source: "<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
       instructions:
+        - {kind: reference, source: "<key>.stack", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/stack, target: Stack}
         - {kind: inlined-node, source: "<key>.slots.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/slots, target: Slot}
         - {kind: slot, source: "<key>.label", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/label}
         - {kind: slot, source: "<key>.slots.<key>.label", subject: "<key>.slots.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/label}
@@ -149,21 +152,26 @@ repository_projection:
       root_class: RelationAssertionCatalog
       document_shape: mapping
       instructions:
-        - {kind: sequence, source: "relations[].action", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/action}
-        - {kind: sequence, source: "relations[].assertion_kind", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/assertion_kind}
-        - {kind: sequence, source: "relations[].id", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/id}
-        - {kind: sequence, source: "relations[].reason", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/reason}
-        - {kind: sequence, source: "relations[].semantic_family", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/semantic_family}
-        - {kind: sequence, source: "relations[].severity", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/severity}
-        - {kind: sequence, source: "relations[].source_selector.category", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/source_selector/category}
-        - {kind: reference, source: "relations[].source_selector.entity.id", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/source_selector/entity/id, target: IdentifiedNode}
-        - {kind: slot, source: "relations[].source_selector.entity.name", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/source_selector/entity/name}
-        - {kind: sequence, source: "relations[].source_selector.term", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/source_selector/term}
-        - {kind: sequence, source: "relations[].target_selector.category", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/target_selector/category}
-        - {kind: reference, source: "relations[].target_selector.entity.id", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/target_selector/entity/id, target: IdentifiedNode}
-        - {kind: slot, source: "relations[].target_selector.entity.name", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/target_selector/entity/name}
-        - {kind: sequence, source: "relations[].target_selector.term", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/target_selector/term}
-        - {kind: sequence, source: "relations[].type", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/type}
+        - {kind: inlined-node, source: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/relations, target: RelationAssertionRecord}
+        - {kind: slot, source: "relations[].action", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/action}
+        - {kind: slot, source: "relations[].assertion_kind", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/assertion_kind}
+        - {kind: slot, source: "relations[].id", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
+        - {kind: slot, source: "relations[].reason", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/reason}
+        - {kind: slot, source: "relations[].semantic_family", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_family}
+        - {kind: slot, source: "relations[].severity", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/severity}
+        - {kind: slot, source: "relations[].relation_type", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/relation_type}
+        - {kind: inlined-node, source: "relations[].source_selector", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/source_selector, target: RelationAssertionSelector}
+        - {kind: inlined-node, source: "relations[].source_selector.entity", subject: "relations[].source_selector", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/entity, target: RelationAssertionEntitySelector}
+        - {kind: slot, source: "relations[].source_selector.category", subject: "relations[].source_selector", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/category}
+        - {kind: reference, source: "relations[].source_selector.entity.entity_id", subject: "relations[].source_selector.entity", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/entity_id, target: Substance}
+        - {kind: slot, source: "relations[].source_selector.entity.name", subject: "relations[].source_selector.entity", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/name}
+        - {kind: slot, source: "relations[].source_selector.term", subject: "relations[].source_selector", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/term}
+        - {kind: inlined-node, source: "relations[].target_selector", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/target_selector, target: RelationAssertionSelector}
+        - {kind: inlined-node, source: "relations[].target_selector.entity", subject: "relations[].target_selector", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/entity, target: RelationAssertionEntitySelector}
+        - {kind: slot, source: "relations[].target_selector.category", subject: "relations[].target_selector", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/category}
+        - {kind: reference, source: "relations[].target_selector.entity.entity_id", subject: "relations[].target_selector.entity", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/entity_id, target: Substance}
+        - {kind: slot, source: "relations[].target_selector.entity.name", subject: "relations[].target_selector.entity", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/name}
+        - {kind: slot, source: "relations[].target_selector.term", subject: "relations[].target_selector", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/term}
 linkml_root: ontology/supp_slotter.yaml
 linkml_modules: [ontology/model.yaml, ontology/vocabulary-model.yaml, ontology/relation-model.yaml, ontology/scheduling-model.yaml, ontology/runtime-protocol.yaml]
 compiler:
@@ -175,7 +183,12 @@ compiler:
     pyyaml: "6.0.3"
 artifacts:
   - card.schema.json
+  - dashboard.schema.json
+  - pillboxes.schema.json
+  - product.schema.json
+  - relations.schema.json
   - schema.json
+  - stacks.schema.json
   - ontology.ttl
   - shapes.ttl
   - context.json

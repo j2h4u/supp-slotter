@@ -1,5 +1,21 @@
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 
-ss:t a ss:OntologyTerm ; ss:semanticCategory ss:kind ; ss:ontocleanProfile ss:rigid_identity .
+ss:profile a ss:OntoCleanProfile ;
+  ss:id "rigid_identity" ;
+  ss:rigidity "rigid" ;
+  ss:supplies_identity true ;
+  ss:dependence "independent" .
 
+ss:kind a ss:SemanticCategory ;
+  ss:id "kind" ;
+  ss:label "Kind" ;
+  ss:allowed_predicates "knowledge.kind" ;
+  ss:ontoclean_profile ss:profile .
+
+ss:term a ss:OntologyTerm ;
+  ss:id "kind:botanical" ;
+  ss:slug "botanical" ;
+  ss:label "Botanical" ;
+  ss:description "A canonical botanical kind." ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile ss:profile .

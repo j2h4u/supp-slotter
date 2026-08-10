@@ -12,7 +12,13 @@ imports:
   - model
 
 enums:
-  AdvisoryMatchDirection:
+  ConstraintExecutionOperation:
+    permissible_values:
+      separate_products_same_slot:
+  ConstraintExecutionAggregation:
+    permissible_values:
+      distinct_constraint:
+  ConstraintExecutionMatchDirection:
     permissible_values:
       symmetric:
       directed:
@@ -38,56 +44,37 @@ classes:
     slots: [operator, field, value, weight, trace_key]
   RuntimePolicyCatalog:
     description: Typed executable policy contract consumed by planner runtime.
-    slots: [id, protocol, glue_contract, fact_fields, source_kind_values, effect_match_dimensions, assignment_axes, assignment_actions, scope_dimensions, scope_rules, constraint_execution_policies, effect_scoring, prefer_with_policy, capability_rules, warning_types, warning_emitters, warning_trait_actions, concern_warning_rules, non_warning_concern_kinds, concern_review_statuses, relation_warning_rules, relation_review_statuses, relation_presence_statuses, relation_endpoint_policies, runtime_projection]
+    slots: [id, glue_contract, source_kind_values, effect_match_dimensions, assignment_axes, slot_near_values, constraint_execution_policies, effect_scoring, prefer_with_policy, warning_types, warning_emitters, warning_trait_actions, concern_catalog, relation_warning_rules, relation_presence_statuses, selector_form_capabilities, dashboard_state_catalog, runtime_projection]
     slot_usage:
-      fact_fields: {required: true, inlined: true, inlined_as_list: true}
       source_kind_values: {required: true, inlined: true, inlined_as_list: true}
       effect_match_dimensions: {required: true, inlined: true, inlined_as_list: true}
       assignment_axes: {required: true, inlined: true, inlined_as_list: true}
-      assignment_actions: {required: true, inlined: true, inlined_as_list: true}
-      scope_dimensions: {required: true, inlined: true, inlined_as_list: true}
-      scope_rules: {required: true, inlined: true, inlined_as_list: true}
+      slot_near_values: {required: true, multivalued: true}
       constraint_execution_policies: {required: true, inlined: true, inlined_as_list: true}
       effect_scoring: {required: true, inlined: true}
       prefer_with_policy: {required: true, inlined: true}
-      capability_rules: {required: true, inlined: true, inlined_as_list: true}
       warning_types: {required: true, inlined: true, inlined_as_list: true}
       warning_emitters: {required: true, inlined: true, inlined_as_list: true}
       warning_trait_actions: {required: true, inlined: true, inlined_as_list: true}
-      concern_warning_rules: {required: true, inlined: true, inlined_as_list: true}
-      non_warning_concern_kinds: {required: true, inlined: true, inlined_as_list: true}
-      concern_review_statuses: {required: true, inlined: true, inlined_as_list: true}
+      concern_catalog: {required: true, inlined: true, inlined_as_list: true}
       relation_warning_rules: {required: true, inlined: true, inlined_as_list: true}
-      relation_review_statuses: {required: true, inlined: true, inlined_as_list: true}
       relation_presence_statuses: {required: true, inlined: true, inlined_as_list: true}
-      relation_endpoint_policies: {required: true, inlined: true, inlined_as_list: true}
+      selector_form_capabilities: {required: true, inlined: true, inlined_as_list: true}
+      dashboard_state_catalog: {required: true, inlined: true}
       runtime_projection: {required: true, inlined: true, inlined_as_list: true}
-      protocol: {required: true, inlined: true}
       glue_contract: {required: true, inlined: true}
-  RuntimeProtocolInventory:
-    slots: [condition_classes, action_classes, policy_class]
-    slot_usage:
-      condition_classes: {required: true, multivalued: true}
-      action_classes: {required: true, multivalued: true}
-      policy_class: {required: true}
   RuntimeGlueContract:
     slots:
       - id
       - inactive_stack_name
       - source_kinds
       - source_kind_roles
-      - scope_fact_adapters
       - relation_warning_filter_fields
       - relation_warning_active_sides
       - relation_presence_active_sides
       - relation_presence_truth_table
-      - relation_review_status_ids
       - relation_endpoint_selector_kinds
-      - concern_membership_roles
-      - active_concern_role
-      - inactive_concern_role
-      - product_concern_fallback_role
-      - substance_concern_fallback_role
+      - relation_selector_forms
       - warning_emitter_ids
       - prefer_with_source_fields
       - prefer_with_target_resolutions
@@ -97,62 +84,50 @@ classes:
       inactive_stack_name: {required: true}
       source_kinds: {required: true, multivalued: true}
       source_kind_roles: {required: true, multivalued: true}
-      scope_fact_adapters: {required: true, multivalued: true}
       relation_warning_filter_fields: {required: true, multivalued: true, range: RelationWarningFilterField}
       relation_warning_active_sides: {required: true, multivalued: true, range: RelationWarningActiveSide}
       relation_presence_active_sides: {required: true, multivalued: true}
       relation_presence_truth_table: {required: true, multivalued: true, range: RuntimeRelationPresenceTruthState, inlined: true, inlined_as_list: true}
-      relation_review_status_ids: {required: true, multivalued: true}
       relation_endpoint_selector_kinds: {required: true, multivalued: true}
-      concern_membership_roles: {required: true, multivalued: true}
-      active_concern_role: {required: true}
-      inactive_concern_role: {required: true}
-      product_concern_fallback_role: {required: true}
-      substance_concern_fallback_role: {required: true}
+      relation_selector_forms: {required: true, multivalued: true}
       warning_emitter_ids: {required: true, multivalued: true}
       prefer_with_source_fields: {required: true, multivalued: true}
       prefer_with_target_resolutions: {required: true, multivalued: true}
       prefer_with_pair_modes: {required: true, multivalued: true}
   RuntimeProjectionDescriptor:
-    slots: [id, target, source, kind, emit_table, children]
+    slots: [id, target, source, children]
     slot_usage:
       target: {required: true}
       children: {inlined: true, inlined_as_list: true, range: RuntimeProjectionDescriptor}
-  RuntimeFactFieldPolicy:
-    slots: [id, field, value_type]
-    slot_usage: {field: {required: true}, value_type: {required: true}}
   RuntimeSourceKindValuePolicy:
-    slots: [id, source_kind, applies_to, description]
+    slots: [id, source_kind, applies_to]
     slot_usage:
       source_kind: {required: true}
       applies_to: {required: true}
-      description: {required: true}
-  RuntimeScopeDimensionPolicy:
-    slots: [id, key, values, rule_ids, default_outcome, fact_adapter, capability_field]
-    slot_usage: {key: {required: true}, values: {required: true}, rule_ids: {required: true}, default_outcome: {required: true}, fact_adapter: {required: true}, capability_field: {required: true}}
   RuntimeEffectMatchDimensionPolicy:
     slots: [id, key, slot_field, value_type]
     slot_usage: {key: {required: true}, slot_field: {required: true}, value_type: {required: true}}
   RuntimeAssignmentAxisPolicy:
-    slots: [id, axis, order, assignment_source, assignment_field]
-    slot_usage: {axis: {required: true}, order: {required: true}, assignment_source: {required: true}, assignment_field: {required: true}}
-  RuntimeAssignmentActionPolicy:
-    slots: [id, assignment_action, executable, shadowed]
-    slot_usage: {assignment_action: {required: true}, executable: {required: true}, shadowed: {required: true}}
-  RuntimeScopeRulePolicy:
-    slots: [id, priority, conditions, outcome]
-    slot_usage: {priority: {required: true}, conditions: {required: true, inlined: true, inlined_as_list: true}, outcome: {required: true}}
+    slots: [id, axis, order, assignment_source, assignment_field, minimum_cardinality, maximum_cardinality]
+    slot_usage:
+      axis: {required: true}
+      order: {required: true}
+      assignment_source: {required: true}
+      assignment_field: {required: true}
+      minimum_cardinality: {required: true}
+      maximum_cardinality: {required: true}
   RuntimeEffectScore:
     slots: [id, level, score]
     slot_usage: {level: {required: true}, score: {required: true}}
   RuntimeEffectScoringPolicy:
-    slots: [id, scores, balance_weight, prefer_with_bonus, advisory_constraint_score_delta, advisory_match_direction]
+    slots: [id, objective_function, balance_penalty_expression, tie_break, scores, balance_weight, prefer_with_bonus]
     slot_usage:
+      objective_function: {required: true}
+      balance_penalty_expression: {required: true}
+      tie_break: {required: true}
       scores: {required: true, inlined: true, inlined_as_list: true}
       balance_weight: {required: true}
       prefer_with_bonus: {required: true}
-      advisory_constraint_score_delta: {required: true}
-      advisory_match_direction: {required: true}
   RuntimePreferWithPolicy:
     slots: [id, source_field, target_resolution, pair_mode]
     slot_usage:
@@ -162,28 +137,13 @@ classes:
   RuntimeConstraintExecutionPolicy:
     slots: [id, operation, match_direction, aggregation, selector_resolution, blocks_slots, scores_advisory, score_delta]
     slot_usage:
-      operation: {required: true}
-      match_direction: {required: true}
-      aggregation: {required: true}
+      operation: {required: true, range: ConstraintExecutionOperation}
+      match_direction: {required: true, range: ConstraintExecutionMatchDirection}
+      aggregation: {required: true, range: ConstraintExecutionAggregation}
       selector_resolution: {required: true}
       blocks_slots: {required: true}
       scores_advisory: {required: true}
       score_delta: {required: true}
-  RuntimeCapabilityRule:
-    slots: [id, planner, food_model, base_slot_models, slot_models, product_scope, formulations, near_to_model]
-    slot_usage:
-      planner: {required: true}
-      food_model: {required: true}
-      base_slot_models: {required: true}
-      slot_models: {required: true}
-      product_scope: {required: true}
-      formulations: {required: true}
-      near_to_model: {required: true, inlined: true, inlined_as_list: true}
-  RuntimeCapabilityNearModel:
-    slots: [id, near, model]
-    slot_usage:
-      near: {required: true}
-      model: {required: true}
   RuntimeWarningTypePolicy:
     slots: [id, warning_type, label, action_text]
     slot_usage: {warning_type: {required: true}, label: {required: true}, action_text: {required: true}}
@@ -193,69 +153,76 @@ classes:
   RuntimeWarningTraitActionPolicy:
     slots: [id, trait_id, action_text]
     slot_usage: {trait_id: {required: true}, action_text: {required: true}}
-  RuntimeConcernWarningRule:
+  RuntimeConcernCatalogEntry:
     slots: [id, concern_kind, warning_type]
     slot_usage:
       concern_kind: {required: true, range: ConcernKind}
       warning_type: {required: true}
-  RuntimeNonWarningConcernKindPolicy:
-    slots: [id, concern_kind, review_surface, description]
-    slot_usage:
-      concern_kind: {required: true, range: ConcernKind}
-      review_surface: {required: true}
-      description: {required: true}
-  RuntimeConcernReviewStatusPolicy:
-    slots: [id, status, rank, membership_role, description]
-    slot_usage:
-      status: {required: true}
-      rank: {required: true}
-      membership_role: {required: true}
-      description: {required: true}
   RuntimeRelationWarningRule:
-    slots: [id, relation_kind, warning_type, review_status, filter_field, filter_value, active_side, reverse_output]
+    slots: [id, relation_kind, warning_type, filter_field, filter_value, active_side, reverse_output]
     slot_usage:
       relation_kind: {required: true}
       warning_type: {required: true}
-      review_status: {required: true}
       filter_field: {required: true, range: RelationWarningFilterField}
       filter_value: {required: true}
       active_side: {required: true, range: RelationWarningActiveSide}
       reverse_output: {required: false}
-  RuntimeRelationReviewStatusPolicy:
-    slots: [id, status, rank, description]
-    slot_usage:
-      status: {required: true}
-      rank: {required: true}
-      description: {required: true}
   RuntimeRelationPresenceStatusPolicy:
-    slots: [id, status, source_active, target_active, active_side, default_review_status, description]
+    slots: [id, status, source_active, target_active, description]
     slot_usage:
       status: {required: true}
       source_active: {required: true}
       target_active: {required: true}
-      active_side: {required: true}
-      default_review_status: {required: true}
       description: {required: true}
   RuntimeRelationPresenceTruthState:
     slots: [source_active, target_active]
     slot_usage:
       source_active: {required: true}
       target_active: {required: true}
-  RuntimeRelationEndpointPolicy:
-    slots: [id, selector_kind, broad_endpoint, show_match_details, audit_member_limit, label]
+  RuntimeSelectorFormCapability:
+    slots: [id, selector_form, endpoint_kind, show_match_details]
     slot_usage:
-      selector_kind: {required: true}
-      broad_endpoint: {required: true}
+      selector_form: {required: true}
+      endpoint_kind: {required: true}
       show_match_details: {required: true}
-      audit_member_limit: {required: true}
+  RuntimeDashboardStateCatalog:
+    slots: [usage_states, product_tracking_states, usage_truth_table, product_tracking_truth_table]
+    slot_usage:
+      usage_states: {required: true, inlined: true, inlined_as_list: true}
+      product_tracking_states: {required: true, inlined: true, inlined_as_list: true}
+      usage_truth_table: {required: true, inlined: true, inlined_as_list: true}
+      product_tracking_truth_table: {required: true, inlined: true, inlined_as_list: true}
+  RuntimeDashboardUsageStateDefinition:
+    slots: [id, state, label, order]
+    slot_usage:
+      state: {required: true}
       label: {required: true}
+      order: {required: true}
+  RuntimeDashboardProductTrackingStateDefinition:
+    slots: [id, state, label, order]
+    slot_usage:
+      state: {required: true}
+      label: {required: true}
+      order: {required: true}
+  RuntimeDashboardUsageTruthState:
+    slots: [id, active_stack_membership, inactive_stack_membership, tracked_product_presence, state]
+    slot_usage:
+      active_stack_membership: {required: true}
+      inactive_stack_membership: {required: true}
+      tracked_product_presence: {required: true}
+      state: {required: true}
+  RuntimeDashboardProductTrackingTruthState:
+    slots: [id, tracked_product_presence, state]
+    slot_usage:
+      tracked_product_presence: {required: true}
+      state: {required: true}
 
 slots:
   id: {identifier: true, required: true}
   operator: {required: true}
-  operation:
-  match_direction: {range: AdvisoryMatchDirection}
-  aggregation:
+  operation: {range: ConstraintExecutionOperation}
+  match_direction: {range: ConstraintExecutionMatchDirection}
+  aggregation: {range: ConstraintExecutionAggregation}
   selector_resolution:
   blocks_slots: {range: boolean}
   scores_advisory: {range: boolean}
@@ -270,108 +237,68 @@ slots:
   weight: {range: decimal}
   trace_key:
   condition: {range: Condition, inlined: true}
-  action: {range: Action, inlined: true}
-  emit_table: {range: boolean}
   key:
   slot_field:
-  review_surface:
   rank: {range: integer}
   result:
   source_kind:
   applies_to: {multivalued: true}
+  minimum_cardinality: {range: integer}
+  maximum_cardinality: {range: integer}
   source_kind_values: {multivalued: true, range: RuntimeSourceKindValuePolicy, inlined: true, inlined_as_list: true}
-  scope_dimensions: {multivalued: true, range: RuntimeScopeDimensionPolicy, inlined: true, inlined_as_list: true}
   constraint_execution_policies: {multivalued: true, range: RuntimeConstraintExecutionPolicy, inlined: true, inlined_as_list: true}
   effect_scoring: {range: RuntimeEffectScoringPolicy, inlined: true}
+  objective_function:
+  balance_penalty_expression:
+  tie_break:
   prefer_with_policy: {range: RuntimePreferWithPolicy, inlined: true}
-  capability_rules: {multivalued: true, range: RuntimeCapabilityRule, inlined: true, inlined_as_list: true}
   effect_match_dimensions: {multivalued: true, range: RuntimeEffectMatchDimensionPolicy, inlined: true, inlined_as_list: true}
   warning_types: {multivalued: true, range: RuntimeWarningTypePolicy, inlined: true, inlined_as_list: true}
   warning_emitters: {multivalued: true, range: RuntimeWarningEmitterPolicy, inlined: true, inlined_as_list: true}
   warning_trait_actions: {multivalued: true, range: RuntimeWarningTraitActionPolicy, inlined: true, inlined_as_list: true}
-  concern_warning_rules: {multivalued: true, range: RuntimeConcernWarningRule, inlined: true, inlined_as_list: true}
-  non_warning_concern_kinds: {multivalued: true, range: RuntimeNonWarningConcernKindPolicy, inlined: true, inlined_as_list: true}
-  concern_review_statuses: {multivalued: true, range: RuntimeConcernReviewStatusPolicy, inlined: true, inlined_as_list: true}
+  concern_catalog: {multivalued: true, range: RuntimeConcernCatalogEntry, inlined: true, inlined_as_list: true}
   relation_warning_rules: {multivalued: true, range: RuntimeRelationWarningRule, inlined: true, inlined_as_list: true}
-  relation_review_statuses: {multivalued: true, range: RuntimeRelationReviewStatusPolicy, inlined: true, inlined_as_list: true}
   relation_presence_statuses: {multivalued: true, range: RuntimeRelationPresenceStatusPolicy, inlined: true, inlined_as_list: true}
-  relation_endpoint_policies: {multivalued: true, range: RuntimeRelationEndpointPolicy, inlined: true, inlined_as_list: true}
+  selector_form_capabilities: {multivalued: true, range: RuntimeSelectorFormCapability, inlined: true, inlined_as_list: true}
+  dashboard_state_catalog: {range: RuntimeDashboardStateCatalog, inlined: true}
   runtime_projection: {multivalued: true, range: RuntimeProjectionDescriptor, inlined: true, inlined_as_list: true}
-  fact_fields: {multivalued: true, range: RuntimeFactFieldPolicy, inlined: true, inlined_as_list: true}
   assignment_axes: {multivalued: true, range: RuntimeAssignmentAxisPolicy, inlined: true, inlined_as_list: true}
-  assignment_actions: {multivalued: true, range: RuntimeAssignmentActionPolicy, inlined: true, inlined_as_list: true}
-  scope_rules: {multivalued: true, range: RuntimeScopeRulePolicy, inlined: true, inlined_as_list: true}
-  protocol: {range: RuntimeProtocolInventory, inlined: true}
   glue_contract: {range: RuntimeGlueContract, inlined: true}
   inactive_stack_name:
-  condition_classes: {multivalued: true}
-  action_classes: {multivalued: true}
-  policy_class:
   source_kinds: {multivalued: true}
   source_kind_roles: {multivalued: true}
-  scope_fact_adapters: {multivalued: true}
   relation_warning_filter_fields: {multivalued: true, range: RelationWarningFilterField}
   relation_warning_active_sides: {multivalued: true, range: RelationWarningActiveSide}
   relation_presence_active_sides: {multivalued: true}
   relation_presence_truth_table: {multivalued: true, range: RuntimeRelationPresenceTruthState}
-  relation_review_status_ids: {multivalued: true}
   relation_endpoint_selector_kinds: {multivalued: true}
-  concern_membership_roles: {multivalued: true}
-  active_concern_role:
-  inactive_concern_role:
-  product_concern_fallback_role:
-  substance_concern_fallback_role:
+  relation_selector_forms: {multivalued: true}
   warning_emitter_ids: {multivalued: true}
   prefer_with_source_fields: {multivalued: true}
   prefer_with_target_resolutions: {multivalued: true}
   prefer_with_pair_modes: {multivalued: true}
   target:
   source:
-  kind:
   children: {multivalued: true, range: RuntimeProjectionDescriptor, inlined: true, inlined_as_list: true}
   executable: {range: boolean}
   assignment_source:
   assignment_field:
-  assignment_action:
-  shadowed: {range: boolean}
   order: {range: integer}
   scores: {multivalued: true, range: RuntimeEffectScore, inlined: true, inlined_as_list: true}
   level:
   score: {range: integer}
   balance_weight: {range: decimal}
   prefer_with_bonus: {range: integer}
-  advisory_constraint_score_delta: {range: integer}
-  advisory_match_direction: {range: AdvisoryMatchDirection}
   source_field:
   target_resolution:
   pair_mode:
   value_type:
-  slot_models: {multivalued: true}
-  base_slot_models: {multivalued: true}
-  product_scope: {multivalued: true}
-  formulations: {multivalued: true}
-  planner:
-  food_model:
-  near_to_model: {multivalued: true, range: RuntimeCapabilityNearModel, inlined: true, inlined_as_list: true}
-  outcome:
-  direct_product:
-  formulation:
-  scope_action:
-  axis:
-  rule_ids: {multivalued: true}
-  default_outcome:
-  priority: {range: integer}
-  action_code:
-  reason_code:
-  fact_adapter:
-  capability_field:
+  slot_near_values: {multivalued: true}
   near:
   model:
   warning_type:
-  review_status:
   emitter:
   default_message:
-  membership_role:
   label:
   trait_id:
   action_text:
@@ -383,8 +310,15 @@ slots:
   status:
   source_active: {range: boolean}
   target_active: {range: boolean}
-  default_review_status:
   selector_kind:
-  broad_endpoint: {range: boolean}
+  selector_form:
+  endpoint_kind:
   show_match_details: {range: boolean}
-  audit_member_limit: {range: integer}
+  usage_states: {multivalued: true, range: RuntimeDashboardUsageStateDefinition, inlined: true, inlined_as_list: true}
+  product_tracking_states: {multivalued: true, range: RuntimeDashboardProductTrackingStateDefinition, inlined: true, inlined_as_list: true}
+  usage_truth_table: {multivalued: true, range: RuntimeDashboardUsageTruthState, inlined: true, inlined_as_list: true}
+  product_tracking_truth_table: {multivalued: true, range: RuntimeDashboardProductTrackingTruthState, inlined: true, inlined_as_list: true}
+  state:
+  active_stack_membership: {range: boolean}
+  inactive_stack_membership: {range: boolean}
+  tracked_product_presence: {range: boolean}

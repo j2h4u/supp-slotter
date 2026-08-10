@@ -37,6 +37,7 @@
 
 daily:
   label: Daily
+  stack: daily
   slots:
     morning_empty:
       label: Morning / empty stomach
@@ -60,6 +61,7 @@ daily:
       food: false
 training:
   label: Training
+  stack: training
   slots:
     pre_workout:
       label: Pre-workout

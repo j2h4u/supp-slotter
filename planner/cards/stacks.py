@@ -23,7 +23,12 @@ def check_stack_alignment(
     info: list[str] = []
     referenced_products: set[str] = set()
 
-    for entry in normalize_stack_entries(stacks_data).values():
+    try:
+        normalized_entries = normalize_stack_entries(stacks_data)
+    except ValueError as e:
+        return [f"{stacks_file}: {e}"], info
+
+    for entry in normalized_entries.values():
         product_ref = entry.get("product")
         if not isinstance(product_ref, str):
             continue
@@ -49,29 +54,13 @@ def check_stack_alignment(
     return errors, info
 
 
-def check_stack_duplicate_items(stacks_data: Mapping[str, object], stacks_file: Path) -> list[str]:
-    errors: list[str] = []
-    seen: dict[str, str] = {}
-
-    for stack, items in stacks_data.items():
-        if not isinstance(items, list):
-            continue
-        items_list = items
-        for item_id in items_list:
-            if not isinstance(item_id, str):
-                continue
-            previous_stack = seen.get(item_id)
-            if previous_stack is not None:
-                errors.append(
-                    f"{stacks_file}: stack item '{item_id}' appears in multiple stacks: {previous_stack}, {stack}"
-                )
-            else:
-                seen[item_id] = stack
-    return errors
-
-
 def normalize_stack_entries(stacks_data: Mapping[str, object]) -> dict[str, StackEntry]:
-    """Return a flat dict mapping item_id → {product, stack} for all stack items regardless of active/inactive status."""
+    """Return stack entries, rejecting product IDs assigned to multiple stacks.
+
+    The previous mapping projection let later YAML keys overwrite earlier
+    assignments.  That made downstream dashboard and scheduling state depend
+    on source order, so normalization is deliberately fail-closed.
+    """
     normalized: dict[str, StackEntry] = {}
 
     for stack, items in stacks_data.items():
@@ -82,6 +71,12 @@ def normalize_stack_entries(stacks_data: Mapping[str, object]) -> dict[str, Stac
             if not isinstance(entry, str):
                 continue
             product_id = entry
+            previous = normalized.get(product_id)
+            if previous is not None:
+                previous_stack = previous["stack"]
+                if previous_stack != stack:
+                    raise ValueError(f"stack item '{product_id}' appears in multiple stacks: {previous_stack}, {stack}")
+                raise ValueError(f"stack item '{product_id}' appears more than once in stack '{stack}'")
             normalized[product_id] = {"product": product_id, "stack": stack}
     return normalized
 
@@ -102,7 +97,6 @@ def validate_stacks(
     if not isinstance(stacks_data, dict):
         return [f"{stacks_path}: top-level must be a mapping"], []
     errors = schema_errors(stacks_data, "stacks", stacks_path, bundle)
-    errors.extend(check_stack_duplicate_items(stacks_data, stacks_path))
     alignment_errors, alignment_info = check_stack_alignment(
         stacks_data,
         product_ids,

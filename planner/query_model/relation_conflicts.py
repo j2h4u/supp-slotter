@@ -9,6 +9,7 @@ from planner.ontology.glue_capabilities import WARNING_EMITTER_INTRA_PRODUCT_CON
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.warning_policy import warning_policy_for_emitter
 from planner.query_model.session import SurrealSession
+from planner.scheduling_constraint_execution import interpret_execution_component_pair
 
 
 class RelationConflictWarningRow(TypedDict):
@@ -53,23 +54,36 @@ def collect_intra_product_scheduling_constraint_conflicts(
             for matching_row in _matching_rows_for_pair(rows, source_id, target_id):
                 constraint_id = matching_row.get("id")
                 if not isinstance(constraint_id, str):
-                    continue
+                    raise OntologyInfrastructureError(
+                        f"scheduling constraint execution row has invalid id: {constraint_id!r}",
+                        code=MALFORMED,
+                    )
                 identity = (constraint_id, pair_key)
                 if identity in seen_pairs:
                     continue
                 seen_pairs.add(identity)
                 action = matching_row.get("action")
                 operation = matching_row.get("operation")
+                if not isinstance(operation, str):
+                    raise OntologyInfrastructureError(
+                        f"scheduling constraint {constraint_id}: execution row has malformed operation",
+                        code=MALFORMED,
+                    )
+                if action is not None and not isinstance(action, str):
+                    raise OntologyInfrastructureError(
+                        f"scheduling constraint {constraint_id}: execution row has malformed action",
+                        code=MALFORMED,
+                    )
                 conflicts.append({
                     "constraint_id": constraint_id,
                     "type": warning_type,
                     "item": item_id,
                     "product": product_id,
-                    "relation": operation if isinstance(operation, str) else "",
+                    "relation": operation,
                     "source_substance": source_id,
                     "target_substance": target_id,
                     "message": warning_policy.default_message,
-                    "action": action if isinstance(action, str) else "",
+                    "action": action or "",
                 })
     return sorted(conflicts, key=lambda row: (row["constraint_id"], row["source_substance"], row["target_substance"]))
 
@@ -81,25 +95,64 @@ def _matching_rows_for_pair(
 ) -> list[dict[str, object]]:
     matches: list[dict[str, object]] = []
     for row in sorted(rows, key=lambda item: str(item.get("id", ""))):
-        src_ids: set[str] = set(cast("list[str]", row.get("source_substances") or []))
-        tgt_ids: set[str] = set(cast("list[str]", row.get("target_substances") or []))
-        if not src_ids or not tgt_ids:
+        raw_source_ids = row.get("source_substances")
+        raw_target_ids = row.get("target_substances")
+        if raw_source_ids == [] or raw_target_ids == []:
             continue
-        # Keep parity with the planner matcher and fail closed for a malformed
-        # execution-plan row that bypassed runtime ontology validation.
-        if row.get("aggregation") != "distinct_constraint":
-            raise OntologyInfrastructureError(
-                f"scheduling constraint {row.get('id', '')}: unsupported aggregation {row.get('aggregation')!r}",
-                code=MALFORMED,
-            )
-        direction = row.get("match_direction")
-        if direction not in {"directed", "symmetric"}:
-            raise OntologyInfrastructureError(
-                f"scheduling constraint {row.get('id', '')}: unsupported match direction {direction!r}",
-                code=MALFORMED,
-            )
-        forward = source_id in src_ids and target_id in tgt_ids
-        reverse = target_id in src_ids and source_id in tgt_ids
-        if (direction == "directed" and forward) or (direction == "symmetric" and (forward or reverse)):
+        if _constraint_matches_pair(row, source_id, target_id):
             matches.append(row)
     return matches
+
+
+def _constraint_matches_pair(row: dict[str, object], source_id: str, target_id: str) -> bool:
+    """Delegate execution-grammar interpretation to the scheduler's one seam."""
+    constraint_id = row.get("id")
+    operation = row.get("operation")
+    direction = row.get("match_direction")
+    aggregation = row.get("aggregation")
+    source_ids = row.get("source_substances")
+    target_ids = row.get("target_substances")
+    if not isinstance(constraint_id, str) or not constraint_id.strip():
+        raise OntologyInfrastructureError(
+            f"scheduling constraint execution row has invalid source id: {constraint_id!r}",
+            code=MALFORMED,
+        )
+    if not isinstance(operation, str) or not operation.strip():
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: execution row has invalid operation: {operation!r}",
+            code=MALFORMED,
+        )
+    if not isinstance(direction, str) or not direction.strip():
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: execution row has invalid match_direction: {direction!r}",
+            code=MALFORMED,
+        )
+    if not isinstance(aggregation, str) or not aggregation.strip():
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: execution row has invalid aggregation: {aggregation!r}",
+            code=MALFORMED,
+        )
+    source_ids_list = cast(list[object], source_ids) if isinstance(source_ids, list) else None
+    target_ids_list = cast(list[object], target_ids) if isinstance(target_ids, list) else None
+    if source_ids_list is None or not all(isinstance(item, str) for item in source_ids_list):
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: execution row has malformed source_substances",
+            code=MALFORMED,
+        )
+    if target_ids_list is None or not all(isinstance(item, str) for item in target_ids_list):
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: execution row has malformed target_substances",
+            code=MALFORMED,
+        )
+    return interpret_execution_component_pair(
+        {
+            "id": constraint_id,
+            "operation": operation,
+            "match_direction": direction,
+            "aggregation": aggregation,
+            "source_substances": cast(list[str], source_ids_list),
+            "target_substances": cast(list[str], target_ids_list),
+        },
+        (source_id,),
+        (target_id,),
+    )

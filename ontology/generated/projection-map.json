@@ -82,8 +82,8 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "value",
-          "range": "SlotFeatureValue",
-          "required": true
+          "range": "string",
+          "required": false
         },
         {
           "inlined": false,
@@ -97,34 +97,156 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Action"
     },
     {
-      "name": "AxisValueBinding",
+      "name": "CardConcern",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": false,
+          "name": "kind",
+          "range": "ConcernKind",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "text",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/CardConcern"
+    },
+    {
+      "name": "CardKnowledge",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "context",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "effect",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "kind",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "pathway",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "quality",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "risk",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "role",
+          "range": "string",
+          "required": false
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/CardKnowledge"
+    },
+    {
+      "name": "CardSchedule",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "activity",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "intake",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "prefer_with",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "timing",
+          "range": "string",
+          "required": false
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/CardSchedule"
+    },
+    {
+      "name": "Catalog",
       "slots": [
         {
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "axis",
-          "range": "PolicyAxis",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
+          "name": "catalog_path",
           "range": "string",
-          "required": true
+          "required": false
         },
         {
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "value",
-          "range": "SlotFeatureValue",
-          "required": true
+          "name": "catalog_role",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "catalog_root_class",
+          "range": "string",
+          "required": false
         }
       ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/AxisValueBinding"
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Catalog"
     },
     {
       "name": "Concern",
@@ -204,7 +326,7 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "value",
-          "range": "SlotFeatureValue",
+          "range": "string",
           "required": false
         },
         {
@@ -243,7 +365,7 @@
           "multivalued": false,
           "name": "description",
           "range": "string",
-          "required": false
+          "required": true
         },
         {
           "inlined": false,
@@ -275,7 +397,7 @@
           "multivalued": true,
           "name": "selectors",
           "range": "DashboardSelector",
-          "required": false
+          "required": true
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Dashboard"
@@ -289,7 +411,7 @@
           "multivalued": false,
           "name": "category",
           "range": "string",
-          "required": false
+          "required": true
         },
         {
           "inlined": false,
@@ -297,7 +419,7 @@
           "multivalued": false,
           "name": "selector_term",
           "range": "string",
-          "required": false
+          "required": true
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/DashboardSelector"
@@ -377,15 +499,29 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/KnowledgeAssertion"
     },
     {
-      "name": "ObjectiveTerm",
+      "name": "OntoCleanCatalog",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "ontoclean_profiles",
+          "range": "OntoCleanProfile",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/OntoCleanCatalog"
+    },
+    {
+      "name": "OntoCleanProfile",
       "slots": [
         {
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "expression",
-          "range": "string",
-          "required": false
+          "name": "dependence",
+          "range": "OntoCleanDependence",
+          "required": true
         },
         {
           "inlined": false,
@@ -399,28 +535,34 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "key",
-          "range": "string",
+          "name": "rigidity",
+          "range": "OntoCleanRigidity",
           "required": true
         },
         {
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "rationale",
-          "range": "string",
-          "required": false
-        },
+          "name": "supplies_identity",
+          "range": "boolean",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/OntoCleanProfile"
+    },
+    {
+      "name": "Ontology",
+      "slots": [
         {
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "weight",
-          "range": "decimal",
+          "name": "schema_version",
+          "range": "string",
           "required": false
         }
       ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/ObjectiveTerm"
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Ontology"
     },
     {
       "name": "OntologyTerm",
@@ -431,7 +573,7 @@
           "multivalued": false,
           "name": "description",
           "range": "string",
-          "required": false
+          "required": true
         },
         {
           "inlined": false,
@@ -447,6 +589,14 @@
           "multivalued": false,
           "name": "label",
           "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "ontoclean_profile",
+          "range": "OntoCleanProfile",
           "required": true
         },
         {
@@ -484,6 +634,14 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "id",
+          "range": "RelationType",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "label",
           "range": "string",
           "required": true
         },
@@ -547,126 +705,18 @@
           "multivalued": true,
           "name": "slots",
           "range": "Slot",
-          "required": false
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "stack",
+          "range": "Stack",
+          "required": true
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Pillbox"
-    },
-    {
-      "name": "PolicyAxis",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "description",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "features",
-          "range": "SlotFeature",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "key",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "label",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "schedule_rule",
-          "range": "OntologyTerm",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "value_bindings",
-          "range": "AxisValueBinding",
-          "required": false
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/PolicyAxis"
-    },
-    {
-      "name": "PolicyEffect",
-      "slots": [
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "action",
-          "range": "Action",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "condition",
-          "range": "Condition",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "key",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "rationale",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "weight",
-          "range": "decimal",
-          "required": false
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/PolicyEffect"
     },
     {
       "name": "Product",
@@ -739,6 +789,68 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Product"
     },
     {
+      "name": "ProductCard",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "brand",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "components",
+          "range": "ProductComponent",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "concerns",
+          "range": "CardConcern",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "name",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "notes",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "urls",
+          "range": "string",
+          "required": false
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/ProductCard"
+    },
+    {
       "name": "ProductComponent",
       "slots": [
         {
@@ -769,14 +881,6 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "primary",
-          "range": "boolean",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
           "name": "substance",
           "range": "Substance",
           "required": true
@@ -785,36 +889,58 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/ProductComponent"
     },
     {
-      "name": "RelationCatalog",
+      "name": "RelationAssertionCatalog",
       "slots": [
         {
           "inlined": true,
           "inlined_as_list": true,
           "multivalued": true,
-          "name": "relation_types",
-          "range": "OperationalRelationType",
+          "name": "relations",
+          "range": "RelationAssertionRecord",
           "required": true
         }
       ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RelationCatalog"
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RelationAssertionCatalog"
     },
     {
-      "name": "RuntimeAssignmentActionPolicy",
+      "name": "RelationAssertionEntitySelector",
       "slots": [
         {
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "assignment_action",
-          "range": "string",
-          "required": true
+          "name": "entity_id",
+          "range": "Substance",
+          "required": false
         },
         {
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "executable",
-          "range": "boolean",
+          "name": "name",
+          "range": "string",
+          "required": false
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RelationAssertionEntitySelector"
+    },
+    {
+      "name": "RelationAssertionRecord",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "action",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "assertion_kind",
+          "range": "string",
           "required": true
         },
         {
@@ -829,12 +955,96 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "shadowed",
-          "range": "boolean",
+          "name": "reason",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "relation_type",
+          "range": "RelationType",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "semantic_family",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "severity",
+          "range": "Severity",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "source_selector",
+          "range": "RelationAssertionSelector",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "target_selector",
+          "range": "RelationAssertionSelector",
           "required": true
         }
       ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAssignmentActionPolicy"
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RelationAssertionRecord"
+    },
+    {
+      "name": "RelationAssertionSelector",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "category",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "entity",
+          "range": "RelationAssertionEntitySelector",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "term",
+          "range": "string",
+          "required": false
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RelationAssertionSelector"
+    },
+    {
+      "name": "RelationCatalog",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "relation_types",
+          "range": "OperationalRelationType",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RelationCatalog"
     },
     {
       "name": "RuntimeAssignmentAxisPolicy",
@@ -860,7 +1070,7 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "axis",
-          "range": "PolicyAxis",
+          "range": "string",
           "required": true
         },
         {
@@ -869,6 +1079,22 @@
           "multivalued": false,
           "name": "id",
           "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "maximum_cardinality",
+          "range": "integer",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "minimum_cardinality",
+          "range": "integer",
           "required": true
         },
         {
@@ -883,153 +1109,7 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAssignmentAxisPolicy"
     },
     {
-      "name": "RuntimeCapabilityNearModel",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "model",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "near",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeCapabilityNearModel"
-    },
-    {
-      "name": "RuntimeCapabilityRule",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "base_slot_models",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "food_model",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "formulations",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "near_to_model",
-          "range": "RuntimeCapabilityNearModel",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "planner",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "product_scope",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "slot_models",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeCapabilityRule"
-    },
-    {
-      "name": "RuntimeConcernReviewStatusPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "description",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "membership_role",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "rank",
-          "range": "integer",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "status",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConcernReviewStatusPolicy"
-    },
-    {
-      "name": "RuntimeConcernWarningRule",
+      "name": "RuntimeConcernCatalogEntry",
       "slots": [
         {
           "inlined": false,
@@ -1056,7 +1136,7 @@
           "required": true
         }
       ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConcernWarningRule"
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConcernCatalogEntry"
     },
     {
       "name": "RuntimeConstraintExecutionPolicy",
@@ -1066,7 +1146,7 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "aggregation",
-          "range": "string",
+          "range": "ConstraintExecutionAggregation",
           "required": true
         },
         {
@@ -1090,7 +1170,7 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "match_direction",
-          "range": "AdvisoryMatchDirection",
+          "range": "ConstraintExecutionMatchDirection",
           "required": true
         },
         {
@@ -1098,7 +1178,7 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "operation",
-          "range": "string",
+          "range": "ConstraintExecutionOperation",
           "required": true
         },
         {
@@ -1127,6 +1207,196 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintExecutionPolicy"
+    },
+    {
+      "name": "RuntimeDashboardProductTrackingStateDefinition",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "label",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "order",
+          "range": "integer",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "state",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDashboardProductTrackingStateDefinition"
+    },
+    {
+      "name": "RuntimeDashboardProductTrackingTruthState",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "state",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "tracked_product_presence",
+          "range": "boolean",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDashboardProductTrackingTruthState"
+    },
+    {
+      "name": "RuntimeDashboardStateCatalog",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "product_tracking_states",
+          "range": "RuntimeDashboardProductTrackingStateDefinition",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "product_tracking_truth_table",
+          "range": "RuntimeDashboardProductTrackingTruthState",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "usage_states",
+          "range": "RuntimeDashboardUsageStateDefinition",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "usage_truth_table",
+          "range": "RuntimeDashboardUsageTruthState",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDashboardStateCatalog"
+    },
+    {
+      "name": "RuntimeDashboardUsageStateDefinition",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "label",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "order",
+          "range": "integer",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "state",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDashboardUsageStateDefinition"
+    },
+    {
+      "name": "RuntimeDashboardUsageTruthState",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "active_stack_membership",
+          "range": "boolean",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "inactive_stack_membership",
+          "range": "boolean",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "state",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "tracked_product_presence",
+          "range": "boolean",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDashboardUsageTruthState"
     },
     {
       "name": "RuntimeEffectMatchDimensionPolicy",
@@ -1203,16 +1473,8 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "advisory_constraint_score_delta",
-          "range": "integer",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "advisory_match_direction",
-          "range": "AdvisoryMatchDirection",
+          "name": "balance_penalty_expression",
+          "range": "string",
           "required": true
         },
         {
@@ -1235,6 +1497,14 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
+          "name": "objective_function",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
           "name": "prefer_with_bonus",
           "range": "integer",
           "required": true
@@ -1246,39 +1516,17 @@
           "name": "scores",
           "range": "RuntimeEffectScore",
           "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectScoringPolicy"
-    },
-    {
-      "name": "RuntimeFactFieldPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "field",
-          "range": "string",
-          "required": true
         },
         {
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "value_type",
+          "name": "tie_break",
           "range": "string",
           "required": true
         }
       ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeFactFieldPolicy"
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectScoringPolicy"
     },
     {
       "name": "RuntimeGlueContract",
@@ -1287,31 +1535,7 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "active_concern_role",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "concern_membership_roles",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
           "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "inactive_concern_role",
           "range": "string",
           "required": true
         },
@@ -1350,14 +1574,6 @@
         {
           "inlined": false,
           "inlined_as_list": false,
-          "multivalued": false,
-          "name": "product_concern_fallback_role",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
           "multivalued": true,
           "name": "relation_endpoint_selector_kinds",
           "range": "string",
@@ -1383,7 +1599,7 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": true,
-          "name": "relation_review_status_ids",
+          "name": "relation_selector_forms",
           "range": "string",
           "required": true
         },
@@ -1407,14 +1623,6 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": true,
-          "name": "scope_fact_adapters",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
           "name": "source_kind_roles",
           "range": "string",
           "required": true
@@ -1430,14 +1638,6 @@
         {
           "inlined": false,
           "inlined_as_list": false,
-          "multivalued": false,
-          "name": "substance_concern_fallback_role",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
           "multivalued": true,
           "name": "warning_emitter_ids",
           "range": "string",
@@ -1447,54 +1647,8 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGlueContract"
     },
     {
-      "name": "RuntimeNonWarningConcernKindPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "concern_kind",
-          "range": "ConcernKind",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "description",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "review_surface",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeNonWarningConcernKindPolicy"
-    },
-    {
       "name": "RuntimePolicyCatalog",
       "slots": [
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "assignment_actions",
-          "range": "RuntimeAssignmentActionPolicy",
-          "required": true
-        },
         {
           "inlined": true,
           "inlined_as_list": true,
@@ -1507,24 +1661,8 @@
           "inlined": true,
           "inlined_as_list": true,
           "multivalued": true,
-          "name": "capability_rules",
-          "range": "RuntimeCapabilityRule",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "concern_review_statuses",
-          "range": "RuntimeConcernReviewStatusPolicy",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "concern_warning_rules",
-          "range": "RuntimeConcernWarningRule",
+          "name": "concern_catalog",
+          "range": "RuntimeConcernCatalogEntry",
           "required": true
         },
         {
@@ -1533,6 +1671,14 @@
           "multivalued": true,
           "name": "constraint_execution_policies",
           "range": "RuntimeConstraintExecutionPolicy",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "dashboard_state_catalog",
+          "range": "RuntimeDashboardStateCatalog",
           "required": true
         },
         {
@@ -1553,14 +1699,6 @@
         },
         {
           "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "fact_fields",
-          "range": "RuntimeFactFieldPolicy",
-          "required": true
-        },
-        {
-          "inlined": true,
           "inlined_as_list": false,
           "multivalued": false,
           "name": "glue_contract",
@@ -1577,14 +1715,6 @@
         },
         {
           "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "non_warning_concern_kinds",
-          "range": "RuntimeNonWarningConcernKindPolicy",
-          "required": true
-        },
-        {
-          "inlined": true,
           "inlined_as_list": false,
           "multivalued": false,
           "name": "prefer_with_policy",
@@ -1593,34 +1723,10 @@
         },
         {
           "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "protocol",
-          "range": "RuntimeProtocolInventory",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "relation_endpoint_policies",
-          "range": "RuntimeRelationEndpointPolicy",
-          "required": true
-        },
-        {
-          "inlined": true,
           "inlined_as_list": true,
           "multivalued": true,
           "name": "relation_presence_statuses",
           "range": "RuntimeRelationPresenceStatusPolicy",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "relation_review_statuses",
-          "range": "RuntimeRelationReviewStatusPolicy",
           "required": true
         },
         {
@@ -1643,16 +1749,16 @@
           "inlined": true,
           "inlined_as_list": true,
           "multivalued": true,
-          "name": "scope_dimensions",
-          "range": "RuntimeScopeDimensionPolicy",
+          "name": "selector_form_capabilities",
+          "range": "RuntimeSelectorFormCapability",
           "required": true
         },
         {
-          "inlined": true,
-          "inlined_as_list": true,
+          "inlined": false,
+          "inlined_as_list": false,
           "multivalued": true,
-          "name": "scope_rules",
-          "range": "RuntimeScopeRulePolicy",
+          "name": "slot_near_values",
+          "range": "string",
           "required": true
         },
         {
@@ -1743,25 +1849,9 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "emit_table",
-          "range": "boolean",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
           "name": "id",
           "range": "string",
           "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "kind",
-          "range": "string",
-          "required": false
         },
         {
           "inlined": false,
@@ -1783,108 +1873,8 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProjectionDescriptor"
     },
     {
-      "name": "RuntimeProtocolInventory",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "action_classes",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "condition_classes",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "policy_class",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProtocolInventory"
-    },
-    {
-      "name": "RuntimeRelationEndpointPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "audit_member_limit",
-          "range": "integer",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "broad_endpoint",
-          "range": "boolean",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "label",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "selector_kind",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "show_match_details",
-          "range": "boolean",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationEndpointPolicy"
-    },
-    {
       "name": "RuntimeRelationPresenceStatusPolicy",
       "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "active_side",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "default_review_status",
-          "range": "string",
-          "required": true
-        },
         {
           "inlined": false,
           "inlined_as_list": false,
@@ -1951,44 +1941,6 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceTruthState"
     },
     {
-      "name": "RuntimeRelationReviewStatusPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "description",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "rank",
-          "range": "integer",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "status",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationReviewStatusPolicy"
-    },
-    {
       "name": "RuntimeRelationWarningRule",
       "slots": [
         {
@@ -2043,14 +1995,6 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "review_status",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
           "name": "warning_type",
           "range": "string",
           "required": true
@@ -2059,29 +2003,13 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationWarningRule"
     },
     {
-      "name": "RuntimeScopeDimensionPolicy",
+      "name": "RuntimeSelectorFormCapability",
       "slots": [
         {
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "capability_field",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "default_outcome",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "fact_adapter",
+          "name": "endpoint_kind",
           "range": "string",
           "required": true
         },
@@ -2097,66 +2025,20 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "key",
+          "name": "selector_form",
           "range": "string",
           "required": true
         },
         {
           "inlined": false,
           "inlined_as_list": false,
-          "multivalued": true,
-          "name": "rule_ids",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "values",
-          "range": "string",
+          "multivalued": false,
+          "name": "show_match_details",
+          "range": "boolean",
           "required": true
         }
       ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeDimensionPolicy"
-    },
-    {
-      "name": "RuntimeScopeRulePolicy",
-      "slots": [
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "conditions",
-          "range": "Condition",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "outcome",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "priority",
-          "range": "integer",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeScopeRulePolicy"
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSelectorFormCapability"
     },
     {
       "name": "RuntimeSourceKindValuePolicy",
@@ -2166,14 +2048,6 @@
           "inlined_as_list": false,
           "multivalued": true,
           "name": "applies_to",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "description",
           "range": "string",
           "required": true
         },
@@ -2325,21 +2199,57 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/ScheduleAssertion"
     },
     {
-      "name": "ScheduleAssignment",
+      "name": "SchedulePresentationActiveFactIndex",
       "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "include_namespaces",
+          "range": "string",
+          "required": false
+        },
         {
           "inlined": true,
           "inlined_as_list": true,
           "multivalued": true,
-          "name": "bindings",
-          "range": "AxisValueBinding",
-          "required": false
+          "name": "labels",
+          "range": "SchedulePresentationLabel",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationActiveFactIndex"
+    },
+    {
+      "name": "SchedulePresentationConcernAnnotations",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "include_kinds",
+          "range": "string",
+          "required": true
         },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "labels",
+          "range": "SchedulePresentationLabel",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationConcernAnnotations"
+    },
+    {
+      "name": "SchedulePresentationLabel",
+      "slots": [
         {
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "id",
+          "name": "key",
           "range": "string",
           "required": true
         },
@@ -2347,20 +2257,94 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "policy",
-          "range": "SchedulingPolicy",
+          "name": "label",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationLabel"
+    },
+    {
+      "name": "SchedulePresentationPolicy",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "active_fact_index",
+          "range": "SchedulePresentationActiveFactIndex",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "concern_annotations",
+          "range": "SchedulePresentationConcernAnnotations",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "review_tags",
+          "range": "SchedulePresentationReviewTags",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "zero_effect",
+          "range": "SchedulePresentationZeroEffect",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationPolicy"
+    },
+    {
+      "name": "SchedulePresentationReviewTags",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "exclude_policy_ids",
+          "range": "string",
           "required": false
         },
         {
           "inlined": false,
           "inlined_as_list": false,
-          "multivalued": false,
-          "name": "subject",
-          "range": "Selector",
+          "multivalued": true,
+          "name": "include_namespaces",
+          "range": "string",
           "required": false
         }
       ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/ScheduleAssignment"
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationReviewTags"
+    },
+    {
+      "name": "SchedulePresentationZeroEffect",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "condition",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "template",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationZeroEffect"
     },
     {
       "name": "SchedulingConstraint",
@@ -2374,14 +2358,6 @@
           "required": false
         },
         {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "assertion_type",
-          "range": "string",
-          "required": true
-        },
-        {
           "inlined": true,
           "inlined_as_list": false,
           "multivalued": false,
@@ -2390,9 +2366,9 @@
           "required": false
         },
         {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
           "name": "effect",
           "range": "string",
           "required": true
@@ -2445,17 +2421,9 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "id",
-          "range": "string",
+          "name": "entity_id",
+          "range": "Substance",
           "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "name",
-          "range": "string",
-          "required": false
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintEntitySelector"
@@ -2475,9 +2443,9 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "assertion_type",
-          "range": "string",
-          "required": true
+          "name": "blocks_slots",
+          "range": "boolean",
+          "required": false
         },
         {
           "inlined": false,
@@ -2492,7 +2460,7 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "operation",
-          "range": "string",
+          "range": "ConstraintExecutionOperation",
           "required": true
         },
         {
@@ -2507,8 +2475,16 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "semantic_note",
-          "range": "string",
+          "name": "score_delta",
+          "range": "integer",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "scores_advisory",
+          "range": "boolean",
           "required": false
         },
         {
@@ -2561,31 +2537,97 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintSelector"
     },
     {
-      "name": "SchedulingPolicy",
+      "name": "SchedulingPolicyCatalog",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "schedule_presentation",
+          "range": "SchedulePresentationPolicy",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "scheduling_policies",
+          "range": "SchedulingPolicyRecord",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicyCatalog"
+    },
+    {
+      "name": "SchedulingPolicyEffectMatch",
       "slots": [
         {
           "inlined": false,
           "inlined_as_list": false,
-          "multivalued": true,
-          "name": "axes",
-          "range": "PolicyAxis",
+          "multivalued": false,
+          "name": "food",
+          "range": "boolean",
           "required": false
         },
         {
           "inlined": false,
           "inlined_as_list": false,
-          "multivalued": true,
-          "name": "constraints",
-          "range": "SchedulingConstraint",
+          "multivalued": false,
+          "name": "near",
+          "range": "string",
+          "required": false
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicyEffectMatch"
+    },
+    {
+      "name": "SchedulingPolicyEffectRecord",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "level",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "match",
+          "range": "SchedulingPolicyEffectMatch",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicyEffectRecord"
+    },
+    {
+      "name": "SchedulingPolicyRecord",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "action",
+          "range": "string",
           "required": false
         },
         {
           "inlined": false,
           "inlined_as_list": false,
+          "multivalued": false,
+          "name": "applies_when",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
           "multivalued": true,
           "name": "effects",
-          "range": "PolicyEffect",
-          "required": false
+          "range": "SchedulingPolicyEffectRecord",
+          "required": true
         },
         {
           "inlined": false,
@@ -2599,7 +2641,7 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "key",
+          "name": "term",
           "range": "string",
           "required": true
         },
@@ -2607,20 +2649,12 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "label",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "objectives",
-          "range": "ObjectiveTerm",
-          "required": false
+          "name": "warning",
+          "range": "boolean",
+          "required": true
         }
       ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicy"
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicyRecord"
     },
     {
       "name": "Selector",
@@ -2676,8 +2710,8 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "ontoclean_profile",
-          "range": "string",
-          "required": false
+          "range": "OntoCleanProfile",
+          "required": true
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SemanticCategory"
@@ -2699,7 +2733,7 @@
           "multivalued": false,
           "name": "food",
           "range": "boolean",
-          "required": false
+          "required": true
         },
         {
           "inlined": false,
@@ -2723,7 +2757,7 @@
           "multivalued": false,
           "name": "near",
           "range": "string",
-          "required": false
+          "required": true
         },
         {
           "inlined": false,
@@ -2731,110 +2765,10 @@
           "multivalued": false,
           "name": "order",
           "range": "integer",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "slot_bindings",
-          "range": "AxisValueBinding",
-          "required": false
+          "required": true
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Slot"
-    },
-    {
-      "name": "SlotFeature",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "description",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "feature_values",
-          "range": "SlotFeatureValue",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "key",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "label",
-          "range": "string",
-          "required": false
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SlotFeature"
-    },
-    {
-      "name": "SlotFeatureValue",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "feature",
-          "range": "SlotFeature",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "key",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "label",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "value",
-          "range": "SlotFeatureValue",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SlotFeatureValue"
     },
     {
       "name": "Stack",
@@ -2975,6 +2909,76 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Substance"
     },
     {
+      "name": "SubstanceCard",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "aliases",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "concerns",
+          "range": "CardConcern",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "form",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "knowledge",
+          "range": "CardKnowledge",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "name",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "notes",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "schedule",
+          "range": "CardSchedule",
+          "required": false
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SubstanceCard"
+    },
+    {
       "name": "TermAssignment",
       "slots": [
         {
@@ -3020,11 +3024,87 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "term",
+          "range": "string",
+          "required": false
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/TermSelector"
+    },
+    {
+      "name": "VocabularyCatalog",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "semantic_categories",
+          "range": "VocabularyCategoryRecord",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "terms",
           "range": "OntologyTerm",
           "required": true
         }
       ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/TermSelector"
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/VocabularyCatalog"
+    },
+    {
+      "name": "VocabularyCategoryRecord",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "allowed_predicates",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "maximum_cardinality",
+          "range": "integer",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "minimum_cardinality",
+          "range": "integer",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "multivalued",
+          "range": "boolean",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "ontoclean_profile",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/VocabularyCategoryRecord"
     }
   ],
   "format_version": "ontology-projection-map-v1",
@@ -3038,81 +3118,130 @@
           "document_shape": "mapping",
           "instructions": [
             {
-              "kind": "sequence",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/action",
-              "source": "relations[].action"
-            },
-            {
-              "kind": "sequence",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/assertion_kind",
-              "source": "relations[].assertion_kind"
-            },
-            {
-              "kind": "sequence",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/id",
-              "source": "relations[].id"
-            },
-            {
-              "kind": "sequence",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/reason",
-              "source": "relations[].reason"
-            },
-            {
-              "kind": "sequence",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/semantic_family",
-              "source": "relations[].semantic_family"
-            },
-            {
-              "kind": "sequence",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/severity",
-              "source": "relations[].severity"
-            },
-            {
-              "kind": "sequence",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/source_selector/category",
-              "source": "relations[].source_selector.category"
-            },
-            {
-              "kind": "reference",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/source_selector/entity/id",
-              "source": "relations[].source_selector.entity.id",
-              "target": "IdentifiedNode"
+              "kind": "inlined-node",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/relations",
+              "source": "relations[]",
+              "target": "RelationAssertionRecord"
             },
             {
               "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/source_selector/entity/name",
-              "source": "relations[].source_selector.entity.name"
-            },
-            {
-              "kind": "sequence",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/source_selector/term",
-              "source": "relations[].source_selector.term"
-            },
-            {
-              "kind": "sequence",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/target_selector/category",
-              "source": "relations[].target_selector.category"
-            },
-            {
-              "kind": "reference",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/target_selector/entity/id",
-              "source": "relations[].target_selector.entity.id",
-              "target": "IdentifiedNode"
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/action",
+              "source": "relations[].action",
+              "subject": "relations[]"
             },
             {
               "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/target_selector/entity/name",
-              "source": "relations[].target_selector.entity.name"
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/assertion_kind",
+              "source": "relations[].assertion_kind",
+              "subject": "relations[]"
             },
             {
-              "kind": "sequence",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/target_selector/term",
-              "source": "relations[].target_selector.term"
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/id",
+              "source": "relations[].id",
+              "subject": "relations[]"
             },
             {
-              "kind": "sequence",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/source/relations/type",
-              "source": "relations[].type"
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/reason",
+              "source": "relations[].reason",
+              "subject": "relations[]"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/relation_type",
+              "source": "relations[].relation_type",
+              "subject": "relations[]"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_family",
+              "source": "relations[].semantic_family",
+              "subject": "relations[]"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/severity",
+              "source": "relations[].severity",
+              "subject": "relations[]"
+            },
+            {
+              "kind": "inlined-node",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/source_selector",
+              "source": "relations[].source_selector",
+              "subject": "relations[]",
+              "target": "RelationAssertionSelector"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/category",
+              "source": "relations[].source_selector.category",
+              "subject": "relations[].source_selector"
+            },
+            {
+              "kind": "inlined-node",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/entity",
+              "source": "relations[].source_selector.entity",
+              "subject": "relations[].source_selector",
+              "target": "RelationAssertionEntitySelector"
+            },
+            {
+              "kind": "reference",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/entity_id",
+              "source": "relations[].source_selector.entity.entity_id",
+              "subject": "relations[].source_selector.entity",
+              "target": "Substance"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/name",
+              "source": "relations[].source_selector.entity.name",
+              "subject": "relations[].source_selector.entity"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/term",
+              "source": "relations[].source_selector.term",
+              "subject": "relations[].source_selector"
+            },
+            {
+              "kind": "inlined-node",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/target_selector",
+              "source": "relations[].target_selector",
+              "subject": "relations[]",
+              "target": "RelationAssertionSelector"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/category",
+              "source": "relations[].target_selector.category",
+              "subject": "relations[].target_selector"
+            },
+            {
+              "kind": "inlined-node",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/entity",
+              "source": "relations[].target_selector.entity",
+              "subject": "relations[].target_selector",
+              "target": "RelationAssertionEntitySelector"
+            },
+            {
+              "kind": "reference",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/entity_id",
+              "source": "relations[].target_selector.entity.entity_id",
+              "subject": "relations[].target_selector.entity",
+              "target": "Substance"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/name",
+              "source": "relations[].target_selector.entity.name",
+              "subject": "relations[].target_selector.entity"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/term",
+              "source": "relations[].target_selector.term",
+              "subject": "relations[].target_selector"
             }
           ],
           "root_class": "RelationAssertionCatalog"
@@ -3232,6 +3361,12 @@
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/order",
               "source": "<key>.slots.<key>.order",
               "subject": "<key>.slots.<key>"
+            },
+            {
+              "kind": "reference",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/stack",
+              "source": "<key>.stack",
+              "target": "Stack"
             }
           ],
           "root_class": "Pillbox"
@@ -3281,12 +3416,6 @@
               "subject": "components[]"
             },
             {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/primary",
-              "source": "components[].primary",
-              "subject": "components[]"
-            },
-            {
               "kind": "reference",
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/substance",
               "source": "components[].substance",
@@ -3332,6 +3461,11 @@
               "source": "urls[]"
             }
           ],
+          "maintenance": {
+            "label": "Product",
+            "role": "product",
+            "schema_artifact": "product.schema.json"
+          },
           "root_class": "Product"
         },
         "id": "products",
@@ -3363,6 +3497,11 @@
               "target": "Product"
             }
           ],
+          "maintenance": {
+            "label": "Stack",
+            "role": "stack",
+            "schema_artifact": "stacks.schema.json"
+          },
           "root_class": "Stack"
         },
         "id": "stacks",
@@ -3506,6 +3645,11 @@
               "subject": "schedule.timing[]"
             }
           ],
+          "maintenance": {
+            "label": "Substance",
+            "role": "substance",
+            "schema_artifact": "card.schema.json"
+          },
           "root_class": "Substance"
         },
         "id": "substances",

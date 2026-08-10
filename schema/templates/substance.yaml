@@ -49,40 +49,43 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
 #                             # (any other effect slug goes under knowledge.effect)
 #   activity:                 # MAX ONE slug. Training-context specificity.
 #   - pre_workout             # Values: pre_workout | post_workout | any_workout
-#                             # Substances with activity: MUST be in the training stack.
+#                             # Activity terms are soft workout-slot preferences;
+#                             # they do not require training-stack membership.
 #   prefer_with:              # Substance IDs (sub_*) to co-schedule when possible.
 #   - sub_xxxxxxxxxx          # Planner awards a bonus for placing prefer_with pairs together.
 
 # ---------------------------------------------------------------------------
 # KNOWLEDGE — read by Reviewer
-# These fields do not affect slot assignment. They surface in `planner review`
-# for a smart agent to interpret. Trait-backed namespaces are validated against
-# the canonical ontology vocabulary. context: is validated against data/dashboards/.
+# These fields do not affect slot assignment. The active fact namespaces surface
+# in `planner review` for a smart agent to interpret; authored risk/pathway facts
+# remain reviewer-only data. Trait-backed namespaces are validated against the
+# canonical ontology vocabulary.
 # ---------------------------------------------------------------------------
 
 # knowledge:
-#   is:                       # Structural classification. Used for class-level
+#   kind:                     # Structural classification. Used for class-level
 #   - mineral                 # intrinsic class for review/dashboard/context membership.
 #                             # See ontology/vocabulary.yaml for valid slugs.
 #   effect:                   # Non-scheduling pharmacological effects.
 #   - vasodilator             # See ontology/vocabulary.yaml for valid slugs.
 #                             # Examples: vasodilator, cholinergic_support,
 #                             # pde5_inhibition, fibrinolytic
-#   risk:                     # Safety / interaction flags surfaced by `planner review`.
-#   - manual_review           # NOT used for slot assignment. See ontology/vocabulary.yaml.
+#   risk:                     # Authored reviewer-only safety / interaction facts;
+#                             # not part of the active fact projection in `planner review`.
+#   - manual_review           # NOT used for slot assignment or active-fact rendering.
+#                             # See ontology/vocabulary.yaml.
 #                             # Examples: manual_review, bleeding_med_interaction,
 #                             # hypotension_med_interaction
-#   context:                  # Curated review-context membership for dashboard views.
-#   - vascular_health         # See data/dashboards/ for valid context names.
-#   pathway:                  # Metabolic pathway membership.
+#   pathway:                  # Authored reviewer-only metabolic pathway membership;
+#                             # not part of the active fact projection in `planner review`.
 #   - methylation_cycle       # See ontology/vocabulary.yaml for valid slugs.
 
 # ---------------------------------------------------------------------------
 # CONCERNS
 # Documented caveats, safety notes, and data quality issues. These appear in
-# planner review > Safety / Data Quality / Model Gaps with active/inactive/
-# knowledge-only membership labels. Add one entry per distinct concern. Do not
-# over-flag — only add what is actionable or genuinely uncertain.
+# planner review > Safety / Data Quality / Model Gaps by concern kind. Add one
+# entry per distinct concern. Do not over-flag — only add what is actionable or
+# genuinely uncertain.
 # ---------------------------------------------------------------------------
 
 # concerns:

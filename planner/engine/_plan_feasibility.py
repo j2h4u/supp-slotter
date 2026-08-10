@@ -8,6 +8,7 @@ from typing import NamedTuple
 from planner.contracts import SchedulingPolicy, Slot, SlotCandidateTrace
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import compute_slot_score
+from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.runtime_program import RuntimeProgram
 
 
@@ -33,13 +34,15 @@ def build_feasibility_index(
         candidate_traces = _candidate_traces_for_item(runtime_program, sid, slots, active, policies)
         candidate_traces_by_item[sid] = candidate_traces
         feasible_slots = [
-            (trace.slot_id, trace.score, [diagnostic.code for diagnostic in trace.diagnostics])
-            for trace in candidate_traces
-            if not trace.blocked
+            (trace.slot_id, trace.score, list(trace.diagnostics)) for trace in candidate_traces if not trace.blocked
         ]
         if not feasible_slots:
             contributors = sorted({triple for trace in candidate_traces for triple in trace.block_contributors})
-            assert contributors, "blocked candidates must retain controlling assignment contributors"
+            if not contributors:
+                raise OntologyInfrastructureError(
+                    "blocked candidates must retain controlling ontology assignment contributors",
+                    code=MALFORMED,
+                )
             encoded = ";".join("|".join(triple) for triple in contributors)
             msg = f"plan: stack item '{sid}' is blocked from every slot. [BLOCKED_ALL_SLOTS: {encoded}]"
             print(msg, file=sys.stderr)

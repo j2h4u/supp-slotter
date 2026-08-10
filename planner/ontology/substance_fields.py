@@ -3,16 +3,17 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import fields
 from typing import Protocol, cast
 
 from planner.contracts import Substance
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import IMPLEMENTED_PREDICATE_NAMESPACES
+from planner.ontology.presentation import load_category_predicates, load_term_catalog
 from planner.ontology.runtime_program import RuntimeProgram
 
 
 class OntologyBundleLike(Protocol):
+    root: object
     @property
     def runtime_program(self) -> RuntimeProgram: ...
 
@@ -32,66 +33,85 @@ def schedule_assignment_fields(bundle: OntologyBundleLike) -> tuple[str, ...]:
 def knowledge_category_fields(bundle: OntologyBundleLike) -> tuple[str, ...]:
     """Return substance ``knowledge`` fields declared by ontology categories."""
 
-    categories = bundle.runtime_vocabulary.get("categories")
-    if not isinstance(categories, dict):
-        return ()
-
     fields: list[str] = []
-    for category, raw in categories.items():
-        if not isinstance(category, str) or not isinstance(raw, dict):
-            continue
-        category_data = cast(dict[str, object], raw)
-        allowed_predicates = category_data.get("allowed_predicates")
-        if not isinstance(allowed_predicates, list):
-            continue
-        for predicate in allowed_predicates:
-            if not isinstance(predicate, str) or not predicate.startswith("knowledge."):
-                continue
-            field = predicate.removeprefix("knowledge.")
-            if field and "." not in field:
-                fields.append(field)
+    for predicates in load_category_predicates(bundle).values():
+        fields.extend(predicate.removeprefix("knowledge.") for predicate in predicates if predicate.startswith("knowledge."))
 
     return tuple(dict.fromkeys(fields))
 
 
-def substance_trait_fields(bundle: OntologyBundleLike) -> tuple[tuple[str, str], ...]:
-    """Return ``(Substance field, review namespace)`` pairs from the ontology."""
+def canonical_terms_by_predicate(bundle: OntologyBundleLike) -> Mapping[str, frozenset[str]]:
+    """Return the generated registry of term slugs keyed by assertion predicate.
 
-    schedule_fields = tuple((field, field) for field in schedule_assignment_fields(bundle))
-    knowledge_fields = tuple((field, field) for field in knowledge_category_fields(bundle))
-    return cast(tuple[tuple[str, str], ...], schedule_fields + knowledge_fields)
+    The runtime vocabulary is the only authorization source for card
+    assertions.  A term is usable through a predicate only when the generated
+    registry explicitly declares that predicate in its ``allowed_predicates``;
+    malformed records are ignored, which makes the resolver fail closed.
+    """
+
+    terms_by_predicate: dict[str, set[str]] = {}
+    for term in load_term_catalog(bundle):
+        slug = cast(str, term["slug"])
+        for predicate in cast(tuple[str, ...], tuple(term["allowed_predicates"])):
+            terms_by_predicate.setdefault(predicate, set()).add(slug)
+    return {predicate: frozenset(slugs) for predicate, slugs in terms_by_predicate.items()}
+
+
+def substance_trait_fields(bundle: OntologyBundleLike) -> tuple[tuple[str, str], ...]:
+    """Return ontology categories for review presentation.
+
+    The first element is intentionally a generic assertion collection name;
+    callers must resolve its category through the assertion records rather than
+    treating an ontology category as a Python attribute.
+    """
+
+    categories = knowledge_category_fields(bundle)
+    axes = tuple(
+        row.axis for row in sorted(bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
+    )
+    return tuple(("schedule_assertions", axis) for axis in axes) + tuple(
+        ("knowledge_assertions", category) for category in categories
+    )
 
 
 def allowed_predicate_fields_for_category(bundle: OntologyBundleLike, category: str) -> tuple[str, ...] | None:
     """Return the authored Substance fields backing one selector category.
 
-    Categories are vocabulary-owned.  In particular, ``schedule_rule`` is a
-    category backed by several schedule fields, so treating the category as a
-    dataclass attribute is incorrect.  ``None`` means the authored category
-    or its predicate declaration is unusable and must be handled fail-closed.
+    Categories are vocabulary-owned.  A category may be backed by multiple
+    predicates, so treating its name as a dataclass attribute is incorrect.
+    ``None`` means the authored category or its predicate declaration is
+    unusable and must be handled fail-closed.
     """
 
-    categories = bundle.runtime_vocabulary.get("categories")
-    if not isinstance(categories, dict):
+    try:
+        predicates = load_category_predicates(bundle).get(category)
+    except OntologyInfrastructureError:
         return None
-    typed_categories = cast(dict[str, object], categories)
-    metadata = typed_categories.get(category)
-    if not isinstance(metadata, dict):
-        return None
-    typed_metadata = cast(dict[str, object], metadata)
-    raw_predicates = typed_metadata.get("allowed_predicates")
-    if not isinstance(raw_predicates, list):
+    if predicates is None:
         return None
     fields_for_category: list[str] = []
-    for predicate in raw_predicates:
-        if not isinstance(predicate, str):
-            return None
+    for predicate in predicates:
         namespace, separator, field = predicate.partition(".")
         if namespace not in IMPLEMENTED_PREDICATE_NAMESPACES or separator != "." or not field or "." in field:
             return None
         fields_for_category.append(field)
     unique_fields = tuple(dict.fromkeys(fields_for_category))
     return unique_fields or None
+
+
+def dashboard_selector_category(bundle: OntologyBundleLike, category: str) -> bool:
+    """Return whether a vocabulary category is backed by knowledge assertions.
+
+    Dashboards are review projections over ``KnowledgeAssertion`` records.  A
+    schedule axis is a valid selector for scheduling constraints, but it is not
+    a dashboard membership dimension and must fail closed at this boundary.
+    """
+
+    try:
+        predicates = load_category_predicates(bundle).get(category)
+    except OntologyInfrastructureError:
+        return False
+    return predicates is not None and all(predicate.startswith("knowledge.") for predicate in predicates)
 
 
 def substance_terms_for_category(
@@ -105,16 +125,42 @@ def substance_terms_for_category(
     accessor shape mismatch.  An empty tuple is a valid category with no terms.
     """
 
-    fields_for_category = allowed_predicate_fields_for_category(bundle, category)
-    if fields_for_category is None:
+    schedule_axes = _schedule_axes_for_category(bundle, category)
+    if schedule_axes is not None:
+        return tuple(assertion.value for assertion in substance.schedule_assertions if assertion.axis in schedule_axes)
+    try:
+        predicates = load_category_predicates(bundle).get(category)
+    except OntologyInfrastructureError:
         return None
-    terms: list[str] = []
-    for field in fields_for_category:
-        values = getattr(substance, field, None)
-        if not isinstance(values, tuple) or any(not isinstance(value, str) for value in values):
+    if predicates is None:
+        return None
+    return tuple(assertion.value for assertion in substance.knowledge_assertions if assertion.category == category)
+
+
+def _schedule_axes_for_category(bundle: OntologyBundleLike, category: str) -> frozenset[str] | None:
+    """Return the authored assignment axes represented by one category.
+
+    A selector category is not an alias for all scheduling assertions.  Its
+    declared ``schedule.<axis>`` predicates define the exact assertion stream
+    it can inspect; unknown or malformed categories are unsupported.
+    """
+    try:
+        predicates = load_category_predicates(bundle).get(category)
+    except OntologyInfrastructureError:
+        return None
+    if predicates is None:
+        return None
+    axis_by_field = {row.assignment_field: row.axis for row in bundle.runtime_program.assignment_axes}
+    axes: set[str] = set()
+    for predicate in cast(list[object], predicates):
+        if not isinstance(predicate, str) or not predicate.startswith("schedule."):
             return None
-        terms.extend(cast(tuple[str, ...], values))
-    return tuple(dict.fromkeys(terms))
+        field = predicate.removeprefix("schedule.")
+        axis = axis_by_field.get(field)
+        if axis is None:
+            return None
+        axes.add(axis)
+    return frozenset(axes) or None
 
 
 def validate_substance_schema_conformance(bundle: OntologyBundleLike) -> None:
@@ -125,20 +171,13 @@ def validate_substance_schema_conformance(bundle: OntologyBundleLike) -> None:
     backing field was omitted from the Python runtime contract.
     """
 
-    substance_fields = {item.name for item in fields(Substance)}
-    missing_schedule_fields = sorted(set(schedule_assignment_fields(bundle)) - substance_fields)
-    if missing_schedule_fields:
-        raise OntologyInfrastructureError(
-            "ontology assignment axes reference Substance fields absent from the runtime contract: "
-            + ", ".join(missing_schedule_fields),
-            code=MALFORMED,
-        )
-    categories = bundle.runtime_vocabulary.get("categories")
-    if not isinstance(categories, dict):
+    try:
+        categories = load_category_predicates(bundle)
+    except OntologyInfrastructureError:
         raise OntologyInfrastructureError(
             "ontology runtime vocabulary categories must be a mapping",
             code=MALFORMED,
-        )
+        ) from None
     for category in categories:
         if not isinstance(category, str):
             raise OntologyInfrastructureError(
@@ -149,12 +188,5 @@ def validate_substance_schema_conformance(bundle: OntologyBundleLike) -> None:
         if predicate_fields is None or not predicate_fields:
             raise OntologyInfrastructureError(
                 f"ontology category {category!r} has malformed allowed_predicates",
-                code=MALFORMED,
-            )
-        missing = sorted(set(predicate_fields) - substance_fields)
-        if missing:
-            raise OntologyInfrastructureError(
-                f"ontology category {category!r} references Substance fields absent from the runtime contract: "
-                + ", ".join(missing),
                 code=MALFORMED,
             )

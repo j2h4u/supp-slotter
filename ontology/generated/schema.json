@@ -20,7 +20,10 @@
           ]
         },
         "value": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "weight": {
           "type": [
@@ -30,41 +33,205 @@
         }
       },
       "required": [
-        "operator",
-        "value"
+        "operator"
       ],
       "title": "Action",
       "type": "object"
     },
-    "AdvisoryMatchDirection": {
-      "description": "",
-      "enum": [
-        "symmetric",
-        "directed"
-      ],
-      "title": "AdvisoryMatchDirection",
-      "type": "string"
-    },
-    "AxisValueBinding": {
+    "CardConcern": {
       "additionalProperties": false,
-      "description": "",
+      "description": "A validation-ready concern embedded in a source card.",
       "properties": {
-        "axis": {
-          "type": "string"
+        "kind": {
+          "$ref": "#/$defs/ConcernKind",
+          "description": "Authored card assertion field kind.",
+          "pattern": "^[a-z][a-z0-9_]*$"
         },
-        "id": {
-          "type": "string"
-        },
-        "value": {
+        "text": {
           "type": "string"
         }
       },
       "required": [
-        "id",
-        "axis",
-        "value"
+        "kind",
+        "text"
       ],
-      "title": "AxisValueBinding",
+      "title": "CardConcern",
+      "type": "object"
+    },
+    "CardKnowledge": {
+      "additionalProperties": false,
+      "description": "Nested knowledge namespaces carried by a source substance card.",
+      "properties": {
+        "context": {
+          "description": "Authored card assertion field context.",
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ],
+          "uniqueItems": true
+        },
+        "effect": {
+          "description": "Authored card assertion field effect.",
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ],
+          "uniqueItems": true
+        },
+        "kind": {
+          "description": "Authored card assertion field kind.",
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ],
+          "uniqueItems": true
+        },
+        "pathway": {
+          "description": "Authored card assertion field pathway.",
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ],
+          "uniqueItems": true
+        },
+        "quality": {
+          "description": "Authored card assertion field quality.",
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ],
+          "uniqueItems": true
+        },
+        "risk": {
+          "description": "Authored card assertion field risk.",
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ],
+          "uniqueItems": true
+        },
+        "role": {
+          "description": "Authored card assertion field role.",
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ],
+          "uniqueItems": true
+        }
+      },
+      "title": "CardKnowledge",
+      "type": "object"
+    },
+    "CardSchedule": {
+      "additionalProperties": false,
+      "description": "Nested scheduling namespaces and stable substance references.",
+      "properties": {
+        "activity": {
+          "description": "Authored card assertion field activity.",
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "maxItems": 1,
+          "minItems": 0,
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "intake": {
+          "description": "Authored card assertion field intake.",
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "maxItems": 1,
+          "minItems": 0,
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "prefer_with": {
+          "items": {
+            "pattern": "^sub_[a-z0-9]{10}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "timing": {
+          "description": "Authored card assertion field timing.",
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "maxItems": 1,
+          "minItems": 0,
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "title": "CardSchedule",
+      "type": "object"
+    },
+    "Catalog": {
+      "additionalProperties": false,
+      "description": "Manifest-declared authored catalog included in the ontology.",
+      "properties": {
+        "catalog_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "catalog_role": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "catalog_root_class": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "title": "Catalog",
       "type": "object"
     },
     "Concern": {
@@ -164,6 +331,31 @@
       "title": "Condition",
       "type": "object"
     },
+    "ConstraintExecutionAggregation": {
+      "description": "",
+      "enum": [
+        "distinct_constraint"
+      ],
+      "title": "ConstraintExecutionAggregation",
+      "type": "string"
+    },
+    "ConstraintExecutionMatchDirection": {
+      "description": "",
+      "enum": [
+        "symmetric",
+        "directed"
+      ],
+      "title": "ConstraintExecutionMatchDirection",
+      "type": "string"
+    },
+    "ConstraintExecutionOperation": {
+      "description": "",
+      "enum": [
+        "separate_products_same_slot"
+      ],
+      "title": "ConstraintExecutionOperation",
+      "type": "string"
+    },
     "Dashboard": {
       "additionalProperties": false,
       "description": "",
@@ -184,12 +376,10 @@
           ]
         },
         "description": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "id": {
+          "pattern": "^[a-z][a-z0-9_]*$",
           "type": "string"
         },
         "label": {
@@ -205,15 +395,15 @@
           "items": {
             "$ref": "#/$defs/DashboardSelector"
           },
-          "type": [
-            "array",
-            "null"
-          ]
+          "minItems": 1,
+          "type": "array"
         }
       },
       "required": [
+        "selectors",
         "id",
-        "label"
+        "label",
+        "description"
       ],
       "title": "Dashboard",
       "type": "object"
@@ -223,18 +413,18 @@
       "description": "",
       "properties": {
         "category": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "type": "string"
         },
         "selector_term": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "type": "string"
         }
       },
+      "required": [
+        "category",
+        "selector_term"
+      ],
       "title": "DashboardSelector",
       "type": "object"
     },
@@ -300,40 +490,104 @@
       "title": "KnowledgeAssertion",
       "type": "object"
     },
-    "ObjectiveTerm": {
+    "OntoCleanCatalog": {
+      "additionalProperties": false,
+      "description": "Authored OntoClean profile catalog used by semantic category validation.",
+      "properties": {
+        "ontoclean_profiles": {
+          "additionalProperties": {
+            "$ref": "#/$defs/OntoCleanProfile__identifier_optional"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "ontoclean_profiles"
+      ],
+      "title": "OntoCleanCatalog",
+      "type": "object"
+    },
+    "OntoCleanDependence": {
+      "description": "",
+      "enum": [
+        "independent",
+        "dependent"
+      ],
+      "title": "OntoCleanDependence",
+      "type": "string"
+    },
+    "OntoCleanProfile": {
       "additionalProperties": false,
       "description": "",
       "properties": {
-        "expression": {
-          "type": [
-            "string",
-            "null"
-          ]
+        "dependence": {
+          "$ref": "#/$defs/OntoCleanDependence"
         },
         "id": {
           "type": "string"
         },
-        "key": {
-          "type": "string"
+        "rigidity": {
+          "$ref": "#/$defs/OntoCleanRigidity"
         },
-        "rationale": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "weight": {
-          "type": [
-            "number",
-            "null"
-          ]
+        "supplies_identity": {
+          "type": "boolean"
         }
       },
       "required": [
         "id",
-        "key"
+        "rigidity",
+        "supplies_identity",
+        "dependence"
       ],
-      "title": "ObjectiveTerm",
+      "title": "OntoCleanProfile",
+      "type": "object"
+    },
+    "OntoCleanProfile__identifier_optional": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "dependence": {
+          "$ref": "#/$defs/OntoCleanDependence"
+        },
+        "id": {
+          "type": "string"
+        },
+        "rigidity": {
+          "$ref": "#/$defs/OntoCleanRigidity"
+        },
+        "supplies_identity": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "rigidity",
+        "supplies_identity",
+        "dependence"
+      ],
+      "title": "OntoCleanProfile",
+      "type": "object"
+    },
+    "OntoCleanRigidity": {
+      "description": "",
+      "enum": [
+        "rigid",
+        "anti_rigid"
+      ],
+      "title": "OntoCleanRigidity",
+      "type": "string"
+    },
+    "Ontology": {
+      "additionalProperties": false,
+      "description": "Root metadata for a compiled ontology release.",
+      "properties": {
+        "schema_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "title": "Ontology",
       "type": "object"
     },
     "OntologyTerm": {
@@ -341,15 +595,15 @@
       "description": "",
       "properties": {
         "description": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "id": {
           "type": "string"
         },
         "label": {
+          "type": "string"
+        },
+        "ontoclean_profile": {
           "type": "string"
         },
         "semantic_category": {
@@ -363,7 +617,9 @@
         "id",
         "slug",
         "label",
-        "semantic_category"
+        "description",
+        "semantic_category",
+        "ontoclean_profile"
       ],
       "title": "OntologyTerm",
       "type": "object"
@@ -373,10 +629,13 @@
       "description": "Authored runtime-facing relation type metadata.",
       "properties": {
         "directional": {
-          "description": "Declarative relation metadata used by assertion validation and review presentation; scheduler slot placement must not infer supplement policy from this flag alone.",
+          "description": "Whether reversing a relation's resolved endpoints changes its assertion identity; directionless relations are unordered pairs and duplicate reverse orientations are rejected.",
           "type": "boolean"
         },
         "id": {
+          "$ref": "#/$defs/RelationType"
+        },
+        "label": {
           "type": "string"
         },
         "order": {
@@ -399,6 +658,7 @@
       },
       "required": [
         "id",
+        "label",
         "order",
         "directional",
         "source_selector_forms",
@@ -427,121 +687,20 @@
           "items": {
             "$ref": "#/$defs/Slot"
           },
-          "type": [
-            "array",
-            "null"
-          ]
+          "minItems": 1,
+          "type": "array"
+        },
+        "stack": {
+          "type": "string"
         }
       },
       "required": [
+        "stack",
+        "slots",
         "id",
         "label"
       ],
       "title": "Pillbox",
-      "type": "object"
-    },
-    "PolicyAxis": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "description": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "features": {
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "id": {
-          "type": "string"
-        },
-        "key": {
-          "type": "string"
-        },
-        "label": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "schedule_rule": {
-          "type": "string"
-        },
-        "value_bindings": {
-          "items": {
-            "$ref": "#/$defs/AxisValueBinding"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "id",
-        "key",
-        "schedule_rule"
-      ],
-      "title": "PolicyAxis",
-      "type": "object"
-    },
-    "PolicyEffect": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "action": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Action"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "condition": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Condition"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "id": {
-          "type": "string"
-        },
-        "key": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "rationale": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "weight": {
-          "type": [
-            "number",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "id"
-      ],
-      "title": "PolicyEffect",
       "type": "object"
     },
     "Product": {
@@ -607,6 +766,64 @@
       "title": "Product",
       "type": "object"
     },
+    "ProductCard": {
+      "additionalProperties": false,
+      "description": "Source-facing canonical product card contract.",
+      "properties": {
+        "brand": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "components": {
+          "items": {
+            "$ref": "#/$defs/ProductComponent"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "concerns": {
+          "items": {
+            "$ref": "#/$defs/CardConcern"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "id": {
+          "pattern": "^prd_[a-z0-9]{10}$",
+          "type": "string"
+        },
+        "name": {
+          "pattern": "^.+$",
+          "type": "string"
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "urls": {
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "components"
+      ],
+      "title": "ProductCard",
+      "type": "object"
+    },
     "ProductComponent": {
       "additionalProperties": false,
       "description": "",
@@ -629,12 +846,6 @@
             "null"
           ]
         },
-        "primary": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
         "substance": {
           "type": "string"
         }
@@ -643,6 +854,194 @@
         "substance"
       ],
       "title": "ProductComponent",
+      "type": "object"
+    },
+    "RelationAssertionCatalog": {
+      "additionalProperties": false,
+      "description": "Authored supplement relation assertions consumed by the read model and reviewer surfaces.",
+      "properties": {
+        "relations": {
+          "items": {
+            "$ref": "#/$defs/RelationAssertionRecord"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "relations"
+      ],
+      "title": "RelationAssertionCatalog",
+      "type": "object"
+    },
+    "RelationAssertionEntitySelector": {
+      "additionalProperties": false,
+      "description": "",
+      "oneOf": [
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "name"
+                ]
+              }
+            ]
+          },
+          "properties": {
+            "entity_id": {},
+            "name": {}
+          },
+          "required": [
+            "entity_id"
+          ]
+        },
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "entity_id"
+                ]
+              }
+            ]
+          },
+          "properties": {
+            "entity_id": {},
+            "name": {}
+          },
+          "required": [
+            "name"
+          ]
+        }
+      ],
+      "properties": {
+        "entity_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        }
+      },
+      "title": "RelationAssertionEntitySelector",
+      "type": "object"
+    },
+    "RelationAssertionRecord": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "action": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "assertion_kind": {
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "relation_type": {
+          "$ref": "#/$defs/RelationType"
+        },
+        "semantic_family": {
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "source_selector": {
+          "$ref": "#/$defs/RelationAssertionSelector"
+        },
+        "target_selector": {
+          "$ref": "#/$defs/RelationAssertionSelector"
+        }
+      },
+      "required": [
+        "id",
+        "relation_type",
+        "assertion_kind",
+        "semantic_family",
+        "reason",
+        "source_selector",
+        "target_selector"
+      ],
+      "title": "RelationAssertionRecord",
+      "type": "object"
+    },
+    "RelationAssertionSelector": {
+      "additionalProperties": false,
+      "description": "",
+      "oneOf": [
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "category"
+                ]
+              },
+              {
+                "required": [
+                  "term"
+                ]
+              }
+            ]
+          },
+          "properties": {
+            "category": {},
+            "entity": {},
+            "term": {}
+          },
+          "required": [
+            "entity"
+          ]
+        },
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "entity"
+                ]
+              }
+            ]
+          },
+          "properties": {
+            "category": {},
+            "entity": {},
+            "term": {}
+          },
+          "required": [
+            "category",
+            "term"
+          ]
+        }
+      ],
+      "properties": {
+        "category": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        "entity": {
+          "$ref": "#/$defs/RelationAssertionEntitySelector"
+        },
+        "term": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        }
+      },
+      "title": "RelationAssertionSelector",
       "type": "object"
     },
     "RelationCatalog": {
@@ -671,6 +1070,16 @@
       "title": "RelationSelectorForm",
       "type": "string"
     },
+    "RelationType": {
+      "description": "Relation type identifiers are authored in the relation type catalog.",
+      "enum": [
+        "balance",
+        "review_with",
+        "supports"
+      ],
+      "title": "RelationType",
+      "type": "string"
+    },
     "RelationWarningActiveSide": {
       "description": "",
       "enum": [
@@ -690,32 +1099,6 @@
       "title": "RelationWarningFilterField",
       "type": "string"
     },
-    "RuntimeAssignmentActionPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "assignment_action": {
-          "type": "string"
-        },
-        "executable": {
-          "type": "boolean"
-        },
-        "id": {
-          "type": "string"
-        },
-        "shadowed": {
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "id",
-        "assignment_action",
-        "executable",
-        "shadowed"
-      ],
-      "title": "RuntimeAssignmentActionPolicy",
-      "type": "object"
-    },
     "RuntimeAssignmentAxisPolicy": {
       "additionalProperties": false,
       "description": "",
@@ -732,6 +1115,12 @@
         "id": {
           "type": "string"
         },
+        "maximum_cardinality": {
+          "type": "integer"
+        },
+        "minimum_cardinality": {
+          "type": "integer"
+        },
         "order": {
           "type": "integer"
         }
@@ -741,121 +1130,14 @@
         "axis",
         "order",
         "assignment_source",
-        "assignment_field"
+        "assignment_field",
+        "minimum_cardinality",
+        "maximum_cardinality"
       ],
       "title": "RuntimeAssignmentAxisPolicy",
       "type": "object"
     },
-    "RuntimeCapabilityNearModel": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "model": {
-          "type": "string"
-        },
-        "near": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "near",
-        "model"
-      ],
-      "title": "RuntimeCapabilityNearModel",
-      "type": "object"
-    },
-    "RuntimeCapabilityRule": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "base_slot_models": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "food_model": {
-          "type": "string"
-        },
-        "formulations": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "id": {
-          "type": "string"
-        },
-        "near_to_model": {
-          "items": {
-            "$ref": "#/$defs/RuntimeCapabilityNearModel"
-          },
-          "type": "array"
-        },
-        "planner": {
-          "type": "string"
-        },
-        "product_scope": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "slot_models": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        }
-      },
-      "required": [
-        "id",
-        "planner",
-        "food_model",
-        "base_slot_models",
-        "slot_models",
-        "product_scope",
-        "formulations",
-        "near_to_model"
-      ],
-      "title": "RuntimeCapabilityRule",
-      "type": "object"
-    },
-    "RuntimeConcernReviewStatusPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "description": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "membership_role": {
-          "type": "string"
-        },
-        "rank": {
-          "type": "integer"
-        },
-        "status": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "status",
-        "rank",
-        "membership_role",
-        "description"
-      ],
-      "title": "RuntimeConcernReviewStatusPolicy",
-      "type": "object"
-    },
-    "RuntimeConcernWarningRule": {
+    "RuntimeConcernCatalogEntry": {
       "additionalProperties": false,
       "description": "",
       "properties": {
@@ -874,7 +1156,7 @@
         "concern_kind",
         "warning_type"
       ],
-      "title": "RuntimeConcernWarningRule",
+      "title": "RuntimeConcernCatalogEntry",
       "type": "object"
     },
     "RuntimeConstraintExecutionPolicy": {
@@ -882,7 +1164,7 @@
       "description": "",
       "properties": {
         "aggregation": {
-          "type": "string"
+          "$ref": "#/$defs/ConstraintExecutionAggregation"
         },
         "blocks_slots": {
           "type": "boolean"
@@ -891,10 +1173,10 @@
           "type": "string"
         },
         "match_direction": {
-          "$ref": "#/$defs/AdvisoryMatchDirection"
+          "$ref": "#/$defs/ConstraintExecutionMatchDirection"
         },
         "operation": {
-          "type": "string"
+          "$ref": "#/$defs/ConstraintExecutionOperation"
         },
         "score_delta": {
           "type": "integer"
@@ -917,6 +1199,148 @@
         "score_delta"
       ],
       "title": "RuntimeConstraintExecutionPolicy",
+      "type": "object"
+    },
+    "RuntimeDashboardProductTrackingStateDefinition": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "order": {
+          "type": "integer"
+        },
+        "state": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "state",
+        "label",
+        "order"
+      ],
+      "title": "RuntimeDashboardProductTrackingStateDefinition",
+      "type": "object"
+    },
+    "RuntimeDashboardProductTrackingTruthState": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "tracked_product_presence": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "tracked_product_presence",
+        "state"
+      ],
+      "title": "RuntimeDashboardProductTrackingTruthState",
+      "type": "object"
+    },
+    "RuntimeDashboardStateCatalog": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "product_tracking_states": {
+          "items": {
+            "$ref": "#/$defs/RuntimeDashboardProductTrackingStateDefinition"
+          },
+          "type": "array"
+        },
+        "product_tracking_truth_table": {
+          "items": {
+            "$ref": "#/$defs/RuntimeDashboardProductTrackingTruthState"
+          },
+          "type": "array"
+        },
+        "usage_states": {
+          "items": {
+            "$ref": "#/$defs/RuntimeDashboardUsageStateDefinition"
+          },
+          "type": "array"
+        },
+        "usage_truth_table": {
+          "items": {
+            "$ref": "#/$defs/RuntimeDashboardUsageTruthState"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "usage_states",
+        "product_tracking_states",
+        "usage_truth_table",
+        "product_tracking_truth_table"
+      ],
+      "title": "RuntimeDashboardStateCatalog",
+      "type": "object"
+    },
+    "RuntimeDashboardUsageStateDefinition": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "order": {
+          "type": "integer"
+        },
+        "state": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "state",
+        "label",
+        "order"
+      ],
+      "title": "RuntimeDashboardUsageStateDefinition",
+      "type": "object"
+    },
+    "RuntimeDashboardUsageTruthState": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "active_stack_membership": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "inactive_stack_membership": {
+          "type": "boolean"
+        },
+        "state": {
+          "type": "string"
+        },
+        "tracked_product_presence": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "active_stack_membership",
+        "inactive_stack_membership",
+        "tracked_product_presence",
+        "state"
+      ],
+      "title": "RuntimeDashboardUsageTruthState",
       "type": "object"
     },
     "RuntimeEffectMatchDimensionPolicy": {
@@ -971,16 +1395,16 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
-        "advisory_constraint_score_delta": {
-          "type": "integer"
-        },
-        "advisory_match_direction": {
-          "$ref": "#/$defs/AdvisoryMatchDirection"
+        "balance_penalty_expression": {
+          "type": "string"
         },
         "balance_weight": {
           "type": "number"
         },
         "id": {
+          "type": "string"
+        },
+        "objective_function": {
           "type": "string"
         },
         "prefer_with_bonus": {
@@ -991,58 +1415,28 @@
             "$ref": "#/$defs/RuntimeEffectScore"
           },
           "type": "array"
+        },
+        "tie_break": {
+          "type": "string"
         }
       },
       "required": [
         "id",
+        "objective_function",
+        "balance_penalty_expression",
+        "tie_break",
         "scores",
         "balance_weight",
-        "prefer_with_bonus",
-        "advisory_constraint_score_delta",
-        "advisory_match_direction"
+        "prefer_with_bonus"
       ],
       "title": "RuntimeEffectScoringPolicy",
-      "type": "object"
-    },
-    "RuntimeFactFieldPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "field": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "value_type": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "field",
-        "value_type"
-      ],
-      "title": "RuntimeFactFieldPolicy",
       "type": "object"
     },
     "RuntimeGlueContract": {
       "additionalProperties": false,
       "description": "",
       "properties": {
-        "active_concern_role": {
-          "type": "string"
-        },
-        "concern_membership_roles": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
         "id": {
-          "type": "string"
-        },
-        "inactive_concern_role": {
           "type": "string"
         },
         "inactive_stack_name": {
@@ -1066,9 +1460,6 @@
           },
           "type": "array"
         },
-        "product_concern_fallback_role": {
-          "type": "string"
-        },
         "relation_endpoint_selector_kinds": {
           "items": {
             "type": "string"
@@ -1087,7 +1478,7 @@
           },
           "type": "array"
         },
-        "relation_review_status_ids": {
+        "relation_selector_forms": {
           "items": {
             "type": "string"
           },
@@ -1105,12 +1496,6 @@
           },
           "type": "array"
         },
-        "scope_fact_adapters": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
         "source_kind_roles": {
           "items": {
             "type": "string"
@@ -1122,9 +1507,6 @@
             "type": "string"
           },
           "type": "array"
-        },
-        "substance_concern_fallback_role": {
-          "type": "string"
         },
         "warning_emitter_ids": {
           "items": {
@@ -1138,18 +1520,12 @@
         "inactive_stack_name",
         "source_kinds",
         "source_kind_roles",
-        "scope_fact_adapters",
         "relation_warning_filter_fields",
         "relation_warning_active_sides",
         "relation_presence_active_sides",
         "relation_presence_truth_table",
-        "relation_review_status_ids",
         "relation_endpoint_selector_kinds",
-        "concern_membership_roles",
-        "active_concern_role",
-        "inactive_concern_role",
-        "product_concern_fallback_role",
-        "substance_concern_fallback_role",
+        "relation_selector_forms",
         "warning_emitter_ids",
         "prefer_with_source_fields",
         "prefer_with_target_resolutions",
@@ -1158,63 +1534,19 @@
       "title": "RuntimeGlueContract",
       "type": "object"
     },
-    "RuntimeNonWarningConcernKindPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "concern_kind": {
-          "$ref": "#/$defs/ConcernKind"
-        },
-        "description": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "review_surface": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "concern_kind",
-        "review_surface",
-        "description"
-      ],
-      "title": "RuntimeNonWarningConcernKindPolicy",
-      "type": "object"
-    },
     "RuntimePolicyCatalog": {
       "additionalProperties": false,
       "description": "Typed executable policy contract consumed by planner runtime.",
       "properties": {
-        "assignment_actions": {
-          "items": {
-            "$ref": "#/$defs/RuntimeAssignmentActionPolicy"
-          },
-          "type": "array"
-        },
         "assignment_axes": {
           "items": {
             "$ref": "#/$defs/RuntimeAssignmentAxisPolicy"
           },
           "type": "array"
         },
-        "capability_rules": {
+        "concern_catalog": {
           "items": {
-            "$ref": "#/$defs/RuntimeCapabilityRule"
-          },
-          "type": "array"
-        },
-        "concern_review_statuses": {
-          "items": {
-            "$ref": "#/$defs/RuntimeConcernReviewStatusPolicy"
-          },
-          "type": "array"
-        },
-        "concern_warning_rules": {
-          "items": {
-            "$ref": "#/$defs/RuntimeConcernWarningRule"
+            "$ref": "#/$defs/RuntimeConcernCatalogEntry"
           },
           "type": "array"
         },
@@ -1223,6 +1555,9 @@
             "$ref": "#/$defs/RuntimeConstraintExecutionPolicy"
           },
           "type": "array"
+        },
+        "dashboard_state_catalog": {
+          "$ref": "#/$defs/RuntimeDashboardStateCatalog"
         },
         "effect_match_dimensions": {
           "items": {
@@ -1233,45 +1568,18 @@
         "effect_scoring": {
           "$ref": "#/$defs/RuntimeEffectScoringPolicy"
         },
-        "fact_fields": {
-          "items": {
-            "$ref": "#/$defs/RuntimeFactFieldPolicy"
-          },
-          "type": "array"
-        },
         "glue_contract": {
           "$ref": "#/$defs/RuntimeGlueContract"
         },
         "id": {
           "type": "string"
         },
-        "non_warning_concern_kinds": {
-          "items": {
-            "$ref": "#/$defs/RuntimeNonWarningConcernKindPolicy"
-          },
-          "type": "array"
-        },
         "prefer_with_policy": {
           "$ref": "#/$defs/RuntimePreferWithPolicy"
-        },
-        "protocol": {
-          "$ref": "#/$defs/RuntimeProtocolInventory"
-        },
-        "relation_endpoint_policies": {
-          "items": {
-            "$ref": "#/$defs/RuntimeRelationEndpointPolicy"
-          },
-          "type": "array"
         },
         "relation_presence_statuses": {
           "items": {
             "$ref": "#/$defs/RuntimeRelationPresenceStatusPolicy"
-          },
-          "type": "array"
-        },
-        "relation_review_statuses": {
-          "items": {
-            "$ref": "#/$defs/RuntimeRelationReviewStatusPolicy"
           },
           "type": "array"
         },
@@ -1287,15 +1595,15 @@
           },
           "type": "array"
         },
-        "scope_dimensions": {
+        "selector_form_capabilities": {
           "items": {
-            "$ref": "#/$defs/RuntimeScopeDimensionPolicy"
+            "$ref": "#/$defs/RuntimeSelectorFormCapability"
           },
           "type": "array"
         },
-        "scope_rules": {
+        "slot_near_values": {
           "items": {
-            "$ref": "#/$defs/RuntimeScopeRulePolicy"
+            "type": "string"
           },
           "type": "array"
         },
@@ -1326,29 +1634,22 @@
       },
       "required": [
         "id",
-        "protocol",
         "glue_contract",
-        "fact_fields",
         "source_kind_values",
         "effect_match_dimensions",
         "assignment_axes",
-        "assignment_actions",
-        "scope_dimensions",
-        "scope_rules",
+        "slot_near_values",
         "constraint_execution_policies",
         "effect_scoring",
         "prefer_with_policy",
-        "capability_rules",
         "warning_types",
         "warning_emitters",
         "warning_trait_actions",
-        "concern_warning_rules",
-        "non_warning_concern_kinds",
-        "concern_review_statuses",
+        "concern_catalog",
         "relation_warning_rules",
-        "relation_review_statuses",
         "relation_presence_statuses",
-        "relation_endpoint_policies",
+        "selector_form_capabilities",
+        "dashboard_state_catalog",
         "runtime_projection"
       ],
       "title": "RuntimePolicyCatalog",
@@ -1393,20 +1694,8 @@
             "null"
           ]
         },
-        "emit_table": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
         "id": {
           "type": "string"
-        },
-        "kind": {
-          "type": [
-            "string",
-            "null"
-          ]
         },
         "source": {
           "type": [
@@ -1425,78 +1714,10 @@
       "title": "RuntimeProjectionDescriptor",
       "type": "object"
     },
-    "RuntimeProtocolInventory": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "action_classes": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "condition_classes": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "policy_class": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "condition_classes",
-        "action_classes",
-        "policy_class"
-      ],
-      "title": "RuntimeProtocolInventory",
-      "type": "object"
-    },
-    "RuntimeRelationEndpointPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "audit_member_limit": {
-          "type": "integer"
-        },
-        "broad_endpoint": {
-          "type": "boolean"
-        },
-        "id": {
-          "type": "string"
-        },
-        "label": {
-          "type": "string"
-        },
-        "selector_kind": {
-          "type": "string"
-        },
-        "show_match_details": {
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "id",
-        "selector_kind",
-        "broad_endpoint",
-        "show_match_details",
-        "audit_member_limit",
-        "label"
-      ],
-      "title": "RuntimeRelationEndpointPolicy",
-      "type": "object"
-    },
     "RuntimeRelationPresenceStatusPolicy": {
       "additionalProperties": false,
       "description": "",
       "properties": {
-        "active_side": {
-          "type": "string"
-        },
-        "default_review_status": {
-          "type": "string"
-        },
         "description": {
           "type": "string"
         },
@@ -1518,8 +1739,6 @@
         "status",
         "source_active",
         "target_active",
-        "active_side",
-        "default_review_status",
         "description"
       ],
       "title": "RuntimeRelationPresenceStatusPolicy",
@@ -1541,32 +1760,6 @@
         "target_active"
       ],
       "title": "RuntimeRelationPresenceTruthState",
-      "type": "object"
-    },
-    "RuntimeRelationReviewStatusPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "description": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "rank": {
-          "type": "integer"
-        },
-        "status": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "status",
-        "rank",
-        "description"
-      ],
-      "title": "RuntimeRelationReviewStatusPolicy",
       "type": "object"
     },
     "RuntimeRelationWarningRule": {
@@ -1594,9 +1787,6 @@
             "null"
           ]
         },
-        "review_status": {
-          "type": "string"
-        },
         "warning_type": {
           "type": "string"
         }
@@ -1605,7 +1795,6 @@
         "id",
         "relation_kind",
         "warning_type",
-        "review_status",
         "filter_field",
         "filter_value",
         "active_side"
@@ -1613,77 +1802,30 @@
       "title": "RuntimeRelationWarningRule",
       "type": "object"
     },
-    "RuntimeScopeDimensionPolicy": {
+    "RuntimeSelectorFormCapability": {
       "additionalProperties": false,
       "description": "",
       "properties": {
-        "capability_field": {
-          "type": "string"
-        },
-        "default_outcome": {
-          "type": "string"
-        },
-        "fact_adapter": {
+        "endpoint_kind": {
           "type": "string"
         },
         "id": {
           "type": "string"
         },
-        "key": {
+        "selector_form": {
           "type": "string"
         },
-        "rule_ids": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "values": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
+        "show_match_details": {
+          "type": "boolean"
         }
       },
       "required": [
         "id",
-        "key",
-        "values",
-        "rule_ids",
-        "default_outcome",
-        "fact_adapter",
-        "capability_field"
+        "selector_form",
+        "endpoint_kind",
+        "show_match_details"
       ],
-      "title": "RuntimeScopeDimensionPolicy",
-      "type": "object"
-    },
-    "RuntimeScopeRulePolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "conditions": {
-          "items": {
-            "$ref": "#/$defs/Condition"
-          },
-          "type": "array"
-        },
-        "id": {
-          "type": "string"
-        },
-        "outcome": {
-          "type": "string"
-        },
-        "priority": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "id",
-        "priority",
-        "conditions",
-        "outcome"
-      ],
-      "title": "RuntimeScopeRulePolicy",
+      "title": "RuntimeSelectorFormCapability",
       "type": "object"
     },
     "RuntimeSourceKindValuePolicy": {
@@ -1696,9 +1838,6 @@
           },
           "type": "array"
         },
-        "description": {
-          "type": "string"
-        },
         "id": {
           "type": "string"
         },
@@ -1709,8 +1848,7 @@
       "required": [
         "id",
         "source_kind",
-        "applies_to",
-        "description"
+        "applies_to"
       ],
       "title": "RuntimeSourceKindValuePolicy",
       "type": "object"
@@ -1809,39 +1947,142 @@
       "title": "ScheduleAssertion",
       "type": "object"
     },
-    "ScheduleAssignment": {
+    "SchedulePresentationActiveFactIndex": {
       "additionalProperties": false,
       "description": "",
       "properties": {
-        "bindings": {
+        "include_namespaces": {
           "items": {
-            "$ref": "#/$defs/AxisValueBinding"
+            "type": "string"
           },
           "type": [
             "array",
             "null"
           ]
         },
-        "id": {
+        "labels": {
+          "items": {
+            "$ref": "#/$defs/SchedulePresentationLabel"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "labels"
+      ],
+      "title": "SchedulePresentationActiveFactIndex",
+      "type": "object"
+    },
+    "SchedulePresentationConcernAnnotations": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "include_kinds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "labels": {
+          "items": {
+            "$ref": "#/$defs/SchedulePresentationLabel"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "include_kinds",
+        "labels"
+      ],
+      "title": "SchedulePresentationConcernAnnotations",
+      "type": "object"
+    },
+    "SchedulePresentationLabel": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "key": {
           "type": "string"
         },
-        "policy": {
+        "label": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "label"
+      ],
+      "title": "SchedulePresentationLabel",
+      "type": "object"
+    },
+    "SchedulePresentationPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "active_fact_index": {
+          "$ref": "#/$defs/SchedulePresentationActiveFactIndex"
+        },
+        "concern_annotations": {
+          "$ref": "#/$defs/SchedulePresentationConcernAnnotations"
+        },
+        "review_tags": {
+          "$ref": "#/$defs/SchedulePresentationReviewTags"
+        },
+        "zero_effect": {
+          "$ref": "#/$defs/SchedulePresentationZeroEffect"
+        }
+      },
+      "required": [
+        "concern_annotations",
+        "review_tags",
+        "active_fact_index",
+        "zero_effect"
+      ],
+      "title": "SchedulePresentationPolicy",
+      "type": "object"
+    },
+    "SchedulePresentationReviewTags": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "exclude_policy_ids": {
+          "items": {
+            "type": "string"
+          },
           "type": [
-            "string",
+            "array",
             "null"
           ]
         },
-        "subject": {
+        "include_namespaces": {
+          "items": {
+            "type": "string"
+          },
           "type": [
-            "string",
+            "array",
             "null"
           ]
         }
       },
+      "title": "SchedulePresentationReviewTags",
+      "type": "object"
+    },
+    "SchedulePresentationZeroEffect": {
+      "additionalProperties": false,
+      "description": "Authored explanation for a placement with no non-zero scheduling effect.",
+      "properties": {
+        "condition": {
+          "type": "string"
+        },
+        "template": {
+          "type": "string"
+        }
+      },
       "required": [
-        "id"
+        "condition",
+        "template"
       ],
-      "title": "ScheduleAssignment",
+      "title": "SchedulePresentationZeroEffect",
       "type": "object"
     },
     "SchedulingConstraint": {
@@ -1858,9 +2099,6 @@
             }
           ]
         },
-        "assertion_type": {
-          "type": "string"
-        },
         "condition": {
           "anyOf": [
             {
@@ -1872,7 +2110,12 @@
           ]
         },
         "effect": {
-          "type": "string"
+          "description": "Authored card assertion field effect.",
+          "items": {
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "type": "array"
         },
         "id": {
           "type": "string"
@@ -1890,7 +2133,6 @@
       "required": [
         "id",
         "key",
-        "assertion_type",
         "effect"
       ],
       "title": "SchedulingConstraint",
@@ -1915,20 +2157,14 @@
     },
     "SchedulingConstraintEntitySelector": {
       "additionalProperties": false,
-      "description": "",
+      "description": "Stable identity selector used by executable scheduling constraints.",
       "properties": {
-        "id": {
+        "entity_id": {
           "type": "string"
-        },
-        "name": {
-          "type": [
-            "string",
-            "null"
-          ]
         }
       },
       "required": [
-        "id"
+        "entity_id"
       ],
       "title": "SchedulingConstraintEntitySelector",
       "type": "object"
@@ -1940,21 +2176,30 @@
         "action": {
           "type": "string"
         },
-        "assertion_type": {
-          "type": "string"
+        "blocks_slots": {
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "id": {
           "type": "string"
         },
         "operation": {
-          "type": "string"
+          "$ref": "#/$defs/ConstraintExecutionOperation"
         },
         "rationale": {
           "type": "string"
         },
-        "semantic_note": {
+        "score_delta": {
           "type": [
-            "string",
+            "integer",
+            "null"
+          ]
+        },
+        "scores_advisory": {
+          "type": [
+            "boolean",
             "null"
           ]
         },
@@ -1967,7 +2212,6 @@
       },
       "required": [
         "id",
-        "assertion_type",
         "operation",
         "source_selector",
         "target_selector",
@@ -1984,21 +2228,30 @@
         "action": {
           "type": "string"
         },
-        "assertion_type": {
-          "type": "string"
+        "blocks_slots": {
+          "type": [
+            "boolean",
+            "null"
+          ]
         },
         "id": {
           "type": "string"
         },
         "operation": {
-          "type": "string"
+          "$ref": "#/$defs/ConstraintExecutionOperation"
         },
         "rationale": {
           "type": "string"
         },
-        "semantic_note": {
+        "score_delta": {
           "type": [
-            "string",
+            "integer",
+            "null"
+          ]
+        },
+        "scores_advisory": {
+          "type": [
+            "boolean",
             "null"
           ]
         },
@@ -2010,7 +2263,6 @@
         }
       },
       "required": [
-        "assertion_type",
         "operation",
         "source_selector",
         "target_selector",
@@ -2023,6 +2275,52 @@
     "SchedulingConstraintSelector": {
       "additionalProperties": false,
       "description": "",
+      "oneOf": [
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "category"
+                ]
+              },
+              {
+                "required": [
+                  "term"
+                ]
+              }
+            ]
+          },
+          "properties": {
+            "category": {},
+            "entity": {},
+            "term": {}
+          },
+          "required": [
+            "entity"
+          ]
+        },
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "entity"
+                ]
+              }
+            ]
+          },
+          "properties": {
+            "category": {},
+            "entity": {},
+            "term": {}
+          },
+          "required": [
+            "category",
+            "term"
+          ]
+        }
+      ],
       "properties": {
         "category": {
           "type": [
@@ -2050,64 +2348,140 @@
       "title": "SchedulingConstraintSelector",
       "type": "object"
     },
-    "SchedulingPolicy": {
+    "SchedulingPolicyCatalog": {
+      "additionalProperties": false,
+      "description": "Authored planner policy catalog for slot preferences, warnings, and presentation.",
+      "properties": {
+        "schedule_presentation": {
+          "$ref": "#/$defs/SchedulePresentationPolicy"
+        },
+        "scheduling_policies": {
+          "additionalProperties": {
+            "$ref": "#/$defs/SchedulingPolicyRecord__identifier_optional"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "scheduling_policies",
+        "schedule_presentation"
+      ],
+      "title": "SchedulingPolicyCatalog",
+      "type": "object"
+    },
+    "SchedulingPolicyEffectMatch": {
       "additionalProperties": false,
       "description": "",
       "properties": {
-        "axes": {
-          "items": {
-            "type": "string"
-          },
+        "food": {
           "type": [
-            "array",
+            "boolean",
             "null"
           ]
         },
-        "constraints": {
-          "items": {
-            "type": "string"
-          },
+        "near": {
           "type": [
-            "array",
+            "string",
             "null"
           ]
-        },
-        "effects": {
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "id": {
+        }
+      },
+      "title": "SchedulingPolicyEffectMatch",
+      "type": "object"
+    },
+    "SchedulingPolicyEffectRecord": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "level": {
           "type": "string"
         },
-        "key": {
-          "type": "string"
-        },
-        "label": {
+        "match": {
+          "$ref": "#/$defs/SchedulingPolicyEffectMatch"
+        }
+      },
+      "required": [
+        "match",
+        "level"
+      ],
+      "title": "SchedulingPolicyEffectRecord",
+      "type": "object"
+    },
+    "SchedulingPolicyRecord": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "action": {
           "type": [
             "string",
             "null"
           ]
         },
-        "objectives": {
+        "applies_when": {
+          "type": "string"
+        },
+        "effects": {
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/SchedulingPolicyEffectRecord"
           },
-          "type": [
-            "array",
-            "null"
-          ]
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "term": {
+          "type": "string"
+        },
+        "warning": {
+          "type": "boolean"
         }
       },
       "required": [
         "id",
-        "key"
+        "term",
+        "applies_when",
+        "effects",
+        "warning"
       ],
-      "title": "SchedulingPolicy",
+      "title": "SchedulingPolicyRecord",
+      "type": "object"
+    },
+    "SchedulingPolicyRecord__identifier_optional": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "action": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "applies_when": {
+          "type": "string"
+        },
+        "effects": {
+          "items": {
+            "$ref": "#/$defs/SchedulingPolicyEffectRecord"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "term": {
+          "type": "string"
+        },
+        "warning": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "term",
+        "applies_when",
+        "effects",
+        "warning"
+      ],
+      "title": "SchedulingPolicyRecord",
       "type": "object"
     },
     "Selector": {
@@ -2150,15 +2524,13 @@
           "type": "string"
         },
         "ontoclean_profile": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         }
       },
       "required": [
         "id",
-        "label"
+        "label",
+        "ontoclean_profile"
       ],
       "title": "SemanticCategory",
       "type": "object"
@@ -2185,10 +2557,7 @@
           ]
         },
         "food": {
-          "type": [
-            "boolean",
-            "null"
-          ]
+          "type": "boolean"
         },
         "id": {
           "type": "string"
@@ -2197,105 +2566,21 @@
           "type": "string"
         },
         "near": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "order": {
-          "type": [
-            "integer",
-            "null"
-          ]
-        },
-        "slot_bindings": {
-          "items": {
-            "$ref": "#/$defs/AxisValueBinding"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
+          "minimum": 1,
+          "type": "integer"
         }
       },
       "required": [
+        "order",
+        "near",
+        "food",
         "id",
         "label"
       ],
       "title": "Slot",
-      "type": "object"
-    },
-    "SlotFeature": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "description": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "feature_values": {
-          "items": {
-            "$ref": "#/$defs/SlotFeatureValue"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "id": {
-          "type": "string"
-        },
-        "key": {
-          "type": "string"
-        },
-        "label": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "id",
-        "key"
-      ],
-      "title": "SlotFeature",
-      "type": "object"
-    },
-    "SlotFeatureValue": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "feature": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "id": {
-          "type": "string"
-        },
-        "key": {
-          "type": "string"
-        },
-        "label": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "value": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "key",
-        "value"
-      ],
-      "title": "SlotFeatureValue",
       "type": "object"
     },
     "Stack": {
@@ -2428,6 +2713,76 @@
       "title": "Substance",
       "type": "object"
     },
+    "SubstanceCard": {
+      "additionalProperties": false,
+      "description": "Source-facing canonical substance card contract.",
+      "properties": {
+        "aliases": {
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "concerns": {
+          "items": {
+            "$ref": "#/$defs/CardConcern"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "form": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "pattern": "^sub_[a-z0-9]{10}$",
+          "type": "string"
+        },
+        "knowledge": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CardKnowledge"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "pattern": "^.+$",
+          "type": "string"
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "schedule": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CardSchedule"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "SubstanceCard",
+      "type": "object"
+    },
     "TermAssignment": {
       "additionalProperties": false,
       "description": "",
@@ -2458,14 +2813,125 @@
           "type": "string"
         },
         "term": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "selector_id"
+      ],
+      "title": "TermSelector",
+      "type": "object"
+    },
+    "VocabularyCatalog": {
+      "additionalProperties": false,
+      "description": "Authored semantic vocabulary catalog consumed by ontology generation and runtime projection.",
+      "properties": {
+        "semantic_categories": {
+          "additionalProperties": {
+            "$ref": "#/$defs/VocabularyCategoryRecord__identifier_optional"
+          },
+          "type": "object"
+        },
+        "terms": {
+          "items": {
+            "$ref": "#/$defs/OntologyTerm"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "semantic_categories",
+        "terms"
+      ],
+      "title": "VocabularyCatalog",
+      "type": "object"
+    },
+    "VocabularyCategoryRecord": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "allowed_predicates": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "maximum_cardinality": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "minimum_cardinality": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "multivalued": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "ontoclean_profile": {
           "type": "string"
         }
       },
       "required": [
-        "term",
-        "selector_id"
+        "id",
+        "allowed_predicates",
+        "ontoclean_profile"
       ],
-      "title": "TermSelector",
+      "title": "VocabularyCategoryRecord",
+      "type": "object"
+    },
+    "VocabularyCategoryRecord__identifier_optional": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "allowed_predicates": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "maximum_cardinality": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "minimum_cardinality": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "multivalued": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "ontoclean_profile": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "allowed_predicates",
+        "ontoclean_profile"
+      ],
+      "title": "VocabularyCategoryRecord",
       "type": "object"
     }
   },

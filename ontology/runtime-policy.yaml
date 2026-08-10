@@ -1,14 +1,9 @@
 id: runtime_policy
-protocol:
-  condition_classes: [Condition]
-  action_classes: [Action]
-  policy_class: RuntimePolicyCatalog
 glue_contract:
   id: planner_glue_contract
   inactive_stack_name: inactive
-  source_kinds: [component, product, substance]
+  source_kinds: [assignment]
   source_kind_roles: [assignment_source]
-  scope_fact_adapters: [capability_scalar, capability_values, dimension_singleton, product_identity, source_formulation]
   relation_warning_filter_fields: [assertion_kind, semantic_family]
   relation_warning_active_sides: [both, source, target]
   relation_presence_active_sides: [both, none, source, target]
@@ -17,42 +12,16 @@ glue_contract:
     - {source_active: false, target_active: true}
     - {source_active: true, target_active: false}
     - {source_active: true, target_active: true}
-  relation_review_status_ids: [actionable_now, active_pair_present, inactive, latent_one_side_present]
   relation_endpoint_selector_kinds: [entity, term]
-  concern_membership_roles: [active, inactive, product_fallback, substance_fallback]
-  active_concern_role: active
-  inactive_concern_role: inactive
-  product_concern_fallback_role: product_fallback
-  substance_concern_fallback_role: substance_fallback
+  relation_selector_forms: [entity_id, name, term]
   warning_emitter_ids: [intra_product_constraint_conflict, prefer_with_resolver, trait_review_assignment]
   prefer_with_source_fields: [prefer_with]
   prefer_with_target_resolutions: [exactly_one_active_item]
   prefer_with_pair_modes: [undirected_same_slot_bonus]
-fact_fields:
-  - {id: fact_planner, field: planner, value_type: string}
-  - {id: fact_food_model, field: food_model, value_type: string}
-  - {id: fact_slot_model, field: slot_model, value_type: string}
-  - {id: fact_intended_use, field: intended_use, value_type: string}
-  - {id: fact_substrate, field: substrate, value_type: string}
-  - {id: fact_product, field: product, value_type: string}
-  - {id: fact_formulation, field: formulation, value_type: string}
-  - {id: fact_requested_value, field: requested_value, value_type: string}
-  - {id: fact_supported_value, field: supported_value, value_type: string}
-  - {id: fact_supported_values, field: supported_values, value_type: strings}
-  - {id: fact_source_kind, field: source_kind, value_type: string}
-  - {id: fact_source_form, field: source_form, value_type: string}
-  - {id: fact_scope_kind, field: scope_kind, value_type: string}
-  - {id: fact_requested_product_id, field: requested_product_id, value_type: string}
-  - {id: fact_actual_product_id, field: actual_product_id, value_type: string}
 source_kind_values:
-  - id: source_kind_product
-    source_kind: product
+  - id: source_kind_assignment
+    source_kind: assignment
     applies_to: [assignment_source]
-    description: Direct product-level assignment source.
-  - id: source_kind_substance
-    source_kind: substance
-    applies_to: [assignment_source]
-    description: Substance-level assignment source.
 effect_match_dimensions:
   - id: match_near
     key: near
@@ -63,100 +32,9 @@ effect_match_dimensions:
     slot_field: food
     value_type: boolean
 assignment_axes:
-  - {id: assignment_axis_intake, axis: intake, order: 0, assignment_source: schedule, assignment_field: intake}
-  - {id: assignment_axis_timing, axis: timing, order: 1, assignment_source: schedule, assignment_field: timing}
-  - {id: assignment_axis_activity, axis: activity, order: 2, assignment_source: schedule, assignment_field: activity}
-assignment_actions:
-  - {id: assignment_action_active, assignment_action: active, executable: true, shadowed: false}
-  - {id: assignment_action_suppressed, assignment_action: suppressed, executable: false, shadowed: false}
-  - {id: assignment_action_shadowed, assignment_action: shadowed, executable: false, shadowed: true}
-scope_dimensions:
-  - id: planner
-    key: planner
-    values: [slot_policy, audit]
-    rule_ids: [scope_slot_policy]
-    default_outcome: mismatch_scope
-    fact_adapter: capability_scalar
-    capability_field: planner
-  - id: food_model
-    key: food_model
-    values: [binary]
-    rule_ids: [scope_binary_food]
-    default_outcome: mismatch_scope
-    fact_adapter: capability_scalar
-    capability_field: food_model
-  - id: slot_model
-    key: slot_model
-    values: [binary, wake_day_sleep, workout_before_after, wake, breakfast, day_meal, sleep, workout_before, workout_after]
-    rule_ids: [scope_supported_slot_model]
-    default_outcome: mismatch_scope
-    fact_adapter: capability_values
-    capability_field: slot_models
-  - id: intended_use
-    key: intended_use
-    values: [digestive]
-    rule_ids: [scope_general_use]
-    default_outcome: mismatch_scope
-    fact_adapter: dimension_singleton
-    capability_field: values
-  - id: substrate
-    key: substrate
-    values: [lactose]
-    rule_ids: [scope_human_substrate]
-    default_outcome: mismatch_scope
-    fact_adapter: dimension_singleton
-    capability_field: values
-  - id: product
-    key: product
-    values: [direct]
-    rule_ids: [scope_direct_product]
-    default_outcome: mismatch_scope
-    fact_adapter: product_identity
-    capability_field: product_id
-  - id: formulation
-    key: formulation
-    values: [unknown, capsule, tablet, powder, liquid]
-    rule_ids: [scope_unknown_formulation, scope_supported_formulation]
-    default_outcome: mismatch_scope
-    fact_adapter: source_formulation
-    capability_field: formulations
-scope_rules:
-  - id: scope_slot_policy
-    priority: 10
-    conditions: [{operator: equals_field, field: requested_value, value: supported_value}]
-    outcome: matched_scope
-  - id: scope_binary_food
-    priority: 10
-    conditions: [{operator: equals_field, field: requested_value, value: supported_value}]
-    outcome: matched_scope
-  - id: scope_supported_slot_model
-    priority: 10
-    conditions: [{operator: member_of_field, field: requested_value, value: supported_values}]
-    outcome: matched_scope
-  - id: scope_general_use
-    priority: 10
-    conditions: [{operator: equals_field, field: requested_value, value: supported_value}]
-    outcome: limited_scope
-  - id: scope_human_substrate
-    priority: 10
-    conditions: [{operator: equals_field, field: requested_value, value: supported_value}]
-    outcome: limited_scope
-  - id: scope_unknown_formulation
-    priority: 20
-    conditions: [{operator: equals, field: requested_value, value: unknown}]
-    outcome: limited_scope
-  - id: scope_direct_product
-    priority: 10
-    conditions:
-      - {operator: equals, field: scope_kind, value: direct}
-      - {operator: equals_field, field: requested_product_id, value: actual_product_id}
-    outcome: matched_scope
-  - id: scope_supported_formulation
-    priority: 10
-    conditions:
-      - {operator: equals_field, field: requested_value, value: source_form}
-      - {operator: member_of_field, field: requested_value, value: supported_values}
-    outcome: matched_scope
+  - {id: assignment_axis_intake, axis: intake, order: 0, assignment_source: schedule, assignment_field: intake, minimum_cardinality: 0, maximum_cardinality: 1}
+  - {id: assignment_axis_timing, axis: timing, order: 1, assignment_source: schedule, assignment_field: timing, minimum_cardinality: 0, maximum_cardinality: 1}
+  - {id: assignment_axis_activity, axis: activity, order: 2, assignment_source: schedule, assignment_field: activity, minimum_cardinality: 0, maximum_cardinality: 1}
 constraint_execution_policies:
     - id: separate_products_same_slot
       operation: separate_products_same_slot
@@ -168,6 +46,9 @@ constraint_execution_policies:
       score_delta: -1
 effect_scoring:
   id: effect_scoring
+  objective_function: slot_score_plus_prefer_with_minus_quadratic_balance_penalty
+  balance_penalty_expression: balance_weight * sum(slot_count^2)
+  tie_break: stable_slot_order
   scores:
     - id: prefer_strong
       level: prefer_strong
@@ -183,40 +64,12 @@ effect_scoring:
       score: -4
   balance_weight: 0.5
   prefer_with_bonus: 3
-  advisory_constraint_score_delta: -1
-  advisory_match_direction: symmetric
 prefer_with_policy:
   id: prefer_with_policy
   source_field: prefer_with
   target_resolution: exactly_one_active_item
   pair_mode: undirected_same_slot_bonus
-capability_rules:
-  - id: slot_planner_binary
-    planner: slot_policy
-    food_model: binary
-    base_slot_models: [binary]
-    slot_models: [binary, wake_day_sleep, workout_before_after]
-    product_scope: [direct]
-    formulations: [unknown, capsule, tablet, powder, liquid]
-    near_to_model:
-      - id: wake_near_model
-        near: wake
-        model: wake_day_sleep
-      - id: breakfast_near_model
-        near: breakfast
-        model: wake_day_sleep
-      - id: day_meal_near_model
-        near: day_meal
-        model: wake_day_sleep
-      - id: sleep_near_model
-        near: sleep
-        model: wake_day_sleep
-      - id: workout_before_near_model
-        near: workout_before
-        model: workout_before_after
-      - id: workout_after_near_model
-        near: workout_after
-        model: workout_before_after
+slot_near_values: [wake, breakfast, day_meal, sleep, workout_before, workout_after]
 warning_types:
   - id: warning_safety_concern
     warning_type: safety_concern
@@ -269,45 +122,14 @@ warning_trait_actions:
   - id: warning_trait_hyperkalemia_med_interaction
     trait_id: risk:hyperkalemia_med_interaction
     action_text: Review potassium-related medication context before using this stack.
-concern_warning_rules:
+concern_catalog:
   - id: concern_warning_safety
     concern_kind: safety
     warning_type: safety_concern
-non_warning_concern_kinds:
-  - id: concern_review_only_model_gap
-    concern_kind: model_gap
-    review_surface: review
-    description: Model gap concerns are reviewer-visible metadata and do not emit planner warnings.
-  - id: concern_review_only_data_quality
-    concern_kind: data_quality
-    review_surface: review
-    description: Data quality concerns are reviewer-visible metadata and do not emit planner warnings.
-concern_review_statuses:
-  - id: concern_review_status_active
-    status: active
-    rank: 0
-    membership_role: active
-    description: card is active in a non-inactive stack
-  - id: concern_review_status_inactive
-    status: inactive
-    rank: 1
-    membership_role: inactive
-    description: card is in the inactive stack
-  - id: concern_review_status_tracked_unassigned
-    status: tracked-unassigned
-    rank: 2
-    membership_role: product_fallback
-    description: product card is tracked but outside all stacks
-  - id: concern_review_status_knowledge_only
-    status: knowledge-only
-    rank: 3
-    membership_role: substance_fallback
-    description: substance card is known but not assigned through an active product
 relation_warning_rules:
   - id: relation_warning_review_with_present
     relation_kind: review_with
     warning_type: review_with_substance_present
-    review_status: actionable_now
     filter_field: assertion_kind
     filter_value: clinical_review_signal
     active_side: both
@@ -315,7 +137,6 @@ relation_warning_rules:
   - id: relation_warning_missing_balance_forward
     relation_kind: balance
     warning_type: missing_balance_substance
-    review_status: actionable_now
     filter_field: semantic_family
     filter_value: nutrient_balance_review_signal
     active_side: source
@@ -323,7 +144,6 @@ relation_warning_rules:
   - id: relation_warning_missing_balance_reverse
     relation_kind: balance
     warning_type: missing_balance_substance
-    review_status: actionable_now
     filter_field: semantic_family
     filter_value: nutrient_balance_review_signal
     active_side: target
@@ -331,73 +151,71 @@ relation_warning_rules:
   - id: relation_warning_missing_support
     relation_kind: supports
     warning_type: missing_support_substance
-    review_status: actionable_now
     filter_field: assertion_kind
     filter_value: ontology_assertion
     active_side: target
     reverse_output: false
-
-relation_review_statuses:
-  - id: relation_review_status_actionable_now
-    status: actionable_now
-    rank: 0
-    description: relation semantics fire for the current stack
-  - id: relation_review_status_active_pair_present
-    status: active_pair_present
-    rank: 1
-    description: both endpoints active; no absence warning
-  - id: relation_review_status_latent_one_side_present
-    status: latent_one_side_present
-    rank: 2
-    description: one endpoint active; relation does not fire
-  - id: relation_review_status_inactive
-    status: inactive
-    rank: 3
-    description: both endpoints absent
 
 relation_presence_statuses:
   - id: relation_presence_both_active
     status: both_active
     source_active: true
     target_active: true
-    active_side: both
-    default_review_status: active_pair_present
     description: both endpoints active
   - id: relation_presence_missing_target
     status: missing_target
     source_active: true
     target_active: false
-    active_side: source
-    default_review_status: latent_one_side_present
     description: source active, target absent
   - id: relation_presence_missing_source
     status: missing_source
     source_active: false
     target_active: true
-    active_side: target
-    default_review_status: latent_one_side_present
     description: target active, source absent
   - id: relation_presence_neither_active
     status: neither_active
     source_active: false
     target_active: false
-    active_side: none
-    default_review_status: inactive
     description: both endpoints absent
 
-relation_endpoint_policies:
-  - id: relation_endpoint_entity
-    selector_kind: entity
-    broad_endpoint: false
+selector_form_capabilities:
+  - id: selector_form_entity_id
+    selector_form: entity_id
+    endpoint_kind: entity
     show_match_details: false
-    audit_member_limit: 0
-    label: concrete endpoint
-  - id: relation_endpoint_term
-    selector_kind: term
-    broad_endpoint: true
+  - id: selector_form_name
+    selector_form: name
+    endpoint_kind: entity
     show_match_details: true
-    audit_member_limit: 5
-    label: trait endpoint
+  - id: selector_form_term
+    selector_form: term
+    endpoint_kind: term
+    show_match_details: true
+
+# Dashboard review states are a projection of facts, not a second handwritten
+# classification in the renderer.  The tables cover every boolean input
+# combination so an authored mapping edit is observable and fail-closed.
+dashboard_state_catalog:
+  usage_states:
+    - {id: dashboard_usage_current, state: current, label: Current, order: 0}
+    - {id: dashboard_usage_on_shelf, state: on_shelf, label: On shelf, order: 1}
+    - {id: dashboard_usage_unassigned, state: unassigned, label: Unassigned, order: 2}
+    - {id: dashboard_usage_not_current, state: not_current, label: Not current, order: 3}
+  product_tracking_states:
+    - {id: dashboard_tracking_tracked, state: tracked_product, label: Tracked product, order: 0}
+    - {id: dashboard_tracking_none, state: no_tracked_product, label: No tracked product, order: 1}
+  usage_truth_table:
+    - {id: usage_false_false_false, active_stack_membership: false, inactive_stack_membership: false, tracked_product_presence: false, state: not_current}
+    - {id: usage_false_false_true, active_stack_membership: false, inactive_stack_membership: false, tracked_product_presence: true, state: unassigned}
+    - {id: usage_false_true_false, active_stack_membership: false, inactive_stack_membership: true, tracked_product_presence: false, state: on_shelf}
+    - {id: usage_false_true_true, active_stack_membership: false, inactive_stack_membership: true, tracked_product_presence: true, state: on_shelf}
+    - {id: usage_true_false_false, active_stack_membership: true, inactive_stack_membership: false, tracked_product_presence: false, state: current}
+    - {id: usage_true_false_true, active_stack_membership: true, inactive_stack_membership: false, tracked_product_presence: true, state: current}
+    - {id: usage_true_true_false, active_stack_membership: true, inactive_stack_membership: true, tracked_product_presence: false, state: current}
+    - {id: usage_true_true_true, active_stack_membership: true, inactive_stack_membership: true, tracked_product_presence: true, state: current}
+  product_tracking_truth_table:
+    - {id: tracking_false, tracked_product_presence: false, state: no_tracked_product}
+    - {id: tracking_true, tracked_product_presence: true, state: tracked_product}
 
 # Declarative projection contract.  The compiler walks this descriptor tree;
 # changing a source or target here changes the executable projection without
@@ -406,113 +224,81 @@ runtime_projection:
   - id: glue_contract
     target: glue_contract
     source: glue_contract
-  - id: fact_fields
-    target: fact_fields
-    source: fact_fields
   - id: source_kind_values
     target: source_kind_values
     source: source_kind_values
-    kind: source_kind_value
-    emit_table: true
   - id: effect_match_dimensions
     target: effect_match_dimensions
     source: effect_match_dimensions
-    kind: effect_match_dimension
-    emit_table: true
   - id: assignment_axes
     target: assignment_axes
     source: assignment_axes
-    emit_table: true
-  - id: scope_dimensions_table
-    target: scope_dimensions
-    source: scope_dimensions
-    emit_table: true
-  - id: scope_rules
-    target: scope_rules
-    source: scope_rules
-    emit_table: true
   - id: constraint_execution_policies
     target: constraint_execution_policies
     source: constraint_execution_policies
-    kind: constraint_execution_policy
-    emit_table: true
   - id: scoring_projection
     target: effect_scoring
     children:
       - id: scoring_id
         target: id
         source: effect_scoring.id
+      - id: scoring_objective_function
+        target: objective_function
+        source: effect_scoring.objective_function
+      - id: scoring_balance_penalty_expression
+        target: balance_penalty_expression
+        source: effect_scoring.balance_penalty_expression
+      - id: scoring_tie_break
+        target: tie_break
+        source: effect_scoring.tie_break
       - id: scoring_prefer_with_bonus
         target: prefer_with_bonus
         source: effect_scoring.prefer_with_bonus
-      - id: scoring_advisory_constraint_score_delta
-        target: advisory_constraint_score_delta
-        source: effect_scoring.advisory_constraint_score_delta
-      - id: scoring_advisory_match_direction
-        target: advisory_match_direction
-        source: effect_scoring.advisory_match_direction
       - id: scoring_balance_weight
         target: balance_weight
         source: effect_scoring.balance_weight
       - id: effect_scores
         target: scores
         source: effect_scoring.scores
-        kind: effect_score
-        emit_table: true
   - id: prefer_with_policy
     target: prefer_with_policy
     source: prefer_with_policy
-  - id: capability_projection
-    target: capability_rules
-    source: capability_rules
-    kind: capability
+  - id: slot_near_values
+    target: slot_near_values
+    source: slot_near_values
   - id: warning_types
     target: warning_types
     source: warning_types
-    kind: warning_type
-    emit_table: true
   - id: warning_emitters
     target: warning_emitters
     source: warning_emitters
-    kind: warning_emitter
-    emit_table: true
   - id: warning_trait_actions
     target: warning_trait_actions
     source: warning_trait_actions
-    kind: warning_trait_action
-    emit_table: true
-  - id: concern_review_statuses
-    target: concern_review_statuses
-    source: concern_review_statuses
-    kind: concern_review_status
-    emit_table: true
-  - id: concern_warning_rules
-    target: concern_warning_rules
-    source: concern_warning_rules
-    kind: concern_warning_rule
-    emit_table: true
-  - id: non_warning_concern_kinds
-    target: non_warning_concern_kinds
-    source: non_warning_concern_kinds
-    kind: non_warning_concern_kind
-    emit_table: true
+  - id: concern_catalog
+    target: concern_catalog
+    source: concern_catalog
   - id: relation_warning_rules
     target: relation_warning_rules
     source: relation_warning_rules
-    kind: relation_warning_rule
-    emit_table: true
-  - id: relation_review_statuses
-    target: relation_review_statuses
-    source: relation_review_statuses
-    kind: relation_review_status
-    emit_table: true
   - id: relation_presence_statuses
     target: relation_presence_statuses
     source: relation_presence_statuses
-    kind: relation_presence_status
-    emit_table: true
-  - id: relation_endpoint_policies
-    target: relation_endpoint_policies
-    source: relation_endpoint_policies
-    kind: relation_endpoint_policy
-    emit_table: true
+  - id: dashboard_state_catalog
+    target: dashboard_state_catalog
+    children:
+      - id: dashboard_usage_states
+        target: usage_states
+        source: dashboard_state_catalog.usage_states
+      - id: dashboard_product_tracking_states
+        target: product_tracking_states
+        source: dashboard_state_catalog.product_tracking_states
+      - id: dashboard_usage_truth_table
+        target: usage_truth_table
+        source: dashboard_state_catalog.usage_truth_table
+      - id: dashboard_product_tracking_truth_table
+        target: product_tracking_truth_table
+        source: dashboard_state_catalog.product_tracking_truth_table
+  - id: selector_form_capabilities
+    target: selector_form_capabilities
+    source: selector_form_capabilities

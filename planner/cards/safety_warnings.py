@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from planner.contracts import Product, Substance
+from planner.contracts import Concern, ConcernRecord, Product, Substance
 from planner.ontology.runtime_program import RuntimeProgram
 
 
@@ -28,59 +28,69 @@ class _SafetyWarningContext:
     message: str
 
 
+@dataclass(frozen=True, slots=True)
+class _ActiveConcern:
+    record: ConcernRecord
+    item_id: str
+    product_id: str
+
+
 def collect_active_safety_concerns(
     input_data: SafetyConcernInput,
 ) -> list[dict[str, object]]:
     warnings: list[dict[str, object]] = []
     seen: set[tuple[str, str, str]] = set()
-    for item_id in input_data.active_order:
-        product_id = input_data.item_products[item_id]
-        product = input_data.products.get(product_id)
-        if product is not None:
-            for concern in product.concerns:
-                warning_type = input_data.runtime_program.warning_type_by_concern_kind.get(concern.kind)
-                if warning_type is None:
-                    continue
-                _append_safety_warning(
-                    _SafetyWarningContext(
-                        warnings=warnings,
-                        seen=seen,
-                        scope="product",
-                        scope_id=product_id,
-                        warning={
-                            "type": warning_type,
-                            "item": item_id,
-                            "product": product_id,
-                            "message": concern.text,
-                        },
-                        message=concern.text,
-                    )
-                )
-        for substance_id in input_data.active_components[item_id]:
-            substance = input_data.substances.get(substance_id)
-            if substance is None:
-                continue
-            for concern in substance.concerns:
-                warning_type = input_data.runtime_program.warning_type_by_concern_kind.get(concern.kind)
-                if warning_type is None:
-                    continue
-                _append_safety_warning(
-                    _SafetyWarningContext(
-                        warnings=warnings,
-                        seen=seen,
-                        scope="substance",
-                        scope_id=substance_id,
-                        warning={
-                            "type": warning_type,
-                            "item": item_id,
-                            "product": product_id,
-                            "substance": substance_id,
-                            "message": concern.text,
-                        },
-                        message=concern.text,
-                    )
-                )
+    for active_concern in _active_concerns(input_data):
+        record = active_concern.record
+        warning_type = input_data.runtime_program.concern_warning_catalog_by_kind.get(record.concern_kind)
+        if warning_type is None:
+            continue
+        warning = {
+            "type": warning_type,
+            "item": active_concern.item_id,
+            "product": active_concern.product_id,
+            "message": record.text,
+        }
+        if record.subject_kind == "substance":
+            warning["substance"] = record.subject_id
+        _append_safety_warning(
+            _SafetyWarningContext(
+                warnings=warnings,
+                seen=seen,
+                scope=record.subject_kind,
+                scope_id=record.subject_id,
+                warning=warning,
+                message=record.text,
+            )
+        )
     return warnings
+
+
+def _active_concerns(input_data: SafetyConcernInput) -> tuple[_ActiveConcern, ...]:
+    """Project product and substance cards through one concern interpreter input."""
+    projected: list[_ActiveConcern] = []
+    for item_id in input_data.active_order:
+        product_id = input_data.item_products.get(item_id)
+        if product_id is None:
+            continue
+        product = input_data.products.get(product_id)
+        subjects: list[tuple[str, str, tuple[Concern, ...]]] = []
+        if product is not None:
+            subjects.append(("product", product.id, product.concerns))
+        for substance_id in input_data.active_components.get(item_id, []):
+            substance = input_data.substances.get(substance_id)
+            if substance is not None:
+                subjects.append(("substance", substance.id, substance.concerns))
+        for subject_kind, subject_id, concerns in subjects:
+            projected.extend(
+                _ActiveConcern(
+                    record=ConcernRecord(subject_kind, subject_id, concern.kind, concern.text),
+                    item_id=item_id,
+                    product_id=product_id,
+                )
+                for concern in concerns
+            )
+    return tuple(projected)
 
 
 def _append_safety_warning(

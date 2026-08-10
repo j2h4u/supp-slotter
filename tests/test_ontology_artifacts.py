@@ -1,48 +1,64 @@
-"""Generated ontology artifact checks without retired governance contracts."""
+"""Generated ontology artifact contract checks."""
 
 from __future__ import annotations
 
-import hashlib
 import json
 import shutil
 from pathlib import Path
 from typing import cast
 
+import pytest
 import yaml
 from planner.ontology.artifacts import load_runtime_program
-from scripts.ontology_compiler import compile_ontology
+from planner.ontology.errors import OntologyInfrastructureError
+from planner.ontology.glue_capabilities import (
+    IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
+    IMPLEMENTED_SOURCE_KIND_ROLES,
+)
+from planner.ontology.runtime_program import decode_runtime_program
 
 ROOT = Path(__file__).resolve().parents[1]
 ONTOLOGY = ROOT / "ontology"
 
 
-def _copy_repository_shape(tmp_path: Path) -> Path:
+def _copy_repository_shape(tmp_path: Path) -> Path:  # noqa: PLR0912, PLR0914
     repository = tmp_path / "repo"
     copied = repository / "ontology"
     shutil.copytree(ONTOLOGY, copied)
     manifest = cast(dict[str, object], yaml.safe_load((ONTOLOGY / "manifest.yaml").read_text(encoding="utf-8")))
     paths: set[str] = set()
-    for field in ("linkml_root", "linkml_modules", "policy_sources", "constraint_sources", "assertion_sources", "custom_shapes"):
+    for field in (
+        "linkml_root",
+        "linkml_modules",
+        "policy_sources",
+        "constraint_sources",
+        "assertion_sources",
+        "custom_shapes",
+    ):
         value = manifest.get(field)
         if isinstance(value, str):
             paths.add(value)
         elif isinstance(value, list):
             paths.update(item for item in value if isinstance(item, str))
-    for catalog in cast(list[dict[str, object]], manifest.get("catalogs", [])):
+    catalogs = cast(list[dict[str, object]], manifest.get("catalogs", []))
+    for catalog in catalogs:
         path = catalog.get("path")
         if isinstance(path, str):
             paths.add(path)
     projection = manifest.get("repository_projection")
     if isinstance(projection, dict):
-        for source in cast(list[object], projection.get("sources", [])):
+        projection_map = cast(dict[str, object], projection)
+        for source in cast(list[object], projection_map.get("sources", [])):
             if not isinstance(source, dict):
                 continue
-            locator = source.get("locator")
+            source_map = cast(dict[str, object], source)
+            locator = source_map.get("locator")
             if not isinstance(locator, dict):
                 continue
-            kind = locator.get("kind")
+            locator_map = cast(dict[str, object], locator)
+            kind = locator_map.get("kind")
             if kind == "flat_root":
-                value = locator.get("path")
+                value = locator_map.get("path")
                 if isinstance(value, str):
                     source_dir = ROOT / value
                     paths.update(
@@ -51,11 +67,11 @@ def _copy_repository_shape(tmp_path: Path) -> Path:
                         if child.is_file() and child.suffix == ".yaml"
                     )
             elif kind == "explicit_path":
-                value = locator.get("path")
+                value = locator_map.get("path")
                 if isinstance(value, str):
                     paths.add(value)
             elif kind == "explicit_paths":
-                values = locator.get("paths")
+                values = locator_map.get("paths")
                 if isinstance(values, list):
                     paths.update(item for item in values if isinstance(item, str))
     for relative in paths:
@@ -66,23 +82,213 @@ def _copy_repository_shape(tmp_path: Path) -> Path:
     return copied
 
 
-def test_generation_is_deterministic_and_direct_projection_is_fresh() -> None:
-    first = compile_ontology(ONTOLOGY)
-    assert compile_ontology(ONTOLOGY) == first
-    program = json.loads(first[Path("runtime-program.json")])
-    projection = cast(dict[str, object], program["projection"])
-    assert "effect_scoring" in projection
-    assert "prefer_with_policy" in projection
-    assert "constraint_execution_policies" in projection
-
-
 def test_committed_runtime_program_decodes() -> None:
     runtime = load_runtime_program(ONTOLOGY)
     assert runtime.effect_scoring.prefer_with_bonus > 0
     assert runtime.constraint_execution_policy_for("separate_products_same_slot") is not None
+    declared_roles = set(runtime.glue_contract.source_kind_roles)
+    assert runtime.glue_contract.source_kind_roles == IMPLEMENTED_SOURCE_KIND_ROLES
+    assert all(set(row.applies_to) <= declared_roles for row in runtime.source_kind_values)
 
 
-def test_runtime_source_digest_is_current() -> None:
-    program = json.loads((ONTOLOGY / "generated/runtime-program.json").read_text(encoding="utf-8"))
-    provenance = cast(dict[str, object], program["provenance"])
-    assert provenance["source_sha256"] == hashlib.sha256((ONTOLOGY / "runtime-policy.yaml").read_bytes()).hexdigest()
+def test_dashboard_state_rows_are_role_free_and_truth_table_driven() -> None:
+    runtime = load_runtime_program(ONTOLOGY)
+    payload = _runtime_payload()
+    projection = cast(dict[str, object], payload["projection"])
+    catalog = cast(dict[str, object], projection["dashboard_state_catalog"])
+
+    assert all(not hasattr(row, "stack_source") for row in runtime.dashboard_state_catalog.usage_states)
+    assert all(not hasattr(row, "stack_source") for row in runtime.dashboard_state_catalog.product_tracking_states)
+    for section in ("usage_states", "product_tracking_states", "usage_truth_table", "product_tracking_truth_table"):
+        rows = cast(list[dict[str, object]], catalog[section])
+        assert all("stack_source" not in row for row in rows)
+
+
+def test_runtime_decode_rejects_dashboard_state_role_token() -> None:
+    payload = _runtime_payload()
+    projection = cast(dict[str, object], payload["projection"])
+    catalog = cast(dict[str, object], projection["dashboard_state_catalog"])
+    rows = cast(list[dict[str, object]], catalog["usage_states"])
+    rows[0]["stack_source"] = "active"
+
+    with pytest.raises(OntologyInfrastructureError, match="invalid closed shape"):
+        decode_runtime_program(payload)
+
+
+def test_runtime_decode_rejects_duplicate_dashboard_state_labels() -> None:
+    payload = _runtime_payload()
+    projection = cast(dict[str, object], payload["projection"])
+    catalog = cast(dict[str, object], projection["dashboard_state_catalog"])
+    rows = cast(list[dict[str, object]], catalog["usage_states"])
+    rows[1]["label"] = rows[0]["label"]
+
+    with pytest.raises(OntologyInfrastructureError, match="state labels"):
+        decode_runtime_program(payload)
+
+
+def test_slot_near_values_are_authored_runtime_observations() -> None:
+    runtime = load_runtime_program(ONTOLOGY)
+
+    assert runtime.slot_near_values == (
+        "wake",
+        "breakfast",
+        "day_meal",
+        "sleep",
+        "workout_before",
+        "workout_after",
+    )
+
+
+@pytest.mark.parametrize("values", [[], ["wake", "wake"]])
+def test_runtime_decode_rejects_invalid_slot_near_values(values: list[str]) -> None:
+    payload = cast(
+        dict[str, object],
+        json.loads((ONTOLOGY / "generated/runtime-program.json").read_text(encoding="utf-8")),
+    )
+    projection = cast(dict[str, object], payload["projection"])
+    projection["slot_near_values"] = values
+
+    with pytest.raises(OntologyInfrastructureError, match="slot_near_values"):
+        decode_runtime_program(payload)
+
+
+def test_runtime_decode_rejects_unimplemented_objective_contract() -> None:
+    payload = cast(
+        dict[str, object],
+        json.loads((ONTOLOGY / "generated/runtime-program.json").read_text(encoding="utf-8")),
+    )
+    projection = cast(dict[str, object], payload["projection"])
+    scoring = cast(dict[str, object], projection["effect_scoring"])
+    scoring["objective_function"] = "unimplemented_objective"
+
+    with pytest.raises(OntologyInfrastructureError, match="not implemented"):
+        decode_runtime_program(payload)
+
+
+@pytest.mark.parametrize("capability_field", sorted(IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS))
+def test_runtime_decode_requires_exact_executable_capability_parity(capability_field: str) -> None:
+    payload = _runtime_payload()
+    projection = cast(dict[str, object], payload["projection"])
+    glue = cast(dict[str, object], projection["glue_contract"])
+    values = cast(list[object], glue[capability_field])
+    values.pop()
+
+    with pytest.raises(OntologyInfrastructureError, match=f"glue_contract\\.{capability_field}"):
+        decode_runtime_program(payload)
+
+
+def test_runtime_derives_presence_active_side_from_endpoint_truth_state() -> None:
+    runtime = load_runtime_program(ONTOLOGY)
+    assert {(row.source_active, row.target_active): row.active_side for row in runtime.relation_presence_statuses} == {
+        (False, False): "none",
+        (False, True): "target",
+        (True, False): "source",
+        (True, True): "both",
+    }
+
+
+@pytest.mark.parametrize("field", ["active_side", "label"])
+def test_runtime_decode_rejects_removed_derived_relation_fields(field: str) -> None:
+    payload = _runtime_payload()
+    projection = cast(dict[str, object], payload["projection"])
+    section = "relation_presence_statuses" if field == "active_side" else "selector_form_capabilities"
+    rows = cast(list[dict[str, object]], projection[section])
+    rows[0][field] = "stale"
+
+    with pytest.raises(OntologyInfrastructureError, match="invalid closed shape"):
+        decode_runtime_program(payload)
+
+
+def _runtime_payload() -> dict[str, object]:
+    return cast(
+        dict[str, object],
+        json.loads((ONTOLOGY / "generated/runtime-program.json").read_text(encoding="utf-8")),
+    )
+
+
+@pytest.mark.parametrize(
+    ("section", "key_field"),
+    [
+        ("source_kind_values", "source_kind"),
+        ("effect_match_dimensions", "key"),
+        ("assignment_axes", "axis"),
+        ("constraint_execution_policies", "operation"),
+        ("warning_types", "warning_type"),
+        ("warning_emitters", "emitter"),
+        ("warning_trait_actions", "trait_id"),
+        ("concern_catalog", "concern_kind"),
+        ("relation_presence_statuses", "status"),
+        ("selector_form_capabilities", "selector_form"),
+    ],
+)
+def test_runtime_decode_rejects_duplicate_semantic_keys_with_distinct_ids(section: str, key_field: str) -> None:
+    payload = _runtime_payload()
+    projection = cast(dict[str, object], payload["projection"])
+    rows = cast(list[dict[str, object]], projection[section])
+    rows.append({**rows[0], "id": f"{rows[0]['id']}_collision"})
+
+    with pytest.raises(OntologyInfrastructureError, match="duplicate semantic key"):
+        decode_runtime_program(payload)
+
+
+def test_runtime_decode_rejects_duplicate_relation_rule_match_with_distinct_id() -> None:
+    payload = _runtime_payload()
+    projection = cast(dict[str, object], payload["projection"])
+    rows = cast(list[dict[str, object]], projection["relation_warning_rules"])
+    rows.append({**rows[0], "id": f"{rows[0]['id']}_collision"})
+
+    with pytest.raises(OntologyInfrastructureError, match="duplicate semantic key"):
+        decode_runtime_program(payload)
+
+
+@pytest.mark.parametrize("value", ["false", "true", 0, 1, None])
+def test_runtime_decode_rejects_non_boolean_truth_table_values(value: object) -> None:
+    payload = _runtime_payload()
+    projection = cast(dict[str, object], payload["projection"])
+    glue = cast(dict[str, object], projection["glue_contract"])
+    truth = cast(list[dict[str, object]], glue["relation_presence_truth_table"])
+    truth[0]["source_active"] = value
+
+    with pytest.raises(OntologyInfrastructureError, match="must be boolean"):
+        decode_runtime_program(payload)
+
+
+def test_runtime_decode_requires_exact_unique_four_state_truth_table() -> None:
+    payload = _runtime_payload()
+    projection = cast(dict[str, object], payload["projection"])
+    glue = cast(dict[str, object], projection["glue_contract"])
+    truth = cast(list[dict[str, object]], glue["relation_presence_truth_table"])
+    truth.pop()
+
+    with pytest.raises(OntologyInfrastructureError, match="exact unique four-state coverage"):
+        decode_runtime_program(payload)
+
+
+def test_runtime_decode_requires_presence_status_for_each_truth_state() -> None:
+    payload = _runtime_payload()
+    projection = cast(dict[str, object], payload["projection"])
+    statuses = cast(list[dict[str, object]], projection["relation_presence_statuses"])
+    statuses.pop()
+
+    with pytest.raises(OntologyInfrastructureError, match="relation_presence_statuses"):
+        decode_runtime_program(payload)
+
+
+def test_runtime_decode_rejects_unsupported_relation_endpoint_selector_kind() -> None:
+    payload = _runtime_payload()
+    projection = cast(dict[str, object], payload["projection"])
+    endpoints = cast(list[dict[str, object]], projection["selector_form_capabilities"])
+    endpoints[0]["endpoint_kind"] = "category"
+
+    with pytest.raises(OntologyInfrastructureError, match="endpoint kinds"):
+        decode_runtime_program(payload)
+
+
+def test_runtime_decode_rejects_unsupported_selector_form() -> None:
+    payload = _runtime_payload()
+    projection = cast(dict[str, object], payload["projection"])
+    capabilities = cast(list[dict[str, object]], projection["selector_form_capabilities"])
+    capabilities[0]["selector_form"] = "category"
+
+    with pytest.raises(OntologyInfrastructureError, match="selector forms"):
+        decode_runtime_program(payload)

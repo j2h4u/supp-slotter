@@ -19,14 +19,14 @@ def _write_find_fixture(tmp_path: Path) -> None:
                 "prd_glycine000": {"stack": "inactive"},
             },
             products={
-                "prd_magnesium1": [("sub_magnesium1", ["timing:wake"])],
+                "prd_magnesium1": [("sub_magnesium1", ["timing:energy_like"])],
                 "prd_citrulline": [("sub_citrulline", ["activity:workout"])],
-                "prd_glycine000": [("sub_glycine000", ["timing:wake"])],
+                "prd_glycine000": [("sub_glycine000", ["timing:energy_like"])],
             },
             traits={
-                "timing:wake": {
-                    "label": "Wake",
-                    "description": "Fixture wake timing.",
+                "timing:energy_like": {
+                    "label": "Energy-like",
+                    "description": "Fixture energy-like timing.",
                     "applies_when": "Fixture only.",
                 },
                 "activity:workout": {

@@ -7,9 +7,6 @@ concerns:
 - kind: safety
   text: Review if insulin, metformin, other antidiabetes medication, or levothyroxine is present; NIH ODS notes possible additive
     hypoglycemia risk with antidiabetes medications and reduced levothyroxine absorption when co-administered.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   kind:
   - mineral

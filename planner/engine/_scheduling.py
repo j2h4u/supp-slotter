@@ -2,19 +2,17 @@
 
 Cards only declare schedule axes/values.  The ontology supplies the matching
 policy and score; this module merely joins the two and evaluates the policy
-effects against the observable slot fields.
+effects against immutable ontology observations exposed by each slot.
 """
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-
 from planner.cards.substance import format_substance_name
 from planner.contracts import (
-    PlannerCapability,
     Product,
     ProjectedEffectTrace,
     ScheduleAssignment,
+    ScheduleAssignmentSource,
     SchedulePolicyGroup,
     ScheduleProjection,
     SchedulingPolicy,
@@ -24,38 +22,53 @@ from planner.contracts import (
     Substance,
     TraitEffectMatch,
 )
-from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
-from planner.ontology.runtime_program import RuntimeAssignmentAxis, RuntimeProgram
+from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
+from planner.ontology.glue_capabilities import (
+    ONTOLOGY_COMPOSITE_KEY_SEPARATOR,
+    SOURCE_KIND_ROLE_ASSIGNMENT,
+)
+from planner.ontology.presentation import load_review_presentation
+from planner.ontology.runtime_program import RuntimeAssignmentAxis, RuntimeProgram, axis_cardinality_violation
 
 
 def _assignment_axes(program: RuntimeProgram) -> tuple[RuntimeAssignmentAxis, ...]:
     axes = tuple(sorted(program.assignment_axes, key=lambda row: (row.order, row.id)))
     if not axes or len({row.axis for row in axes}) != len(axes):
-        raise ValueError("ontology assignment axes are missing or ambiguous")
+        raise OntologyInfrastructureError("ontology assignment axes are missing or ambiguous", code=MALFORMED)
     return axes
 
 
-def _axis_values(source: Product | Substance, axis: RuntimeAssignmentAxis) -> tuple[str, ...]:
-    values = getattr(source, axis.assignment_field, ())
-    if not isinstance(values, tuple):
-        raise ValueError(f"schedule field {axis.assignment_field!r} is not a tuple")
+def _axis_values(source: ScheduleAssignmentSource, axis: RuntimeAssignmentAxis) -> tuple[str, ...]:
+    values = tuple(assertion.value for assertion in source.assertions if assertion.axis == axis.axis)
+    violation = axis_cardinality_violation(axis, len(values))
+    if violation is not None:
+        raise OntologyInfrastructureError(
+            f"invalid schedule assignment count for axis {axis.axis!r}: {violation}", code=MALFORMED
+        )
     if any(not isinstance(value, str) or not value for value in values):
-        raise ValueError(f"schedule field {axis.assignment_field!r} contains an invalid value")
+        raise OntologyInfrastructureError(f"invalid schedule assignment value for axis {axis.axis!r}", code=MALFORMED)
     return values
 
 
 def _sources(
     program: RuntimeProgram, product: Product, substances: dict[str, Substance]
-) -> tuple[tuple[str, str, str | None, Product | Substance], ...]:
+) -> tuple[ScheduleAssignmentSource, ...]:
     assignment_kinds = tuple(
-        row.source_kind for row in program.source_kind_values if "assignment_source" in row.applies_to
+        row.source_kind for row in program.source_kind_values if SOURCE_KIND_ROLE_ASSIGNMENT in row.applies_to
     )
-    if len(assignment_kinds) < 2:
-        raise ValueError("ontology source-kind taxonomy must declare product and component assignment sources")
-    product_kind, substance_kind = assignment_kinds[0], assignment_kinds[-1]
-    rows: list[tuple[str, str, str | None, Product | Substance]] = [(product_kind, product.id, None, product)]
+    if len(assignment_kinds) != 1:
+        raise OntologyInfrastructureError(
+            "ontology source-kind taxonomy must declare exactly one executable generic assignment source",
+            code=MALFORMED,
+        )
+    # Source kind is intentionally metadata, not a Product/Substance dispatch
+    # axis.  The projection boundary emits one uniform record shape and the
+    # scheduler below only consumes that shape.
+    source_kind = assignment_kinds[0]
+    rows: list[ScheduleAssignmentSource] = []
     rows.extend(
-        (substance_kind, substance.id, substance.id, substance)
+        ScheduleAssignmentSource(source_kind, substance.id, substance.id, substance.schedule_assertions)
         for component in product.components
         if (substance := substances.get(component.substance)) is not None
     )
@@ -67,36 +80,17 @@ def project_schedule_assignments(
     product: Product,
     substances: dict[str, Substance],
     policies: dict[str, SchedulingPolicy],
-    capability: PlannerCapability | None = None,
 ) -> ScheduleProjection:
     """Project every authored card assignment to its ontology policy.
 
     All resolved assignments contribute a soft score. Card schedule data is
     joined directly to ontology policies; no extra runtime action is created.
     """
-    del capability
     rows: list[ScheduleAssignment] = []
-    for axis_row in _assignment_axes(program):
-        for source_kind, source_id, component_id, source in _sources(program, product, substances):
-            for slug in _axis_values(source, axis_row):
-                policy_id = f"{axis_row.axis}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{slug}"
-                if policy_id not in policies:
-                    continue
-                rows.append(
-                    ScheduleAssignment(
-                        assignment_id=ONTOLOGY_COMPOSITE_KEY_SEPARATOR.join((
-                            source_kind,
-                            source_id,
-                            axis_row.axis,
-                            slug,
-                        )),
-                        axis=axis_row.axis,
-                        policy_id=policy_id,
-                        source_kind=source_kind,
-                        source_card_id=source_id,
-                        component_id=component_id,
-                    )
-                )
+    axes = _assignment_axes(program)
+    sources = _sources(program, product, substances)
+    _validate_source_assignments(axes, sources)
+    rows.extend(_project_source_assignments(axes, sources, policies))
     if len({row.assignment_id for row in rows}) != len(rows):
         raise ValueError("schedule assignment identifiers are ambiguous")
     groups: list[SchedulePolicyGroup] = []
@@ -107,14 +101,78 @@ def project_schedule_assignments(
     return ScheduleProjection(tuple(rows), tuple(groups))
 
 
+def _validate_source_assignments(
+    axes: tuple[RuntimeAssignmentAxis, ...],
+    sources: tuple[ScheduleAssignmentSource, ...],
+) -> None:
+    declared_axes = {row.axis for row in axes}
+    for source in sources:
+        for assertion in source.assertions:
+            if assertion.axis not in declared_axes:
+                raise OntologyInfrastructureError(
+                    "unknown schedule assignment: "
+                    f"axis={assertion.axis!r}, slug={assertion.value!r}, "
+                    f"source_kind={source.source_kind!r}, source_id={source.source_card_id!r}",
+                    code=MALFORMED,
+                )
+
+
+def _project_source_assignments(
+    axes: tuple[RuntimeAssignmentAxis, ...],
+    sources: tuple[ScheduleAssignmentSource, ...],
+    policies: dict[str, SchedulingPolicy],
+) -> list[ScheduleAssignment]:
+    rows: list[ScheduleAssignment] = []
+    for axis_row in axes:
+        for source in sources:
+            for slug in _axis_values(source, axis_row):
+                policy_id = f"{axis_row.axis}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{slug}"
+                if policy_id not in policies:
+                    raise OntologyInfrastructureError(
+                        "unknown schedule assignment: "
+                        f"axis={axis_row.axis!r}, slug={slug!r}, "
+                        f"source_kind={source.source_kind!r}, source_id={source.source_card_id!r}",
+                        code=MALFORMED,
+                    )
+                rows.append(
+                    ScheduleAssignment(
+                        assignment_id=ONTOLOGY_COMPOSITE_KEY_SEPARATOR.join((
+                            source.source_kind,
+                            source.source_card_id,
+                            axis_row.axis,
+                            slug,
+                        )),
+                        axis=axis_row.axis,
+                        policy_id=policy_id,
+                        source_kind=source.source_kind,
+                        source_card_id=source.source_card_id,
+                        component_id=source.component_id,
+                    )
+                )
+    return rows
+
+
 def slot_matches(program: RuntimeProgram, slot: Slot, match: TraitEffectMatch) -> bool:
+    observations = {observation.key: observation.value for observation in slot.observations}
+    if len(observations) != len(slot.observations):
+        raise OntologyInfrastructureError("slot observations contain duplicate keys", code=MALFORMED)
+    unknown_observations = set(observations) - set(program.effect_match_dimensions_by_key)
+    if unknown_observations:
+        raise OntologyInfrastructureError(
+            "slot contains unknown ontology observations: " + ", ".join(sorted(unknown_observations)),
+            code=MALFORMED,
+        )
     for key, expected in match.values:
         dimension = program.effect_match_dimensions_by_key.get(key)
         if dimension is None:
-            raise ValueError(f"unknown effect match dimension {key!r}")
-        if not hasattr(slot, dimension.slot_field):
-            raise ValueError(f"effect match dimension {key!r} references unknown slot field")
-        if getattr(slot, dimension.slot_field) != expected:
+            raise OntologyInfrastructureError(f"unknown ontology effect match dimension {key!r}", code=MALFORMED)
+        actual = observations.get(dimension.key)
+        if actual is None:
+            raise OntologyInfrastructureError(
+                f"slot has no observation for ontology effect match dimension {key!r}",
+                code=MALFORMED,
+            )
+        if actual != expected:
             return False
     return True
 
@@ -137,7 +195,10 @@ def compute_slot_score(
                 continue
             score_row = scores.get(effect.level)
             if score_row is None:
-                raise ValueError(f"ontology score level {effect.level!r} is missing")
+                raise OntologyInfrastructureError(
+                    f"ontology score level {effect.level!r} is missing",
+                    code=MALFORMED,
+                )
             delta = round(float(score_row.score) * group.score_weight)
             score += delta
             effects.append(
@@ -174,11 +235,19 @@ def build_substance_slot_names(
     return sorted(names, key=str.casefold)
 
 
-def render_slot_effects(trace: SlotScoreTrace | SlotCandidateTrace) -> list[str]:
+def render_slot_effects(trace: SlotScoreTrace | SlotCandidateTrace, bundle: OntologyBundle) -> list[str]:
+    presentation = load_review_presentation(bundle)
     rows = [
         f"{effect.policy_id}: score={effect.delta:+d}; assignments={','.join(effect.assignment_ids)}; "
         f"sources={','.join(effect.source_card_ids)}"
         for effect in trace.effects
         if effect.delta != 0
     ]
-    return rows or ["No strict timing driver; placed in an available compatible slot."]
+    if rows:
+        return rows
+    if presentation.zero_effect_condition != "no_nonzero_effects":
+        raise OntologyInfrastructureError(
+            "ontology schedule_presentation zero-effect condition is unsupported",
+            code=MALFORMED,
+        )
+    return [presentation.zero_effect_template]

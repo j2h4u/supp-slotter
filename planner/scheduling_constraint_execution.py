@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 
 from planner.contracts import RelationSelector, SchedulingConstraint, Substance
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.runtime_program import RuntimeProgram
-from planner.ontology.substance_fields import allowed_predicate_fields_for_category, substance_terms_for_category
+from planner.ontology.schema_enums import schema_enum_values
+from planner.ontology.selector import resolve_selector
 
 
 @dataclass(frozen=True, slots=True)
@@ -43,12 +44,18 @@ class SchedulingConstraintExecutionPlan:
         return self.target_substance_ids
 
 
+@dataclass(frozen=True, slots=True)
+class _AuthoredExecutionGrammar:
+    operation_values: tuple[str, ...]
+    direction_values: tuple[str, ...]
+    aggregation_values: tuple[str, ...]
+
+
 def compile_scheduling_constraint_execution_plans(
     constraints: Iterable[SchedulingConstraint],
     substances: dict[str, Substance],
     runtime_program: RuntimeProgram,
     *,
-    allow_empty_selector_resolution: bool = False,
     ontology_bundle: OntologyBundle,
 ) -> tuple[SchedulingConstraintExecutionPlan, ...]:
     """Compile constraints against one verified runtime program.
@@ -59,6 +66,7 @@ def compile_scheduling_constraint_execution_plans(
     """
 
     plans: list[SchedulingConstraintExecutionPlan] = []
+    grammar = _authored_execution_grammar(ontology_bundle)
     for constraint in constraints:
         operation = constraint.operation
         if not operation:
@@ -72,30 +80,42 @@ def compile_scheduling_constraint_execution_plans(
                 f"scheduling constraint {constraint.id}: unsupported operation '{operation}'",
                 code=MALFORMED,
             )
-        source_ids, source_outcome = _selector_matching_substance_ids(
-            constraint.source_selector, substances, ontology_bundle
+        _validate_execution_grammar(
+            constraint.id,
+            operation,
+            execution_policy.match_direction,
+            execution_policy.aggregation,
+            grammar=grammar,
         )
-        target_ids, target_outcome = _selector_matching_substance_ids(
-            constraint.target_selector, substances, ontology_bundle
-        )
+        _handler_for_operation(constraint.id, operation)
+        source_resolution = resolve_selector(constraint.source_selector, substances, ontology_bundle)
+        target_resolution = resolve_selector(constraint.target_selector, substances, ontology_bundle)
+        source_ids, source_outcome = source_resolution.substance_ids, source_resolution.outcome
+        target_ids, target_outcome = target_resolution.substance_ids, target_resolution.outcome
         selector_outcome = _combine_selector_outcomes(source_outcome, target_outcome)
         if selector_outcome in {"malformed_selector", "unsupported_selector"}:
             raise OntologyInfrastructureError(
                 f"scheduling constraint {constraint.id}: {selector_outcome}",
                 code=MALFORMED,
             )
-        if (
-            selector_outcome == "empty"
-            and execution_policy.selector_resolution == "require_nonempty"
-            and not allow_empty_selector_resolution
-        ):
+        if selector_outcome == "empty" and execution_policy.selector_resolution == "require_nonempty":
             raise OntologyInfrastructureError(
                 f"scheduling constraint {constraint.id}: selector resolution is empty",
                 code=MALFORMED,
             )
         executable = selector_outcome == "resolved"
-        blocks_slots = bool(executable and execution_policy.blocks_slots)
-        scores_advisory = bool(executable and execution_policy.scores_advisory)
+        blocks_slots = bool(
+            executable
+            and (constraint.blocks_slots if constraint.blocks_slots is not None else execution_policy.blocks_slots)
+        )
+        scores_advisory = bool(
+            executable
+            and (
+                constraint.scores_advisory
+                if constraint.scores_advisory is not None
+                else execution_policy.scores_advisory
+            )
+        )
         plans.append(
             SchedulingConstraintExecutionPlan(
                 id=constraint.id,
@@ -106,7 +126,11 @@ def compile_scheduling_constraint_execution_plans(
                 executable=executable,
                 blocks_slots=blocks_slots,
                 scores_advisory=scores_advisory,
-                score_delta=execution_policy.score_delta if scores_advisory else 0,
+                score_delta=(
+                    constraint.score_delta if constraint.score_delta is not None else execution_policy.score_delta
+                )
+                if scores_advisory
+                else 0,
                 match_direction=execution_policy.match_direction,
                 aggregation=execution_policy.aggregation,
                 selector_resolution=execution_policy.selector_resolution,
@@ -120,50 +144,6 @@ def compile_scheduling_constraint_execution_plans(
     return tuple(plans)
 
 
-def _selector_matching_substance_ids(
-    selector: RelationSelector | None,
-    substances: dict[str, Substance],
-    ontology_bundle: OntologyBundle,
-) -> tuple[tuple[str, ...], str]:
-    if selector is None:
-        return (), "missing"
-    populated = sum(
-        value is not None for value in (selector.entity_id, selector.entity_name, selector.category, selector.term)
-    )
-    if (
-        populated not in {1, 2}
-        or (selector.entity_id is not None and selector.entity_name is not None)
-        or (selector.category is not None and selector.term is None)
-        or (selector.category is None and selector.term is not None)
-    ):
-        return (), "malformed_selector"
-
-    def matches(substance_id: str, substance: Substance) -> bool:
-        if selector.entity_id is not None:
-            return selector.entity_id == substance_id
-        if selector.entity_name is not None:
-            return selector.entity_name == substance.name
-        if selector.category is None or selector.term is None:
-            return False
-        values = substance_terms_for_category(substance, selector.category, ontology_bundle)
-        return values is not None and selector.term in values
-
-    matched = tuple(
-        substance_id for substance_id, substance in sorted(substances.items()) if matches(substance_id, substance)
-    )
-    if (
-        selector.entity_id is None
-        and selector.entity_name is None
-        and (
-            selector.category is None
-            or selector.term is None
-            or allowed_predicate_fields_for_category(ontology_bundle, selector.category) is None
-        )
-    ):
-        return (), "unsupported_selector"
-    return matched, "resolved" if matched else "empty"
-
-
 def _combine_selector_outcomes(source: str, target: str) -> str:
     if source == "resolved" and target == "resolved":
         return "resolved"
@@ -171,12 +151,153 @@ def _combine_selector_outcomes(source: str, target: str) -> str:
         return "unsupported_selector"
     if "malformed_selector" in {source, target}:
         return "malformed_selector"
-    if "missing" in {source, target}:
-        return "missing"
     return "empty"
+
+
+def _authored_execution_grammar(bundle: OntologyBundle) -> _AuthoredExecutionGrammar:
+    """Read execution vocabulary from the verified authored schema."""
+
+    return _AuthoredExecutionGrammar(
+        operation_values=schema_enum_values(bundle, "ConstraintExecutionOperation"),
+        direction_values=schema_enum_values(bundle, "ConstraintExecutionMatchDirection"),
+        aggregation_values=schema_enum_values(bundle, "ConstraintExecutionAggregation"),
+    )
+
+
+def _validate_execution_grammar(
+    constraint_id: str,
+    operation: str,
+    direction: str,
+    aggregation: str,
+    *,
+    grammar: _AuthoredExecutionGrammar,
+) -> None:
+    """Validate IDs against authored enum metadata, never a Python allow-list."""
+
+    if aggregation not in grammar.aggregation_values:
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: unsupported aggregation {aggregation!r}",
+            code=MALFORMED,
+        )
+    if direction not in grammar.direction_values:
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: unsupported match direction {direction!r}",
+            code=MALFORMED,
+        )
+    if operation not in grammar.operation_values:
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: unsupported operation {operation!r}",
+            code=MALFORMED,
+        )
+
+
+def _handler_for_operation(constraint_id: str, operation: str) -> Callable[..., bool]:
+    handler = _EXECUTION_HANDLERS.get(operation)
+    if handler is None:
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: no runtime handler for operation {operation!r}",
+            code=MALFORMED,
+        )
+    return handler
+
+
+def _interpret_separate_products_same_slot(
+    direction: str,
+    item_components: Sequence[str],
+    existing_components: Sequence[str],
+    source_ids: Sequence[str],
+    target_ids: Sequence[str],
+) -> bool:
+    source_matches_item = bool(set(item_components) & set(source_ids))
+    target_matches_existing = bool(set(existing_components) & set(target_ids))
+    target_matches_item = bool(set(item_components) & set(target_ids))
+    source_matches_existing = bool(set(existing_components) & set(source_ids))
+    forward = source_matches_item and target_matches_existing
+    if direction == "directed":
+        return forward
+    if direction == "symmetric":
+        return forward or (target_matches_item and source_matches_existing)
+    raise OntologyInfrastructureError(
+        f"unsupported match direction {direction!r}",
+        code=MALFORMED,
+    )
+
+
+_EXECUTION_HANDLERS: dict[str, Callable[..., bool]] = {
+    "separate_products_same_slot": _interpret_separate_products_same_slot,
+}
+
+
+def interpret_execution_component_pair(
+    execution: Mapping[str, object],
+    item_components: Sequence[str],
+    existing_components: Sequence[str],
+) -> bool:
+    """Interpret a resolved execution row without fabricating plan metadata."""
+
+    constraint_id = execution.get("id")
+    operation = execution.get("operation")
+    match_direction = execution.get("match_direction")
+    aggregation = execution.get("aggregation")
+    source_substances = execution.get("source_substances")
+    target_substances = execution.get("target_substances")
+    if not isinstance(constraint_id, str) or not constraint_id.strip():
+        raise OntologyInfrastructureError("scheduling constraint execution row has invalid id", code=MALFORMED)
+    if not isinstance(operation, str) or not operation.strip():
+        raise OntologyInfrastructureError(f"scheduling constraint {constraint_id}: invalid operation", code=MALFORMED)
+    if not isinstance(match_direction, str) or not match_direction.strip():
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: invalid match direction", code=MALFORMED
+        )
+    if not isinstance(aggregation, str) or not aggregation.strip():
+        raise OntologyInfrastructureError(f"scheduling constraint {constraint_id}: invalid aggregation", code=MALFORMED)
+    if not isinstance(source_substances, Sequence) or isinstance(source_substances, (str, bytes)):
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: malformed source substances", code=MALFORMED
+        )
+    if not isinstance(target_substances, Sequence) or isinstance(target_substances, (str, bytes)):
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: malformed target substances", code=MALFORMED
+        )
+    if not all(isinstance(item, str) for item in source_substances) or not all(
+        isinstance(item, str) for item in target_substances
+    ):
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: malformed source or target substances", code=MALFORMED
+        )
+    handler = _handler_for_operation(constraint_id, operation)
+    if aggregation != "distinct_constraint":
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: unsupported aggregation {aggregation!r}",
+            code=MALFORMED,
+        )
+    return handler(match_direction, item_components, existing_components, source_substances, target_substances)
+
+
+def interpret_constraint_component_pair(
+    constraint: SchedulingConstraintExecutionPlan,
+    item_components: Sequence[str],
+    existing_components: Sequence[str],
+) -> bool:
+    """Interpret the closed runtime grammar for one unordered component pair."""
+
+    return interpret_execution_component_pair(
+        {
+            "id": constraint.id,
+            "operation": constraint.operation,
+            "match_direction": constraint.match_direction,
+            "aggregation": constraint.aggregation,
+            "source_substances": constraint.source_substance_ids,
+            "target_substances": constraint.target_substance_ids,
+        },
+        item_components,
+        existing_components,
+    )
 
 
 __all__ = [
     "SchedulingConstraintExecutionPlan",
     "compile_scheduling_constraint_execution_plans",
+    "interpret_constraint_component_pair",
+    "interpret_execution_component_pair",
 ]

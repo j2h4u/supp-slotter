@@ -72,7 +72,7 @@ def build_surreal_session(
     _load_products(db, products, ontology_bundle)
     _load_stacks(db, context.stacks_data)
     _load_pillboxes(db, context.pillbox_stack_names)
-    _load_dashboards(db, context.dashboards)
+    _load_dashboards(db, context.dashboards, ontology_bundle)
     return db
 
 
@@ -134,8 +134,12 @@ def _load_pillboxes(db: SurrealSession, pillbox_stack_names: set[str] | None) ->
         db.create("pillbox", {"stack_name": stack_name})
 
 
-def _load_dashboards(db: SurrealSession, dashboards: dict[str, Dashboard] | None) -> None:
+def _load_dashboards(
+    db: SurrealSession,
+    dashboards: dict[str, Dashboard] | None,
+    ontology_bundle: OntologyBundle,
+) -> None:
     if not dashboards:
         return
-    for slug, dashboard in dashboards.items():
-        db.create("dashboard", dashboard_record(slug, dashboard))
+    for dashboard in dashboards.values():
+        db.create("dashboard", dashboard_record(dashboard, ontology_bundle))

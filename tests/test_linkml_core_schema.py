@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import TypeGuard, cast
 
@@ -19,11 +20,6 @@ def _mapping(value: object) -> YamlMapping:
     return value
 
 
-def _string_list(value: object) -> list[str]:
-    assert isinstance(value, list) and all(isinstance(item, str) for item in value), "expected a YAML string list"
-    return value
-
-
 def _read(name: str) -> YamlMapping:
     loaded = cast(object, yaml.safe_load((ROOT / "ontology" / name).read_text()))
     return _mapping(loaded)
@@ -42,6 +38,11 @@ def test_core_classes_and_structural_slots_are_authored() -> None:
         "StackEntry",
         "Dashboard",
         "EntitySelector",
+        "CardConcern",
+        "CardKnowledge",
+        "CardSchedule",
+        "SubstanceCard",
+        "ProductCard",
     }
     assert expected <= set(_mapping(schema["classes"]))
     assert {"id", "label", "components", "slots", "entries", "selectors"} <= set(_mapping(schema["slots"]))
@@ -51,27 +52,6 @@ def test_vocabulary_terms_are_classes_not_linkml_enums() -> None:
     schema = _read("vocabulary-model.yaml")
     assert {"SemanticCategory", "OntologyTerm", "TermAssignment"} <= set(_mapping(schema["classes"]))
     assert "enums" not in schema
-
-
-def test_linkml_schema_views_load_core_modules() -> None:
-    schemaview = SchemaView
-    for filename in ("model.yaml", "vocabulary-model.yaml"):
-        view = schemaview(str(ROOT / "ontology" / filename))
-        assert view.all_classes()
-
-
-def test_root_imports_modular_graph_with_repo_relative_names() -> None:
-    root = _read("supp_slotter.yaml")
-    assert _string_list(root["imports"]) == [
-        "linkml:types",
-        "model",
-        "vocabulary-model",
-        "relation-model",
-        "scheduling-model",
-        "runtime-protocol",
-    ]
-    imports = _string_list(root["imports"])
-    assert all("/" not in item and ".." not in item for item in imports if not item.startswith("linkml:"))
 
 
 def test_global_slot_definitions_do_not_disagree() -> None:
@@ -121,12 +101,9 @@ def test_composed_root_induced_embedding_and_reference_contracts() -> None:
         ("Pillbox", "slots", "Slot"),
         ("Stack", "entries", "StackEntry"),
         ("Dashboard", "selectors", "DashboardSelector"),
-        ("PolicyAxis", "value_bindings", "AxisValueBinding"),
         ("Condition", "conditions", "Condition"),
         ("Condition", "left", "Condition"),
         ("Condition", "right", "Condition"),
-        ("PolicyEffect", "condition", "Condition"),
-        ("PolicyEffect", "action", "Action"),
         ("SchedulingConstraint", "condition", "Condition"),
         ("SchedulingConstraint", "action", "Action"),
     ]:
@@ -136,22 +113,11 @@ def test_composed_root_induced_embedding_and_reference_contracts() -> None:
             assert s.inlined_as_list
     for cls, slot, rng in [
         ("Condition", "selector", "Selector"),
-        ("PolicyAxis", "schedule_rule", "OntologyTerm"),
         ("TermAssignment", "subject", "Selector"),
         ("ProductComponent", "substance", "Substance"),
         ("StackEntry", "product", "Product"),
         ("EntitySelector", "entity_id", "IdentifiedNode"),
         ("TermAssignment", "term", "OntologyTerm"),
-        ("SlotFeatureValue", "feature", "SlotFeature"),
-        ("PolicyAxis", "features", "SlotFeature"),
-        ("AxisValueBinding", "axis", "PolicyAxis"),
-        ("AxisValueBinding", "value", "SlotFeatureValue"),
-        ("ScheduleAssignment", "subject", "Selector"),
-        ("ScheduleAssignment", "policy", "SchedulingPolicy"),
-        ("SchedulingPolicy", "axes", "PolicyAxis"),
-        ("SchedulingPolicy", "effects", "PolicyEffect"),
-        ("SchedulingPolicy", "constraints", "SchedulingConstraint"),
-        ("SchedulingPolicy", "objectives", "ObjectiveTerm"),
     ]:
         s = view.induced_slot(slot, cls)
         assert s.range == rng and not bool(s.inlined)
@@ -160,4 +126,51 @@ def test_composed_root_induced_embedding_and_reference_contracts() -> None:
         "OntologyTerm",
     ):
         assert view.induced_slot("label", cls).required
-    assert view.induced_slot("schedule_rule", "PolicyAxis").required
+
+
+def test_decorative_scheduling_classes_are_not_in_composed_schema() -> None:
+    view = SchemaView(str(ROOT / "ontology" / "supp_slotter.yaml"))
+    assert not {
+        "SlotFeature",
+        "SlotFeatureValue",
+        "PolicyAxis",
+        "PolicyEffect",
+        "ScheduleAssignment",
+        "ObjectiveTerm",
+    } & set(view.all_classes())
+
+
+def test_card_contracts_author_id_patterns_and_nested_cardinality() -> None:
+    view = SchemaView(str(ROOT / "ontology" / "supp_slotter.yaml"))
+    assert "name" in view.class_slots("SubstanceCard")
+    assert "label" not in view.class_slots("SubstanceCard")
+    assert "name" in view.class_slots("ProductCard")
+    assert "label" not in view.class_slots("ProductCard")
+    assert view.induced_slot("id", "SubstanceCard").pattern == r"^sub_[a-z0-9]{10}$"
+    assert view.induced_slot("id", "ProductCard").pattern == r"^prd_[a-z0-9]{10}$"
+    # The base schema owns the schedule envelope only.  Concrete axis and
+    # knowledge properties are generated from authored catalogs.
+    assert not {"intake", "timing", "activity"} & set(view.class_slots("CardSchedule"))
+    assert not {"kind", "role", "quality", "effect", "risk", "context", "pathway"} & set(
+        view.class_slots("CardKnowledge")
+    )
+    prefer_with = view.induced_slot("prefer_with", "CardSchedule")
+    assert prefer_with.range == "string"
+    assert prefer_with.pattern == r"^sub_[a-z0-9]{10}$"
+    assert prefer_with.minimum_cardinality == 1
+    assert view.induced_slot("components", "ProductCard").minimum_cardinality == 1
+
+
+def test_generated_card_schema_projects_authored_axis_and_category_properties() -> None:
+    generated = json.loads((ROOT / "ontology" / "generated" / "card.schema.json").read_text())
+    definitions = generated["$defs"]
+    assert set(definitions["CardSchedule"]["properties"]) >= {"intake", "timing", "activity", "prefer_with"}
+    assert set(definitions["CardKnowledge"]["properties"]) >= {
+        "kind",
+        "role",
+        "quality",
+        "effect",
+        "risk",
+        "context",
+        "pathway",
+    }

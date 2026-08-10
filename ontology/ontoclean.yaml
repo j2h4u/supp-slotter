@@ -11,15 +11,12 @@ ontoclean_profiles:
   rigid_identity:
     rigidity: rigid
     supplies_identity: true
-    unity: variable
     dependence: independent
   anti_rigid_dependent:
     rigidity: anti_rigid
     supplies_identity: false
-    unity: variable
     dependence: dependent
   dependent_assertion:
     rigidity: rigid
     supplies_identity: false
-    unity: variable
     dependence: dependent

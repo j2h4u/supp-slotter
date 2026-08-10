@@ -18,7 +18,7 @@ def test_full_audit_prints_constraint_structure_and_selector_coverage(tmp_path: 
     with contextlib.redirect_stdout(stdout):
         result = cmd_audit(data_root=tmp_path, full=True)
 
-    lines = result.full["full.scheduling_constraints"]
+    lines = result.full["diagnostics"]
     assert len(lines) == 4
     assert [line.split(":", maxsplit=1)[0] for line in lines] == sorted(
         line.split(":", maxsplit=1)[0] for line in lines
@@ -26,8 +26,8 @@ def test_full_audit_prints_constraint_structure_and_selector_coverage(tmp_path: 
     assert all("selectors=" in line and "source=" in line and "target=" in line for line in lines)
     assert all("operation=separate_products_same_slot" in line for line in lines)
     assert all("action=" in line for line in lines)
-    assert any("coverage=UNRESOLVED" in line for line in lines)
-    assert "Scheduling constraints — structure and selector coverage (4)" in stdout.getvalue()
+    assert all("coverage=resolved" in line for line in lines)
+    assert "Full audit (4)" in stdout.getvalue()
 
 
 def test_regular_audit_does_not_print_constraint_coverage(tmp_path: Path) -> None:

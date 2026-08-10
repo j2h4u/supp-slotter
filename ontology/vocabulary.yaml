@@ -12,52 +12,52 @@ semantic_categories:
     allowed_predicates:
     - knowledge.kind
     ontoclean_profile: rigid_identity
-    rigidity: rigid
-    dependence: independent
+    multivalued: true
   role:
     allowed_predicates:
     - knowledge.role
     ontoclean_profile: anti_rigid_dependent
-    rigidity: anti_rigid
-    dependence: dependent
+    multivalued: true
   quality:
     allowed_predicates:
     - knowledge.quality
     ontoclean_profile: dependent_assertion
-    rigidity: rigid
-    dependence: dependent
+    multivalued: true
   effect:
     allowed_predicates:
     - knowledge.effect
     ontoclean_profile: dependent_assertion
-    rigidity: rigid
-    dependence: dependent
+    multivalued: true
   risk:
     allowed_predicates:
     - knowledge.risk
     ontoclean_profile: dependent_assertion
-    rigidity: rigid
-    dependence: dependent
+    multivalued: true
   pathway:
     allowed_predicates:
     - knowledge.pathway
     ontoclean_profile: dependent_assertion
-    rigidity: rigid
-    dependence: dependent
+    multivalued: true
   context:
     allowed_predicates:
     - knowledge.context
     ontoclean_profile: anti_rigid_dependent
-    rigidity: anti_rigid
-    dependence: dependent
-  schedule_rule:
+    multivalued: true
+  intake:
     allowed_predicates:
     - schedule.intake
+    ontoclean_profile: dependent_assertion
+    multivalued: true
+  timing:
+    allowed_predicates:
     - schedule.timing
+    ontoclean_profile: dependent_assertion
+    multivalued: true
+  activity:
+    allowed_predicates:
     - schedule.activity
     ontoclean_profile: dependent_assertion
-    rigidity: rigid
-    dependence: dependent
+    multivalued: true
 terms:
 - slug: antioxidant_protection
   label: Antioxidant Protection
@@ -341,7 +341,6 @@ terms:
   # It deliberately remains in the existing context namespace so dashboard and
   # relation selectors keep their explicit, non-clinical-decision semantics.
   semantic_category: context
-  assertion_kind: clinical_exposure_context
 - slug: insulin_signaling_context
   label: Insulin Signaling Context
   description: Insulin-signaling context for substances that affect insulin sensitivity, insulin receptor signaling, or glucose-disposal
@@ -874,44 +873,44 @@ terms:
 - slug: any_workout
   label: Any workout slot
   description: Training-adjacent marker where pre/post timing is flexible.
-  semantic_category: schedule_rule
+  semantic_category: activity
 - slug: post_workout
   label: Post-workout
   description: Timing marker for substances intended after training.
-  semantic_category: schedule_rule
+  semantic_category: activity
 - slug: pre_workout
   label: Pre-workout
   description: Timing marker for substances intended before training.
-  semantic_category: schedule_rule
+  semantic_category: activity
 - slug: empty_preferred
   label: Prefers empty stomach
   description: Works or absorbs better away from food, without a hard food block.
-  semantic_category: schedule_rule
+  semantic_category: intake
 - slug: fat_meal_required
   label: Requires fat-containing meal
   description: Fat-containing food is the real intake target; current slot model approximates this as food=true.
-  semantic_category: schedule_rule
+  semantic_category: intake
 - slug: food_neutral
   label: Food neutral
   description: Food state is not a meaningful scheduling driver.
-  semantic_category: schedule_rule
+  semantic_category: intake
 - slug: food_preferred
   label: Prefers food
   description: Food improves tolerance or practical use, but empty-stomach intake remains acceptable.
-  semantic_category: schedule_rule
+  semantic_category: intake
 - slug: food_required
   label: Requires food
   description: Active substance requires food for absorption, stomach tolerance, or reliable effect.
-  semantic_category: schedule_rule
+  semantic_category: intake
 - slug: energy_like
   label: Energy-like
   description: Direct wake-promoting or activating effect.
-  semantic_category: schedule_rule
+  semantic_category: timing
 - slug: sleep_disruptive
   label: Sleep disruptive
   description: Likely to disrupt sleep and should not be placed near bedtime.
-  semantic_category: schedule_rule
+  semantic_category: timing
 - slug: sleep_support
   label: Sleep support
   description: Directly supports sleep onset or sleep quality.
-  semantic_category: schedule_rule
+  semantic_category: timing

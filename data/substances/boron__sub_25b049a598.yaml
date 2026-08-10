@@ -3,9 +3,6 @@ name: Boron
 notes: Generic elemental boron contribution. Product cards keep the concrete source form in component labels and notes. NIH
   ODS says boron is not classified as an essential human nutrient, but may affect calcium metabolism, bone formation, brain
   function, insulin/energy-substrate metabolism, immunity, and steroid hormone function including vitamin D and estrogen.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - bone_mineral_metabolism_support

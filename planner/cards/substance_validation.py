@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Set
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
@@ -11,7 +11,11 @@ from planner.cards._common import load_card_mapping
 from planner.cards.substance import canonical_substance_filename
 from planner.contracts import CardLoadError, Substance
 from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.substance_fields import knowledge_category_fields, schedule_assignment_fields
+from planner.ontology.substance_fields import (
+    canonical_terms_by_predicate,
+    knowledge_category_fields,
+    schedule_assignment_fields,
+)
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue
@@ -19,9 +23,10 @@ from planner.yaml_io import YamlValue
 
 @dataclass(frozen=True, slots=True)
 class _CanonicalTermContext:
-    known_terms: frozenset[tuple[str, str]]
+    terms_by_predicate: Mapping[str, frozenset[str]]
     schedule_fields: tuple[str, ...]
     knowledge_fields: tuple[str, ...]
+    schedule_axis_by_field: tuple[tuple[str, str], ...]
 
 
 def check_substances(
@@ -119,36 +124,60 @@ def _validate_canonical_terms(
     context: _CanonicalTermContext,
     errors: list[str],
 ) -> None:
+    schedule_axis_by_field = dict(context.schedule_axis_by_field)
     for field in context.schedule_fields:
-        _append_unknown_term_errors(path, "schedule_rule", schedule.get(field), context.known_terms, errors)
+        axis = schedule_axis_by_field.get(field)
+        if axis is None:
+            continue
+        _append_unknown_schedule_term_errors(
+            path, axis, schedule.get(field), context.terms_by_predicate.get(f"schedule.{axis}", frozenset()), errors
+        )
     for category in context.knowledge_fields:
-        _append_unknown_term_errors(path, category, knowledge.get(category), context.known_terms, errors)
+        _append_unknown_term_errors(
+            path,
+            category,
+            knowledge.get(category),
+            context.terms_by_predicate.get(f"knowledge.{category}", frozenset()),
+            errors,
+        )
 
 
 def _canonical_term_context(bundle: OntologyBundle) -> _CanonicalTermContext:
+    assignment_axes = tuple(
+        (row.assignment_field, row.axis)
+        for row in sorted(bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
+    )
     return _CanonicalTermContext(
-        known_terms=_known_canonical_terms(dict(bundle.runtime_vocabulary)),
+        terms_by_predicate=canonical_terms_by_predicate(bundle),
         schedule_fields=schedule_assignment_fields(bundle),
         knowledge_fields=knowledge_category_fields(bundle),
+        schedule_axis_by_field=assignment_axes,
     )
 
 
-def _known_canonical_terms(vocabulary: dict[str, object]) -> frozenset[tuple[str, str]]:
-    return frozenset(
-        (str(term["semantic_category"]), str(term["slug"]))
-        for raw in cast(list[object], vocabulary.get("terms", []))
-        if isinstance(raw, dict)
-        for term in [cast(dict[str, object], raw)]
+def _append_unknown_schedule_term_errors(
+    path: Path,
+    axis: str,
+    values: YamlValue | None,
+    known: frozenset[str],
+    errors: list[str],
+) -> None:
+    if not isinstance(values, list):
+        return
+    errors.extend(
+        f"{path}: term '{axis}:{term}' is not in canonical ontology vocabulary"
+        for term in values
+        if isinstance(term, str) and term not in known
     )
 
 
 def _append_unknown_term_errors(
-    path: Path, category: str, values: YamlValue | None, known: Set[tuple[str, str]], errors: list[str]
+    path: Path, category: str, values: YamlValue | None, known: frozenset[str], errors: list[str]
 ) -> None:
     if not isinstance(values, list):
         return
     errors.extend(
         f"{path}: term '{category}:{term}' is not in canonical ontology vocabulary"
         for term in values
-        if isinstance(term, str) and (category, term) not in known
+        if isinstance(term, str) and term not in known
     )

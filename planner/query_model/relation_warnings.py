@@ -19,6 +19,7 @@ _RELATION_WARNING_PROJECTION = "src_key, tgt_key, src_display, tgt_display, reas
 
 class RelationWarningRow(TypedDict):
     type: str
+    relation: str
     source_substance: str
     source_name: str
     target_substance: str
@@ -95,11 +96,16 @@ def _query_for_rule(
         raise ValueError(f"ontology relation_warning_rules has unsupported filter_field {rule.filter_field!r}")
     sql = (
         f"SELECT {projection} FROM ontology_assertion "
-        f"WHERE {column} = $filter_value "
+        f"WHERE type = $relation_type "
+        f"  AND {column} = $filter_value "
         f"  AND src_substances {source_match} $active "
         f"  AND tgt_substances {target_match} $active"
     )
-    return sql, {"active": list(active_substances), "filter_value": rule.filter_value}
+    return sql, {
+        "active": list(active_substances),
+        "filter_value": rule.filter_value,
+        "relation_type": rule.relation_kind,
+    }
 
 
 def _presence_operator(is_active: bool) -> str:
@@ -125,13 +131,14 @@ def _collect_relation_warnings(
         if key in seen:
             continue
         seen.add(key)
-        warnings.append(_warning_from_row(typed_row, warning_type))
+        warnings.append(_warning_from_row(typed_row, warning_type, relation_type))
     return warnings
 
 
-def _warning_from_row(row: RelationWarningQueryRow, warning_type: str) -> RelationWarningRow:
+def _warning_from_row(row: RelationWarningQueryRow, warning_type: str, relation_type: str) -> RelationWarningRow:
     out: RelationWarningRow = {
         "type": warning_type,
+        "relation": relation_type,
         "source_substance": row["src_key"],
         "source_name": row["src_display"],
         "target_substance": row["tgt_key"],

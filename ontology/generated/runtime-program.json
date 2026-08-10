@@ -7,6 +7,8 @@
         "assignment_source": "schedule",
         "axis": "intake",
         "id": "assignment_axis_intake",
+        "maximum_cardinality": 1,
+        "minimum_cardinality": 0,
         "order": 0
       },
       {
@@ -14,6 +16,8 @@
         "assignment_source": "schedule",
         "axis": "timing",
         "id": "assignment_axis_timing",
+        "maximum_cardinality": 1,
+        "minimum_cardinality": 0,
         "order": 1
       },
       {
@@ -21,97 +25,12 @@
         "assignment_source": "schedule",
         "axis": "activity",
         "id": "assignment_axis_activity",
+        "maximum_cardinality": 1,
+        "minimum_cardinality": 0,
         "order": 2
       }
     ],
-    "capability_rules": [
-      {
-        "base_slot_models": [
-          "binary"
-        ],
-        "food_model": "binary",
-        "formulations": [
-          "unknown",
-          "capsule",
-          "tablet",
-          "powder",
-          "liquid"
-        ],
-        "id": "slot_planner_binary",
-        "near_to_model": [
-          {
-            "id": "wake_near_model",
-            "model": "wake_day_sleep",
-            "near": "wake"
-          },
-          {
-            "id": "breakfast_near_model",
-            "model": "wake_day_sleep",
-            "near": "breakfast"
-          },
-          {
-            "id": "day_meal_near_model",
-            "model": "wake_day_sleep",
-            "near": "day_meal"
-          },
-          {
-            "id": "sleep_near_model",
-            "model": "wake_day_sleep",
-            "near": "sleep"
-          },
-          {
-            "id": "workout_before_near_model",
-            "model": "workout_before_after",
-            "near": "workout_before"
-          },
-          {
-            "id": "workout_after_near_model",
-            "model": "workout_before_after",
-            "near": "workout_after"
-          }
-        ],
-        "planner": "slot_policy",
-        "product_scope": [
-          "direct"
-        ],
-        "slot_models": [
-          "binary",
-          "wake_day_sleep",
-          "workout_before_after"
-        ]
-      }
-    ],
-    "concern_review_statuses": [
-      {
-        "description": "card is active in a non-inactive stack",
-        "id": "concern_review_status_active",
-        "membership_role": "active",
-        "rank": 0,
-        "status": "active"
-      },
-      {
-        "description": "card is in the inactive stack",
-        "id": "concern_review_status_inactive",
-        "membership_role": "inactive",
-        "rank": 1,
-        "status": "inactive"
-      },
-      {
-        "description": "product card is tracked but outside all stacks",
-        "id": "concern_review_status_tracked_unassigned",
-        "membership_role": "product_fallback",
-        "rank": 2,
-        "status": "tracked-unassigned"
-      },
-      {
-        "description": "substance card is known but not assigned through an active product",
-        "id": "concern_review_status_knowledge_only",
-        "membership_role": "substance_fallback",
-        "rank": 3,
-        "status": "knowledge-only"
-      }
-    ],
-    "concern_warning_rules": [
+    "concern_catalog": [
       {
         "concern_kind": "safety",
         "id": "concern_warning_safety",
@@ -130,6 +49,118 @@
         "selector_resolution": "require_nonempty"
       }
     ],
+    "dashboard_state_catalog": {
+      "product_tracking_states": [
+        {
+          "id": "dashboard_tracking_tracked",
+          "label": "Tracked product",
+          "order": 0,
+          "state": "tracked_product"
+        },
+        {
+          "id": "dashboard_tracking_none",
+          "label": "No tracked product",
+          "order": 1,
+          "state": "no_tracked_product"
+        }
+      ],
+      "product_tracking_truth_table": [
+        {
+          "id": "tracking_false",
+          "state": "no_tracked_product",
+          "tracked_product_presence": false
+        },
+        {
+          "id": "tracking_true",
+          "state": "tracked_product",
+          "tracked_product_presence": true
+        }
+      ],
+      "usage_states": [
+        {
+          "id": "dashboard_usage_current",
+          "label": "Current",
+          "order": 0,
+          "state": "current"
+        },
+        {
+          "id": "dashboard_usage_on_shelf",
+          "label": "On shelf",
+          "order": 1,
+          "state": "on_shelf"
+        },
+        {
+          "id": "dashboard_usage_unassigned",
+          "label": "Unassigned",
+          "order": 2,
+          "state": "unassigned"
+        },
+        {
+          "id": "dashboard_usage_not_current",
+          "label": "Not current",
+          "order": 3,
+          "state": "not_current"
+        }
+      ],
+      "usage_truth_table": [
+        {
+          "active_stack_membership": false,
+          "id": "usage_false_false_false",
+          "inactive_stack_membership": false,
+          "state": "not_current",
+          "tracked_product_presence": false
+        },
+        {
+          "active_stack_membership": false,
+          "id": "usage_false_false_true",
+          "inactive_stack_membership": false,
+          "state": "unassigned",
+          "tracked_product_presence": true
+        },
+        {
+          "active_stack_membership": false,
+          "id": "usage_false_true_false",
+          "inactive_stack_membership": true,
+          "state": "on_shelf",
+          "tracked_product_presence": false
+        },
+        {
+          "active_stack_membership": false,
+          "id": "usage_false_true_true",
+          "inactive_stack_membership": true,
+          "state": "on_shelf",
+          "tracked_product_presence": true
+        },
+        {
+          "active_stack_membership": true,
+          "id": "usage_true_false_false",
+          "inactive_stack_membership": false,
+          "state": "current",
+          "tracked_product_presence": false
+        },
+        {
+          "active_stack_membership": true,
+          "id": "usage_true_false_true",
+          "inactive_stack_membership": false,
+          "state": "current",
+          "tracked_product_presence": true
+        },
+        {
+          "active_stack_membership": true,
+          "id": "usage_true_true_false",
+          "inactive_stack_membership": true,
+          "state": "current",
+          "tracked_product_presence": false
+        },
+        {
+          "active_stack_membership": true,
+          "id": "usage_true_true_true",
+          "inactive_stack_membership": true,
+          "state": "current",
+          "tracked_product_presence": true
+        }
+      ]
+    },
     "effect_match_dimensions": [
       {
         "id": "match_near",
@@ -145,10 +176,10 @@
       }
     ],
     "effect_scoring": {
-      "advisory_constraint_score_delta": -1,
-      "advisory_match_direction": "symmetric",
+      "balance_penalty_expression": "balance_weight * sum(slot_count^2)",
       "balance_weight": 0.5,
       "id": "effect_scoring",
+      "objective_function": "slot_score_plus_prefer_with_minus_quadratic_balance_penalty",
       "prefer_with_bonus": 3,
       "scores": [
         {
@@ -171,95 +202,11 @@
           "level": "avoid_strong",
           "score": -4
         }
-      ]
-    },
-    "fact_fields": [
-      {
-        "field": "planner",
-        "id": "fact_planner",
-        "value_type": "string"
-      },
-      {
-        "field": "food_model",
-        "id": "fact_food_model",
-        "value_type": "string"
-      },
-      {
-        "field": "slot_model",
-        "id": "fact_slot_model",
-        "value_type": "string"
-      },
-      {
-        "field": "intended_use",
-        "id": "fact_intended_use",
-        "value_type": "string"
-      },
-      {
-        "field": "substrate",
-        "id": "fact_substrate",
-        "value_type": "string"
-      },
-      {
-        "field": "product",
-        "id": "fact_product",
-        "value_type": "string"
-      },
-      {
-        "field": "formulation",
-        "id": "fact_formulation",
-        "value_type": "string"
-      },
-      {
-        "field": "requested_value",
-        "id": "fact_requested_value",
-        "value_type": "string"
-      },
-      {
-        "field": "supported_value",
-        "id": "fact_supported_value",
-        "value_type": "string"
-      },
-      {
-        "field": "supported_values",
-        "id": "fact_supported_values",
-        "value_type": "strings"
-      },
-      {
-        "field": "source_kind",
-        "id": "fact_source_kind",
-        "value_type": "string"
-      },
-      {
-        "field": "source_form",
-        "id": "fact_source_form",
-        "value_type": "string"
-      },
-      {
-        "field": "scope_kind",
-        "id": "fact_scope_kind",
-        "value_type": "string"
-      },
-      {
-        "field": "requested_product_id",
-        "id": "fact_requested_product_id",
-        "value_type": "string"
-      },
-      {
-        "field": "actual_product_id",
-        "id": "fact_actual_product_id",
-        "value_type": "string"
-      }
-    ],
-    "glue_contract": {
-      "active_concern_role": "active",
-      "concern_membership_roles": [
-        "active",
-        "inactive",
-        "product_fallback",
-        "substance_fallback"
       ],
+      "tie_break": "stable_slot_order"
+    },
+    "glue_contract": {
       "id": "planner_glue_contract",
-      "inactive_concern_role": "inactive",
       "inactive_stack_name": "inactive",
       "prefer_with_pair_modes": [
         "undirected_same_slot_bonus"
@@ -270,7 +217,6 @@
       "prefer_with_target_resolutions": [
         "exactly_one_active_item"
       ],
-      "product_concern_fallback_role": "product_fallback",
       "relation_endpoint_selector_kinds": [
         "entity",
         "term"
@@ -299,11 +245,10 @@
           "target_active": true
         }
       ],
-      "relation_review_status_ids": [
-        "actionable_now",
-        "active_pair_present",
-        "inactive",
-        "latent_one_side_present"
+      "relation_selector_forms": [
+        "entity_id",
+        "name",
+        "term"
       ],
       "relation_warning_active_sides": [
         "both",
@@ -314,70 +259,26 @@
         "assertion_kind",
         "semantic_family"
       ],
-      "scope_fact_adapters": [
-        "capability_scalar",
-        "capability_values",
-        "dimension_singleton",
-        "product_identity",
-        "source_formulation"
-      ],
       "source_kind_roles": [
         "assignment_source"
       ],
       "source_kinds": [
-        "component",
-        "product",
-        "substance"
+        "assignment"
       ],
-      "substance_concern_fallback_role": "substance_fallback",
       "warning_emitter_ids": [
         "intra_product_constraint_conflict",
         "prefer_with_resolver",
         "trait_review_assignment"
       ]
     },
-    "non_warning_concern_kinds": [
-      {
-        "concern_kind": "model_gap",
-        "description": "Model gap concerns are reviewer-visible metadata and do not emit planner warnings.",
-        "id": "concern_review_only_model_gap",
-        "review_surface": "review"
-      },
-      {
-        "concern_kind": "data_quality",
-        "description": "Data quality concerns are reviewer-visible metadata and do not emit planner warnings.",
-        "id": "concern_review_only_data_quality",
-        "review_surface": "review"
-      }
-    ],
     "prefer_with_policy": {
       "id": "prefer_with_policy",
       "pair_mode": "undirected_same_slot_bonus",
       "source_field": "prefer_with",
       "target_resolution": "exactly_one_active_item"
     },
-    "relation_endpoint_policies": [
-      {
-        "audit_member_limit": 0,
-        "broad_endpoint": false,
-        "id": "relation_endpoint_entity",
-        "label": "concrete endpoint",
-        "selector_kind": "entity",
-        "show_match_details": false
-      },
-      {
-        "audit_member_limit": 5,
-        "broad_endpoint": true,
-        "id": "relation_endpoint_term",
-        "label": "trait endpoint",
-        "selector_kind": "term",
-        "show_match_details": true
-      }
-    ],
     "relation_presence_statuses": [
       {
-        "active_side": "both",
-        "default_review_status": "active_pair_present",
         "description": "both endpoints active",
         "id": "relation_presence_both_active",
         "source_active": true,
@@ -385,8 +286,6 @@
         "target_active": true
       },
       {
-        "active_side": "source",
-        "default_review_status": "latent_one_side_present",
         "description": "source active, target absent",
         "id": "relation_presence_missing_target",
         "source_active": true,
@@ -394,8 +293,6 @@
         "target_active": false
       },
       {
-        "active_side": "target",
-        "default_review_status": "latent_one_side_present",
         "description": "target active, source absent",
         "id": "relation_presence_missing_source",
         "source_active": false,
@@ -403,39 +300,11 @@
         "target_active": true
       },
       {
-        "active_side": "none",
-        "default_review_status": "inactive",
         "description": "both endpoints absent",
         "id": "relation_presence_neither_active",
         "source_active": false,
         "status": "neither_active",
         "target_active": false
-      }
-    ],
-    "relation_review_statuses": [
-      {
-        "description": "relation semantics fire for the current stack",
-        "id": "relation_review_status_actionable_now",
-        "rank": 0,
-        "status": "actionable_now"
-      },
-      {
-        "description": "both endpoints active; no absence warning",
-        "id": "relation_review_status_active_pair_present",
-        "rank": 1,
-        "status": "active_pair_present"
-      },
-      {
-        "description": "one endpoint active; relation does not fire",
-        "id": "relation_review_status_latent_one_side_present",
-        "rank": 2,
-        "status": "latent_one_side_present"
-      },
-      {
-        "description": "both endpoints absent",
-        "id": "relation_review_status_inactive",
-        "rank": 3,
-        "status": "inactive"
       }
     ],
     "relation_warning_rules": [
@@ -446,7 +315,6 @@
         "id": "relation_warning_review_with_present",
         "relation_kind": "review_with",
         "reverse_output": false,
-        "review_status": "actionable_now",
         "warning_type": "review_with_substance_present"
       },
       {
@@ -456,7 +324,6 @@
         "id": "relation_warning_missing_balance_forward",
         "relation_kind": "balance",
         "reverse_output": false,
-        "review_status": "actionable_now",
         "warning_type": "missing_balance_substance"
       },
       {
@@ -466,7 +333,6 @@
         "id": "relation_warning_missing_balance_reverse",
         "relation_kind": "balance",
         "reverse_output": true,
-        "review_status": "actionable_now",
         "warning_type": "missing_balance_substance"
       },
       {
@@ -476,241 +342,44 @@
         "id": "relation_warning_missing_support",
         "relation_kind": "supports",
         "reverse_output": false,
-        "review_status": "actionable_now",
         "warning_type": "missing_support_substance"
       }
     ],
-    "scope_dimensions": [
+    "selector_form_capabilities": [
       {
-        "capability_field": "planner",
-        "default_outcome": "mismatch_scope",
-        "fact_adapter": "capability_scalar",
-        "id": "planner",
-        "key": "planner",
-        "rule_ids": [
-          "scope_slot_policy"
-        ],
-        "values": [
-          "slot_policy",
-          "audit"
-        ]
+        "endpoint_kind": "entity",
+        "id": "selector_form_entity_id",
+        "selector_form": "entity_id",
+        "show_match_details": false
       },
       {
-        "capability_field": "food_model",
-        "default_outcome": "mismatch_scope",
-        "fact_adapter": "capability_scalar",
-        "id": "food_model",
-        "key": "food_model",
-        "rule_ids": [
-          "scope_binary_food"
-        ],
-        "values": [
-          "binary"
-        ]
+        "endpoint_kind": "entity",
+        "id": "selector_form_name",
+        "selector_form": "name",
+        "show_match_details": true
       },
       {
-        "capability_field": "slot_models",
-        "default_outcome": "mismatch_scope",
-        "fact_adapter": "capability_values",
-        "id": "slot_model",
-        "key": "slot_model",
-        "rule_ids": [
-          "scope_supported_slot_model"
-        ],
-        "values": [
-          "binary",
-          "wake_day_sleep",
-          "workout_before_after",
-          "wake",
-          "breakfast",
-          "day_meal",
-          "sleep",
-          "workout_before",
-          "workout_after"
-        ]
-      },
-      {
-        "capability_field": "values",
-        "default_outcome": "mismatch_scope",
-        "fact_adapter": "dimension_singleton",
-        "id": "intended_use",
-        "key": "intended_use",
-        "rule_ids": [
-          "scope_general_use"
-        ],
-        "values": [
-          "digestive"
-        ]
-      },
-      {
-        "capability_field": "values",
-        "default_outcome": "mismatch_scope",
-        "fact_adapter": "dimension_singleton",
-        "id": "substrate",
-        "key": "substrate",
-        "rule_ids": [
-          "scope_human_substrate"
-        ],
-        "values": [
-          "lactose"
-        ]
-      },
-      {
-        "capability_field": "product_id",
-        "default_outcome": "mismatch_scope",
-        "fact_adapter": "product_identity",
-        "id": "product",
-        "key": "product",
-        "rule_ids": [
-          "scope_direct_product"
-        ],
-        "values": [
-          "direct"
-        ]
-      },
-      {
-        "capability_field": "formulations",
-        "default_outcome": "mismatch_scope",
-        "fact_adapter": "source_formulation",
-        "id": "formulation",
-        "key": "formulation",
-        "rule_ids": [
-          "scope_unknown_formulation",
-          "scope_supported_formulation"
-        ],
-        "values": [
-          "unknown",
-          "capsule",
-          "tablet",
-          "powder",
-          "liquid"
-        ]
+        "endpoint_kind": "term",
+        "id": "selector_form_term",
+        "selector_form": "term",
+        "show_match_details": true
       }
     ],
-    "scope_rules": [
-      {
-        "conditions": [
-          {
-            "field": "requested_value",
-            "operator": "equals_field",
-            "value": "supported_value"
-          }
-        ],
-        "id": "scope_slot_policy",
-        "outcome": "matched_scope",
-        "priority": 10
-      },
-      {
-        "conditions": [
-          {
-            "field": "requested_value",
-            "operator": "equals_field",
-            "value": "supported_value"
-          }
-        ],
-        "id": "scope_binary_food",
-        "outcome": "matched_scope",
-        "priority": 10
-      },
-      {
-        "conditions": [
-          {
-            "field": "requested_value",
-            "operator": "member_of_field",
-            "value": "supported_values"
-          }
-        ],
-        "id": "scope_supported_slot_model",
-        "outcome": "matched_scope",
-        "priority": 10
-      },
-      {
-        "conditions": [
-          {
-            "field": "requested_value",
-            "operator": "equals_field",
-            "value": "supported_value"
-          }
-        ],
-        "id": "scope_general_use",
-        "outcome": "limited_scope",
-        "priority": 10
-      },
-      {
-        "conditions": [
-          {
-            "field": "requested_value",
-            "operator": "equals_field",
-            "value": "supported_value"
-          }
-        ],
-        "id": "scope_human_substrate",
-        "outcome": "limited_scope",
-        "priority": 10
-      },
-      {
-        "conditions": [
-          {
-            "field": "requested_value",
-            "operator": "equals",
-            "value": "unknown"
-          }
-        ],
-        "id": "scope_unknown_formulation",
-        "outcome": "limited_scope",
-        "priority": 20
-      },
-      {
-        "conditions": [
-          {
-            "field": "scope_kind",
-            "operator": "equals",
-            "value": "direct"
-          },
-          {
-            "field": "requested_product_id",
-            "operator": "equals_field",
-            "value": "actual_product_id"
-          }
-        ],
-        "id": "scope_direct_product",
-        "outcome": "matched_scope",
-        "priority": 10
-      },
-      {
-        "conditions": [
-          {
-            "field": "requested_value",
-            "operator": "equals_field",
-            "value": "source_form"
-          },
-          {
-            "field": "requested_value",
-            "operator": "member_of_field",
-            "value": "supported_values"
-          }
-        ],
-        "id": "scope_supported_formulation",
-        "outcome": "matched_scope",
-        "priority": 10
-      }
+    "slot_near_values": [
+      "wake",
+      "breakfast",
+      "day_meal",
+      "sleep",
+      "workout_before",
+      "workout_after"
     ],
     "source_kind_values": [
       {
         "applies_to": [
           "assignment_source"
         ],
-        "description": "Direct product-level assignment source.",
-        "id": "source_kind_product",
-        "source_kind": "product"
-      },
-      {
-        "applies_to": [
-          "assignment_source"
-        ],
-        "description": "Substance-level assignment source.",
-        "id": "source_kind_substance",
-        "source_kind": "substance"
+        "id": "source_kind_assignment",
+        "source_kind": "assignment"
       }
     ],
     "warning_emitters": [
@@ -795,1033 +464,12 @@
       }
     ]
   },
-  "protocol": {
-    "action_classes": [
-      "Action"
-    ],
-    "condition_classes": [
-      "Condition"
-    ],
-    "gate_classes": [
-      "ProjectionDescriptor",
-      "RuntimeTable"
-    ],
-    "policy_class": "RuntimePolicyCatalog"
-  },
   "provenance": {
-    "compiler_sha256": "be6ed8e8b38374e64044cfd2653bc5d368108e78e7b3961dc6a307ef0fdeb185",
+    "compiler_sha256": "f4bbe9eba17be829499410796488657c1f297828569fef3ed052b82f1f5c358b",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "dfa8bbffe17051fa57e6fc9cc785c1d72d3a0c4e0d4db791d94e24a7781123ca"
+    "source_sha256": "66a6cf334327aa11b2f9d8d42f158b464b151863a1cad2e5c2f68a1924cd2012"
   },
-  "rules": [
-    {
-      "applies_to": [
-        "assignment_source"
-      ],
-      "description": "Direct product-level assignment source.",
-      "id": "source_kind_product",
-      "kind": "source_kind_value",
-      "source_kind": "product"
-    },
-    {
-      "applies_to": [
-        "assignment_source"
-      ],
-      "description": "Substance-level assignment source.",
-      "id": "source_kind_substance",
-      "kind": "source_kind_value",
-      "source_kind": "substance"
-    },
-    {
-      "id": "match_near",
-      "key": "near",
-      "kind": "effect_match_dimension",
-      "slot_field": "near",
-      "value_type": "slot_near"
-    },
-    {
-      "id": "match_food",
-      "key": "food",
-      "kind": "effect_match_dimension",
-      "slot_field": "food",
-      "value_type": "boolean"
-    },
-    {
-      "aggregation": "distinct_constraint",
-      "blocks_slots": true,
-      "id": "separate_products_same_slot",
-      "kind": "constraint_execution_policy",
-      "match_direction": "symmetric",
-      "operation": "separate_products_same_slot",
-      "score_delta": -1,
-      "scores_advisory": true,
-      "selector_resolution": "require_nonempty"
-    },
-    {
-      "id": "prefer_strong",
-      "kind": "effect_score",
-      "level": "prefer_strong",
-      "score": 4
-    },
-    {
-      "id": "prefer",
-      "kind": "effect_score",
-      "level": "prefer",
-      "score": 2
-    },
-    {
-      "id": "avoid",
-      "kind": "effect_score",
-      "level": "avoid",
-      "score": -2
-    },
-    {
-      "id": "avoid_strong",
-      "kind": "effect_score",
-      "level": "avoid_strong",
-      "score": -4
-    },
-    {
-      "base_slot_models": [
-        "binary"
-      ],
-      "food_model": "binary",
-      "formulations": [
-        "unknown",
-        "capsule",
-        "tablet",
-        "powder",
-        "liquid"
-      ],
-      "id": "slot_planner_binary",
-      "kind": "capability",
-      "near_to_model": [
-        {
-          "id": "wake_near_model",
-          "model": "wake_day_sleep",
-          "near": "wake"
-        },
-        {
-          "id": "breakfast_near_model",
-          "model": "wake_day_sleep",
-          "near": "breakfast"
-        },
-        {
-          "id": "day_meal_near_model",
-          "model": "wake_day_sleep",
-          "near": "day_meal"
-        },
-        {
-          "id": "sleep_near_model",
-          "model": "wake_day_sleep",
-          "near": "sleep"
-        },
-        {
-          "id": "workout_before_near_model",
-          "model": "workout_before_after",
-          "near": "workout_before"
-        },
-        {
-          "id": "workout_after_near_model",
-          "model": "workout_before_after",
-          "near": "workout_after"
-        }
-      ],
-      "planner": "slot_policy",
-      "product_scope": [
-        "direct"
-      ],
-      "slot_models": [
-        "binary",
-        "wake_day_sleep",
-        "workout_before_after"
-      ]
-    },
-    {
-      "action_text": "Review this safety concern before treating the schedule as final.",
-      "id": "warning_safety_concern",
-      "kind": "warning_type",
-      "label": "Safety concern",
-      "warning_type": "safety_concern"
-    },
-    {
-      "action_text": "Review this product manually; competing components are inside one physical product and cannot be separated by scheduling.",
-      "id": "warning_intra_product_scheduling_constraint_conflict",
-      "kind": "warning_type",
-      "label": "Component conflict inside one product",
-      "warning_type": "intra_product_scheduling_constraint_conflict"
-    },
-    {
-      "action_text": "Choose the intended companion product before relying on co-location.",
-      "id": "warning_ambiguous_prefer_with",
-      "kind": "warning_type",
-      "label": "Companion product is ambiguous",
-      "warning_type": "ambiguous_prefer_with"
-    },
-    {
-      "action_text": "Review this ontology trait before treating the schedule as final.",
-      "id": "warning_trait_review",
-      "kind": "warning_type",
-      "label": "Trait review",
-      "warning_type": "trait_review"
-    },
-    {
-      "action_text": "Review whether the paired balancing substance should be present in the active stack.",
-      "id": "warning_missing_balance_substance",
-      "kind": "warning_type",
-      "label": "Missing balancing substance",
-      "warning_type": "missing_balance_substance"
-    },
-    {
-      "action_text": "Review whether adding the supporting substance would improve this target in the active stack.",
-      "id": "warning_missing_support_substance",
-      "kind": "warning_type",
-      "label": "Missing supporting substance",
-      "warning_type": "missing_support_substance"
-    },
-    {
-      "action_text": "Review this active pairing; the planner surfaces it for operator review and does not separate it by slot.",
-      "id": "warning_review_with_substance_present",
-      "kind": "warning_type",
-      "label": "Active review pairing",
-      "warning_type": "review_with_substance_present"
-    },
-    {
-      "default_message": "prefer_with target maps to multiple active stack items; no bonus awarded",
-      "emitter": "prefer_with_resolver",
-      "id": "warning_emitter_prefer_with_resolver",
-      "kind": "warning_emitter",
-      "warning_type": "ambiguous_prefer_with"
-    },
-    {
-      "default_message": "Scheduling constraint applies inside one physical product; scheduling keeps the product together and emits this warning.",
-      "emitter": "intra_product_constraint_conflict",
-      "id": "warning_emitter_intra_product_constraint_conflict",
-      "kind": "warning_emitter",
-      "warning_type": "intra_product_scheduling_constraint_conflict"
-    },
-    {
-      "default_message": "Manual review required.",
-      "emitter": "trait_review_assignment",
-      "id": "warning_emitter_trait_review_assignment",
-      "kind": "warning_emitter",
-      "warning_type": "trait_review"
-    },
-    {
-      "action_text": "Review this substance/product context manually before treating the schedule as final.",
-      "id": "warning_trait_manual_review",
-      "kind": "warning_trait_action",
-      "trait_id": "risk:manual_review"
-    },
-    {
-      "action_text": "Review total daily amount across products and avoid accidental stacking.",
-      "id": "warning_trait_narrow_therapeutic_window",
-      "kind": "warning_trait_action",
-      "trait_id": "risk:narrow_therapeutic_window"
-    },
-    {
-      "action_text": "Review potassium-related medication context before using this stack.",
-      "id": "warning_trait_hyperkalemia_med_interaction",
-      "kind": "warning_trait_action",
-      "trait_id": "risk:hyperkalemia_med_interaction"
-    },
-    {
-      "description": "card is active in a non-inactive stack",
-      "id": "concern_review_status_active",
-      "kind": "concern_review_status",
-      "membership_role": "active",
-      "rank": 0,
-      "status": "active"
-    },
-    {
-      "description": "card is in the inactive stack",
-      "id": "concern_review_status_inactive",
-      "kind": "concern_review_status",
-      "membership_role": "inactive",
-      "rank": 1,
-      "status": "inactive"
-    },
-    {
-      "description": "product card is tracked but outside all stacks",
-      "id": "concern_review_status_tracked_unassigned",
-      "kind": "concern_review_status",
-      "membership_role": "product_fallback",
-      "rank": 2,
-      "status": "tracked-unassigned"
-    },
-    {
-      "description": "substance card is known but not assigned through an active product",
-      "id": "concern_review_status_knowledge_only",
-      "kind": "concern_review_status",
-      "membership_role": "substance_fallback",
-      "rank": 3,
-      "status": "knowledge-only"
-    },
-    {
-      "concern_kind": "safety",
-      "id": "concern_warning_safety",
-      "kind": "concern_warning_rule",
-      "warning_type": "safety_concern"
-    },
-    {
-      "concern_kind": "model_gap",
-      "description": "Model gap concerns are reviewer-visible metadata and do not emit planner warnings.",
-      "id": "concern_review_only_model_gap",
-      "kind": "non_warning_concern_kind",
-      "review_surface": "review"
-    },
-    {
-      "concern_kind": "data_quality",
-      "description": "Data quality concerns are reviewer-visible metadata and do not emit planner warnings.",
-      "id": "concern_review_only_data_quality",
-      "kind": "non_warning_concern_kind",
-      "review_surface": "review"
-    },
-    {
-      "active_side": "both",
-      "filter_field": "assertion_kind",
-      "filter_value": "clinical_review_signal",
-      "id": "relation_warning_review_with_present",
-      "kind": "relation_warning_rule",
-      "relation_kind": "review_with",
-      "reverse_output": false,
-      "review_status": "actionable_now",
-      "warning_type": "review_with_substance_present"
-    },
-    {
-      "active_side": "source",
-      "filter_field": "semantic_family",
-      "filter_value": "nutrient_balance_review_signal",
-      "id": "relation_warning_missing_balance_forward",
-      "kind": "relation_warning_rule",
-      "relation_kind": "balance",
-      "reverse_output": false,
-      "review_status": "actionable_now",
-      "warning_type": "missing_balance_substance"
-    },
-    {
-      "active_side": "target",
-      "filter_field": "semantic_family",
-      "filter_value": "nutrient_balance_review_signal",
-      "id": "relation_warning_missing_balance_reverse",
-      "kind": "relation_warning_rule",
-      "relation_kind": "balance",
-      "reverse_output": true,
-      "review_status": "actionable_now",
-      "warning_type": "missing_balance_substance"
-    },
-    {
-      "active_side": "target",
-      "filter_field": "assertion_kind",
-      "filter_value": "ontology_assertion",
-      "id": "relation_warning_missing_support",
-      "kind": "relation_warning_rule",
-      "relation_kind": "supports",
-      "reverse_output": false,
-      "review_status": "actionable_now",
-      "warning_type": "missing_support_substance"
-    },
-    {
-      "description": "relation semantics fire for the current stack",
-      "id": "relation_review_status_actionable_now",
-      "kind": "relation_review_status",
-      "rank": 0,
-      "status": "actionable_now"
-    },
-    {
-      "description": "both endpoints active; no absence warning",
-      "id": "relation_review_status_active_pair_present",
-      "kind": "relation_review_status",
-      "rank": 1,
-      "status": "active_pair_present"
-    },
-    {
-      "description": "one endpoint active; relation does not fire",
-      "id": "relation_review_status_latent_one_side_present",
-      "kind": "relation_review_status",
-      "rank": 2,
-      "status": "latent_one_side_present"
-    },
-    {
-      "description": "both endpoints absent",
-      "id": "relation_review_status_inactive",
-      "kind": "relation_review_status",
-      "rank": 3,
-      "status": "inactive"
-    },
-    {
-      "active_side": "both",
-      "default_review_status": "active_pair_present",
-      "description": "both endpoints active",
-      "id": "relation_presence_both_active",
-      "kind": "relation_presence_status",
-      "source_active": true,
-      "status": "both_active",
-      "target_active": true
-    },
-    {
-      "active_side": "source",
-      "default_review_status": "latent_one_side_present",
-      "description": "source active, target absent",
-      "id": "relation_presence_missing_target",
-      "kind": "relation_presence_status",
-      "source_active": true,
-      "status": "missing_target",
-      "target_active": false
-    },
-    {
-      "active_side": "target",
-      "default_review_status": "latent_one_side_present",
-      "description": "target active, source absent",
-      "id": "relation_presence_missing_source",
-      "kind": "relation_presence_status",
-      "source_active": false,
-      "status": "missing_source",
-      "target_active": true
-    },
-    {
-      "active_side": "none",
-      "default_review_status": "inactive",
-      "description": "both endpoints absent",
-      "id": "relation_presence_neither_active",
-      "kind": "relation_presence_status",
-      "source_active": false,
-      "status": "neither_active",
-      "target_active": false
-    },
-    {
-      "audit_member_limit": 0,
-      "broad_endpoint": false,
-      "id": "relation_endpoint_entity",
-      "kind": "relation_endpoint_policy",
-      "label": "concrete endpoint",
-      "selector_kind": "entity",
-      "show_match_details": false
-    },
-    {
-      "audit_member_limit": 5,
-      "broad_endpoint": true,
-      "id": "relation_endpoint_term",
-      "kind": "relation_endpoint_policy",
-      "label": "trait endpoint",
-      "selector_kind": "term",
-      "show_match_details": true
-    }
-  ],
   "schema_version": "2",
-  "source_hash": "b26c3281bef5d332567c1ae677f4dd3646922acdc73fed89f4718de504c28d37",
-  "tables": [
-    {
-      "id": "source_kind_values",
-      "rows": [
-        {
-          "applies_to": [
-            "assignment_source"
-          ],
-          "description": "Direct product-level assignment source.",
-          "id": "source_kind_product",
-          "source_kind": "product"
-        },
-        {
-          "applies_to": [
-            "assignment_source"
-          ],
-          "description": "Substance-level assignment source.",
-          "id": "source_kind_substance",
-          "source_kind": "substance"
-        }
-      ]
-    },
-    {
-      "id": "effect_match_dimensions",
-      "rows": [
-        {
-          "id": "match_near",
-          "key": "near",
-          "slot_field": "near",
-          "value_type": "slot_near"
-        },
-        {
-          "id": "match_food",
-          "key": "food",
-          "slot_field": "food",
-          "value_type": "boolean"
-        }
-      ]
-    },
-    {
-      "id": "assignment_axes",
-      "rows": [
-        {
-          "assignment_field": "intake",
-          "assignment_source": "schedule",
-          "axis": "intake",
-          "id": "assignment_axis_intake",
-          "order": 0
-        },
-        {
-          "assignment_field": "timing",
-          "assignment_source": "schedule",
-          "axis": "timing",
-          "id": "assignment_axis_timing",
-          "order": 1
-        },
-        {
-          "assignment_field": "activity",
-          "assignment_source": "schedule",
-          "axis": "activity",
-          "id": "assignment_axis_activity",
-          "order": 2
-        }
-      ]
-    },
-    {
-      "id": "scope_dimensions_table",
-      "rows": [
-        {
-          "capability_field": "planner",
-          "default_outcome": "mismatch_scope",
-          "fact_adapter": "capability_scalar",
-          "id": "planner",
-          "key": "planner",
-          "rule_ids": [
-            "scope_slot_policy"
-          ],
-          "values": [
-            "slot_policy",
-            "audit"
-          ]
-        },
-        {
-          "capability_field": "food_model",
-          "default_outcome": "mismatch_scope",
-          "fact_adapter": "capability_scalar",
-          "id": "food_model",
-          "key": "food_model",
-          "rule_ids": [
-            "scope_binary_food"
-          ],
-          "values": [
-            "binary"
-          ]
-        },
-        {
-          "capability_field": "slot_models",
-          "default_outcome": "mismatch_scope",
-          "fact_adapter": "capability_values",
-          "id": "slot_model",
-          "key": "slot_model",
-          "rule_ids": [
-            "scope_supported_slot_model"
-          ],
-          "values": [
-            "binary",
-            "wake_day_sleep",
-            "workout_before_after",
-            "wake",
-            "breakfast",
-            "day_meal",
-            "sleep",
-            "workout_before",
-            "workout_after"
-          ]
-        },
-        {
-          "capability_field": "values",
-          "default_outcome": "mismatch_scope",
-          "fact_adapter": "dimension_singleton",
-          "id": "intended_use",
-          "key": "intended_use",
-          "rule_ids": [
-            "scope_general_use"
-          ],
-          "values": [
-            "digestive"
-          ]
-        },
-        {
-          "capability_field": "values",
-          "default_outcome": "mismatch_scope",
-          "fact_adapter": "dimension_singleton",
-          "id": "substrate",
-          "key": "substrate",
-          "rule_ids": [
-            "scope_human_substrate"
-          ],
-          "values": [
-            "lactose"
-          ]
-        },
-        {
-          "capability_field": "product_id",
-          "default_outcome": "mismatch_scope",
-          "fact_adapter": "product_identity",
-          "id": "product",
-          "key": "product",
-          "rule_ids": [
-            "scope_direct_product"
-          ],
-          "values": [
-            "direct"
-          ]
-        },
-        {
-          "capability_field": "formulations",
-          "default_outcome": "mismatch_scope",
-          "fact_adapter": "source_formulation",
-          "id": "formulation",
-          "key": "formulation",
-          "rule_ids": [
-            "scope_unknown_formulation",
-            "scope_supported_formulation"
-          ],
-          "values": [
-            "unknown",
-            "capsule",
-            "tablet",
-            "powder",
-            "liquid"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "scope_rules",
-      "rows": [
-        {
-          "conditions": [
-            {
-              "field": "requested_value",
-              "operator": "equals_field",
-              "value": "supported_value"
-            }
-          ],
-          "id": "scope_slot_policy",
-          "outcome": "matched_scope",
-          "priority": 10
-        },
-        {
-          "conditions": [
-            {
-              "field": "requested_value",
-              "operator": "equals_field",
-              "value": "supported_value"
-            }
-          ],
-          "id": "scope_binary_food",
-          "outcome": "matched_scope",
-          "priority": 10
-        },
-        {
-          "conditions": [
-            {
-              "field": "requested_value",
-              "operator": "member_of_field",
-              "value": "supported_values"
-            }
-          ],
-          "id": "scope_supported_slot_model",
-          "outcome": "matched_scope",
-          "priority": 10
-        },
-        {
-          "conditions": [
-            {
-              "field": "requested_value",
-              "operator": "equals_field",
-              "value": "supported_value"
-            }
-          ],
-          "id": "scope_general_use",
-          "outcome": "limited_scope",
-          "priority": 10
-        },
-        {
-          "conditions": [
-            {
-              "field": "requested_value",
-              "operator": "equals_field",
-              "value": "supported_value"
-            }
-          ],
-          "id": "scope_human_substrate",
-          "outcome": "limited_scope",
-          "priority": 10
-        },
-        {
-          "conditions": [
-            {
-              "field": "requested_value",
-              "operator": "equals",
-              "value": "unknown"
-            }
-          ],
-          "id": "scope_unknown_formulation",
-          "outcome": "limited_scope",
-          "priority": 20
-        },
-        {
-          "conditions": [
-            {
-              "field": "scope_kind",
-              "operator": "equals",
-              "value": "direct"
-            },
-            {
-              "field": "requested_product_id",
-              "operator": "equals_field",
-              "value": "actual_product_id"
-            }
-          ],
-          "id": "scope_direct_product",
-          "outcome": "matched_scope",
-          "priority": 10
-        },
-        {
-          "conditions": [
-            {
-              "field": "requested_value",
-              "operator": "equals_field",
-              "value": "source_form"
-            },
-            {
-              "field": "requested_value",
-              "operator": "member_of_field",
-              "value": "supported_values"
-            }
-          ],
-          "id": "scope_supported_formulation",
-          "outcome": "matched_scope",
-          "priority": 10
-        }
-      ]
-    },
-    {
-      "id": "constraint_execution_policies",
-      "rows": [
-        {
-          "aggregation": "distinct_constraint",
-          "blocks_slots": true,
-          "id": "separate_products_same_slot",
-          "match_direction": "symmetric",
-          "operation": "separate_products_same_slot",
-          "score_delta": -1,
-          "scores_advisory": true,
-          "selector_resolution": "require_nonempty"
-        }
-      ]
-    },
-    {
-      "id": "effect_scores",
-      "rows": [
-        {
-          "id": "prefer_strong",
-          "level": "prefer_strong",
-          "score": 4
-        },
-        {
-          "id": "prefer",
-          "level": "prefer",
-          "score": 2
-        },
-        {
-          "id": "avoid",
-          "level": "avoid",
-          "score": -2
-        },
-        {
-          "id": "avoid_strong",
-          "level": "avoid_strong",
-          "score": -4
-        }
-      ]
-    },
-    {
-      "id": "warning_types",
-      "rows": [
-        {
-          "action_text": "Review this safety concern before treating the schedule as final.",
-          "id": "warning_safety_concern",
-          "label": "Safety concern",
-          "warning_type": "safety_concern"
-        },
-        {
-          "action_text": "Review this product manually; competing components are inside one physical product and cannot be separated by scheduling.",
-          "id": "warning_intra_product_scheduling_constraint_conflict",
-          "label": "Component conflict inside one product",
-          "warning_type": "intra_product_scheduling_constraint_conflict"
-        },
-        {
-          "action_text": "Choose the intended companion product before relying on co-location.",
-          "id": "warning_ambiguous_prefer_with",
-          "label": "Companion product is ambiguous",
-          "warning_type": "ambiguous_prefer_with"
-        },
-        {
-          "action_text": "Review this ontology trait before treating the schedule as final.",
-          "id": "warning_trait_review",
-          "label": "Trait review",
-          "warning_type": "trait_review"
-        },
-        {
-          "action_text": "Review whether the paired balancing substance should be present in the active stack.",
-          "id": "warning_missing_balance_substance",
-          "label": "Missing balancing substance",
-          "warning_type": "missing_balance_substance"
-        },
-        {
-          "action_text": "Review whether adding the supporting substance would improve this target in the active stack.",
-          "id": "warning_missing_support_substance",
-          "label": "Missing supporting substance",
-          "warning_type": "missing_support_substance"
-        },
-        {
-          "action_text": "Review this active pairing; the planner surfaces it for operator review and does not separate it by slot.",
-          "id": "warning_review_with_substance_present",
-          "label": "Active review pairing",
-          "warning_type": "review_with_substance_present"
-        }
-      ]
-    },
-    {
-      "id": "warning_emitters",
-      "rows": [
-        {
-          "default_message": "prefer_with target maps to multiple active stack items; no bonus awarded",
-          "emitter": "prefer_with_resolver",
-          "id": "warning_emitter_prefer_with_resolver",
-          "warning_type": "ambiguous_prefer_with"
-        },
-        {
-          "default_message": "Scheduling constraint applies inside one physical product; scheduling keeps the product together and emits this warning.",
-          "emitter": "intra_product_constraint_conflict",
-          "id": "warning_emitter_intra_product_constraint_conflict",
-          "warning_type": "intra_product_scheduling_constraint_conflict"
-        },
-        {
-          "default_message": "Manual review required.",
-          "emitter": "trait_review_assignment",
-          "id": "warning_emitter_trait_review_assignment",
-          "warning_type": "trait_review"
-        }
-      ]
-    },
-    {
-      "id": "warning_trait_actions",
-      "rows": [
-        {
-          "action_text": "Review this substance/product context manually before treating the schedule as final.",
-          "id": "warning_trait_manual_review",
-          "trait_id": "risk:manual_review"
-        },
-        {
-          "action_text": "Review total daily amount across products and avoid accidental stacking.",
-          "id": "warning_trait_narrow_therapeutic_window",
-          "trait_id": "risk:narrow_therapeutic_window"
-        },
-        {
-          "action_text": "Review potassium-related medication context before using this stack.",
-          "id": "warning_trait_hyperkalemia_med_interaction",
-          "trait_id": "risk:hyperkalemia_med_interaction"
-        }
-      ]
-    },
-    {
-      "id": "concern_review_statuses",
-      "rows": [
-        {
-          "description": "card is active in a non-inactive stack",
-          "id": "concern_review_status_active",
-          "membership_role": "active",
-          "rank": 0,
-          "status": "active"
-        },
-        {
-          "description": "card is in the inactive stack",
-          "id": "concern_review_status_inactive",
-          "membership_role": "inactive",
-          "rank": 1,
-          "status": "inactive"
-        },
-        {
-          "description": "product card is tracked but outside all stacks",
-          "id": "concern_review_status_tracked_unassigned",
-          "membership_role": "product_fallback",
-          "rank": 2,
-          "status": "tracked-unassigned"
-        },
-        {
-          "description": "substance card is known but not assigned through an active product",
-          "id": "concern_review_status_knowledge_only",
-          "membership_role": "substance_fallback",
-          "rank": 3,
-          "status": "knowledge-only"
-        }
-      ]
-    },
-    {
-      "id": "concern_warning_rules",
-      "rows": [
-        {
-          "concern_kind": "safety",
-          "id": "concern_warning_safety",
-          "warning_type": "safety_concern"
-        }
-      ]
-    },
-    {
-      "id": "non_warning_concern_kinds",
-      "rows": [
-        {
-          "concern_kind": "model_gap",
-          "description": "Model gap concerns are reviewer-visible metadata and do not emit planner warnings.",
-          "id": "concern_review_only_model_gap",
-          "review_surface": "review"
-        },
-        {
-          "concern_kind": "data_quality",
-          "description": "Data quality concerns are reviewer-visible metadata and do not emit planner warnings.",
-          "id": "concern_review_only_data_quality",
-          "review_surface": "review"
-        }
-      ]
-    },
-    {
-      "id": "relation_warning_rules",
-      "rows": [
-        {
-          "active_side": "both",
-          "filter_field": "assertion_kind",
-          "filter_value": "clinical_review_signal",
-          "id": "relation_warning_review_with_present",
-          "relation_kind": "review_with",
-          "reverse_output": false,
-          "review_status": "actionable_now",
-          "warning_type": "review_with_substance_present"
-        },
-        {
-          "active_side": "source",
-          "filter_field": "semantic_family",
-          "filter_value": "nutrient_balance_review_signal",
-          "id": "relation_warning_missing_balance_forward",
-          "relation_kind": "balance",
-          "reverse_output": false,
-          "review_status": "actionable_now",
-          "warning_type": "missing_balance_substance"
-        },
-        {
-          "active_side": "target",
-          "filter_field": "semantic_family",
-          "filter_value": "nutrient_balance_review_signal",
-          "id": "relation_warning_missing_balance_reverse",
-          "relation_kind": "balance",
-          "reverse_output": true,
-          "review_status": "actionable_now",
-          "warning_type": "missing_balance_substance"
-        },
-        {
-          "active_side": "target",
-          "filter_field": "assertion_kind",
-          "filter_value": "ontology_assertion",
-          "id": "relation_warning_missing_support",
-          "relation_kind": "supports",
-          "reverse_output": false,
-          "review_status": "actionable_now",
-          "warning_type": "missing_support_substance"
-        }
-      ]
-    },
-    {
-      "id": "relation_review_statuses",
-      "rows": [
-        {
-          "description": "relation semantics fire for the current stack",
-          "id": "relation_review_status_actionable_now",
-          "rank": 0,
-          "status": "actionable_now"
-        },
-        {
-          "description": "both endpoints active; no absence warning",
-          "id": "relation_review_status_active_pair_present",
-          "rank": 1,
-          "status": "active_pair_present"
-        },
-        {
-          "description": "one endpoint active; relation does not fire",
-          "id": "relation_review_status_latent_one_side_present",
-          "rank": 2,
-          "status": "latent_one_side_present"
-        },
-        {
-          "description": "both endpoints absent",
-          "id": "relation_review_status_inactive",
-          "rank": 3,
-          "status": "inactive"
-        }
-      ]
-    },
-    {
-      "id": "relation_presence_statuses",
-      "rows": [
-        {
-          "active_side": "both",
-          "default_review_status": "active_pair_present",
-          "description": "both endpoints active",
-          "id": "relation_presence_both_active",
-          "source_active": true,
-          "status": "both_active",
-          "target_active": true
-        },
-        {
-          "active_side": "source",
-          "default_review_status": "latent_one_side_present",
-          "description": "source active, target absent",
-          "id": "relation_presence_missing_target",
-          "source_active": true,
-          "status": "missing_target",
-          "target_active": false
-        },
-        {
-          "active_side": "target",
-          "default_review_status": "latent_one_side_present",
-          "description": "target active, source absent",
-          "id": "relation_presence_missing_source",
-          "source_active": false,
-          "status": "missing_source",
-          "target_active": true
-        },
-        {
-          "active_side": "none",
-          "default_review_status": "inactive",
-          "description": "both endpoints absent",
-          "id": "relation_presence_neither_active",
-          "source_active": false,
-          "status": "neither_active",
-          "target_active": false
-        }
-      ]
-    },
-    {
-      "id": "relation_endpoint_policies",
-      "rows": [
-        {
-          "audit_member_limit": 0,
-          "broad_endpoint": false,
-          "id": "relation_endpoint_entity",
-          "label": "concrete endpoint",
-          "selector_kind": "entity",
-          "show_match_details": false
-        },
-        {
-          "audit_member_limit": 5,
-          "broad_endpoint": true,
-          "id": "relation_endpoint_term",
-          "label": "trait endpoint",
-          "selector_kind": "term",
-          "show_match_details": true
-        }
-      ]
-    }
-  ]
+  "source_hash": "59ab81b22b1857043a0c83861de1db3c42efba5e9888ddb4664305cb2e341ef6"
 }

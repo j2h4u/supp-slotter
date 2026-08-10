@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import TypedDict, cast
 
 import yaml
-from planner.engine import cmd_review_substance
+from planner.engine import cmd_review, cmd_review_substance
 
 from tests.helpers import run_planner
 from tests.planner_fixture import PlannerFixtureInput, find_card_path_by_id, write_minimal_planner_fixture
@@ -37,9 +37,9 @@ def _write_review_substance_fixture(tmp_path: Path) -> Path:
             },
             products={
                 "prd_citrulline": [("sub_citrulline", ["intake:empty_preferred", "effect:nitric_oxide_support"])],
-                "prd_bsix000001": [("sub_bsix000001", ["timing:wake"])],
-                "prd_levodopa01": [("sub_levodopa01", ["timing:wake"])],
-                "prd_creatine01": [("sub_creatine01", ["activity:workout"])],
+                "prd_bsix000001": [("sub_bsix000001", ["timing:energy_like"])],
+                "prd_levodopa01": [("sub_levodopa01", ["timing:energy_like"])],
+                "prd_creatine01": [("sub_creatine01", ["activity:any_workout"])],
             },
             traits={
                 "intake:empty_preferred": {
@@ -57,12 +57,12 @@ def _write_review_substance_fixture(tmp_path: Path) -> Path:
                     "description": "Fixture nitric oxide effect.",
                     "applies_when": "Fixture only.",
                 },
-                "timing:wake": {
-                    "label": "Wake",
-                    "description": "Fixture wake timing.",
+                "timing:energy_like": {
+                    "label": "Energy-like",
+                    "description": "Fixture energy-like timing.",
                     "applies_when": "Fixture only.",
                 },
-                "activity:workout": {
+                "activity:any_workout": {
                     "label": "Workout",
                     "description": "Fixture workout activity.",
                     "applies_when": "Fixture only.",
@@ -99,10 +99,10 @@ def _write_review_substance_fixture(tmp_path: Path) -> Path:
         "relations": [
             {
                 "id": "rel_fixture_central",
-                "type": "supports",
+                "relation_type": "supports",
                 "assertion_kind": "ontology_assertion",
                 "semantic_family": "biochemical_mechanism_assertion",
-                "source_selector": {"entity": {"id": "sub_bsix000001"}},
+                "source_selector": {"entity": {"entity_id": "sub_bsix000001"}},
                 "target_selector": {"entity": {"name": "Levodopa"}},
                 "reason": "Fixture central relation.",
             }
@@ -121,10 +121,9 @@ def test_review_substance_prints_grouped_trait_checklist(tmp_path: Path) -> None
     assert result.exit_code == 0, result.output + result.stderr
     assert "Substance review: L-Citrulline (malate)" in result.output
     assert "\nintake\n" in result.output
-    assert "  [x] food_preferred - Prefers food" in result.output
-    assert "Food improves tolerance or practical use" in result.output
-    assert "Slot effects: prefer when food=True" in result.output
-    assert "Slot effects: prefer_strong when food=False; avoid when food=True" not in result.output
+    assert "  [x] empty_preferred - Prefers empty stomach" in result.output
+    assert "Works or absorbs better away from food, without a hard food block." in result.output
+    assert "Slot effects: prefer when food=False; avoid when food=True" in result.output
     assert "Output: schedule warning" in result.output
     assert "Concerns" in result.output
 
@@ -132,6 +131,7 @@ def test_review_substance_prints_grouped_trait_checklist(tmp_path: Path) -> None
 def test_review_substance_prints_central_relation_matches(tmp_path: Path) -> None:
     temp_data = _write_review_substance_fixture(tmp_path)
     relation_document = cast(dict[str, object], yaml.safe_load((temp_data / "relations.yaml").read_text()))
+    relations = cast(Relations, relation_document)
     assertion = cast(dict[str, object], cast(list[object], relation_document["relations"])[0])
     assert assertion["assertion_kind"] == "ontology_assertion"
     assert assertion["semantic_family"] == "biochemical_mechanism_assertion"
@@ -148,6 +148,89 @@ def test_review_substance_prints_central_relation_matches(tmp_path: Path) -> Non
     assert "Vitamin B6 (pyridoxine HCl) -> Levodopa" in result.output
     assert "matched by: source selector" in result.output
 
+    relations["relations"].append({
+        "id": "rel_fixture_review",
+        "relation_type": "review_with",
+        "assertion_kind": "clinical_review_signal",
+        "semantic_family": "clinical_review_signal",
+        "source_selector": {"entity": {"entity_id": "sub_bsix000001"}},
+        "target_selector": {"entity": {"name": "Levodopa"}},
+        "reason": "Synthetic review fixture.",
+    })
+    relations_path = temp_data / "relations.yaml"
+    relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
+    compact_result = cmd_review_substance(str(substance_path), data_root=tmp_path, compact=True)
+
+    assert compact_result.exit_code == 0, compact_result.output + compact_result.stderr
+    assert "review_with" in compact_result.output
+    assert "Vitamin B6 (pyridoxine HCl) -> Levodopa" in compact_result.output
+    assert "matched by: source selector" in compact_result.output
+
+
+def test_review_surfaces_share_authored_relation_order(tmp_path: Path) -> None:
+    temp_data = _write_review_substance_fixture(tmp_path)
+    substance_path = find_card_path_by_id(temp_data / "substances", "sub_citrulline")
+    relations = {
+        "relations": [
+            {
+                "id": "rel_fixture_balance",
+                "relation_type": "balance",
+                "assertion_kind": "ontology_assertion",
+                "semantic_family": "biochemical_mechanism_assertion",
+                "source_selector": {"entity": {"entity_id": "sub_citrulline"}},
+                "target_selector": {"entity": {"entity_id": "sub_creatine01"}},
+                "reason": "Fixture balance relation.",
+            },
+            {
+                "id": "rel_fixture_supports",
+                "relation_type": "supports",
+                "assertion_kind": "ontology_assertion",
+                "semantic_family": "biochemical_mechanism_assertion",
+                "source_selector": {"entity": {"entity_id": "sub_citrulline"}},
+                "target_selector": {"entity": {"entity_id": "sub_bsix000001"}},
+                "reason": "Fixture support relation.",
+            },
+            {
+                "id": "rel_fixture_review_with",
+                "relation_type": "review_with",
+                "assertion_kind": "clinical_review_signal",
+                "semantic_family": "clinical_review_signal",
+                "source_selector": {"entity": {"entity_id": "sub_citrulline"}},
+                "target_selector": {"entity": {"entity_id": "sub_levodopa01"}},
+                "reason": "Fixture review relation.",
+            },
+        ]
+    }
+    (temp_data / "relations.yaml").write_text(yaml.safe_dump(relations, sort_keys=False))
+
+    full_review = cmd_review(data_root=tmp_path)
+    substance_review = cmd_review_substance(str(substance_path), data_root=tmp_path)
+
+    assert full_review.exit_code == 0, full_review.stderr
+    assert substance_review.exit_code == 0, substance_review.stderr
+    full_positions = [
+        full_review.output.index(f"[{label}]")
+        for label in ("Balance pairing", "Support relationship", "Review together")
+    ]
+    substance_positions = [substance_review.output.index(name) for name in ("balance", "supports", "review_with")]
+    assert full_positions == sorted(full_positions)
+    assert substance_positions == sorted(substance_positions)
+
+
+def test_review_substance_fails_closed_on_unknown_relation_entity(tmp_path: Path) -> None:
+    temp_data = _write_review_substance_fixture(tmp_path)
+    relations_path = temp_data / "relations.yaml"
+    relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
+    relation = cast(dict[str, object], cast(list[object], relations["relations"])[0])
+    relation["source_selector"] = {"entity": {"entity_id": "sub_missing000"}}
+    relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
+    substance_path = find_card_path_by_id(temp_data / "substances", "sub_bsix000001")
+
+    result = cmd_review_substance(str(substance_path), data_root=tmp_path)
+
+    assert result.exit_code == 1
+    assert "no matching substance card" in result.stderr
+
 
 def test_review_substance_prints_trait_relation_matches(tmp_path: Path) -> None:
     temp_data = _write_review_substance_fixture(tmp_path)
@@ -155,7 +238,7 @@ def test_review_substance_prints_trait_relation_matches(tmp_path: Path) -> None:
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
     relations["relations"].append({
         "id": "rel_fixture_effect",
-        "type": "supports",
+        "relation_type": "supports",
         "assertion_kind": "ontology_assertion",
         "semantic_family": "biochemical_mechanism_assertion",
         "source_selector": {"entity": {"name": "Creatine"}},
@@ -169,7 +252,7 @@ def test_review_substance_prints_trait_relation_matches(tmp_path: Path) -> None:
 
     assert result.exit_code == 0, result.output + result.stderr
     assert "Central relations from data/relations.yaml (read-only)" in result.output
-    assert "Creatine -> effect:nitric_oxide_support" in result.output
+    assert "Creatine -> Nitric Oxide Support" in result.output
     assert "matched by: target selector" in result.output
 
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 
 
 class RelationReviewRow(TypedDict):
@@ -10,7 +10,10 @@ class RelationReviewRow(TypedDict):
     source: str
     target: str
     reason: str
+    action: NotRequired[str]
+    severity: NotRequired[str]
     presence: str
+    warning_type: str | None
     source_matches: list[str]
     target_matches: list[str]
     show_matches: bool

@@ -34,6 +34,7 @@ from planner.ontology.errors import (
     UNSUPPORTED,
     OntologyInfrastructureError,
 )
+from planner.yaml_io import safe_load_yaml
 
 if TYPE_CHECKING:
     from planner.ontology.runtime_program import RuntimeProgram
@@ -44,7 +45,12 @@ SCHEMA_VERSION = "2"
 _SHA256_HEX_LENGTH = 64
 _REQUIRED_OUTPUTS = frozenset({
     "card.schema.json",
+    "dashboard.schema.json",
+    "pillboxes.schema.json",
+    "product.schema.json",
+    "relations.schema.json",
     "schema.json",
+    "stacks.schema.json",
     "ontology.ttl",
     "shapes.ttl",
     "context.json",
@@ -155,6 +161,13 @@ class OntologyBundle:
         return runtime_program
 
     @property
+    def ontoclean_profiles(self) -> Mapping[str, object]:
+        """Typed, fail-closed OntoClean catalog from this verified bundle."""
+        from planner.ontology.presentation import load_ontoclean_profiles
+
+        return cast(Mapping[str, object], load_ontoclean_profiles(self))
+
+    @property
     def artifact_bytes(self) -> Mapping[str, bytes]:
         """Alias documenting that values are the original verified bytes."""
 
@@ -244,7 +257,7 @@ def load_ontology(root: Path) -> OntologyBundle:  # noqa: PLR0914
         content = _read_once(path, code=MISSING)
         _check_hash(content, record["sha256"], relative, source=False)
         artifact_bytes[relative] = content
-        decoded[relative] = _decode_artifact(relative, content)
+        decoded[relative] = _decode_artifact(relative, content, path=path)
         _validate_declared_format(relative, decoded[relative])
 
     runtime = decoded.get("runtime-vocabulary.yaml")
@@ -300,6 +313,12 @@ def load_ontology(root: Path) -> OntologyBundle:  # noqa: PLR0914
         frozen_artifacts,
         frozen_decoded,
     )
+    # Validate the complete generated term/category registries before the
+    # bundle becomes observable to any card loader.  In particular, an empty
+    # assertion stream must not hide malformed vocabulary metadata.
+    from planner.ontology.presentation import validate_runtime_catalog
+
+    validate_runtime_catalog(bundle)
     # Keep the typed Substance accessor boundary in lockstep with authored
     # selector vocabulary before exposing the verified bundle to loaders.
     from planner.ontology.substance_fields import validate_substance_schema_conformance
@@ -333,9 +352,7 @@ def _read_mapping(path: Path, *, yaml_format: bool) -> tuple[dict[str, object], 
         raise _error(UNSAFE_PATH, f"Symlinked ontology path is not trusted: {path}", path)
     content = _read_bytes(path, code=MISSING)
     try:
-        value = (
-            cast(object, yaml.safe_load(content)) if yaml_format else cast(object, json.loads(content.decode("utf-8")))
-        )
+        value = safe_load_yaml(content, path=path) if yaml_format else json.loads(content.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError, yaml.YAMLError) as error:
         raise _error(MALFORMED, f"Malformed ontology contract: {path}: {error}", path) from error
     if not isinstance(value, dict):
@@ -540,13 +557,13 @@ def _check_hash(content: bytes, expected: str, relative: str, *, source: bool) -
         raise _error(STALE, f"Stale ontology {subject} hash for {relative!r}: expected {expected}, got {actual}")
 
 
-def _decode_artifact(relative: str, content: bytes) -> object:
+def _decode_artifact(relative: str, content: bytes, *, path: Path | None = None) -> object:
     suffix = Path(relative).suffix.lower()
     try:
         if suffix == ".json":
             return cast(object, json.loads(content.decode("utf-8")))
         if suffix == ".yaml" or suffix == ".yml":
-            return cast(object, yaml.safe_load(content))
+            return cast(object, safe_load_yaml(content, path=path or relative))
         if suffix == ".ttl":
             # C3 intentionally does not parse RDF; UTF-8 decoding still proves
             # the artifact is a loadable text payload.
@@ -557,7 +574,14 @@ def _decode_artifact(relative: str, content: bytes) -> object:
 
 
 def _validate_declared_format(relative: str, decoded: object) -> None:
-    if relative in {"card.schema.json", "schema.json"}:
+    if relative in {
+        "card.schema.json",
+        "dashboard.schema.json",
+        "product.schema.json",
+        "relations.schema.json",
+        "schema.json",
+        "stacks.schema.json",
+    }:
         decoded_map = cast(dict[object, object], decoded) if isinstance(decoded, dict) else None
         if decoded_map is None or decoded_map.get("$schema") != "https://json-schema.org/draft/2020-12/schema":
             raise _error(UNSUPPORTED, f"Unsupported JSON Schema declaration in {relative!r}")

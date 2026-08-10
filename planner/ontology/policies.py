@@ -20,10 +20,22 @@ from planner.contracts import (
     TraitEffectMatch,
 )
 from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
+from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
+from planner.ontology.glue_capabilities import (
+    IMPLEMENTED_EFFECT_MATCH_VALUE_HANDLERS,
+    ONTOLOGY_COMPOSITE_KEY_SEPARATOR,
+)
+from planner.ontology.presentation import load_review_presentation
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.schema_enums import schema_enum_values
+from planner.ontology.selector import hydrate_selector
 from planner.paths import ROOT
+
+
+def _policy_error(bundle: OntologyBundle, message: str) -> OntologyInfrastructureError:
+    """Report malformed generated policy data with its immutable source."""
+    source = bundle.root / "generated" / "runtime-vocabulary.yaml"
+    return OntologyInfrastructureError(f"{message} [source: {source}]", code=MALFORMED, path=source)
 
 
 def _build_trait_effect(effect: dict[str, object], runtime: RuntimeProgram) -> TraitEffect:
@@ -55,15 +67,18 @@ def _build_trait_effect(effect: dict[str, object], runtime: RuntimeProgram) -> T
 
 
 def _validated_effect_match_value(value: object, key: str, value_type: str, runtime: RuntimeProgram) -> str | bool:
-    if value_type == "slot_near":
-        if not isinstance(value, str) or value not in runtime.slot_near_values:
-            raise CardLoadError(ROOT / "ontology", f"policy effect has invalid {key}")
-        return value
-    if value_type == "boolean":
+    handler = IMPLEMENTED_EFFECT_MATCH_VALUE_HANDLERS.get(value_type)
+    if handler is None:
+        raise CardLoadError(ROOT / "ontology", f"policy effect has unsupported match value type {value_type}")
+    if handler == "boolean":
         if not isinstance(value, bool):
             raise CardLoadError(ROOT / "ontology", f"policy effect has invalid {key}")
         return value
-    raise CardLoadError(ROOT / "ontology", f"policy effect has unsupported match value type {value_type}")
+    if handler == "capability_values":
+        if not isinstance(value, str) or value not in runtime.slot_near_values:
+            raise CardLoadError(ROOT / "ontology", f"policy effect has invalid {key}")
+        return value
+    raise CardLoadError(ROOT / "ontology", f"policy effect has unsupported match handler {handler}")
 
 
 def _required_policy_string(policy: dict[str, object], policy_id: str, key: str) -> str:
@@ -82,36 +97,52 @@ def _validate_warning_trait_actions(runtime: RuntimeProgram, policies: dict[str,
         )
 
 
+def _canonical_policy_categories(bundle: OntologyBundle) -> dict[str, object]:
+    categories = bundle.runtime_vocabulary.get("categories")
+    if not isinstance(categories, dict) or not categories:
+        raise _policy_error(bundle, "canonical runtime vocabulary has no semantic categories")
+    return cast(dict[str, object], categories)
+
+
 def load_scheduling_policies(bundle: OntologyBundle) -> dict[str, SchedulingPolicy]:
     """Materialize scheduler policies from generated canonical ontology artifacts."""
     vocabulary = bundle.runtime_vocabulary
     runtime = bundle.runtime_program
     raw_policies = vocabulary.get("scheduling_policies")
     if not isinstance(raw_policies, dict):
-        raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no scheduling_policies")
+        raise _policy_error(bundle, "canonical runtime vocabulary has no scheduling_policies")
+    categories = _canonical_policy_categories(bundle)
     out: dict[str, SchedulingPolicy] = {}
     for tid, policy_obj in raw_policies.items():
         if not isinstance(tid, str) or not isinstance(policy_obj, dict) or ONTOLOGY_COMPOSITE_KEY_SEPARATOR not in tid:
-            raise CardLoadError(ROOT / "ontology", f"malformed scheduling policy {tid!r}")
+            raise _policy_error(bundle, f"malformed scheduling policy {tid!r}")
         namespace, short_name = tid.split(ONTOLOGY_COMPOSITE_KEY_SEPARATOR, maxsplit=1)
+        if namespace not in categories:
+            raise _policy_error(bundle, f"policy {tid!r} uses unknown canonical category {namespace!r}")
         policy = cast(dict[str, object], policy_obj)
         effects_raw = policy.get("effects")
         if not isinstance(effects_raw, list):
-            raise CardLoadError(ROOT / "ontology", f"policy {tid!r} has invalid effects")
+            raise _policy_error(bundle, f"policy {tid!r} has invalid effects")
         effects: list[TraitEffect] = []
         for index, effect in enumerate(effects_raw):
             if not isinstance(effect, dict):
-                raise CardLoadError(ROOT / "ontology", f"policy {tid!r} effects[{index}] is malformed")
-            effects.append(_build_trait_effect(cast(dict[str, object], effect), runtime))
-        label = _required_policy_string(policy, tid, "label")
-        description = _required_policy_string(policy, tid, "description")
-        applies_when = _required_policy_string(policy, tid, "applies_when")
+                raise _policy_error(bundle, f"policy {tid!r} effects[{index}] is malformed")
+            try:
+                effects.append(_build_trait_effect(cast(dict[str, object], effect), runtime))
+            except CardLoadError as error:
+                raise _policy_error(bundle, str(error)) from error
+        try:
+            label = _required_policy_string(policy, tid, "label")
+            description = _required_policy_string(policy, tid, "description")
+            applies_when = _required_policy_string(policy, tid, "applies_when")
+        except CardLoadError as error:
+            raise _policy_error(bundle, str(error)) from error
         warning = policy.get("warning")
         if not isinstance(warning, bool):
-            raise CardLoadError(ROOT / "ontology", f"policy {tid!r} has invalid warning")
+            raise _policy_error(bundle, f"policy {tid!r} has invalid warning")
         action = policy.get("action")
         if action is not None and (not isinstance(action, str) or not action.strip()):
-            raise CardLoadError(ROOT / "ontology", f"policy {tid!r} has invalid action")
+            raise _policy_error(bundle, f"policy {tid!r} has invalid action")
         out[tid] = SchedulingPolicy(
             id=tid,
             namespace=namespace,
@@ -123,7 +154,10 @@ def load_scheduling_policies(bundle: OntologyBundle) -> dict[str, SchedulingPoli
             warning=warning,
             action=action if isinstance(action, str) else None,
         )
-    _validate_warning_trait_actions(runtime, out)
+    try:
+        _validate_warning_trait_actions(runtime, out)
+    except CardLoadError as error:
+        raise _policy_error(bundle, str(error)) from error
     return out
 
 
@@ -135,34 +169,83 @@ def load_scheduling_constraints(
     runtime = bundle.runtime_program
     raw_constraints = vocabulary.get("scheduling_constraints")
     if not isinstance(raw_constraints, dict):
-        raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no scheduling_constraints")
+        raise _policy_error(bundle, "canonical runtime vocabulary has no scheduling_constraints")
+    required_string_fields = _required_constraint_string_fields(bundle)
     constraints: list[SchedulingConstraint] = []
     constraints_mapping = cast(dict[str, object], raw_constraints)
     for constraint_id, raw_value in constraints_mapping.items():
         raw = _object_mapping(raw_value)
         if not isinstance(constraint_id, str) or not constraint_id.strip() or raw is None:
-            raise CardLoadError(ROOT / "ontology", f"malformed scheduling constraint {constraint_id!r}")
-        source = _constraint_selector(raw.get("source_selector"))
-        target = _constraint_selector(raw.get("target_selector"))
+            raise _policy_error(bundle, f"malformed scheduling constraint {constraint_id!r}")
+        try:
+            source = _constraint_selector(raw.get("source_selector"))
+            target = _constraint_selector(raw.get("target_selector"))
+        except CardLoadError as error:
+            raise _policy_error(bundle, f"constraint {constraint_id!r}: {error}") from error
         operation = raw.get("operation")
         if not isinstance(operation, str) or not operation.strip():
-            raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid operation")
+            raise _policy_error(bundle, f"constraint {constraint_id!r} has invalid operation")
         if runtime.constraint_execution_policy_for(operation) is None:
-            raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has unknown operation {operation!r}")
-        action = raw.get("action")
-        if action is not None and (not isinstance(action, str) or not action.strip()):
-            raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid action")
+            raise _policy_error(bundle, f"constraint {constraint_id!r} has unknown operation {operation!r}")
+        required_strings: dict[str, str] = {}
+        for field in required_string_fields:
+            value = raw.get(field)
+            if not isinstance(value, str) or not value.strip():
+                raise _policy_error(bundle, f"constraint {constraint_id!r} has invalid {field}")
+            required_strings[field] = value
+        action = required_strings["action"]
         constraints.append(
             SchedulingConstraint(
                 id=constraint_id,
                 source_selector=source,
                 target_selector=target,
                 operation=operation,
-                action=action if isinstance(action, str) else None,
-                rationale=_optional_constraint_string(raw, constraint_id, "rationale"),
+                action=action,
+                rationale=required_strings["rationale"],
+                blocks_slots=raw.get("blocks_slots") if isinstance(raw.get("blocks_slots"), bool) else None,
+                scores_advisory=raw.get("scores_advisory") if isinstance(raw.get("scores_advisory"), bool) else None,
+                score_delta=raw.get("score_delta")
+                if isinstance(raw.get("score_delta"), int) and not isinstance(raw.get("score_delta"), bool)
+                else None,
             )
         )
     return tuple(constraints)
+
+
+def _required_constraint_string_fields(bundle: OntologyBundle) -> tuple[str, ...]:
+    """Read required string metadata from the generated formal schema.
+
+    The runtime vocabulary is generated from ``SchedulingConstraintRecord``;
+    keeping this check driven by the committed schema prevents the loader from
+    silently drifting when the formal model adds another required string field.
+    """
+    schema = bundle.decoded.get("schema.json")
+    if not isinstance(schema, dict):
+        raise _policy_error(bundle, "generated schema has no mapping")
+    definitions = schema.get("$defs")
+    if not isinstance(definitions, dict):
+        raise _policy_error(bundle, "generated schema has no definitions")
+    definition = definitions.get("SchedulingConstraintRecord__identifier_optional")
+    if not isinstance(definition, dict):
+        raise _policy_error(bundle, "generated schema has no scheduling constraint record definition")
+    required = definition.get("required")
+    properties = definition.get("properties")
+    if (
+        not isinstance(required, list)
+        or any(not isinstance(field, str) for field in required)
+        or not isinstance(properties, dict)
+    ):
+        raise _policy_error(bundle, "generated scheduling constraint record metadata is malformed")
+    string_fields: list[str] = []
+    for field in cast(list[str], required):
+        property_schema = properties.get(field)
+        if isinstance(property_schema, dict) and property_schema.get("type") == "string":
+            string_fields.append(field)
+    if not string_fields:
+        raise _policy_error(bundle, "generated scheduling constraint record declares no required string metadata")
+    if not {"action", "rationale"} <= set(string_fields):
+        raise _policy_error(bundle, "generated scheduling constraint record must require action and rationale")
+    return tuple(string_fields)
 
 
 def load_ontology_assertions(bundle: OntologyBundle) -> tuple[OntologyAssertion, ...]:
@@ -170,10 +253,10 @@ def load_ontology_assertions(bundle: OntologyBundle) -> tuple[OntologyAssertion,
     vocabulary = bundle.runtime_vocabulary
     raw_assertions = vocabulary.get("ontology_assertions")
     if not isinstance(raw_assertions, dict):
-        raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no ontology_assertions")
+        raise _policy_error(bundle, "canonical runtime vocabulary has no ontology_assertions")
     raw_relation_types = vocabulary.get("relation_types")
     if not isinstance(raw_relation_types, dict) or not raw_relation_types:
-        raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no relation_types")
+        raise _policy_error(bundle, "canonical runtime vocabulary has no relation_types")
     relation_types = set(raw_relation_types)
     severity_values = frozenset(schema_enum_values(bundle, "Severity"))
     assertions: list[OntologyAssertion] = []
@@ -181,24 +264,27 @@ def load_ontology_assertions(bundle: OntologyBundle) -> tuple[OntologyAssertion,
     for assertion_id, raw_value in assertions_mapping.items():
         raw = _object_mapping(raw_value)
         if not isinstance(assertion_id, str) or not assertion_id.strip() or raw is None:
-            raise CardLoadError(ROOT / "ontology", f"malformed ontology assertion {assertion_id!r}")
-        source = _constraint_selector(raw.get("source_selector"))
-        target = _constraint_selector(raw.get("target_selector"))
+            raise _policy_error(bundle, f"malformed ontology assertion {assertion_id!r}")
+        try:
+            source = _assertion_selector(raw.get("source_selector"))
+            target = _assertion_selector(raw.get("target_selector"))
+        except CardLoadError as error:
+            raise _policy_error(bundle, f"assertion {assertion_id!r}: {error}") from error
         relation_type = raw.get("relation_type")
         assertion_kind = raw.get("assertion_kind")
         semantic_family = raw.get("semantic_family")
         reason = raw.get("reason")
         if source is None or target is None:
-            raise CardLoadError(ROOT / "ontology", f"assertion {assertion_id!r} has invalid selector")
+            raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid selector")
         if relation_type not in relation_types:
-            raise CardLoadError(ROOT / "ontology", f"assertion {assertion_id!r} has invalid relation_type")
+            raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid relation_type")
         if not isinstance(assertion_kind, str) or not isinstance(semantic_family, str) or not isinstance(reason, str):
-            raise CardLoadError(ROOT / "ontology", f"assertion {assertion_id!r} has invalid semantics")
+            raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid semantics")
         action, severity = raw.get("action"), raw.get("severity")
         if action is not None and (not isinstance(action, str) or not action.strip()):
-            raise CardLoadError(ROOT / "ontology", f"assertion {assertion_id!r} has invalid action")
+            raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid action")
         if severity is not None and severity not in severity_values:
-            raise CardLoadError(ROOT / "ontology", f"assertion {assertion_id!r} has invalid severity")
+            raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid severity")
         assertions.append(
             OntologyAssertion(
                 id=assertion_id,
@@ -226,6 +312,7 @@ def project_ontology_assertions(
     valid only when the YAML supplied both explicit semantic fields, never by
     inferring behaviour from the relation type.
     """
+    _validate_relation_ids_before_projection(relations)
     generated = load_ontology_assertions(bundle)
     generated_ids = {assertion.id for assertion in generated}
     fixture_assertions = tuple(
@@ -248,43 +335,33 @@ def project_ontology_assertions(
     return (*generated, *fixture_assertions)
 
 
+def _validate_relation_ids_before_projection(relations: list[Relation]) -> None:
+    """Reject malformed relation identities before read-model projection.
+
+    YAML loaders normally enforce this through the generated relation schema's
+    keyed uniqueness contract.  Keep the projection boundary fail-closed for
+    callers that construct typed relations directly (fixtures and integrations)
+    so duplicate IDs cannot become duplicate read-model assertions.
+    """
+    seen: dict[str, int] = {}
+    for index, relation in enumerate(relations):
+        identifier = relation.id
+        if not isinstance(identifier, str) or not identifier.strip():
+            raise ValueError(f"relations[{index}].id must be a non-empty string")
+        previous = seen.get(identifier)
+        if previous is not None:
+            raise ValueError(
+                f"relations[{index}].id duplicates {identifier!r}; previously declared at relations[{previous}].id"
+            )
+        seen[identifier] = index
+
+
 def _constraint_selector(raw: object) -> RelationSelector:
-    selector = _object_mapping(raw)
-    if selector is None:
-        raise CardLoadError(ROOT / "ontology", "constraint selector must be a mapping")
-    if "entity" in selector and ({"category", "term"} & set(selector)):
-        raise CardLoadError(ROOT / "ontology", "selector must use entity or category/term, not both")
-    entity = _object_mapping(selector.get("entity"))
-    if entity is not None:
-        if set(selector) != {"entity"} or not set(entity).issubset({"id", "name"}):
-            raise CardLoadError(ROOT / "ontology", "malformed entity selector")
-        entity_id, entity_name = entity.get("id"), entity.get("name")
-        if (entity_id is None) == (entity_name is None):
-            raise CardLoadError(ROOT / "ontology", "entity selector requires exactly one non-empty id/name")
-        value = entity_id if entity_id is not None else entity_name
-        if not isinstance(value, str) or not value.strip():
-            raise CardLoadError(ROOT / "ontology", "entity selector value must be a non-empty string")
-        return RelationSelector(
-            entity_id=entity_id if isinstance(entity_id, str) else None,
-            entity_name=entity_name if isinstance(entity_name, str) else None,
-        )
-    category, term = selector.get("category"), selector.get("term")
-    if (
-        set(selector) != {"category", "term"}
-        or not isinstance(category, str)
-        or not category.strip()
-        or not isinstance(term, str)
-        or not term.strip()
-    ):
-        raise CardLoadError(ROOT / "ontology", "category selector requires non-empty category and term")
-    return RelationSelector(category=category, term=term)
+    return hydrate_selector(raw, path=ROOT / "ontology", label="constraint", allow_entity_name=False)
 
 
-def _optional_constraint_string(raw: dict[str, object], constraint_id: str, key: str) -> str | None:
-    value = raw.get(key)
-    if value is not None and (not isinstance(value, str) or not value.strip()):
-        raise CardLoadError(ROOT / "ontology", f"constraint {constraint_id!r} has invalid metadata {key}")
-    return value if isinstance(value, str) else None
+def _assertion_selector(raw: object) -> RelationSelector:
+    return hydrate_selector(raw, path=ROOT / "ontology", label="assertion", allow_entity_name=True)
 
 
 def _object_mapping(value: object) -> dict[str, object] | None:
@@ -362,12 +439,18 @@ def readable_policies(
     """
     visibility = _review_tag_visibility(bundle)
     labels: list[str] = []
-    for trait_id in sorted(trait_ids):
+    for trait_id in sorted(trait_ids, key=str):
+        if not isinstance(trait_id, str):
+            raise _policy_error(bundle, f"schedule output references malformed policy id {trait_id!r}")
         namespace, separator, _short_name = trait_id.partition(ONTOLOGY_COMPOSITE_KEY_SEPARATOR)
-        if not separator or namespace not in visibility.include_namespaces or trait_id in visibility.exclude_policy_ids:
+        if not separator:
+            raise _policy_error(bundle, f"schedule output references malformed policy id {trait_id!r}")
+        if namespace not in visibility.include_namespaces or trait_id in visibility.exclude_policy_ids:
             continue
         trait = policies.get(trait_id)
-        labels.append(trait.label if trait and trait.label else trait_id)
+        if trait is None:
+            raise _policy_error(bundle, f"schedule output references unknown policy {trait_id!r}")
+        labels.append(trait.label)
     return sorted(labels, key=str.casefold)
 
 
@@ -377,21 +460,8 @@ class _ReviewTagVisibility(NamedTuple):
 
 
 def _review_tag_visibility(bundle: OntologyBundle) -> _ReviewTagVisibility:
-    raw_presentation = bundle.runtime_vocabulary.get("schedule_presentation")
-    if not isinstance(raw_presentation, dict):
-        raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no schedule_presentation")
-    presentation = cast(dict[str, object], raw_presentation)
-    raw_review_tags = presentation.get("review_tags")
-    if not isinstance(raw_review_tags, dict):
-        raise CardLoadError(ROOT / "ontology", "canonical schedule_presentation has no review_tags")
-    review_tags = cast(dict[str, object], raw_review_tags)
-    include_namespaces = review_tags.get("include_namespaces")
-    exclude_policy_ids = review_tags.get("exclude_policy_ids")
-    if (
-        not isinstance(include_namespaces, list)
-        or not all(isinstance(item, str) and item for item in include_namespaces)
-        or not isinstance(exclude_policy_ids, list)
-        or not all(isinstance(item, str) and item for item in exclude_policy_ids)
-    ):
-        raise CardLoadError(ROOT / "ontology", "canonical schedule_presentation review_tags is malformed")
-    return _ReviewTagVisibility(frozenset(include_namespaces), frozenset(exclude_policy_ids))
+    presentation = load_review_presentation(bundle)
+    return _ReviewTagVisibility(
+        frozenset(presentation.review_tag_namespaces),
+        frozenset(presentation.excluded_policy_ids),
+    )

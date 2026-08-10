@@ -38,10 +38,8 @@ name: ""     # Required. Product name as it appears on the label.
 # an exact substance name+form, alias, or filename stem; `uv run python -m planner check`
 # rewrites unique matches to sub_* and fails on unknown or ambiguous names.
 #
-# For single-ingredient products: one component, no primary: field needed.
-# For multi-ingredient products: mark the therapeutically primary substance
-# with primary: true; leave others unmarked (they default to secondary and
-# contribute to scheduling traits at reduced weight).
+# For single-ingredient products: one component is enough.
+# For multi-ingredient products: add one component entry per substance.
 # ---------------------------------------------------------------------------
 
 components:
@@ -50,17 +48,11 @@ components:
                    # for this ingredient (e.g. "Vitamin B6 as pyridoxine HCl").
   # amount: ""     # Dose as printed on the label, e.g. "500 mg", "1000 IU", "10 mcg".
   # notes: ""      # Component-level notes, e.g. sourcing caveat or form clarification.
-  # primary: true  # Set to true for the main therapeutic ingredient in multi-component
-                   # products. Omit for single-ingredient products. When any component
-                   # has primary: true, unmarked components are treated as secondary
-                   # (their traits score at reduced weight and never block slot assignment).
 
 # Add more components as needed:
 # - substance: "Magnesium glycinate"
 #   label: ""
 #   amount: ""
-#   primary: false  # Explicitly secondary (same as omitting primary: when another
-                    # component has primary: true)
 
 # ---------------------------------------------------------------------------
 # NOTES & CONCERNS
@@ -72,15 +64,11 @@ components:
 
 # concerns:
 # - kind: data_quality  # See ontology/model.yaml ConcernKind.
-#   text: ""            # Specific concern. Shown by `planner review` with
-#                       # active/inactive/tracked-unassigned membership labels. Examples:
+#   text: ""            # Specific concern. Shown by `planner review` under its
+#                       # kind heading (safety, model_gap, or data_quality). Examples:
 #                       #   "Secondary sources disagree on B6 amount; verify label."
 #                       #   "Discontinued product; Supplement Facts from secondary source."
 #
 # - kind: safety
 #   text: ""            # Product-level safety note that applies to the formulation
 #                       # as a whole (not a property of any single substance).
-
-# Optional direct product schedule assignment.
-# schedule:
-#   intake: [food_preferred]

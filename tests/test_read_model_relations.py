@@ -2,13 +2,27 @@
 
 from __future__ import annotations
 
-from planner.contracts import OntologyAssertion, Relation, RelationSelector
+import pytest
+from planner.contracts import Relation, RelationSelector
+from planner.ontology.policies import load_ontology_assertions
 from planner.query_model import build_stack_read_model
 from planner.query_model.relation_matches import _row_match_labels
-from planner.query_model.surreal_records import relation_record
 
 from tests.helpers import ontology_bundle
 from tests.scheduling_fixtures import make_substance
+
+
+def test_canonical_balance_assertion_retains_authored_review_metadata() -> None:
+    bundle = ontology_bundle()
+    assertion = next(item for item in load_ontology_assertions(bundle) if item.id == "rel_balance_001")
+
+    read_model = build_stack_read_model({}, [], ontology_bundle=bundle)
+    rows = read_model.classify_relations(set())
+    row = next(row for entries in rows.values() for row in entries if row["reason"] == assertion.reason)
+
+    assert row["reason"] == assertion.reason
+    assert row["severity"] == "medium"
+    assert row["action"] == "Review zinc/copper balance in long-term active stacks."
 
 
 def test_collect_relation_warnings_support_source_active_target_absent_no_warning() -> None:
@@ -67,67 +81,35 @@ def test_collect_relation_warnings_support_target_active_source_absent_emits_war
     assert warning["reason"] == "supports pair"
 
 
-def test_row_match_labels_reports_canonical_selector_matches() -> None:
-    row: dict[str, object] = {
-        "src_substances": ["sub_target"],
-        "tgt_substances": ["sub_target"],
-    }
-
-    labels = _row_match_labels(row, "sub_target")
-
-    assert labels == ["source selector", "target selector"]
-
-
-def test_row_match_labels_returns_no_label_without_selector_membership() -> None:
-    row: dict[str, object] = {
-        "src_substances": ["sub_other"],
-        "tgt_substances": ["sub_other"],
-    }
-
-    labels = _row_match_labels(row, "sub_target")
-
-    assert labels == []
-
-
-def test_row_match_labels_uses_declared_entity_name_when_endpoint_is_unresolved() -> None:
-    row: dict[str, object] = {
-        "src_substances": [],
-        "tgt_substances": [],
-        "src_selector": {"kind": "entity", "name": "Vitamin B6"},
-        "tgt_selector": {"kind": "entity", "name": "Levodopa"},
-    }
-
-    labels = _row_match_labels(row, "sub_fixture_b6", "Vitamin B6")
-
-    assert labels == ["source selector"]
-
-
-def test_relation_projection_uses_entity_label_for_id_selector() -> None:
-    substance = make_substance("sub_source", "Readable Source")
-    relation = Relation(
-        id="rel_projection",
-        type="supports",
-        reason="test",
-        source_selector=RelationSelector(entity_id="sub_source"),
-        target_selector=RelationSelector(entity_name="Readable Target"),
-    )
-
-    record = relation_record(relation, {substance.id: substance}, ontology_bundle())
-
-    assert record["src_key"] == "sub_source"
-    assert record["src_display"] == "Readable Source"
-    assert record["tgt_display"] == "Readable Target"
-
-
-def _assertion(relation: Relation) -> OntologyAssertion:
-    return OntologyAssertion(
-        id=relation.id,
-        relation_type=relation.type,
-        assertion_kind="ontology_assertion",
-        semantic_family="biochemical_mechanism_assertion",
-        reason=relation.reason,
-        source_selector=relation.source_selector,
-        target_selector=relation.target_selector,
-        action=relation.action,
-        severity=relation.severity,
-    )
+@pytest.mark.parametrize(
+    ("row", "substance_id", "substance_name", "expected"),
+    [
+        (
+            {"src_substances": ["sub_target"], "tgt_substances": ["sub_target"]},
+            "sub_target",
+            "",
+            ["source selector", "target selector"],
+        ),
+        (
+            {"src_substances": ["sub_other"], "tgt_substances": ["sub_other"]},
+            "sub_target",
+            "",
+            [],
+        ),
+        (
+            {
+                "src_substances": [],
+                "tgt_substances": [],
+                "src_selector": {"kind": "entity", "name": "Vitamin B6"},
+                "tgt_selector": {"kind": "entity", "name": "Levodopa"},
+            },
+            "sub_fixture_b6",
+            "Vitamin B6",
+            ["source selector"],
+        ),
+    ],
+)
+def test_row_match_labels_reports_selector_matches(
+    row: dict[str, object], substance_id: str, substance_name: str, expected: list[str]
+) -> None:
+    assert _row_match_labels(row, substance_id, substance_name) == expected

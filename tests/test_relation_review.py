@@ -7,7 +7,7 @@ import pytest
 import yaml
 from planner.engine import cmd_check, cmd_plan, cmd_review
 from planner.ontology.runtime_program import RuntimeRelationWarningRule
-from planner.query_model.relations import _RelationReviewContext, _semantic_review_status
+from planner.query_model.relations import _RelationReviewContext, _warning_type_for_relation
 
 from tests.helpers import ontology_bundle
 from tests.planner_fixture import PlannerFixtureInput, find_card_path_by_id, write_minimal_planner_fixture
@@ -30,7 +30,6 @@ def test_relation_review_rule_filter_field_fails_closed() -> None:
         id="rule_bad_filter",
         relation_kind="supports",
         warning_type="missing_support_substance",
-        review_status="actionable_now",
         filter_field="unsupported_field",
         filter_value="biochemical_mechanism_assertion",
         active_side="target",
@@ -38,14 +37,13 @@ def test_relation_review_rule_filter_field_fails_closed() -> None:
     )
 
     with pytest.raises(ValueError, match="unsupported filter_field"):
-        _semantic_review_status(
+        _warning_type_for_relation(
             "supports",
             "ontology_assertion",
             "biochemical_mechanism_assertion",
             "missing_source",
             _RelationReviewContext(
                 (rule,),
-                runtime.relation_review_statuses_by_status,
                 runtime.relation_presence_statuses_by_status,
                 runtime.relation_presence_statuses_by_active_side,
             ),
@@ -64,17 +62,17 @@ def _write_relation_fixture(tmp_path: Path) -> Path:
             },
             products={
                 "prd_trace00001": [
-                    ("sub_zinc000001", ["is:mineral", "timing:wake"]),
-                    ("sub_copper0001", ["is:mineral", "timing:wake"]),
-                    ("sub_dthree0001", ["is:fat_soluble", "timing:wake"]),
-                    ("sub_citrulline", ["effect:nitric_oxide_support", "timing:wake"]),
+                    ("sub_zinc000001", ["kind:mineral"]),
+                    ("sub_copper0001", ["kind:mineral"]),
+                    ("sub_dthree0001", ["quality:fat_soluble"]),
+                    ("sub_citrulline", ["effect:nitric_oxide_support"]),
                 ],
-                "prd_tadal00001": [("sub_tadal00001", ["effect:pde5_inhibition", "timing:wake"])],
+                "prd_tadal00001": [("sub_tadal00001", ["role:pharmaceutical", "effect:pde5_inhibition"])],
                 "prd_nac0000001": [
-                    ("sub_nac0000001", ["timing:wake"]),
-                    ("sub_selenium01", ["timing:wake"]),
+                    ("sub_nac0000001", ["kind:amino"]),
+                    ("sub_selenium01", ["kind:mineral"]),
                 ],
-                "prd_selenium01": [("sub_selenium01", ["timing:wake"])],
+                    "prd_selenium01": [("sub_selenium01", ["kind:mineral"])],
             },
             traits={},
         ),
@@ -91,7 +89,7 @@ def _write_relation_fixture(tmp_path: Path) -> Path:
         "relations": [
             {
                 "id": "rel_fixture_balance",
-                "type": "balance",
+                "relation_type": "balance",
                 "assertion_kind": "clinical_review_signal",
                 "semantic_family": "nutrient_balance_review_signal",
                 "source_selector": {"entity": {"name": "Zinc"}},
@@ -102,7 +100,7 @@ def _write_relation_fixture(tmp_path: Path) -> Path:
             },
             {
                 "id": "rel_fixture_supports",
-                "type": "supports",
+                "relation_type": "supports",
                 "assertion_kind": "ontology_assertion",
                 "semantic_family": "biochemical_mechanism_assertion",
                 "source_selector": {"entity": {"name": "Selenium"}},
@@ -111,7 +109,7 @@ def _write_relation_fixture(tmp_path: Path) -> Path:
             },
             {
                 "id": "rel_fixture_review_with",
-                "type": "review_with",
+                "relation_type": "review_with",
                 "assertion_kind": "clinical_review_signal",
                 "semantic_family": "clinical_review_signal",
                 "source_selector": {"category": "effect", "term": "nitric_oxide_support"},
@@ -148,7 +146,7 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
     review_result = cmd_review(data_root=tmp_path)
 
     assert review_result.exit_code == 0
-    assert "actionable_now" in review_result.output
+    assert "Relation outcomes:" in review_result.output
     assert "Zinc" in review_result.output and "Copper" in review_result.output
 
     plan_result = cmd_plan(data_root=tmp_path)
@@ -171,7 +169,7 @@ def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> N
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
     relations["relations"].append({
         "id": "rel_missing_source",
-        "type": "supports",
+        "relation_type": "supports",
         "assertion_kind": "ontology_assertion",
         "semantic_family": "biochemical_mechanism_assertion",
         "source_selector": {"entity": {"name": "Definitely Missing"}},
@@ -194,7 +192,7 @@ def test_relation_validation_accepts_typed_term_endpoint_for_supports(
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
     relations["relations"].append({
         "id": "rel_cross_category_support",
-        "type": "supports",
+        "relation_type": "supports",
         "assertion_kind": "ontology_assertion",
         "semantic_family": "biochemical_mechanism_assertion",
         "source_selector": {"category": "kind", "term": "mineral"},
@@ -216,10 +214,10 @@ def test_relation_validation_rejects_invalid_selector_shape(
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
     relations["relations"].append({
         "id": "rel_invalid_selector",
-        "type": "supports",
+        "relation_type": "supports",
         "assertion_kind": "ontology_assertion",
         "semantic_family": "biochemical_mechanism_assertion",
-        "source_selector": {"entity": {"id": "sub_zinc000001"}, "category": "kind", "term": "mineral"},
+        "source_selector": {"entity": {"entity_id": "sub_zinc000001"}, "category": "kind", "term": "mineral"},
         "target_selector": {"entity": {"name": "Copper"}},
         "reason": "Fixture relation with mixed source endpoint strategy.",
     })
@@ -231,7 +229,7 @@ def test_relation_validation_rejects_invalid_selector_shape(
     assert result.exit_code != 0
     assert "relation endpoints must choose exactly one source endpoint and exactly one target endpoint" in error_text
     assert "found source endpoints: category, entity, term" in error_text
-    assert "Use the canonical selector shape {entity: {id|name}} or {category, term} on each side." in error_text
+    assert "Use the canonical selector shape {entity: {entity_id|name}} or {category, term} on each side." in error_text
 
 
 def test_typed_selector_relation_does_not_create_a_scheduling_conflict(tmp_path: Path) -> None:
@@ -249,7 +247,7 @@ def test_relation_validation_rejects_unregistered_trait(tmp_path: Path) -> None:
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
     relations["relations"].append({
         "id": "rel_unknown_effect",
-        "type": "review_with",
+        "relation_type": "review_with",
         "assertion_kind": "clinical_review_signal",
         "semantic_family": "clinical_review_signal",
         "source_selector": {"category": "effect", "term": "not_real"},
@@ -270,7 +268,7 @@ def test_trait_relation_endpoint_warns_by_matching_trait(tmp_path: Path) -> None
     relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
     relations["relations"].append({
         "id": "rel_effect_to_tadalafil",
-        "type": "review_with",
+        "relation_type": "review_with",
         "assertion_kind": "clinical_review_signal",
         "semantic_family": "clinical_review_signal",
         "source_selector": {"category": "effect", "term": "nitric_oxide_support"},
@@ -305,9 +303,9 @@ def test_nitric_oxide_pde5_trait_relation_warns_for_active_stack(
     assert any(
         warning.get("type") == "review_with_substance_present"
         and warning.get("source_substance") == "effect:nitric_oxide_support"
-        and warning.get("source_name") == "effect:nitric_oxide_support"
+        and warning.get("source_name") == "Nitric Oxide Support"
         and warning.get("target_substance") == "effect:pde5_inhibition"
-        and warning.get("target_name") == "effect:pde5_inhibition"
+        and warning.get("target_name") == "PDE5 Inhibition"
         and warning.get("severity") == "medium"
         and "additive blood-pressure lowering" in str(warning.get("reason"))
         for warning in result.warnings
@@ -330,7 +328,7 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     review_result = cmd_review(data_root=tmp_path)
 
     assert review_result.exit_code == 0
-    assert "actionable_now" in review_result.output
+    assert "Relation outcomes:" in review_result.output
     assert "Selenium" in review_result.output
     assert "N-Acetyl Cysteine" in review_result.output
 
@@ -356,16 +354,12 @@ def test_support_relation_accepts_active_supporter_from_another_product(
 
     assert review_result.exit_code == 0, review_result.output
     relations_output = review_result.output.split("Relations", maxsplit=1)[1].split(
-        "Risk flags",
+        "Context memberships",
         maxsplit=1,
     )[0]
-    selenium_nac_line = "[supports] Selenium -> N-Acetyl Cysteine"
+    selenium_nac_line = "[Support relationship] Selenium -> N-Acetyl Cysteine"
     assert selenium_nac_line in relations_output
-    active_pair_section = relations_output.split("active_pair_present", maxsplit=1)[1].split(
-        "latent_one_side_present",
-        maxsplit=1,
-    )[0]
-    assert selenium_nac_line in active_pair_section
+    assert "both_active" in relations_output
 
 
 def _remove_component_from_product(

@@ -6,10 +6,10 @@ from pathlib import Path
 from typing import NamedTuple
 
 from planner.contracts import (
-    ScheduleProjection,
     Pillbox,
     Product,
     Relation,
+    ScheduleProjection,
     SchedulingConstraint,
     SchedulingPolicy,
     Slot,

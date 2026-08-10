@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import cast
 
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
+from planner.ontology.presentation import load_review_presentation, load_term_labels
 from planner.query_model.session import SurrealSession, id_str, string_list
 from planner.schedule_types import ActiveFactIndexEntry
 
@@ -35,23 +38,8 @@ def inactive_substance_ids(db: SurrealSession, inactive_stack_name: str) -> set[
     return _stack_partition_substance_ids(db, inactive=True, inactive_stack_name=inactive_stack_name)
 
 
-def _title_from_slug(slug: str) -> str:
-    return slug.replace("_", " ").title()
-
-
 def _knowledge_namespaces(ontology_bundle: OntologyBundle) -> tuple[str, ...]:
-    raw_presentation = ontology_bundle.runtime_vocabulary.get("schedule_presentation")
-    if not isinstance(raw_presentation, dict):
-        return ()
-    presentation = cast(dict[str, object], raw_presentation)
-    raw_active_fact_index = presentation.get("active_fact_index")
-    if not isinstance(raw_active_fact_index, dict):
-        return ()
-    active_fact_index = cast(dict[str, object], raw_active_fact_index)
-    include_namespaces = active_fact_index.get("include_namespaces")
-    if not isinstance(include_namespaces, list):
-        return ()
-    return tuple(namespace for namespace in include_namespaces if isinstance(namespace, str))
+    return load_review_presentation(ontology_bundle).active_fact_namespaces
 
 
 def active_fact_index(
@@ -70,7 +58,7 @@ def active_fact_index(
     knowledge_namespaces = _knowledge_namespaces(ontology_bundle)
     substances_by_id = _active_substances_by_id(db, products_by_id)
     facts = _facts_by_namespace_slug(products_by_id, substances_by_id, knowledge_namespaces)
-    labels = _FactLabels.from_db(db, ontology_bundle)
+    labels = _FactLabels.from_bundle(ontology_bundle)
 
     namespace_rank = {namespace: index for index, namespace in enumerate(knowledge_namespaces)}
     index: list[ActiveFactIndexEntry] = []
@@ -148,47 +136,68 @@ def _add_substance_facts(
 ) -> None:
     if substance_row is None:
         return
-    for namespace in knowledge_namespaces:
-        slugs = cast("list[str]", substance_row.get(namespace) or [])
-        for slug in slugs:
+    substance_id = substance_row.get("id", "<unknown>")
+    for assertion in _assertions(
+        substance_row.get("knowledge_assertions"),
+        field="knowledge_assertions",
+        substance_id=str(substance_id),
+    ):
+        namespace = cast(str, assertion["knowledge_category"])
+        slug = cast(str, assertion["knowledge_value"])
+        if namespace in knowledge_namespaces:
             facts.setdefault((namespace, slug), {})[product_id] = product_name
+    for assertion in _assertions(
+        substance_row.get("schedule_assertions"),
+        field="schedule_assertions",
+        substance_id=str(substance_id),
+    ):
+        namespace = cast(str, assertion["schedule_axis"])
+        slug = cast(str, assertion["schedule_value"])
+        if namespace in knowledge_namespaces:
+            facts.setdefault((namespace, slug), {})[product_id] = product_name
+
+
+def _assertions(value: object, *, field: str, substance_id: str) -> tuple[Mapping[str, object], ...]:
+    if not isinstance(value, list):
+        raise OntologyInfrastructureError(f"substance {substance_id} {field} must be a list", code=MALFORMED)
+    required_fields = {
+        "knowledge_assertions": {"knowledge_category", "knowledge_value"},
+        "schedule_assertions": {"schedule_axis", "schedule_value"},
+    }[field]
+    assertions: list[Mapping[str, object]] = []
+    for index, assertion in enumerate(value):
+        if not isinstance(assertion, Mapping):
+            raise OntologyInfrastructureError(
+                f"substance {substance_id} {field}[{index}] must be a mapping", code=MALFORMED
+            )
+        mapping = cast(Mapping[str, object], assertion)
+        if set(mapping) != required_fields:
+            raise OntologyInfrastructureError(
+                f"substance {substance_id} {field}[{index}] has malformed fields", code=MALFORMED
+            )
+        if any(not isinstance(mapping[key], str) or not mapping[key].strip() for key in required_fields):
+            raise OntologyInfrastructureError(
+                f"substance {substance_id} {field}[{index}] has malformed values", code=MALFORMED
+            )
+        assertions.append(mapping)
+    return tuple(assertions)
 
 
 class _FactLabels:
     vocabulary_label_by_pair: dict[tuple[str, str], str]
-    dashboard_name_by_slug: dict[str, str]
 
     def __init__(
         self,
         vocabulary_label_by_pair: dict[tuple[str, str], str],
-        dashboard_name_by_slug: dict[str, str],
     ) -> None:
         self.vocabulary_label_by_pair = vocabulary_label_by_pair
-        self.dashboard_name_by_slug = dashboard_name_by_slug
 
     @classmethod
-    def from_db(cls, db: SurrealSession, ontology_bundle: OntologyBundle) -> _FactLabels:
-        vocabulary = ontology_bundle.runtime_vocabulary
-        vocabulary_label_by_pair: dict[tuple[str, str], str] = {}
-        raw_terms = vocabulary.get("terms", [])
-        if isinstance(raw_terms, list):
-            for raw_term in raw_terms:
-                if not isinstance(raw_term, dict):
-                    continue
-                term = cast(dict[str, object], raw_term)
-                namespace, slug, label = term.get("semantic_category"), term.get("slug"), term.get("label")
-                if all(isinstance(value, str) for value in (namespace, slug, label)):
-                    vocabulary_label_by_pair[(cast(str, namespace), cast(str, slug))] = cast(str, label)
-
-        dashboard_name_by_slug: dict[str, str] = {
-            cast(str, row["slug"]): cast(str, row["name"]) for row in db.query("SELECT slug, name FROM dashboard")
-        }
-        return cls(vocabulary_label_by_pair, dashboard_name_by_slug)
+    def from_bundle(cls, ontology_bundle: OntologyBundle) -> _FactLabels:
+        return cls(dict(load_term_labels(ontology_bundle)))
 
     def label(self, namespace: str, slug: str) -> str:
         label = self.vocabulary_label_by_pair.get((namespace, slug))
         if label:
             return label
-        if namespace == "context":
-            return self.dashboard_name_by_slug.get(slug, _title_from_slug(slug))
-        return _title_from_slug(slug)
+        raise OntologyInfrastructureError(f"ontology fact has no authored label for {namespace}:{slug}", code=MALFORMED)

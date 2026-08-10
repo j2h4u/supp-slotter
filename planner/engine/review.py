@@ -17,16 +17,20 @@ from planner.engine.review_substance_model import (
 )
 from planner.engine.review_substance_render import render_substance_review
 from planner.ontology.artifacts import OntologyBundle, load_ontology
+from planner.ontology.errors import OntologyInfrastructureError
 from planner.paths import ROOT, Paths
 from planner.schema_validation import validate_schemas
 
 
 def _review_inner(paths: Paths, bundle: OntologyBundle) -> int:
-    schema_result = validate_schemas(paths, bundle)
-    if schema_result != 0:
-        return schema_result
-
-    model, errors = build_review_model(paths, bundle)
+    try:
+        schema_result = validate_schemas(paths, bundle)
+        if schema_result != 0:
+            return schema_result
+        model, errors = build_review_model(paths, bundle)
+    except OntologyInfrastructureError as error:
+        _print_errors([f"review: ontology infrastructure error: {error}"])
+        return 1
     if model is None:
         _print_errors(errors)
         return 1
@@ -36,7 +40,7 @@ def _review_inner(paths: Paths, bundle: OntologyBundle) -> int:
 
 
 def cmd_review(data_root: Path | None = None) -> ReviewResult:
-    """Knowledge-section review of concerns, relations, risks, pathways, and dashboards."""
+    """Knowledge-section review of concerns, relations, fact memberships, and dashboards."""
     paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
     if data_root is not None:
         stdout_buf = _io.StringIO()
@@ -78,11 +82,14 @@ def _review_substance_inner(target: str, paths: Paths, bundle: OntologyBundle, *
         print(path_error, file=sys.stderr)
         return 1
 
-    schema_result = validate_schemas(paths, bundle)
-    if schema_result != 0:
-        return schema_result
-
-    model, errors = build_substance_review_model(path, paths, bundle)
+    try:
+        schema_result = validate_schemas(paths, bundle)
+        if schema_result != 0:
+            return schema_result
+        model, errors = build_substance_review_model(path, paths, bundle)
+    except OntologyInfrastructureError as error:
+        _print_errors([f"review-substance: ontology infrastructure error: {error}"])
+        return 1
     if model is None:
         _print_errors(errors)
         return 1

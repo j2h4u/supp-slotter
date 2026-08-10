@@ -22,6 +22,7 @@ import yaml
 
 from planner.ontology.artifacts import OntologyBundle, _is_verified_bundle
 from planner.ontology.errors import OntologyInfrastructureError
+from planner.yaml_io import safe_load_yaml
 
 
 @dataclass(frozen=True)
@@ -167,7 +168,7 @@ def _load_document(  # noqa: PLR0913
         assert name is not None
         if expected_inode is None:
             expected_inode = _entry_inode(parent_fd, name, path)
-        loaded = yaml.safe_load(_read_document_bytes(parent_fd, name, expected_inode, path))
+        loaded = safe_load_yaml(_read_document_bytes(parent_fd, name, expected_inode, path), path=path)
     except (OSError, UnicodeDecodeError, yaml.YAMLError, OntologyInfrastructureError) as error:
         raise OntologyInfrastructureError(f"Cannot load repository source {relative}: {error}") from error
     finally:

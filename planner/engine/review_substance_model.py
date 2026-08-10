@@ -6,8 +6,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
-import yaml
-
 from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance, load_substance_registry
 from planner.contracts import CardLoadError, SchedulingPolicy, Substance
@@ -15,13 +13,12 @@ from planner.engine._types import SubstanceRelationMatchRow
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
 from planner.ontology.policies import load_scheduling_policies
-from planner.ontology.substance_fields import substance_trait_fields
+from planner.ontology.presentation import load_relation_type_order, load_review_presentation
 from planner.paths import ROOT, Paths, display_path, strip_root_prefix
 from planner.query_model import build_stack_read_model
 from planner.query_model.surreal import SurrealLoadContext
 
 SubstanceRelationMatch = tuple[SubstanceRelationMatchRow, list[str]]
-ContextDashboardDetails = dict[str, tuple[str, str] | None]
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,7 +30,6 @@ class SubstanceReviewModel:
     substance_slugs_by_namespace: dict[str, set[str]]
     current_traits: set[str]
     relation_matches: list[SubstanceRelationMatch]
-    context_dashboards: ContextDashboardDetails
     relation_type_order: tuple[str, ...]
 
 
@@ -83,13 +79,14 @@ def build_substance_review_model(
         for slug in slugs
     }
     review_substances = load_substance_registry(paths, bundle)
+    relation_type_order = load_relation_type_order(bundle)
     try:
-        relation_type_order = _relation_type_order(bundle)
+        global_relations = load_global_relations(paths, bundle, review_substances)
     except CardLoadError as e:
         return None, [strip_root_prefix(e.message)]
     read_model = build_stack_read_model(
         review_substances,
-        load_global_relations(paths, bundle),
+        global_relations,
         context=SurrealLoadContext(
             policies=policies,
             stacks_data=None,
@@ -104,7 +101,7 @@ def build_substance_review_model(
             path=path,
             substance=substance,
             policies=policies,
-            namespace_order=_namespace_order(bundle),
+            namespace_order=load_review_presentation(bundle).namespace_order,
             substance_slugs_by_namespace=substance_slugs,
             current_traits=current_traits,
             relation_matches=cast(
@@ -114,7 +111,6 @@ def build_substance_review_model(
                     substance.name,
                 ),
             ),
-            context_dashboards=_context_dashboards(paths, substance_slugs),
             relation_type_order=relation_type_order,
         ),
         [],
@@ -123,67 +119,9 @@ def build_substance_review_model(
 
 def _substance_slugs_by_namespace(substance: Substance, bundle: OntologyBundle) -> dict[str, set[str]]:
     slugs_by_namespace: dict[str, set[str]] = {}
-    for field, namespace in substance_trait_fields(bundle):
-        slugs_by_namespace[namespace] = set(cast(tuple[str, ...], getattr(substance, field)))
+    del bundle
+    for assertion in substance.schedule_assertions:
+        slugs_by_namespace.setdefault(assertion.axis, set()).add(assertion.value)
+    for assertion in substance.knowledge_assertions:
+        slugs_by_namespace.setdefault(assertion.category, set()).add(assertion.value)
     return slugs_by_namespace
-
-
-def _namespace_order(bundle: OntologyBundle) -> tuple[str, ...]:
-    categories = bundle.runtime_vocabulary.get("categories")
-    if not isinstance(categories, dict):
-        return tuple(
-            row.axis for row in sorted(bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
-        )
-    order: list[str] = []
-    assignment_axes = tuple(
-        row.axis for row in sorted(bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
-    )
-    for category in categories:
-        if not isinstance(category, str):
-            continue
-        if category == "schedule_rule":
-            order.extend(assignment_axes)
-        else:
-            order.append(category)
-    return tuple(dict.fromkeys(order))
-
-
-def _relation_type_order(bundle: OntologyBundle) -> tuple[str, ...]:
-    raw_relation_types = bundle.runtime_vocabulary.get("relation_types")
-    if not isinstance(raw_relation_types, dict):
-        raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has no relation_types")
-    relation_types = cast(dict[object, object], raw_relation_types)
-    rows: list[tuple[int, str]] = []
-    for relation_type, raw in relation_types.items():
-        if not isinstance(relation_type, str) or not isinstance(raw, dict):
-            raise CardLoadError(ROOT / "ontology", "canonical runtime vocabulary has malformed relation_types")
-        row = cast(dict[object, object], raw)
-        order = row.get("order")
-        if not isinstance(order, int) or isinstance(order, bool):
-            raise CardLoadError(ROOT / "ontology", f"relation type {relation_type!r} has invalid order")
-        rows.append((order, relation_type))
-    return tuple(relation_type for _order, relation_type in sorted(rows, key=lambda item: (item[0], item[1])))
-
-
-def _context_dashboards(
-    paths: Paths,
-    slugs_by_namespace: dict[str, set[str]],
-) -> ContextDashboardDetails:
-    details: ContextDashboardDetails = {}
-    for slug in slugs_by_namespace.get("context", set()):
-        yaml_path = paths.dashboards / f"{slug}.yaml"
-        if not yaml_path.exists():
-            details[slug] = None
-            continue
-        raw_data = cast(object, yaml.safe_load(yaml_path.read_text(encoding="utf-8")))
-        if not isinstance(raw_data, dict):
-            details[slug] = (slug, "")
-            continue
-        data = cast(dict[str, object], raw_data)
-        name = data.get("name", slug)
-        desc = data.get("description", "")
-        details[slug] = (
-            name if isinstance(name, str) else slug,
-            desc if isinstance(desc, str) else "",
-        )
-    return details

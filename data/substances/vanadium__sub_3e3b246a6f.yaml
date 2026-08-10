@@ -8,9 +8,6 @@ concerns:
 - kind: safety
   text: Review as a glucose/insulin-context trace mineral rather than routine essential support; current product dose is below
     the adult UL but far above usual dietary intake estimates, and antidiabetes medication context matters.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   kind:
   - mineral

@@ -205,7 +205,6 @@ class _PlanSearch:
                 item,
                 slot_items.get(slot_name, []),
                 self.input.active_components,
-                self.input.substances,
                 self.advisory_constraints,
             )
             materialized.append((slot_name, base_score, base_score + penalty, reasons, matched_ids))
@@ -262,7 +261,6 @@ class _PlanSearch:
             penalty, matched_ids = advisory_penalty_for_slot(
                 slot_items.get(slot_name, []),
                 self.input.active_components,
-                self.input.substances,
                 self.advisory_constraints,
             )
             evaluations[slot_name] = AdvisorySlotEvaluation(

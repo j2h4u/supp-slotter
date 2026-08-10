@@ -1,4 +1,4 @@
-"""Scheduling-constraint query governance tests."""
+"""Scheduling-constraint query contract tests."""
 
 from planner.query_model.relation_conflicts import collect_intra_product_scheduling_constraint_conflicts
 

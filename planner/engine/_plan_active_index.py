@@ -3,22 +3,20 @@
 from __future__ import annotations
 
 import sys
-from collections.abc import Iterable
 from typing import NamedTuple
 
 from planner.cards.product import product_component_substances
 from planner.contracts import (
-    ScheduleProjection,
-    PlannerCapability,
     Product,
+    ScheduleProjection,
     SchedulingPolicy,
     Slot,
     StackEntry,
     Substance,
 )
 from planner.engine._plan_types import ActiveIndex
-from planner.engine._scheduling import project_schedule_assignments, slot_matches
-from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
+from planner.engine._scheduling import project_schedule_assignments
+from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
     IMPLEMENTED_PREFER_WITH_PAIR_MODES,
     IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS,
@@ -26,7 +24,6 @@ from planner.ontology.glue_capabilities import (
     WARNING_EMITTER_PREFER_WITH_RESOLVER,
 )
 from planner.ontology.runtime_program import RuntimeProgram
-from planner.ontology.scheduling_runtime import resolve_capability
 from planner.ontology.warning_policy import warning_policy_for_emitter
 from planner.query_model import StackReadModel
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
@@ -55,7 +52,6 @@ class _ActiveItemInput(NamedTuple):
     item_id: str
     entry: StackEntry
     context: ActiveIndexInput
-    slots: dict[str, Slot]
 
 
 class _PreferTargetContext(NamedTuple):
@@ -82,7 +78,7 @@ def build_active_index(
 
     for item_id, entry in stack_entries.items():
         item_index = _active_item_index(
-            _ActiveItemInput(item_id=item_id, entry=entry, context=index_input, slots=slots)
+            _ActiveItemInput(item_id=item_id, entry=entry, context=index_input)
         )
         if item_index is None:
             continue
@@ -125,46 +121,11 @@ def _active_item_index(
             file=sys.stderr,
         )
         return None
-    capability_rows = index_input.context.runtime_program.capability_rules
-    if len(capability_rows) != 1:
-        raise OntologyInfrastructureError(
-            "plan scheduling capability table must contain exactly one row",
-            code=MALFORMED,
-        )
-    capability_row = capability_rows[0]
-    resolved = resolve_capability(
-        index_input.context.runtime_program,
-        capability_row.planner,
-        capability_row.food_model,
-    )
-    slot_models = set(resolved.base_slot_models)
-    for slot in index_input.slots.values():
-        model = resolved.near_to_model.get(slot.near)
-        if model is None or model not in resolved.slot_models:
-            raise OntologyInfrastructureError(
-                f"plan scheduling capability has no valid model for slot near {slot.near!r}",
-                code=MALFORMED,
-            )
-        slot_models.add(model)
-    component_forms_list: list[tuple[str, str]] = []
-    for component in product.components:
-        substance = index_input.context.substances.get(component.substance)
-        if substance is not None and substance.form is not None:
-            component_forms_list.append((component.substance, substance.form))
-    component_forms = tuple(sorted(component_forms_list))
-    capability = PlannerCapability(
-        capability_row.planner,
-        capability_row.food_model,
-        frozenset(slot_models),
-        product.id,
-        component_forms,
-    )
     projection = project_schedule_assignments(
         index_input.context.runtime_program,
         product,
         index_input.context.substances,
         index_input.context.policies,
-        capability,
     )
     active_components = product_component_substances(product)
     relation_conflicts = index_input.context.read_model.collect_intra_product_scheduling_constraint_conflicts(

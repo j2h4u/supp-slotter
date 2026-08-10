@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 from planner.cards.dashboard_validation import check_dashboards
-from planner.cards.pillboxes import check_pillbox_slot_ids, load_pillboxes
+from planner.cards.pillboxes import load_pillboxes
 from planner.cards.product_validation import check_product_formulas
 from planner.cards.relations import check_global_relations
 from planner.cards.stacks import validate_stacks
@@ -40,7 +40,7 @@ def cmd_check(data_root: Path | None = None) -> CheckResult:
 def _cmd_check_inner(paths: Paths, bundle: OntologyBundle) -> CheckResult:
     errors: list[str] = []
     info: list[str] = []
-    maintenance_result = run_auto_maintenance(paths, suppress_output=True, collect_errors=errors)
+    maintenance_result = run_auto_maintenance(paths, suppress_output=True, collect_errors=errors, ontology=bundle)
     if maintenance_result != 0:
         print("check: skipped (auto-maintenance failed; see errors above)", file=sys.stderr)
         return CheckResult(exit_code=maintenance_result, errors=errors, info=info)
@@ -89,7 +89,14 @@ def _schema_preflight_errors(paths: Paths, info: list[str], bundle: OntologyBund
         report([msg], [])
         return CheckResult(exit_code=1, errors=[msg], info=[])
 
-    errors.extend(schema_errors(slots_data, "pillboxes", slots_path, bundle))
+    try:
+        stacks_data = load_yaml(paths.stacks_file)
+    except CardLoadError:
+        stacks_data = None
+    references = (
+        {"Stack": {key for key in stacks_data if isinstance(key, str)}} if isinstance(stacks_data, dict) else {}
+    )
+    errors.extend(schema_errors(slots_data, "pillboxes", slots_path, bundle, reference_values=references))
     if errors:
         report(errors, info)
         return CheckResult(exit_code=1, errors=errors, info=info)
@@ -98,9 +105,8 @@ def _schema_preflight_errors(paths: Paths, info: list[str], bundle: OntologyBund
 
 def _load_domain_validators(paths: Paths, info: list[str], bundle: OntologyBundle) -> CheckResult:
     errors: list[str] = []
-    slots_path = paths.data / "pillboxes.yaml"
     try:
-        pillboxes = load_pillboxes(slots_path)
+        load_pillboxes(paths.data / "pillboxes.yaml", bundle)
     except CardLoadError as e:
         report([e.message], info)
         return CheckResult(exit_code=1, errors=[e.message], info=info)
@@ -110,7 +116,6 @@ def _load_domain_validators(paths: Paths, info: list[str], bundle: OntologyBundl
         report([e.message], info)
         return CheckResult(exit_code=1, errors=[e.message], info=info)
 
-    errors.extend(check_pillbox_slot_ids(pillboxes, slots_path))
     errors.extend(check_scheduling_policies(policies, ROOT / "ontology"))
     errors.extend(check_warning_type_references(bundle))
     return CheckResult(exit_code=0, errors=errors, info=info)

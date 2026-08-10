@@ -181,14 +181,14 @@ def _project_document(  # noqa: C901, PLR0912, PLR0913, PLR0917
                 if subject_ref is not None:
                     if not isinstance(subject_ref, str):
                         raise OntologyInfrastructureError(f"Instruction subject is invalid at {path}")
-                    node_instruction = _inlined_node_instruction(subject_ref, instructions)
-                    parent_class = cast(str, node_instruction["target"])
-                    parent_path = _subject_path(subject_ref, path)
-                    parent_value = _lookup_actual_path(value, _relative_lookup_path(parent_path, key))
-                    if parent_value is _MISSING:
-                        raise OntologyInfrastructureError(f"Instruction subject {subject_ref!r} is missing at {path}")
-                    triple_subject = URIRef(
-                        _child_entity_iri(base_iri, parent_class, subject, parent_path, parent_value)
+                    triple_subject = _inlined_subject_iri(
+                        base_iri=base_iri,
+                        root_subject=subject,
+                        subject_pattern=subject_ref,
+                        actual_path=path,
+                        document_value=value,
+                        key=key,
+                        instructions=instructions,
                     )
                 obj = URIRef(_child_entity_iri(base_iri, target_class, triple_subject, path, leaf))
                 _emit(graph, emitted, triple_subject, predicate, obj, document, _display_path(path), repository_root)
@@ -208,13 +208,15 @@ def _project_document(  # noqa: C901, PLR0912, PLR0913, PLR0917
             if subject_ref is not None:
                 if not isinstance(subject_ref, str):
                     raise OntologyInfrastructureError(f"Instruction subject is invalid at {path}")
-                node_instruction = _inlined_node_instruction(subject_ref, instructions)
-                target_class = cast(str, node_instruction["target"])
-                subject_path = _subject_path(subject_ref, path)
-                child_value = _lookup_actual_path(value, _relative_lookup_path(subject_path, key))
-                if child_value is _MISSING:
-                    raise OntologyInfrastructureError(f"Instruction subject {subject_ref!r} is missing at {path}")
-                triple_subject = URIRef(_child_entity_iri(base_iri, target_class, subject, subject_path, child_value))
+                triple_subject = _inlined_subject_iri(
+                    base_iri=base_iri,
+                    root_subject=subject,
+                    subject_pattern=subject_ref,
+                    actual_path=path,
+                    document_value=value,
+                    key=key,
+                    instructions=instructions,
+                )
             target = instruction.get("target")
             if target is not None:
                 if not isinstance(target, str) or not target or isinstance(leaf, (Mapping, list)):
@@ -242,7 +244,7 @@ def _project_document(  # noqa: C901, PLR0912, PLR0913, PLR0917
             _emit(graph, emitted, triple_subject, predicate, obj, document, _display_path(path), repository_root)
 
 
-def _validate_structure(  # noqa: C901, PLR0912
+def _validate_structure(  # noqa: C901
     document: RepositoryDocument, instructions: list[dict[str, object]]
 ) -> None:
     allowed = [str(item["source"]) for item in instructions]
@@ -252,8 +254,6 @@ def _validate_structure(  # noqa: C901, PLR0912
             raise OntologyInfrastructureError(f"Source {document.source_id!r} must be a mapping")
         for key, value in root.items():
             for path, leaf, node_kind in _walk(value, (str(key),)):
-                if document.source_id == "assertions" and path and path[0] != "relations":
-                    continue
                 matching = _matching_instructions(path, instructions)
                 if leaf is _CONTAINER and not matching:
                     raise _unknown(document, path)
@@ -267,8 +267,6 @@ def _validate_structure(  # noqa: C901, PLR0912
                     raise _unknown(document, path)
     else:
         for path, leaf, node_kind in _walk(root, ()):
-            if document.source_id == "assertions" and path and path[0] != "relations":
-                continue
             matching = _matching_instructions(path, instructions)
             if leaf is _CONTAINER and not matching:
                 raise _unknown(document, path)
@@ -477,6 +475,39 @@ def _inlined_node_instruction(subject_pattern: str, instructions: list[dict[str,
             if isinstance(target, str) and target:
                 return instruction
     raise OntologyInfrastructureError(f"Instruction subject {subject_pattern!r} has no matching inlined-node")
+
+
+def _inlined_subject_iri(  # noqa: PLR0913
+    *,
+    base_iri: str,
+    root_subject: URIRef,
+    subject_pattern: str,
+    actual_path: tuple[str, ...],
+    document_value: object,
+    key: str | None,
+    instructions: list[dict[str, object]],
+) -> URIRef:
+    instruction = _inlined_node_instruction(subject_pattern, instructions)
+    target_class = cast(str, instruction["target"])
+    subject_path = _subject_path(subject_pattern, actual_path)
+    child_value = _lookup_actual_path(document_value, _relative_lookup_path(subject_path, key))
+    if child_value is _MISSING:
+        raise OntologyInfrastructureError(f"Instruction subject {subject_pattern!r} is missing at {actual_path}")
+    parent_pattern = instruction.get("subject")
+    parent = root_subject
+    if parent_pattern is not None:
+        if not isinstance(parent_pattern, str):
+            raise OntologyInfrastructureError(f"Instruction subject parent is invalid for {subject_pattern!r}")
+        parent = _inlined_subject_iri(
+            base_iri=base_iri,
+            root_subject=root_subject,
+            subject_pattern=parent_pattern,
+            actual_path=subject_path,
+            document_value=document_value,
+            key=key,
+            instructions=instructions,
+        )
+    return URIRef(_child_entity_iri(base_iri, target_class, parent, subject_path, child_value))
 
 
 def _path_token_value(source: str, actual_path: tuple[str, ...], token: str, token_index: int) -> str:

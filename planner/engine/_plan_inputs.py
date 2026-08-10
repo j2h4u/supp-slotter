@@ -34,11 +34,11 @@ def load_plan_inputs(
     Returns a PlanInputs or None on failure.
     """
     try:
-        pillboxes = load_pillboxes(paths.data / "pillboxes.yaml")
+        pillboxes = load_pillboxes(paths.data / "pillboxes.yaml", bundle)
         anchor_errors = check_pillbox_slot_anchors(
             pillboxes,
             paths.data / "pillboxes.yaml",
-            bundle.runtime_program.slot_near_values,
+            bundle,
         )
         if anchor_errors:
             raise CardLoadError(paths.data / "pillboxes.yaml", "\n".join(anchor_errors))
@@ -50,8 +50,11 @@ def load_plan_inputs(
     except CardLoadError as e:
         print(f"plan: {e.message}", file=sys.stderr)
         return None
-    stacks_data = load_yaml(paths.stacks_file)
-
+    try:
+        stacks_data = load_yaml(paths.stacks_file)
+    except CardLoadError as e:
+        print(f"plan: {e.message}", file=sys.stderr)
+        return None
     if not isinstance(stacks_data, dict):
         print("plan: stacks.yaml: top-level must be a mapping", file=sys.stderr)
         return None
@@ -66,16 +69,19 @@ def load_plan_inputs(
 
     substances = load_substance_registry(paths, bundle)
     products = load_product_registry(paths, bundle)
-    global_relations = load_global_relations(paths, bundle)
+    global_relations = load_global_relations(paths, bundle, substances)
     dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
-    stack_entries = normalize_stack_entries(stacks_dict)
+    try:
+        stack_entries = normalize_stack_entries(stacks_dict)
+    except ValueError as e:
+        print(f"plan: {paths.stacks_file}: {e}", file=sys.stderr)
+        return None
 
     scheduling_constraints = load_scheduling_constraints(bundle)
     scheduling_constraint_plans = compile_scheduling_constraint_execution_plans(
         scheduling_constraints,
         substances,
         bundle.runtime_program,
-        allow_empty_selector_resolution=True,
         ontology_bundle=bundle,
     )
 

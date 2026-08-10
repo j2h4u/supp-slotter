@@ -28,7 +28,7 @@ def main(data_root: Path | None = None) -> None:
             "Usage:\n"
             "  python -m planner                        — show schedule (default)\n"
             "  python -m planner check                  — validate data files only\n"
-            "  python -m planner review                 — concerns, relations, risk flags, pathways\n"
+            "  python -m planner review                 — concerns, relations, fact memberships\n"
             "  python -m planner audit                  — diagnostics and card-quality checks\n"
             "  python -m planner find <words>           — search cards\n"
             "  python -m planner review-substance <path> — single-card trait checklist\n\n"
@@ -46,10 +46,7 @@ def main(data_root: Path | None = None) -> None:
     audit_parser.add_argument(
         "--full",
         action="store_true",
-        help=(
-            "also run deep card quality checks: no-form variants, missing fields, "
-            "intake review, active product source gaps"
-        ),
+        help="also include the generic full-audit diagnostics",
     )
 
     find_parser = sub.add_parser(
@@ -65,7 +62,7 @@ def main(data_root: Path | None = None) -> None:
     )
     sub.add_parser(
         "review",
-        help="knowledge-section review of active stack (concerns, relations, risk flags, pathways)",
+        help="knowledge-section review of active stack (concerns, relations, fact memberships)",
     )
 
     review_substance = sub.add_parser(

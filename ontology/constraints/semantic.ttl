@@ -5,75 +5,51 @@
 # Wave B2A authored semantic constraints.  Every named shape is a stable rule
 # owner; the rule ID is repeated in sh:message for deterministic diagnostics.
 
-ss:term_registered_category_profile
-  a sh:NodeShape ; sh:name "term_registered_category_profile" ;
-  sh:targetClass ss:OntologyTerm ;
-  sh:sparql [ sh:message "[term_registered_category_profile] a term has exactly one registered category and a category-compatible OntoClean profile" ; sh:select """
-    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-    PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
-    SELECT $this WHERE {
-      $this a ss:OntologyTerm .
-      FILTER (
-        !EXISTS { $this ss:semanticCategory ?missingCategory } ||
-        EXISTS { $this ss:semanticCategory ?category1, ?category2 . FILTER(?category1 != ?category2) } ||
-        !EXISTS { $this ss:ontocleanProfile ?missingProfile } ||
-        EXISTS { $this ss:semanticCategory ?category ; ss:ontocleanProfile ?profile .
-          FILTER (!((?category = ss:kind && ?profile = ss:rigid_identity) ||
-            (?category = ss:role && ?profile = ss:anti_rigid_dependent) ||
-            (?category = ss:quality && ?profile = ss:dependent_assertion) ||
-            (?category = ss:effect && ?profile = ss:dependent_assertion) ||
-            (?category = ss:risk && ?profile = ss:dependent_assertion) ||
-            (?category = ss:pathway && ?profile = ss:dependent_assertion) ||
-            (?category = ss:context && ?profile = ss:anti_rigid_dependent) ||
-            (?category = ss:schedule_rule && ?profile = ss:dependent_assertion))) }
-      )
-    }
-  """ ] .
-
 ss:term_placement
   a sh:NodeShape ; sh:name "term_placement" ;
-  sh:targetSubjectsOf ss:hasKind, ss:hasRole, ss:hasQuality, ss:hasEffect,
-    ss:hasRisk, ss:hasPathway, ss:hasContext ;
+  sh:targetSubjectsOf ss:knowledge_assertions ;
   sh:sparql [ sh:message "[term_placement] a semantic term must be registered under its declared category predicate" ; sh:select """
-    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
     SELECT $this WHERE {
-      { $this ss:hasKind ?term . FILTER NOT EXISTS { ?term a ss:OntologyTerm ; ss:semanticCategory ss:kind } }
-      UNION { $this ss:hasRole ?term . FILTER NOT EXISTS { ?term a ss:OntologyTerm ; ss:semanticCategory ss:role } }
-      UNION { $this ss:hasQuality ?term . FILTER NOT EXISTS { ?term a ss:OntologyTerm ; ss:semanticCategory ss:quality } }
-      UNION { $this ss:hasEffect ?term . FILTER NOT EXISTS { ?term a ss:OntologyTerm ; ss:semanticCategory ss:effect } }
-      UNION { $this ss:hasRisk ?term . FILTER NOT EXISTS { ?term a ss:OntologyTerm ; ss:semanticCategory ss:risk } }
-      UNION { $this ss:hasPathway ?term . FILTER NOT EXISTS { ?term a ss:OntologyTerm ; ss:semanticCategory ss:pathway } }
-      UNION { $this ss:hasContext ?term . FILTER NOT EXISTS { ?term a ss:OntologyTerm ; ss:semanticCategory ss:context } }
+      $this ss:knowledge_assertions ?assertion .
+      { FILTER NOT EXISTS {
+          ?assertion a ss:KnowledgeAssertion ;
+            ss:knowledge_category ?category ;
+            ss:knowledge_value ?value
+        } }
+      UNION {
+        ?assertion a ss:KnowledgeAssertion ;
+          ss:knowledge_category ?category ;
+          ss:knowledge_value ?value .
+        FILTER NOT EXISTS {
+          ?registered_term a ss:OntologyTerm ;
+            ss:slug ?value ;
+            ss:semantic_category ?declared_category .
+          ?declared_category ss:allowed_predicates ?allowed_predicate .
+          FILTER(?allowed_predicate = CONCAT("knowledge.", STR(?category)))
+        }
+      }
     }
   """ ] .
 
-ss:schedule_axis_value_typing
-  a sh:NodeShape ; sh:name "schedule_axis_value_typing" ;
-  sh:targetClass ss:AxisValueBinding ;
-  sh:sparql [ sh:message "[schedule_axis_value_typing] an axis/value binding has exactly one PolicyAxis and one SlotFeatureValue" ; sh:select """
+ss:schedule_assertion_term_registry
+  a sh:NodeShape ; sh:name "schedule_assertion_term_registry" ;
+  sh:targetClass ss:ScheduleAssertion ;
+  sh:sparql [ sh:message "[schedule_assertion_term_registry] every schedule assertion axis/value pair must be a canonical ontology term placed on its authored assignment axis" ; sh:select """
     PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
     SELECT $this WHERE {
-      { FILTER NOT EXISTS { $this ss:axis ?axis } }
-      UNION { $this ss:axis ?axis1, ?axis2 . FILTER(?axis1 != ?axis2) }
-      UNION { $this ss:axis ?axis . FILTER NOT EXISTS { ?axis a ss:PolicyAxis } }
-      UNION { FILTER NOT EXISTS { $this ss:value ?value } }
-      UNION { $this ss:value ?value1, ?value2 . FILTER(?value1 != ?value2) }
-      UNION { $this ss:value ?value . FILTER NOT EXISTS { ?value a ss:SlotFeatureValue } }
-    }
-  """ ] .
-
-ss:schedule_rule_metadata
-  a sh:NodeShape ; sh:name "schedule_rule_metadata" ;
-  sh:targetClass ss:PolicyAxis ;
-  sh:sparql [ sh:message "[schedule_rule_metadata] a policy axis has exactly one registered schedule_rule term" ; sh:select """
-    PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
-    SELECT $this WHERE {
-      { FILTER NOT EXISTS { $this ss:scheduleRule ?rule } }
-      UNION { $this ss:scheduleRule ?r1, ?r2 . FILTER(?r1 != ?r2) }
-      UNION { $this ss:scheduleRule ?rule . FILTER NOT EXISTS {
-        ?rule a ss:OntologyTerm ; ss:semanticCategory ss:schedule_rule
-      } }
+      $this ss:schedule_axis ?axis ;
+        ss:schedule_value ?value .
+      FILTER NOT EXISTS {
+        ?registered_term a ss:OntologyTerm ;
+          ss:slug ?value ;
+          ss:semantic_category ?declared_category .
+        ?declared_category ss:allowed_predicates ?allowed_predicate .
+        ?assignment_axis ss:axis ?axis ;
+          ss:assignment_source "schedule" ;
+          ss:assignment_field ?assignment_field .
+        FILTER(?allowed_predicate = CONCAT("schedule.", STR(?assignment_field)))
+      }
     }
   """ ] .
 
@@ -89,112 +65,223 @@ ss:component_reference_integrity
     }
   """ ] .
 
-ss:selector_exactly_one_endpoint
-  a sh:NodeShape ; sh:name "selector_exactly_one_endpoint" ;
-  sh:targetClass ss:Selector ;
-  sh:sparql [ sh:message "[selector_exactly_one_endpoint] a typed selector declares exactly one term or entity endpoint" ; sh:select """
+ss:relation_assertion_selector_exactly_one_endpoint
+  a sh:NodeShape ; sh:name "relation_assertion_selector_exactly_one_endpoint" ;
+  sh:targetClass ss:RelationAssertionSelector ;
+  sh:sparql [ sh:message "[relation_assertion_selector_exactly_one_endpoint] a relation assertion selector declares exactly one entity or category/term endpoint" ; sh:select """
     PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
     SELECT $this WHERE {
-      { FILTER NOT EXISTS { $this ss:selectsTerm ?term } FILTER NOT EXISTS { $this ss:selectsEntity ?entity } }
-      UNION { $this ss:selectsTerm ?term ; ss:selectsEntity ?entity }
-      UNION { $this ss:selectsTerm ?term1, ?term2 . FILTER(?term1 != ?term2) }
-      UNION { $this ss:selectsEntity ?entity1, ?entity2 . FILTER(?entity1 != ?entity2) }
+      { FILTER NOT EXISTS { $this ss:entity ?entity } FILTER NOT EXISTS { $this ss:category ?category ; ss:term ?term } }
+      UNION { $this ss:entity ?entity . { $this ss:category ?category } UNION { $this ss:term ?term } }
+      UNION { $this ss:category ?category . FILTER NOT EXISTS { $this ss:term ?term } }
+      UNION { $this ss:term ?term . FILTER NOT EXISTS { $this ss:category ?category } }
+      UNION { $this ss:entity ?first, ?second . FILTER(?first != ?second) }
+      UNION { $this ss:category ?first, ?second . FILTER(?first != ?second) }
+      UNION { $this ss:term ?first, ?second . FILTER(?first != ?second) }
     }
   """ ] .
 
-ss:selector_target_nonempty
-  a sh:NodeShape ; sh:name "selector_target_nonempty" ;
-  sh:targetClass ss:Selector ;
-  sh:sparql [ sh:message "[selector_target_nonempty] a selector endpoint has a registered term or nonempty entity representation" ; sh:select """
+ss:relation_assertion_entity_selector_exactly_one_identity
+  a sh:NodeShape ; sh:name "relation_assertion_entity_selector_exactly_one_identity" ;
+  sh:targetClass ss:RelationAssertionEntitySelector ;
+  sh:sparql [ sh:message "[relation_assertion_entity_selector_exactly_one_identity] a relation assertion entity selector declares exactly one entity_id or name" ; sh:select """
     PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
     SELECT $this WHERE {
-      { $this ss:selectsTerm ?term . FILTER NOT EXISTS { ?term a ss:OntologyTerm } }
-      UNION { $this ss:selectsEntity ?entity . FILTER NOT EXISTS {
-        { ?entity ss:entityId ?id . FILTER(STRLEN(STR(?id)) > 0) }
-        UNION { ?entity ss:entityName ?name . FILTER(STRLEN(STR(?name)) > 0) }
-      } }
+      { FILTER NOT EXISTS { $this ss:entity_id ?id } FILTER NOT EXISTS { $this ss:name ?name } }
+      UNION { $this ss:entity_id ?id ; ss:name ?name }
+      UNION { $this ss:entity_id ?first, ?second . FILTER(?first != ?second) }
+      UNION { $this ss:name ?first, ?second . FILTER(?first != ?second) }
     }
   """ ] .
 
-ss:symmetric_relation_duplicate
-  a sh:NodeShape ; sh:name "symmetric_relation_duplicate" ;
-  sh:targetClass ss:Relation ;
-  sh:sparql [ sh:message "[symmetric_relation_duplicate] a symmetric relation cannot have an exact duplicate" ; sh:select """
+ss:relation_assertion_selector_canonical
+  a sh:NodeShape ; sh:name "relation_assertion_selector_canonical" ;
+  sh:targetClass ss:RelationAssertionSelector ;
+  sh:sparql [ sh:message "[relation_assertion_selector_canonical] a relation assertion category/term selector uses a nonblank canonical term registered under that category" ; sh:select """
     PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
     SELECT $this WHERE {
-      $this ss:relationType ?type ; ss:sourceSelector ?sourceSelector ; ss:targetSelector ?targetSelector .
-      ?type ss:symmetric true .
-      { { ?sourceSelector ss:selectsTerm ?sourceValue . BIND("term" AS ?sourceForm) }
-        UNION { ?sourceSelector ss:selectsEntity ?sourceEntity . ?sourceEntity ss:entityId ?sourceValue . BIND("entity" AS ?sourceForm) }
-        UNION { ?sourceSelector ss:selectsEntity ?sourceEntity . ?sourceEntity ss:entityName ?sourceValue .
-                FILTER NOT EXISTS { ?sourceEntity ss:entityId ?sourceId } BIND("entity" AS ?sourceForm) } }
-      { { ?targetSelector ss:selectsTerm ?targetValue . BIND("term" AS ?targetForm) }
-        UNION { ?targetSelector ss:selectsEntity ?targetEntity . ?targetEntity ss:entityId ?targetValue . BIND("entity" AS ?targetForm) }
-        UNION { ?targetSelector ss:selectsEntity ?targetEntity . ?targetEntity ss:entityName ?targetValue .
-                FILTER NOT EXISTS { ?targetEntity ss:entityId ?targetId } BIND("entity" AS ?targetForm) } }
-      ?other a ss:Relation ; ss:relationType ?type ; ss:sourceSelector ?otherSourceSelector ; ss:targetSelector ?otherTargetSelector .
-      { { ?otherSourceSelector ss:selectsTerm ?otherSourceValue . BIND("term" AS ?otherSourceForm) }
-        UNION { ?otherSourceSelector ss:selectsEntity ?otherSourceEntity . ?otherSourceEntity ss:entityId ?otherSourceValue . BIND("entity" AS ?otherSourceForm) }
-        UNION { ?otherSourceSelector ss:selectsEntity ?otherSourceEntity . ?otherSourceEntity ss:entityName ?otherSourceValue .
-                FILTER NOT EXISTS { ?otherSourceEntity ss:entityId ?otherSourceId } BIND("entity" AS ?otherSourceForm) } }
-      { { ?otherTargetSelector ss:selectsTerm ?otherTargetValue . BIND("term" AS ?otherTargetForm) }
-        UNION { ?otherTargetSelector ss:selectsEntity ?otherTargetEntity . ?otherTargetEntity ss:entityId ?otherTargetValue . BIND("entity" AS ?otherTargetForm) }
-        UNION { ?otherTargetSelector ss:selectsEntity ?otherTargetEntity . ?otherTargetEntity ss:entityName ?otherTargetValue .
-                FILTER NOT EXISTS { ?otherTargetEntity ss:entityId ?otherTargetId } BIND("entity" AS ?otherTargetForm) } }
+      $this ss:category ?category ; ss:term ?term .
+      { FILTER(STRLEN(STR(?category)) = 0) }
+      UNION { FILTER(REGEX(STR(?category), "^ *$")) }
+      UNION { FILTER(STRLEN(STR(?term)) = 0) }
+      UNION { FILTER(REGEX(STR(?term), "^ *$")) }
+      UNION {
+        FILTER NOT EXISTS {
+          ?registered_term a ss:OntologyTerm ;
+            ss:slug ?term ;
+            ss:semantic_category ?declared_category .
+          ?declared_category ss:id ?category .
+        }
+      }
+    }
+  """ ] .
+
+ss:relation_assertion_entity_selector_resolution
+  a sh:NodeShape ; sh:name "relation_assertion_entity_selector_resolution" ;
+  sh:targetClass ss:RelationAssertionEntitySelector ;
+  sh:sparql [ sh:message "[relation_assertion_entity_selector_resolution] a relation assertion entity selector uses a nonblank identity that resolves in the canonical substance registry when available" ; sh:select """
+    PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
+    SELECT $this WHERE {
+      { $this ss:entity_id ?id .
+        FILTER(REGEX(STR(?id), "^ *$")) }
+      UNION { $this ss:name ?name .
+        FILTER(REGEX(STR(?name), "^ *$")) }
+      UNION { ?known_entity a ss:Substance .
+        $this ss:entity_id ?id .
+        FILTER NOT EXISTS { ?id a ss:Substance } }
+      UNION { ?known_entity a ss:Substance .
+        $this ss:name ?name .
+        FILTER NOT EXISTS { ?canonical_entity a ss:Substance ; ss:label ?name } }
+    }
+  """ ] .
+
+ss:relation_assertion_non_directional_duplicate
+  a sh:NodeShape ; sh:name "relation_assertion_non_directional_duplicate" ;
+  sh:targetClass ss:RelationAssertionRecord ;
+  sh:sparql [ sh:message "[relation_assertion_non_directional_duplicate] a non-directional relation assertion cannot duplicate or reverse another assertion" ; sh:select """
+    PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
+    SELECT $this WHERE {
+      $this ss:relation_type ?relation_type ;
+        ss:source_selector ?source_selector ;
+        ss:target_selector ?target_selector .
+      ?relation_metadata a ss:OperationalRelationType ;
+        ss:id ?relation_type ;
+        ss:directional false .
+      ?other a ss:RelationAssertionRecord ;
+        ss:relation_type ?relation_type ;
+        ss:source_selector ?other_source_selector ;
+        ss:target_selector ?other_target_selector .
       FILTER(?other != $this)
-      FILTER(?sourceForm = ?otherSourceForm && ?sourceValue = ?otherSourceValue &&
-             ?targetForm = ?otherTargetForm && ?targetValue = ?otherTargetValue)
+
+      # Selector keys mirror compiler/runtime identity semantics.  A name is
+      # one deterministic aggregate over its complete sorted resolved ID set;
+      # exact set equality duplicates, while strict subsets remain distinct.
+      {
+        { $source_selector ss:category ?source_category ; ss:term ?source_term .
+          BIND(CONCAT("term:", STR(?source_category), ":", STR(?source_term)) AS ?source_key) }
+        UNION
+        { $source_selector ss:entity ?source_entity .
+          ?source_entity ss:entity_id ?source_ref .
+          { ?source_ref a ss:Substance ; ss:id ?source_id .
+            BIND(CONCAT("entity:", STR(?source_id)) AS ?source_key) }
+          UNION
+          { ?source_ref a ss:Substance .
+            FILTER NOT EXISTS { ?source_ref ss:id ?source_id }
+            BIND(CONCAT("entity:", STR(?source_ref)) AS ?source_key) } }
+        UNION
+        { SELECT $this ?source_selector (CONCAT("entity:", GROUP_CONCAT(?source_id; separator=",")) AS ?source_key) WHERE {
+            { SELECT $this ?source_selector ?source_id WHERE {
+                $this ss:source_selector ?source_selector .
+                ?source_selector ss:entity/ss:name ?source_name .
+                ?canonical_source a ss:Substance ; ss:label ?source_name .
+                OPTIONAL { ?canonical_source ss:id ?source_id_value }
+                BIND(COALESCE(STR(?source_id_value), STR(?canonical_source)) AS ?source_id)
+              } ORDER BY ?source_id }
+          } GROUP BY $this ?source_selector }
+      }
+      {
+        { $target_selector ss:category ?target_category ; ss:term ?target_term .
+          BIND(CONCAT("term:", STR(?target_category), ":", STR(?target_term)) AS ?target_key) }
+        UNION
+        { $target_selector ss:entity ?target_entity .
+          ?target_entity ss:entity_id ?target_ref .
+          { ?target_ref a ss:Substance ; ss:id ?target_id .
+            BIND(CONCAT("entity:", STR(?target_id)) AS ?target_key) }
+          UNION
+          { ?target_ref a ss:Substance .
+            FILTER NOT EXISTS { ?target_ref ss:id ?target_id }
+            BIND(CONCAT("entity:", STR(?target_ref)) AS ?target_key) } }
+        UNION
+        { SELECT $this ?target_selector (CONCAT("entity:", GROUP_CONCAT(?target_id; separator=",")) AS ?target_key) WHERE {
+            { SELECT $this ?target_selector ?target_id WHERE {
+                $this ss:target_selector ?target_selector .
+                ?target_selector ss:entity/ss:name ?target_name .
+                ?canonical_target a ss:Substance ; ss:label ?target_name .
+                OPTIONAL { ?canonical_target ss:id ?target_id_value }
+                BIND(COALESCE(STR(?target_id_value), STR(?canonical_target)) AS ?target_id)
+              } ORDER BY ?target_id }
+          } GROUP BY $this ?target_selector }
+      }
+      {
+        { $other_source_selector ss:category ?other_source_category ; ss:term ?other_source_term .
+          BIND(CONCAT("term:", STR(?other_source_category), ":", STR(?other_source_term)) AS ?other_source_key) }
+        UNION
+        { $other_source_selector ss:entity ?other_source_entity .
+          ?other_source_entity ss:entity_id ?other_source_ref .
+          { ?other_source_ref a ss:Substance ; ss:id ?other_source_id .
+            BIND(CONCAT("entity:", STR(?other_source_id)) AS ?other_source_key) }
+          UNION
+          { ?other_source_ref a ss:Substance .
+            FILTER NOT EXISTS { ?other_source_ref ss:id ?other_source_id }
+            BIND(CONCAT("entity:", STR(?other_source_ref)) AS ?other_source_key) } }
+        UNION
+        { SELECT $this ?other_source_selector (CONCAT("entity:", GROUP_CONCAT(?other_source_id; separator=",")) AS ?other_source_key) WHERE {
+            { SELECT $this ?other_source_selector ?other_source_id WHERE {
+                ?other ss:source_selector ?other_source_selector . FILTER(?other != $this)
+                ?other_source_selector ss:entity/ss:name ?other_source_name .
+                ?canonical_other_source a ss:Substance ; ss:label ?other_source_name .
+                OPTIONAL { ?canonical_other_source ss:id ?other_source_id_value }
+                BIND(COALESCE(STR(?other_source_id_value), STR(?canonical_other_source)) AS ?other_source_id)
+              } ORDER BY ?other_source_id }
+          } GROUP BY $this ?other_source_selector }
+      }
+      {
+        { $other_target_selector ss:category ?other_target_category ; ss:term ?other_target_term .
+          BIND(CONCAT("term:", STR(?other_target_category), ":", STR(?other_target_term)) AS ?other_target_key) }
+        UNION
+        { $other_target_selector ss:entity ?other_target_entity .
+          ?other_target_entity ss:entity_id ?other_target_ref .
+          { ?other_target_ref a ss:Substance ; ss:id ?other_target_id .
+            BIND(CONCAT("entity:", STR(?other_target_id)) AS ?other_target_key) }
+          UNION
+          { ?other_target_ref a ss:Substance .
+            FILTER NOT EXISTS { ?other_target_ref ss:id ?other_target_id }
+            BIND(CONCAT("entity:", STR(?other_target_ref)) AS ?other_target_key) } }
+        UNION
+        { SELECT $this ?other_target_selector (CONCAT("entity:", GROUP_CONCAT(?other_target_id; separator=",")) AS ?other_target_key) WHERE {
+            { SELECT $this ?other_target_selector ?other_target_id WHERE {
+                ?other ss:target_selector ?other_target_selector . FILTER(?other != $this)
+                ?other_target_selector ss:entity/ss:name ?other_target_name .
+                ?canonical_other_target a ss:Substance ; ss:label ?other_target_name .
+                OPTIONAL { ?canonical_other_target ss:id ?other_target_id_value }
+                BIND(COALESCE(STR(?other_target_id_value), STR(?canonical_other_target)) AS ?other_target_id)
+              } ORDER BY ?other_target_id }
+          } GROUP BY $this ?other_target_selector }
+      }
+      FILTER(
+        (?source_key = ?other_source_key && ?target_key = ?other_target_key) ||
+        (?source_key = ?other_target_key && ?target_key = ?other_source_key)
+      )
     }
   """ ] .
 
-ss:symmetric_relation_reversed_duplicate
-  a sh:NodeShape ; sh:name "symmetric_relation_reversed_duplicate" ;
-  sh:targetClass ss:Relation ;
-  sh:sparql [ sh:message "[symmetric_relation_reversed_duplicate] a symmetric relation cannot have a reversed duplicate" ; sh:select """
+ss:relation_assertion_selector_form_contract
+  a sh:NodeShape ; sh:name "relation_assertion_selector_form_contract" ;
+  sh:targetClass ss:RelationAssertionRecord ;
+  sh:sparql [ sh:message "[relation_assertion_selector_form_contract] relation assertion selectors use forms allowed by their authored relation type" ; sh:select """
     PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
     SELECT $this WHERE {
-      $this ss:relationType ?type ; ss:sourceSelector ?sourceSelector ; ss:targetSelector ?targetSelector .
-      ?type ss:symmetric true .
-      { { ?sourceSelector ss:selectsTerm ?sourceValue . BIND("term" AS ?sourceForm) }
-        UNION { ?sourceSelector ss:selectsEntity ?sourceEntity . ?sourceEntity ss:entityId ?sourceValue . BIND("entity" AS ?sourceForm) }
-        UNION { ?sourceSelector ss:selectsEntity ?sourceEntity . ?sourceEntity ss:entityName ?sourceValue .
-                FILTER NOT EXISTS { ?sourceEntity ss:entityId ?sourceId } BIND("entity" AS ?sourceForm) } }
-      { { ?targetSelector ss:selectsTerm ?targetValue . BIND("term" AS ?targetForm) }
-        UNION { ?targetSelector ss:selectsEntity ?targetEntity . ?targetEntity ss:entityId ?targetValue . BIND("entity" AS ?targetForm) }
-        UNION { ?targetSelector ss:selectsEntity ?targetEntity . ?targetEntity ss:entityName ?targetValue .
-                FILTER NOT EXISTS { ?targetEntity ss:entityId ?targetId } BIND("entity" AS ?targetForm) } }
-      ?other a ss:Relation ; ss:relationType ?type ; ss:sourceSelector ?otherSourceSelector ; ss:targetSelector ?otherTargetSelector .
-      { { ?otherSourceSelector ss:selectsTerm ?otherSourceValue . BIND("term" AS ?otherSourceForm) }
-        UNION { ?otherSourceSelector ss:selectsEntity ?otherSourceEntity . ?otherSourceEntity ss:entityId ?otherSourceValue . BIND("entity" AS ?otherSourceForm) }
-        UNION { ?otherSourceSelector ss:selectsEntity ?otherSourceEntity . ?otherSourceEntity ss:entityName ?otherSourceValue .
-                FILTER NOT EXISTS { ?otherSourceEntity ss:entityId ?otherSourceId } BIND("entity" AS ?otherSourceForm) } }
-      { { ?otherTargetSelector ss:selectsTerm ?otherTargetValue . BIND("term" AS ?otherTargetForm) }
-        UNION { ?otherTargetSelector ss:selectsEntity ?otherTargetEntity . ?otherTargetEntity ss:entityId ?otherTargetValue . BIND("entity" AS ?otherTargetForm) }
-        UNION { ?otherTargetSelector ss:selectsEntity ?otherTargetEntity . ?otherTargetEntity ss:entityName ?otherTargetValue .
-                FILTER NOT EXISTS { ?otherTargetEntity ss:entityId ?otherTargetId } BIND("entity" AS ?otherTargetForm) } }
-      FILTER(?other != $this)
-      FILTER(?sourceForm = ?otherTargetForm && ?sourceValue = ?otherTargetValue &&
-             ?targetForm = ?otherSourceForm && ?targetValue = ?otherSourceValue)
-    }
-  """ ] .
-
-ss:symmetric_relation_self_prohibited
-  a sh:NodeShape ; sh:name "symmetric_relation_self_prohibited" ;
-  sh:targetClass ss:Relation ;
-  sh:sparql [ sh:message "[symmetric_relation_self_prohibited] a symmetric relation cannot relate an endpoint to itself" ; sh:select """
-    PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
-    SELECT $this WHERE {
-      $this ss:relationType ?type ; ss:sourceSelector ?sourceSelector ; ss:targetSelector ?targetSelector .
-      ?type ss:symmetric true .
-      { { ?sourceSelector ss:selectsTerm ?sourceValue . BIND("term" AS ?sourceForm) }
-        UNION { ?sourceSelector ss:selectsEntity ?sourceEntity . ?sourceEntity ss:entityId ?sourceValue . BIND("entity" AS ?sourceForm) }
-        UNION { ?sourceSelector ss:selectsEntity ?sourceEntity . ?sourceEntity ss:entityName ?sourceValue .
-                FILTER NOT EXISTS { ?sourceEntity ss:entityId ?sourceId } BIND("entity" AS ?sourceForm) } }
-      { { ?targetSelector ss:selectsTerm ?targetValue . BIND("term" AS ?targetForm) }
-        UNION { ?targetSelector ss:selectsEntity ?targetEntity . ?targetEntity ss:entityId ?targetValue . BIND("entity" AS ?targetForm) }
-        UNION { ?targetSelector ss:selectsEntity ?targetEntity . ?targetEntity ss:entityName ?targetValue .
-                FILTER NOT EXISTS { ?targetEntity ss:entityId ?targetId } BIND("entity" AS ?targetForm) } }
-      FILTER(?sourceForm = ?targetForm && ?sourceValue = ?targetValue)
+      $this ss:relation_type ?relation_type ;
+        ss:source_selector ?source_selector ;
+        ss:target_selector ?target_selector .
+      BIND(IRI(CONCAT(
+        "https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/",
+        STR(?relation_type)
+      )) AS ?relation_metadata)
+      OPTIONAL { ?source_selector ss:entity ?source_entity }
+      OPTIONAL { ?source_selector ss:category ?source_category ; ss:term ?source_term }
+      OPTIONAL { ?target_selector ss:entity ?target_entity }
+      OPTIONAL { ?target_selector ss:category ?target_category ; ss:term ?target_term }
+      FILTER (
+        (BOUND(?source_entity) &&
+          NOT EXISTS { ?relation_metadata ss:source_selector_forms "entity" }) ||
+        (BOUND(?source_category) && BOUND(?source_term) &&
+          NOT EXISTS { ?relation_metadata ss:source_selector_forms "term" }) ||
+        (BOUND(?target_entity) &&
+          NOT EXISTS { ?relation_metadata ss:target_selector_forms "entity" }) ||
+        (BOUND(?target_category) && BOUND(?target_term) &&
+          NOT EXISTS { ?relation_metadata ss:target_selector_forms "term" })
+      )
     }
   """ ] .
 
@@ -204,23 +291,32 @@ ss:dashboard_selector_validity
   sh:sparql [ sh:message "[dashboard_selector_validity] dashboard selectors use a registered term with the matching category" ; sh:select """
     PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
     SELECT $this WHERE {
-      $this ss:hasSelector ?selector .
-      { FILTER NOT EXISTS { ?selector a ss:Selector } }
-      UNION { ?selector ss:selectorCategory ?category ; ss:selectsTerm ?term .
-              FILTER NOT EXISTS { ?term a ss:OntologyTerm ; ss:semanticCategory ?category } }
+      $this ss:selectors ?selector .
+      { FILTER NOT EXISTS { ?selector a ss:DashboardSelector } }
+      UNION {
+        ?selector a ss:DashboardSelector ;
+          ss:category ?category ;
+          ss:selector_term ?term .
+        BIND(IRI(CONCAT("https://j2h4u.github.io/supp-slotter/ontology/v1/term/", STR(?category), "/", STR(?term))) AS ?registered_term)
+        FILTER NOT EXISTS {
+          ?registered_term a ss:OntologyTerm
+        }
+      }
     }
   """ ] .
 
 ss:context_dashboard_mapping
   a sh:NodeShape ; sh:name "context_dashboard_mapping" ;
-  sh:targetSubjectsOf ss:hasContext ;
+  sh:targetSubjectsOf ss:knowledge_assertions ;
   sh:sparql [ sh:message "[context_dashboard_mapping] every extensional context term maps to exactly one declaring dashboard" ; sh:select """
     PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
     SELECT $this WHERE {
-      $this ss:hasContext ?context .
-      { FILTER NOT EXISTS { ?context a ss:OntologyTerm ; ss:semanticCategory ss:context } }
-      UNION { FILTER NOT EXISTS { ?dashboard ss:declaresContext ?context } }
-      UNION { ?dashboard1 ss:declaresContext ?context ; ?p ?o .
-              ?dashboard2 ss:declaresContext ?context . FILTER(?dashboard1 != ?dashboard2) }
+      $this ss:knowledge_assertions ?assertion .
+      ?assertion a ss:KnowledgeAssertion ;
+        ss:knowledge_category "context" ;
+        ss:knowledge_value ?context .
+      { FILTER NOT EXISTS { ?dashboard ss:declares_context ?context } }
+      UNION { ?dashboard1 ss:declares_context ?context .
+              ?dashboard2 ss:declares_context ?context . FILTER(?dashboard1 != ?dashboard2) }
     }
   """ ] .

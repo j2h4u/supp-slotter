@@ -25,8 +25,10 @@ from planner.contracts import Pillbox, Product, SchedulingPolicy, Slot, SlotCand
 from planner.engine._plan_types import ActiveIndex, AdvisorySlotEvaluation
 from planner.engine._scheduling import build_substance_slot_names, render_slot_effects
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import WARNING_EMITTER_TRAIT_REVIEW_ASSIGNMENT
 from planner.ontology.policies import readable_policies
+from planner.ontology.presentation import load_review_presentation
 from planner.ontology.warning_policy import warning_policy_for_emitter
 from planner.query_model import StackReadModel
 from planner.query_model.relation_warnings import RelationWarningRow
@@ -169,18 +171,16 @@ def build_schedule_output(
 
 def _is_excluded_review_warning(warning: dict[str, object], bundle: OntologyBundle) -> bool:
     trait = warning.get("trait")
-    if not isinstance(trait, str):
+    if trait is None:
         return False
-    raw_presentation = bundle.runtime_vocabulary.get("schedule_presentation")
-    if not isinstance(raw_presentation, dict):
-        return False
-    presentation = cast(dict[str, object], raw_presentation)
-    raw_review_tags = presentation.get("review_tags")
-    if not isinstance(raw_review_tags, dict):
-        return False
-    review_tags = cast(dict[str, object], raw_review_tags)
-    excluded = review_tags.get("exclude_policy_ids")
-    return isinstance(excluded, list) and trait in excluded
+    if not isinstance(trait, str) or not trait.strip():
+        raise _output_policy_error(bundle, f"warning has malformed policy id {trait!r}")
+    return trait in load_review_presentation(bundle).excluded_policy_ids
+
+
+def _output_policy_error(bundle: OntologyBundle, message: str) -> OntologyInfrastructureError:
+    source = bundle.root / "generated" / "runtime-vocabulary.yaml"
+    return OntologyInfrastructureError(f"{message} [source: {source}]", code=MALFORMED, path=source)
 
 
 def _initial_schedule(
@@ -247,7 +247,6 @@ def _populate_explanations(
     schedule: ScheduleData,
     output_input: ScheduleOutputInput,
 ) -> None:
-    runtime_program = output_input.ontology_bundle.runtime_program
     for item_id in output_input.item_id_sequence:
         slot_name = output_input.assignment[item_id]
         slot = output_input.slots[slot_name]
@@ -257,7 +256,7 @@ def _populate_explanations(
             trace for trace in output_input.candidate_traces_by_item[item_id] if trace.slot_id == slot_name
         )
         active_policy_ids = {group.policy_id for group in projection.groups}
-        why_here = render_slot_effects(chosen_trace)
+        why_here = render_slot_effects(chosen_trace, output_input.ontology_bundle)
         advisory = output_input.advisory_by_slot.get(slot_name)
         if advisory is not None and advisory.matched_constraint_ids:
             why_here.append(
@@ -327,7 +326,12 @@ def _append_trait_warnings(
     for item_id, projection in active.schedule_projection_by_item.items():
         for row in projection.assignments:
             trait_def = policies.get(row.policy_id)
-            if trait_def is None or not trait_def.warning:
+            if trait_def is None:
+                raise _output_policy_error(
+                    ontology_bundle,
+                    f"schedule output references unknown policy {row.policy_id!r}",
+                )
+            if not trait_def.warning:
                 continue
             for source in [row.source_card_id]:
                 schedule["warnings"].append({
@@ -353,6 +357,7 @@ def _append_read_model_warnings(
 def _relation_warning_to_schedule_warning(row: RelationWarningRow) -> ScheduleWarning:
     warning: ScheduleWarning = {
         "type": row["type"],
+        "relation": row["relation"],
         "source_substance": row["source_substance"],
         "source_name": row["source_name"],
         "target_substance": row["target_substance"],

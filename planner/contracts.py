@@ -8,8 +8,8 @@ inside the planner engine.
 Dashboard selector resolution is union (logical OR): a substance belongs when it
 carries at least one declared category/term selector.
 
-Substance carries scheduling fields (intake, timing, activity, prefer_with) and
-canonical knowledge fields (kind, role, quality, effect, risk, context, pathway).
+Substance carries generic ontology assertion records.  Axis/category names are
+owned by generated ontology metadata, not by this runtime contract.
 """
 
 from __future__ import annotations
@@ -31,6 +31,21 @@ class Concern:
     text: str
 
 
+@dataclass(frozen=True, slots=True)
+class ConcernRecord:
+    """A concern projected from any authored subject card.
+
+    Concerns are annotations only.  The subject identity is retained so
+    presentation code can explain where the authored text came from, while
+    the scheduler never needs to inspect this record.
+    """
+
+    subject_kind: str
+    subject_id: str
+    concern_kind: ConcernKind
+    text: str
+
+
 class CardLoadError(Exception):
     """Raised when a YAML card fails to load or validate against its schema."""
 
@@ -41,6 +56,36 @@ class CardLoadError(Exception):
         super().__init__(message)
         self.path = path
         self.message = message
+
+
+@dataclass(frozen=True, slots=True)
+class KnowledgeAssertion:
+    category: str
+    value: str
+
+
+@dataclass(frozen=True, slots=True)
+class ScheduleAssertion:
+    axis: str
+    value: str
+
+
+@dataclass(frozen=True, slots=True)
+class SlotObservation:
+    """One authored effect-match observation exposed by a slot."""
+
+    key: str
+    value: str | bool
+
+
+@dataclass(frozen=True, slots=True)
+class ScheduleAssignmentSource:
+    """Uniform projection-boundary record for one scheduling source."""
+
+    source_kind: AssignmentSourceKind
+    source_card_id: str
+    component_id: str | None
+    assertions: tuple[ScheduleAssertion, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -66,15 +111,6 @@ class SchedulePolicyGroup:
 class ScheduleProjection:
     assignments: tuple[ScheduleAssignment, ...]
     groups: tuple[SchedulePolicyGroup, ...]
-
-
-@dataclass(frozen=True, slots=True)
-class PlannerCapability:
-    planner: str
-    food_model: str
-    slot_models: frozenset[str]
-    product_id: str
-    source_forms: tuple[tuple[str, str], ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -111,20 +147,9 @@ class SlotCandidateTrace:
 class Substance:
     id: str
     name: str
-    # --- schedule: section (Planner reads these) ---
-    intake: tuple[str, ...] = ()  # 0 or 1 slug
-    timing: tuple[str, ...] = ()  # 0 or 1 slug — NEW
-    activity: tuple[str, ...] = ()  # 0 or 1 slug
-    prefer_with: tuple[str, ...] = ()  # sub_* IDs
-    # --- knowledge: section (Reviewer reads these) ---
-    kind: tuple[str, ...] = ()
-    role: tuple[str, ...] = ()
-    quality: tuple[str, ...] = ()
-    effect: tuple[str, ...] = ()  # non-scheduling pharmacology only
-    risk: tuple[str, ...] = ()
-    context: tuple[str, ...] = ()
-    pathway: tuple[str, ...] = ()  # NEW
-    # --- common ---
+    knowledge_assertions: tuple[KnowledgeAssertion, ...] = ()
+    schedule_assertions: tuple[ScheduleAssertion, ...] = ()
+    prefer_with: tuple[str, ...] = ()
     form: str | None = None
     aliases: tuple[str, ...] = ()
     notes: str | None = None
@@ -137,9 +162,6 @@ class ProductComponent:
     label: str | None = None
     amount: str | None = None
     notes: str | None = None
-    # None = unset; inference in effective_stack_item_traits:
-    # if any sibling has primary=True, unset components are secondary.
-    primary: bool | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -151,9 +173,6 @@ class Product:
     urls: tuple[str, ...] = ()
     notes: str | None = None
     concerns: tuple[Concern, ...] = ()
-    intake: tuple[str, ...] = ()
-    timing: tuple[str, ...] = ()
-    activity: tuple[str, ...] = ()
 
 
 class StackEntry(TypedDict):
@@ -173,12 +192,16 @@ class DashboardRisk:
 
 @dataclass(frozen=True, slots=True)
 class Dashboard:
+    id: str
     name: str
     description: str
     selectors: tuple[RelationSelector, ...]
+    declares_context: tuple[str, ...] = ()
     benefit: DashboardBenefit | None = None
     risk: DashboardRisk | None = None
-    started: str | None = None
+    # Provenance only: this path is never used for dashboard identity or
+    # equality.  Authored ``id`` is the sole semantic identity.
+    source_path: Path | None = field(default=None, compare=False, repr=False)
 
 
 @dataclass(frozen=True, slots=True)
@@ -199,6 +222,9 @@ class SchedulingConstraint:
     operation: str
     action: str | None = None
     rationale: str | None = None
+    blocks_slots: bool | None = None
+    scores_advisory: bool | None = None
+    score_delta: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -257,16 +283,14 @@ class SchedulingPolicy:
 class Slot:
     """One pillbox slot, post-flatten.
 
-    The pillbox, pillbox_label, and stack fields are NOT part of the on-disk slot schema;
-    they are joined in by load_pillboxes when it assembles Slot instances from the raw
-    pillbox YAML data.
+    The pillbox and pillbox_label fields are joined in by load_pillboxes. The stack
+    field is the explicit authored pillbox-to-stack reference.
     """
 
     slot_id: str
     label: str
     order: int
-    near: SlotNear
-    food: bool
+    observations: tuple[SlotObservation, ...]
     pillbox: str
     pillbox_label: str
     stack: str
@@ -276,7 +300,8 @@ class Slot:
 class Pillbox:
     name: str
     label: str
-    # key = slot_id; values are flattened Slot instances joined with pillbox/stack metadata at load time.
+    stack: str
+    # key = slot_id; values are flattened Slot instances joined with pillbox metadata at load time.
     slots: dict[str, Slot]
 
 

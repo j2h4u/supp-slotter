@@ -41,7 +41,10 @@ class DashboardMember(TypedDict):
 
 
 class DashboardReviewEntry(TypedDict):
+    id: str
     name: str
+    declares_context: list[str]
+    declares_context_labels: list[str]
 
 
 class DashboardReviewEntryWithMembers(DashboardReviewEntry, total=False):

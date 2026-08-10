@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from planner.contracts import RelationSelector, SchedulingConstraint, Slot, Substance
+from planner.contracts import RelationSelector, SchedulingConstraint, Slot, SlotObservation, Substance
 from planner.engine._plan_search import PlanSearchInput, run_plan_search
 from planner.scheduling_constraint_execution import (
     SchedulingConstraintExecutionPlan,
     compile_scheduling_constraint_execution_plans,
 )
+from planner.scheduling_constraint_matching import advisory_penalty_for_candidate
 
 from tests.helpers import ontology_bundle
 
@@ -48,7 +49,7 @@ def test_plan_search_returns_none_when_hard_constraint_blocks_all_assignments() 
 
 
 def test_advisory_penalty_prefers_separate_slot() -> None:
-    constraints = (_advisory("advisory", "sub_a", "sub_b"),)
+    constraints = (_advisory("rule_z", "sub_a", "sub_b"), _advisory("rule_a", "sub_b", "sub_a"))
     assignment, metrics = run_plan_search(
         _search_input(
             {"item_a": [("morning", 0, []), ("evening", 0, [])], "item_b": [("morning", 0, []), ("evening", 0, [])]},
@@ -57,17 +58,12 @@ def test_advisory_penalty_prefers_separate_slot() -> None:
     )
     assert metrics is not None and metrics[1] == 0
     assert assignment in ({"item_a": "morning", "item_b": "evening"}, {"item_a": "evening", "item_b": "morning"})
-
-
-def test_empty_constraint_projection_does_not_change_search_layout_or_score() -> None:
-    feasible: dict[str, list[tuple[str, int, list[str]]]] = {
-        "item_a": [("morning", 0, []), ("evening", 0, [])],
-        "item_b": [("morning", 0, []), ("evening", 0, [])],
-    }
-    baseline = run_plan_search(_search_input(feasible, ()))
-    with_empty_projection = run_plan_search(_search_input(feasible, ()))
-
-    assert with_empty_projection == baseline
+    plans = _constraint_plans(constraints)
+    active = {"item_a": ["sub_a"], "item_b": ["sub_b"]}
+    forward = advisory_penalty_for_candidate("item_a", ["item_b", "item_b"], active, plans)
+    reverse = advisory_penalty_for_candidate("item_b", ["item_a"], active, plans)
+    assert forward == (-2, ("rule_a", "rule_z"))
+    assert reverse == forward
 
 
 def _advisory(rule_id: str, source: str, target: str) -> SchedulingConstraint:
@@ -114,8 +110,7 @@ def _slot(slot_id: str, order: int) -> Slot:
         slot_id=slot_id,
         label=slot_id.title(),
         order=order,
-        near="wake",
-        food=False,
+        observations=(SlotObservation("near", "wake"), SlotObservation("food", False)),
         pillbox="daily",
         pillbox_label="Daily",
         stack="daily",

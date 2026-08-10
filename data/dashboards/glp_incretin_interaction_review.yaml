@@ -20,3 +20,5 @@ selectors:
   term: fiber
 - category: risk
   term: glucose_med_interaction
+declares_context:
+- incretin_drug_context

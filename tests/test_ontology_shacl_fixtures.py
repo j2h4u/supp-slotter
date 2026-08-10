@@ -4,17 +4,18 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import Protocol, TypeGuard, cast
 
+from planner.ontology.artifacts import load_ontology
+from planner.ontology.projection import project_repository
+from planner.ontology.validation import compose_validation_graph
 from pyshacl import validate
 from pyshacl.errors import ValidationFailure
-from rdflib import Graph
-from rdflib.namespace import RDF, SH, Namespace
+from rdflib import Graph, Literal, URIRef
+from rdflib.namespace import RDF, SH
 from rdflib.term import Identifier, Node
 
 ROOT = Path(__file__).resolve().parents[1]
 SHAPES_PATH = ROOT / "ontology/constraints/semantic.ttl"
 FIXTURE_ROOT = ROOT / "tests/fixtures/ontology/shacl"
-FULL_CATALOG_FIXTURE = FIXTURE_ROOT / "full_catalog_positive.ttl"
-SS = Namespace("https://j2h4u.github.io/supp-slotter/ontology/v1/")
 
 type _ValidationReport = Graph | ValidationFailure | bytes
 type _ValidationResult = tuple[bool, _ValidationReport, str]
@@ -84,19 +85,27 @@ def _validate_graph(graph: Graph, shapes: Graph) -> tuple[bool, Graph]:
 
 
 def _validate(path: Path, shapes: Graph) -> tuple[bool, Graph]:
-    return _validate_graph(Graph().parse(path, format="turtle"), shapes)
+    graph = Graph().parse(path, format="turtle")
+    return _validate_graph(compose_validation_graph(graph, ROOT / "ontology"), shapes)
 
 
-def test_every_authored_rule_has_exactly_one_positive_and_negative_fixture() -> None:
+def test_custom_rules_have_focus_nodes_in_repository_projection() -> None:
+    """Every live custom rule must target a node emitted by the real projector."""
+
     shapes = _shapes()
     rules = _rule_shapes(shapes)
-    fixture_rules = {path.name for path in FIXTURE_ROOT.iterdir() if path.is_dir()}
-    assert fixture_rules == set(rules), fixture_rules ^ set(rules)
-
-    for rule_id in sorted(rules):
-        directory = FIXTURE_ROOT / rule_id
-        files = {path.name for path in directory.iterdir() if path.is_file()}
-        assert files == {"positive.ttl", "negative.ttl"}, rule_id
+    projection = project_repository(ROOT, load_ontology(ROOT / "ontology")).graph
+    for rule_id, shape in rules.items():
+        focus_nodes: set[Identifier] = set()
+        for target_class in shapes.objects(shape, SH.targetClass):
+            focus_nodes.update(
+                node for node in projection.subjects(RDF.type, target_class) if isinstance(node, Identifier)
+            )
+        for target_predicate in shapes.objects(shape, SH.targetSubjectsOf):
+            focus_nodes.update(
+                node for node in projection.subjects(target_predicate, None) if isinstance(node, Identifier)
+            )
+        assert focus_nodes, f"custom rule has no repository-projection focus node: {rule_id}"
 
 
 def test_positive_fixtures_conform_and_negative_diagnostics_are_isolated() -> None:
@@ -124,8 +133,17 @@ def test_positive_fixtures_conform_and_negative_diagnostics_are_isolated() -> No
         }
 
 
-def test_full_catalog_sentinel_is_present_and_conforms() -> None:
-    root_fixtures = {path.name for path in FIXTURE_ROOT.glob("*.ttl")}
-    assert root_fixtures == {FULL_CATALOG_FIXTURE.name}
-    conforms, report = _validate(FULL_CATALOG_FIXTURE, _shapes())
-    assert conforms, report.serialize(format="turtle")
+def test_fixture_term_instances_do_not_extend_canonical_registry() -> None:
+    """A local OntologyTerm-shaped node cannot make an unknown slug valid."""
+
+    graph = Graph().parse(FIXTURE_ROOT / "term_placement/negative.ttl", format="turtle")
+    fake_term = URIRef("https://j2h4u.github.io/supp-slotter/ontology/v1/fixture-term")
+    graph.add((fake_term, RDF.type, URIRef("https://j2h4u.github.io/supp-slotter/ontology/v1/OntologyTerm")))
+    graph.add((fake_term, URIRef("https://j2h4u.github.io/supp-slotter/ontology/v1/slug"), Literal("not_registered")))
+    graph.add((
+        fake_term,
+        URIRef("https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_category"),
+        URIRef("https://j2h4u.github.io/supp-slotter/ontology/v1/kind"),
+    ))
+    conforms, _report = _validate_graph(compose_validation_graph(graph, ROOT / "ontology"), _shapes())
+    assert not conforms

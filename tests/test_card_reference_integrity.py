@@ -20,7 +20,7 @@ def test_check_substances_uses_explicit_ontology_bundle(tmp_path: Path) -> None:
     paths = Paths.from_root(tmp_path)
     substance_files: list[Path] = []
     for index in range(3):
-        substance_id = f"sub_zz{index:06d}zzzz"
+        substance_id = f"sub_zz{index:04d}zzzz"
         path = tmp_path / f"test_substance_{index}__{substance_id}.yaml"
         path.write_text(yaml.safe_dump({"id": substance_id, "name": f"Test Substance {index}"}, sort_keys=False))
         substance_files.append(path)
@@ -29,7 +29,7 @@ def test_check_substances_uses_explicit_ontology_bundle(tmp_path: Path) -> None:
 
     assert errors == []
     assert info == []
-    assert set(seen) == {f"sub_zz{index:06d}zzzz" for index in range(3)}
+    assert set(seen) == {f"sub_zz{index:04d}zzzz" for index in range(3)}
 
 
 def test_check_substances_accepts_empty_batch(tmp_path: Path) -> None:

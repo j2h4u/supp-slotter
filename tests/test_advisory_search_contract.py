@@ -3,10 +3,13 @@
 from dataclasses import replace
 
 import pytest
-from planner.contracts import RelationSelector, Substance
+from planner.contracts import RelationSelector
 from planner.ontology.errors import OntologyInfrastructureError
-from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
-from planner.scheduling_constraint_matching import advisory_penalty_for_candidate, constraint_matches_component_pair
+from planner.scheduling_constraint_execution import (
+    SchedulingConstraintExecutionPlan,
+    interpret_constraint_component_pair,
+)
+from planner.scheduling_constraint_matching import advisory_penalty_for_candidate
 
 
 def _rule(rule_id: str, source: str, target: str) -> SchedulingConstraintExecutionPlan:
@@ -14,7 +17,7 @@ def _rule(rule_id: str, source: str, target: str) -> SchedulingConstraintExecuti
         id=rule_id,
         source_substance_ids=(source,),
         target_substance_ids=(target,),
-        operation="separate_slots",
+        operation="separate_products_same_slot",
         effect_role="advisory",
         executable=True,
         blocks_slots=False,
@@ -29,25 +32,9 @@ def _rule(rule_id: str, source: str, target: str) -> SchedulingConstraintExecuti
     )
 
 
-def test_advisory_penalty_is_symmetric_and_deduplicated() -> None:
-    active = {"item_a": ["sub_a"], "item_b": ["sub_b"]}
-    substances = {
-        "sub_a": Substance(id="sub_a", name="A"),
-        "sub_b": Substance(id="sub_b", name="B"),
-    }
-    rules = (_rule("rule_z", "sub_a", "sub_b"), _rule("rule_a", "sub_b", "sub_a"))
-
-    forward = advisory_penalty_for_candidate("item_a", ["item_b", "item_b"], active, substances, rules)
-    reverse = advisory_penalty_for_candidate("item_b", ["item_a"], active, substances, rules)
-
-    assert forward == (-2, ("rule_a", "rule_z"))
-    assert reverse == forward
-
-
 def test_empty_constraint_projection_has_no_advisory_penalty() -> None:
     active = {"item_a": ["sub_a"], "item_b": ["sub_b"]}
-    substances = {"sub_a": Substance(id="sub_a", name="A"), "sub_b": Substance(id="sub_b", name="B")}
-    assert advisory_penalty_for_candidate("item_a", ["item_b"], active, substances, ()) == (0, ())
+    assert advisory_penalty_for_candidate("item_a", ["item_b"], active, ()) == (0, ())
 
 
 def test_malformed_execution_plan_aggregation_fails_closed() -> None:
@@ -55,9 +42,8 @@ def test_malformed_execution_plan_aggregation_fails_closed() -> None:
     malformed = replace(rule, aggregation="unsupported_aggregation")
 
     with pytest.raises(OntologyInfrastructureError, match="unsupported aggregation"):
-        constraint_matches_component_pair(
+        interpret_constraint_component_pair(
             malformed,
             ("sub_a",),
             ("sub_b",),
-            {"sub_a": Substance(id="sub_a", name="A"), "sub_b": Substance(id="sub_b", name="B")},
         )

@@ -96,10 +96,6 @@ def _print_trait_checklist(model: SubstanceReviewModel) -> None:
     for namespace in all_namespaces:
         substance_slugs = model.substance_slugs_by_namespace.get(namespace, set())
         print(f"\n{namespace}")
-        if namespace == "context":
-            _print_context_namespace(model, substance_slugs)
-            continue
-
         registered_traits = registered_by_namespace.get(namespace, [])
         registered_short_names = {trait.short_name for trait in registered_traits}
         unknown_slugs = sorted(
@@ -135,10 +131,6 @@ def _print_current_traits(model: SubstanceReviewModel) -> None:
             continue
         printed_any = True
         print(f"\n{namespace}")
-        if namespace == "context":
-            _print_context_namespace(model, substance_slugs)
-            continue
-
         registered_traits = {trait.short_name: trait for trait in registered_by_namespace.get(namespace, [])}
         for slug in sorted(substance_slugs, key=str.casefold):
             trait = registered_traits.get(slug)
@@ -150,25 +142,6 @@ def _print_current_traits(model: SubstanceReviewModel) -> None:
 
     if not printed_any:
         print("  none")
-
-
-def _print_context_namespace(
-    model: SubstanceReviewModel,
-    substance_slugs: set[str],
-) -> None:
-    if not substance_slugs:
-        print("  (empty)")
-        return
-
-    for slug in sorted(substance_slugs, key=str.casefold):
-        details = model.context_dashboards.get(slug)
-        if details is None:
-            print(f"  [x] {slug}  (no dashboard yaml — run planner check)")
-            continue
-        name, description = details
-        print(f"  [x] {slug} - {name}")
-        if description:
-            print(f"      {description}")
 
 
 def _print_substance_concerns(model: SubstanceReviewModel) -> None:

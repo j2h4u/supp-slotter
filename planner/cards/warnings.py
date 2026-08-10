@@ -6,8 +6,7 @@ from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
 from planner.contracts import Product, Substance
 from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
-from planner.ontology.warning_policy import warning_action, warning_category_label
+from planner.ontology.warning_policy import warning_action, warning_category_label, warning_concern_label
 
 
 def _format_warning_entities(
@@ -48,20 +47,6 @@ def _format_warning_entities(
     return out
 
 
-def _derive_concern_text(
-    warning_type: str,
-    trait: str,
-    relation: str,
-    warning: dict[str, object],
-) -> str:
-    """Return the human-readable concern label."""
-    if trait:
-        return trait.split(ONTOLOGY_COMPOSITE_KEY_SEPARATOR, 1)[1].replace("_", " ")
-    if relation:
-        return relation.replace("_", " ")
-    return warning_type.replace("_", " ")
-
-
 def humanize_warning(
     warning: dict[str, object],
     *,
@@ -73,17 +58,21 @@ def humanize_warning(
     if not isinstance(warning_type_raw, str) or not warning_type_raw:
         raise ValueError("schedule warning is missing required ontology warning type")
     warning_type = warning_type_raw
-    trait = str(warning.get("trait") or "")
-    relation = str(warning.get("relation") or "")
+    trait_raw = warning.get("trait")
+    relation_raw = warning.get("relation")
+    if trait_raw is not None and not isinstance(trait_raw, str):
+        raise ValueError(f"schedule warning trait id is malformed: {trait_raw!r}")
+    if relation_raw is not None and not isinstance(relation_raw, str):
+        raise ValueError(f"schedule warning relation id is malformed: {relation_raw!r}")
+    trait = trait_raw or ""
+    relation = relation_raw or ""
 
     out: dict[str, object] = {
         "category": warning_category_label(warning_type, ontology_bundle),
     }
     out.update(_format_warning_entities(warning, products, substances))
 
-    concern = _derive_concern_text(warning_type, trait, relation, warning)
-    if concern:
-        out["concern"] = concern
+    out["concern"] = warning_concern_label(warning_type, trait, relation, ontology_bundle)
 
     message = warning.get("message") or warning.get("reason")
     if isinstance(message, str) and message and "operator attention" not in message:

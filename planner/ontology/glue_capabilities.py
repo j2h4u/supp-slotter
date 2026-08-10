@@ -9,35 +9,18 @@ from __future__ import annotations
 
 from typing import Final, cast
 
-IMPLEMENTED_SCOPE_FACT_ADAPTERS: Final[tuple[str, ...]] = (
-    "capability_scalar",
-    "capability_values",
-    "dimension_singleton",
-    "product_identity",
-    "source_formulation",
-)
+# Authored effect-match value types are dispatch IDs.  Keep the closed mapping
+# here so policy consumers do not own domain-specific type names.
+IMPLEMENTED_EFFECT_MATCH_VALUE_HANDLERS: Final[dict[str, str]] = {
+    "boolean": "boolean",
+    "slot_near": "capability_values",
+}
 # Predicate namespaces are part of the planner execution grammar.  Keep this
 # boundary in the glue capability module so authored vocabulary cannot expand
 # the runtime surface merely by introducing a new prefix.
 IMPLEMENTED_PREDICATE_NAMESPACES: Final[tuple[str, ...]] = (
     "schedule",
     "knowledge",
-)
-EFFECT_ROLE_NONE: Final = "none"
-EFFECT_ROLE_WARNING: Final = "warning"
-EFFECT_ROLE_SCORED: Final = "scored"
-EFFECT_ROLE_BLOCKING: Final = "blocking"
-IMPLEMENTED_EFFECT_ROLES: Final[tuple[str, ...]] = (
-    EFFECT_ROLE_NONE,
-    EFFECT_ROLE_WARNING,
-    EFFECT_ROLE_SCORED,
-    EFFECT_ROLE_BLOCKING,
-)
-EFFECT_BLOCK_BEHAVIOR_PRESERVE: Final = "preserve"
-EFFECT_BLOCK_BEHAVIOR_SUPPRESS: Final = "suppress"
-IMPLEMENTED_EFFECT_BLOCK_BEHAVIORS: Final[tuple[str, ...]] = (
-    EFFECT_BLOCK_BEHAVIOR_PRESERVE,
-    EFFECT_BLOCK_BEHAVIOR_SUPPRESS,
 )
 RELATION_WARNING_FILTER_ASSERTION_KIND: Final = "assertion_kind"
 RELATION_WARNING_FILTER_SEMANTIC_FAMILY: Final = "semantic_family"
@@ -62,8 +45,19 @@ IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE: Final[tuple[tuple[bool, bool], ...]] 
     (True, False),
     (True, True),
 )
+IMPLEMENTED_RELATION_PRESENCE_ACTIVE_SIDE_BY_STATE: Final[dict[tuple[bool, bool], str]] = {
+    (False, False): "none",
+    (False, True): "target",
+    (True, False): "source",
+    (True, True): "both",
+}
 IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS: Final[tuple[str, ...]] = (
     "entity",
+    "term",
+)
+IMPLEMENTED_RELATION_SELECTOR_FORMS: Final[tuple[str, ...]] = (
+    "entity_id",
+    "name",
     "term",
 )
 WARNING_EMITTER_INTRA_PRODUCT_CONSTRAINT_CONFLICT: Final = "intra_product_constraint_conflict"
@@ -75,7 +69,8 @@ IMPLEMENTED_WARNING_EMITTER_IDS: Final[tuple[str, ...]] = (
     WARNING_EMITTER_TRAIT_REVIEW_ASSIGNMENT,
 )
 ONTOLOGY_COMPOSITE_KEY_SEPARATOR: Final = ":"
-AUDIT_GOVERNANCE_KEY_SEPARATOR: Final = ONTOLOGY_COMPOSITE_KEY_SEPARATOR
+SOURCE_KIND_ROLE_ASSIGNMENT: Final = "assignment_source"
+IMPLEMENTED_SOURCE_KIND_ROLES: Final[tuple[str, ...]] = (SOURCE_KIND_ROLE_ASSIGNMENT,)
 IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS: Final[tuple[str, ...]] = ("prefer_with",)
 IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS: Final[tuple[str, ...]] = ("exactly_one_active_item",)
 IMPLEMENTED_PREFER_WITH_PAIR_MODES: Final[tuple[str, ...]] = ("undirected_same_slot_bonus",)
@@ -83,53 +78,17 @@ ONTOLOGY_ASSERTION_FILTER_COLUMNS: Final[dict[str, str]] = {
     field: field for field in IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS
 }
 IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS: Final[dict[str, tuple[str, ...]]] = {
-    "scope_fact_adapters": IMPLEMENTED_SCOPE_FACT_ADAPTERS,
+    "source_kind_roles": IMPLEMENTED_SOURCE_KIND_ROLES,
     "relation_warning_filter_fields": IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS,
     "relation_warning_active_sides": IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES,
     "relation_presence_active_sides": IMPLEMENTED_RELATION_PRESENCE_ACTIVE_SIDES,
     "relation_endpoint_selector_kinds": IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS,
+    "relation_selector_forms": IMPLEMENTED_RELATION_SELECTOR_FORMS,
     "warning_emitter_ids": IMPLEMENTED_WARNING_EMITTER_IDS,
     "prefer_with_source_fields": IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS,
     "prefer_with_target_resolutions": IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS,
     "prefer_with_pair_modes": IMPLEMENTED_PREFER_WITH_PAIR_MODES,
 }
-IMPLEMENTED_GLUE_CONTRACT_AUTHORED_SEQUENCE_FIELDS: Final[tuple[str, ...]] = (
-    "source_kinds",
-    "source_kind_roles",
-    "relation_review_status_ids",
-    "concern_membership_roles",
-)
-IMPLEMENTED_GLUE_CONTRACT_SCALAR_FIELDS: Final[tuple[str, ...]] = (
-    "id",
-    "inactive_stack_name",
-    "active_concern_role",
-    "inactive_concern_role",
-    "product_concern_fallback_role",
-    "substance_concern_fallback_role",
-)
-IMPLEMENTED_GLUE_CONTRACT_STRUCTURED_FIELDS: Final[tuple[str, ...]] = ("relation_presence_truth_table",)
-IMPLEMENTED_GLUE_CONTRACT_FIELD_NAMES: Final[tuple[str, ...]] = (
-    "id",
-    "inactive_stack_name",
-    "source_kinds",
-    "source_kind_roles",
-    "scope_fact_adapters",
-    "relation_warning_filter_fields",
-    "relation_warning_active_sides",
-    "relation_presence_active_sides",
-    "relation_presence_truth_table",
-    "relation_review_status_ids",
-    "relation_endpoint_selector_kinds",
-    "concern_membership_roles",
-    "active_concern_role",
-    "inactive_concern_role",
-    "product_concern_fallback_role",
-    "substance_concern_fallback_role",
-    "warning_emitter_ids",
-    "prefer_with_source_fields",
-    "prefer_with_target_resolutions",
-    "prefer_with_pair_modes",
-)
 
 
 def relation_endpoint_selector_kind(selector: object) -> str:
@@ -140,6 +99,17 @@ def relation_endpoint_selector_kind(selector: object) -> str:
     if not isinstance(kind, str) or kind not in IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS:
         raise ValueError(f"relation selector projection has unsupported kind {kind!r}")
     return kind
+
+
+def relation_presence_active_side(source_active: bool, target_active: bool) -> str:
+    """Return the canonical active-side label for an endpoint truth state."""
+    try:
+        return IMPLEMENTED_RELATION_PRESENCE_ACTIVE_SIDE_BY_STATE[(source_active, target_active)]
+    except KeyError as error:
+        raise ValueError(
+            "relation presence state is outside the executable truth table: "
+            f"source_active={source_active!r}, target_active={target_active!r}"
+        ) from error
 
 
 def ontology_assertion_filter_value(filter_field: str, *, assertion_kind: str, semantic_family: str) -> str:

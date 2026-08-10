@@ -11,26 +11,15 @@ matching, which has no native SurrealQL equivalent.
 
 from __future__ import annotations
 
-from collections import defaultdict
-from collections.abc import Mapping
 from typing import cast
 
 from planner.cards.substance import format_substance_name
 from planner.cards.substance_similarity import collect_similar_substances
 from planner.contracts import Substance
 from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.glue_capabilities import (
-    AUDIT_GOVERNANCE_KEY_SEPARATOR,
-    ONTOLOGY_COMPOSITE_KEY_SEPARATOR,
-    relation_endpoint_selector_kind,
-)
-from planner.ontology.runtime_program import RuntimeRelationEndpointPolicy
-from planner.query_model.audit_rules import load_audit_relation_exemptions
+from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
+from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
 from planner.query_model.session import SurrealSession, id_str, string_list
-
-_EFFECT_USAGE_REVIEW_MIN_SUBSTANCES = 3
-_CONTEXT_EFFECT_WITHOUT_CONSUMER_MIN_SUBSTANCES = 3
-MIN_OVERLAP_REVIEW_SLUGS = 2
 
 
 def collect_cleanup_sections(
@@ -61,18 +50,16 @@ def collect_cleanup_sections(
     similar_names = collect_similar_substances(substances)
 
     return {
-        "substances.knowledge_only": knowledge_only_substances,
-        "products.without_stack": products_without_stack,
-        "ontology.policies.unused": _unused_scheduling_policies(db, ontology_bundle),
-        "context.without_dashboard_selector": _collect_context_without_dashboard_selector_messages(db),
-        "stacks.empty": empty_stacks,
-        "stacks.without_pillboxes": stacks_without_pillboxes,
-        "pillboxes.without_stack": pillboxes_without_stack,
-        "substances.similar_names": similar_names,
-        "dashboard.empty_cluster": _empty_dashboard_cluster_messages(db),
-        "effects.context_without_consumer": _collect_context_effect_without_consumer_messages(db),
-        "effects.overlap_review": _collect_effect_overlap_messages(db),
-        "relations.broad_trait_endpoint": _collect_broad_relation_trait_endpoint_messages(db, ontology_bundle),
+        "diagnostics": [
+            *knowledge_only_substances,
+            *products_without_stack,
+            *_unused_scheduling_policies(db, ontology_bundle),
+            *empty_stacks,
+            *stacks_without_pillboxes,
+            *pillboxes_without_stack,
+            *similar_names,
+            *_empty_dashboard_cluster_messages(db),
+        ]
     }
 
 
@@ -96,21 +83,63 @@ def _referenced_substance_ids(db: SurrealSession) -> tuple[set[str], set[str], s
 
 def _unused_scheduling_policies(db: SurrealSession, ontology_bundle: OntologyBundle) -> list[str]:
     """Report canonical scheduling policies with no card assignment."""
-    vocabulary = ontology_bundle.runtime_vocabulary
-    policies = vocabulary.get("scheduling_policies")
+    policy_ids = _canonical_policy_ids(ontology_bundle)
+    assigned = _assigned_policy_ids(db, ontology_bundle)
+    schedule_assignment_ids = _schedule_assignment_ids(db, ontology_bundle)
+    unknown_assignments = sorted(schedule_assignment_ids - set(policy_ids))
+    if unknown_assignments:
+        raise _audit_policy_error(
+            ontology_bundle,
+            "substance schedule_assertions reference unknown policies: " + ", ".join(unknown_assignments),
+        )
+    return sorted(policy_id for policy_id in policy_ids if policy_id not in assigned)
+
+
+def _canonical_policy_ids(bundle: OntologyBundle) -> tuple[str, ...]:
+    policies = bundle.runtime_vocabulary.get("scheduling_policies")
     if not isinstance(policies, dict):
-        return []
-    assignment_fields = tuple(
-        (row.assignment_field, row.axis)
-        for row in sorted(ontology_bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
-    )
+        raise _audit_policy_error(bundle, "canonical runtime vocabulary has no scheduling_policies")
+    policy_mapping = cast(dict[object, object], policies)
+    if any(
+        not isinstance(policy_id, str) or not isinstance(policy, dict) for policy_id, policy in policy_mapping.items()
+    ):
+        raise _audit_policy_error(bundle, "canonical scheduling_policies contains malformed entries")
+    return tuple(cast(str, policy_id) for policy_id in policy_mapping)
+
+
+def _assigned_policy_ids(db: SurrealSession, bundle: OntologyBundle) -> set[str]:
     assigned: set[str] = set()
     for row in db.query("SELECT term_refs FROM substance"):
-        assigned.update(string_list(row.get("term_refs")))
-    for row in db.query("SELECT * FROM substance"):
-        for field, axis in assignment_fields:
-            assigned.update(f"{axis}{AUDIT_GOVERNANCE_KEY_SEPARATOR}{term}" for term in string_list(row.get(field)))
-    return sorted(policy_id for policy_id in policies if isinstance(policy_id, str) and policy_id not in assigned)
+        raw_terms = row.get("term_refs")
+        raw_terms_list = cast(list[object], raw_terms) if isinstance(raw_terms, list) else None
+        if raw_terms_list is None or not all(isinstance(item, str) for item in raw_terms_list):
+            raise _audit_policy_error(bundle, "substance term_refs contain malformed policy references")
+        assigned.update(cast(list[str], raw_terms_list))
+    return assigned
+
+
+def _schedule_assignment_ids(db: SurrealSession, bundle: OntologyBundle) -> set[str]:
+    assignment_ids: set[str] = set()
+    for row in db.query("SELECT schedule_assertions FROM substance"):
+        assignments = row.get("schedule_assertions")
+        assignments_list = cast(list[object], assignments) if isinstance(assignments, list) else None
+        if assignments_list is None:
+            raise _audit_policy_error(bundle, "substance schedule_assertions are malformed")
+        for assignment in assignments_list:
+            if not isinstance(assignment, dict):
+                raise _audit_policy_error(bundle, "substance schedule_assertions contain malformed entries")
+            assignment_map = cast(dict[str, object], assignment)
+            axis = assignment_map.get("schedule_axis")
+            value = assignment_map.get("schedule_value")
+            if not isinstance(axis, str) or not axis.strip() or not isinstance(value, str) or not value.strip():
+                raise _audit_policy_error(bundle, "substance schedule_assertions contain malformed values")
+            assignment_ids.add(f"{axis}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{value}")
+    return assignment_ids
+
+
+def _audit_policy_error(bundle: OntologyBundle, message: str) -> OntologyInfrastructureError:
+    source = bundle.root / "generated" / "runtime-vocabulary.yaml"
+    return OntologyInfrastructureError(f"{message} [source: {source}]", code=MALFORMED, path=source)
 
 
 def _products_without_stack_messages(db: SurrealSession, product_ids: set[str]) -> list[str]:
@@ -134,8 +163,14 @@ def _stack_cleanup_sections(db: SurrealSession, inactive_stack_name: str) -> tup
 
 def _empty_dashboard_cluster_messages(db: SurrealSession) -> list[str]:
     messages: list[str] = []
-    for dash in db.query("SELECT slug, from_terms FROM dashboard"):
-        slug = cast(str, dash["slug"])
+    for dash in db.query("SELECT id, source_path, from_terms FROM dashboard"):
+        dashboard_id = id_str(dash["id"])
+        source_path = dash.get("source_path")
+        diagnostic_path = (
+            cast(str, source_path)
+            if isinstance(source_path, str) and source_path
+            else f"data/dashboards/{dashboard_id}.yaml"
+        )
         pairs = cast("list[str]", dash.get("from_terms") or [])
         if pairs:
             members = db.query(
@@ -145,243 +180,12 @@ def _empty_dashboard_cluster_messages(db: SurrealSession) -> list[str]:
             if members:
                 continue
         messages.append(
-            f"Empty cluster: data/dashboards/{slug}.yaml selectors resolves to "
+            f"Empty cluster: {diagnostic_path} selectors resolves to "
             f"zero member substances (using union resolution: OR across all listed "
             f"(namespace, slug) pairs). Resolution: update selectors to match "
             f"substance ontology terms, OR remove the dashboard yaml if abandoned."
         )
     return messages
-
-
-def _collect_context_without_dashboard_selector_messages(
-    db: SurrealSession,
-) -> list[str]:
-    """Return context tags that no dashboard consumes."""
-    selected_contexts: set[str] = set()
-    for row in db.query("SELECT from_terms FROM dashboard"):
-        for pair in cast("list[str]", row.get("from_terms") or []):
-            namespace, _, slug = pair.partition(ONTOLOGY_COMPOSITE_KEY_SEPARATOR)
-            if namespace == "context" and slug:
-                selected_contexts.add(slug)
-
-    members_by_context: dict[str, list[str]] = defaultdict(list)
-    for row in db.query("SELECT id, name, context FROM substance"):
-        substance_label = f"{id_str(row['id'])} {cast(str, row['name'])}"
-        for slug in cast("list[str]", row.get("context") or []):
-            members_by_context[slug].append(substance_label)
-
-    messages: list[str] = []
-    for slug, members in sorted(members_by_context.items()):
-        if slug in selected_contexts:
-            continue
-        messages.append(
-            f"context:{slug} is carried by {len(members)} substances but no "
-            "dashboard selectors selector consumes it. "
-            f"Members: {', '.join(sorted(members))}. "
-            "Resolution: remove stale context tags, add a dashboard selector, "
-            "or document an explicit exception."
-        )
-    return messages
-
-
-def _collect_context_effect_without_consumer_messages(
-    db: SurrealSession,
-) -> list[str]:
-    """Return high-use effect:*_context slugs that no dashboard or relation consumes."""
-    consumed_effects = _consumed_effect_slugs(db)
-    members_by_effect = _context_effect_members(db)
-
-    messages: list[str] = []
-    for slug, members in sorted(members_by_effect.items()):
-        if slug in consumed_effects or len(members) < _CONTEXT_EFFECT_WITHOUT_CONSUMER_MIN_SUBSTANCES:
-            continue
-        messages.append(
-            f"effect:{slug} is assigned to {len(members)} substances but no "
-            "dashboard or relation consumes it. "
-            f"Members: {', '.join(sorted(members))}. "
-            "Resolution: connect it to a review surface, demote it to notes, "
-            "or delete it if another trait already carries the meaning."
-        )
-    return messages
-
-
-def _consumed_effect_slugs(db: SurrealSession) -> set[str]:
-    consumed_effects: set[str] = set()
-    for row in db.query("SELECT from_terms FROM dashboard"):
-        for pair in cast("list[str]", row.get("from_terms") or []):
-            namespace, _, slug = pair.partition(ONTOLOGY_COMPOSITE_KEY_SEPARATOR)
-            if namespace == "effect" and slug:
-                consumed_effects.add(slug)
-
-    for row in db.query("SELECT src_selector, tgt_selector FROM ontology_assertion"):
-        for field in ("src_selector", "tgt_selector"):
-            selector = row.get(field)
-            selector_mapping = cast(dict[str, object], selector) if isinstance(selector, dict) else None
-            if selector_mapping is not None and selector_mapping.get("category") == "effect":
-                term = selector_mapping.get("term")
-                if isinstance(term, str):
-                    consumed_effects.add(term)
-    return consumed_effects
-
-
-def _context_effect_members(db: SurrealSession) -> dict[str, list[str]]:
-    members_by_effect: dict[str, list[str]] = defaultdict(list)
-    for row in db.query("SELECT id, name, effect FROM substance"):
-        substance_label = f"{id_str(row['id'])} {cast(str, row['name'])}"
-        for slug in cast("list[str]", row.get("effect") or []):
-            if slug.endswith("_context"):
-                members_by_effect[slug].append(substance_label)
-    return members_by_effect
-
-
-def _collect_effect_overlap_messages(db: SurrealSession) -> list[str]:
-    """Return non-blocking review hints for potentially overlapping effect axes."""
-    effect_labels: dict[str, str] = {}
-    for row in db.query("SELECT effect FROM substance"):
-        for slug in string_list(row.get("effect")):
-            effect_labels.setdefault(slug, slug.replace("_", " "))
-
-    messages: list[str] = []
-    messages.extend(_same_stem_effect_messages(effect_labels))
-    messages.extend(_same_usage_effect_messages(db, effect_labels))
-    return messages
-
-
-def _collect_broad_relation_trait_endpoint_messages(
-    db: SurrealSession,
-    ontology_bundle: OntologyBundle,
-) -> list[str]:
-    """Return trait-endpoint relations that may over-broadly inherit future cards."""
-    messages: list[str] = []
-    exemptions = {
-        (
-            cast(str, exemption["relation_type"]),
-            cast(str, exemption["source_selector_key"]),
-            cast(str, exemption["target_selector_key"]),
-        )
-        for exemption in load_audit_relation_exemptions(ontology_bundle)
-    }
-    for row in db.query(
-        "SELECT type, src_key, tgt_key, src_selector, tgt_selector, src_substances, tgt_substances "
-        "FROM ontology_assertion"
-    ):
-        relation_type = cast(str, row["type"])
-        source_key = cast(str, row["src_key"])
-        target_key = cast(str, row["tgt_key"])
-        if (relation_type, source_key, target_key) in exemptions:
-            continue
-
-        endpoint_messages = _broad_trait_endpoint_parts(
-            row,
-            ontology_bundle.runtime_program.relation_endpoint_policies_by_selector_kind,
-        )
-        messages.extend(f"{relation_type} {source_key} -> {target_key}: {message}" for message in endpoint_messages)
-    return sorted(messages)
-
-
-def _broad_trait_endpoint_parts(
-    row: dict[str, object],
-    endpoint_policies_by_selector_kind: Mapping[str, RuntimeRelationEndpointPolicy],
-) -> list[str]:
-    endpoint_parts: list[str] = []
-    source_key = cast(str, row["src_key"])
-    target_key = cast(str, row["tgt_key"])
-    source_selector = row.get("src_selector")
-    target_selector = row.get("tgt_selector")
-    source_kind = relation_endpoint_selector_kind(source_selector)
-    target_kind = relation_endpoint_selector_kind(target_selector)
-    source_size = len(string_list(row.get("src_substances")))
-    target_size = len(string_list(row.get("tgt_substances")))
-    source_policy = _relation_endpoint_policy(source_kind, endpoint_policies_by_selector_kind)
-    target_policy = _relation_endpoint_policy(target_kind, endpoint_policies_by_selector_kind)
-    if source_policy.broad_endpoint and source_size > source_policy.audit_member_limit:
-        endpoint_parts.append(_broad_trait_endpoint_message("source", source_key, source_size, source_policy))
-    if target_policy.broad_endpoint and target_size > target_policy.audit_member_limit:
-        endpoint_parts.append(_broad_trait_endpoint_message("target", target_key, target_size, target_policy))
-    return endpoint_parts
-
-
-def _relation_endpoint_policy(
-    selector_kind: str,
-    endpoint_policies_by_selector_kind: Mapping[str, RuntimeRelationEndpointPolicy],
-) -> RuntimeRelationEndpointPolicy:
-    try:
-        return endpoint_policies_by_selector_kind[selector_kind]
-    except KeyError as error:
-        raise ValueError(f"ontology relation_endpoint_policies does not declare {selector_kind!r}") from error
-
-
-def _broad_trait_endpoint_message(
-    side: str,
-    key: str,
-    size: int,
-    policy: RuntimeRelationEndpointPolicy,
-) -> str:
-    return (
-        f"{side} {policy.label} {key} resolves to {size} substances. "
-        f"Resolution: narrow the {policy.label}, use concrete substance/name endpoints, "
-        "or add an explicit audit allowlist entry with rationale if inheritance "
-        "by future cards is intentional."
-    )
-
-
-def _same_stem_effect_messages(effect_labels: dict[str, str]) -> list[str]:
-    by_stem: dict[str, list[str]] = defaultdict(list)
-    for slug in effect_labels:
-        by_stem[_effect_overlap_stem(slug)].append(slug)
-
-    messages: list[str] = []
-    for _stem, slugs in sorted(by_stem.items()):
-        if len(slugs) < MIN_OVERLAP_REVIEW_SLUGS:
-            continue
-        messages.append(
-            "Same-stem effect slugs: "
-            f"{', '.join(sorted(slugs))}. "
-            "Review whether these are distinct facts or should be merged."
-        )
-    return messages
-
-
-def _same_usage_effect_messages(
-    db: SurrealSession,
-    effect_labels: dict[str, str],
-) -> list[str]:
-    usage_by_effect: dict[str, set[str]] = defaultdict(set)
-    names_by_id: dict[str, str] = {}
-    for row in db.query("SELECT id, name, effect FROM substance"):
-        substance_id = id_str(row["id"])
-        names_by_id[substance_id] = cast(str, row["name"])
-        effect_slugs = cast("list[str]", row.get("effect") or [])
-        for slug in effect_slugs:
-            if slug in effect_labels:
-                usage_by_effect[slug].add(substance_id)
-
-    by_usage: dict[tuple[str, ...], list[str]] = defaultdict(list)
-    for slug, substance_ids in usage_by_effect.items():
-        by_usage[tuple(sorted(substance_ids))].append(slug)
-
-    messages: list[str] = []
-    for substance_ids, slugs in sorted(by_usage.items()):
-        if len(slugs) < MIN_OVERLAP_REVIEW_SLUGS or len(substance_ids) < _EFFECT_USAGE_REVIEW_MIN_SUBSTANCES:
-            continue
-        substance_names = [f"{substance_id} {names_by_id[substance_id]}" for substance_id in substance_ids]
-        messages.append(
-            f"Same effect usage across {len(substance_ids)} substances "
-            f"({', '.join(substance_names)}): {', '.join(sorted(slugs))}. "
-            "Review whether these facts stay independent as coverage expands."
-        )
-    return messages
-
-
-def _effect_overlap_stem(slug: str) -> str:
-    parts = slug.split("_")
-    suffixes = {"context", "support", "modulation", "cofactor"}
-    while parts and parts[-1] in suffixes:
-        parts.pop()
-    aliases = {
-        "metabolic": "metabolism",
-    }
-    return "_".join(aliases.get(part, part) for part in parts)
 
 
 def _format_substance_audit_entry(substance: Substance) -> str:

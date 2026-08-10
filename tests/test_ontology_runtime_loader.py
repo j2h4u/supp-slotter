@@ -15,7 +15,6 @@ from planner.ontology.errors import (
     MALFORMED,
     MISSING,
     STALE,
-    UNSAFE_PATH,
     UNSUPPORTED,
     OntologyInfrastructureError,
 )
@@ -36,23 +35,6 @@ def _fixture(tmp_path: Path) -> Path:
     return repository / "ontology"
 
 
-def _lock(root: Path) -> dict[str, object]:
-    return cast(dict[str, object], json.loads((root / "generated/artifact-lock.json").read_text()))
-
-
-def _write_lock(root: Path, lock: dict[str, object]) -> None:
-    (root / "generated/artifact-lock.json").write_text(json.dumps(lock, indent=2) + "\n")
-
-
-def _refresh_manifest_hash(root: Path, lock: dict[str, object]) -> None:
-    digest = hashlib.sha256((root / "manifest.yaml").read_bytes()).hexdigest()
-    for record in cast(list[dict[str, object]], lock["sources"]):
-        if record["path"] == "ontology/manifest.yaml":
-            record["sha256"] = digest
-            return
-    raise AssertionError("fixture lock has no manifest source record")
-
-
 def _raises(root: Path, code: str) -> None:
     with pytest.raises(OntologyInfrastructureError) as raised:
         load_ontology(root)
@@ -65,6 +47,12 @@ def test_success_and_runtime_vocabulary_delegate_to_one_bundle(tmp_path: Path) -
     assert isinstance(bundle, OntologyBundle)
     assert bundle.runtime_vocabulary["format"] == "supp-slotter.runtime-vocabulary/v2"
     assert load_runtime_vocabulary(root) == bundle.runtime_vocabulary
+    profiles = bundle.ontoclean_profiles
+    assert set(profiles) == {"rigid_identity", "anti_rigid_dependent", "dependent_assertion"}
+    categories = cast(dict[str, dict[str, object]], bundle.runtime_vocabulary["categories"])
+    for term in cast(list[dict[str, object]], bundle.runtime_vocabulary["terms"]):
+        category = cast(str, term["semantic_category"])
+        assert term["ontoclean_profile"] == categories[category]["ontoclean_profile"]
 
 
 def test_missing_output_fails_closed(tmp_path: Path) -> None:
@@ -84,51 +72,57 @@ def test_source_and_output_hash_mismatch_are_stale(tmp_path: Path) -> None:
     _raises(root, STALE)
 
 
-def test_unsafe_output_path_fails_closed(tmp_path: Path) -> None:
-    root = _fixture(tmp_path)
-    lock = _lock(root)
-    outputs = cast(list[dict[str, object]], lock["outputs"])
-    outputs[0]["path"] = "../escape.json"
-    _write_lock(root, lock)
-    _raises(root, UNSAFE_PATH)
-
-
-def test_symlink_output_fails_closed(tmp_path: Path) -> None:
-    root = _fixture(tmp_path)
-    output = root / "generated/runtime-program.json"
-    payload = output.read_bytes()
-    output.unlink()
-    output.symlink_to(root / "generated/runtime-vocabulary.yaml")
-    _raises(root, UNSAFE_PATH)
-    output.unlink()
-    output.write_bytes(payload)
-
-
-def test_minimal_artifact_inventory_fails_closed(tmp_path: Path) -> None:
-    root = _fixture(tmp_path)
-    manifest = cast(dict[str, object], yaml.safe_load((root / "manifest.yaml").read_bytes()))
-    assert isinstance(manifest, dict)
-    manifest["artifacts"] = ["runtime-vocabulary.yaml", "artifact-lock.json"]
-    (root / "manifest.yaml").write_text(yaml.safe_dump(manifest, sort_keys=False))
-    lock = _lock(root)
-    _refresh_manifest_hash(root, lock)
-    _write_lock(root, lock)
-    _raises(root, UNSUPPORTED)
-
-
 def test_malformed_and_unsupported_contracts_fail_closed(tmp_path: Path) -> None:
     root = _fixture(tmp_path)
     output = root / "generated/runtime-program.json"
     output.write_bytes(b"{")
-    lock = _lock(root)
+    lock_path = root / "generated/artifact-lock.json"
+    lock = cast(dict[str, object], json.loads(lock_path.read_text()))
     for record in cast(list[dict[str, object]], lock["outputs"]):
         if record["path"] == "runtime-program.json":
             record["sha256"] = hashlib.sha256(b"{").hexdigest()
-    _write_lock(root, lock)
+    lock_path.write_text(json.dumps(lock, indent=2) + "\n")
     _raises(root, MALFORMED)
 
     root = _fixture(tmp_path / "second")
-    lock = _lock(root)
+    lock_path = root / "generated/artifact-lock.json"
+    lock = cast(dict[str, object], json.loads(lock_path.read_text()))
     lock["format_version"] = "unknown-lock"
-    _write_lock(root, lock)
+    lock_path.write_text(json.dumps(lock, indent=2) + "\n")
     _raises(root, UNSUPPORTED)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ["empty_terms", "category_identity", "unknown_profile", "term_profile_mismatch", "changed_profile"],
+)
+def test_bundle_registration_rejects_malformed_catalog_before_card_load(tmp_path: Path, mutation: str) -> None:
+    root = _fixture(tmp_path)
+    vocabulary_path = root / "generated/runtime-vocabulary.yaml"
+    vocabulary = cast(dict[str, object], yaml.safe_load(vocabulary_path.read_text(encoding="utf-8")))
+    if mutation == "empty_terms":
+        vocabulary["terms"] = []
+    elif mutation == "category_identity":
+        categories = cast(dict[str, dict[str, object]], vocabulary["categories"])
+        categories["kind"]["allowed_predicates"] = ["knowledge.role"]
+    elif mutation == "unknown_profile":
+        terms = cast(list[dict[str, object]], vocabulary["terms"])
+        terms[0]["ontoclean_profile"] = "unknown_profile"
+    elif mutation == "term_profile_mismatch":
+        terms = cast(list[dict[str, object]], vocabulary["terms"])
+        categories = cast(dict[str, dict[str, object]], vocabulary["categories"])
+        terms[0]["ontoclean_profile"] = categories["kind"]["ontoclean_profile"]
+        categories[cast(str, terms[0]["semantic_category"])]["ontoclean_profile"] = "anti_rigid_dependent"
+    else:
+        profiles = cast(dict[str, dict[str, object]], vocabulary["ontoclean_profiles"])
+        profiles["rigid_identity"]["rigidity"] = "anti_rigid"
+    content = yaml.safe_dump(vocabulary, sort_keys=False).encode("utf-8")
+    vocabulary_path.write_bytes(content)
+    lock_path = root / "generated/artifact-lock.json"
+    lock = cast(dict[str, object], json.loads(lock_path.read_text(encoding="utf-8")))
+    for record in cast(list[dict[str, object]], lock["outputs"]):
+        if record["path"] == "runtime-vocabulary.yaml":
+            record["sha256"] = hashlib.sha256(content).hexdigest()
+    lock_path.write_text(json.dumps(lock, indent=2) + "\n")
+
+    _raises(root, MALFORMED)

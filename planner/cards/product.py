@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from typing import cast
 
@@ -18,7 +17,6 @@ from planner.contracts import (
 from planner.domain_constants import FIND_MIN_SCORE
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.schema_enums import schema_enum_values
-from planner.ontology.substance_fields import schedule_assignment_fields
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
 
@@ -33,7 +31,6 @@ def load_product(path: Path, bundle: OntologyBundle) -> Product:
     errors = schema_errors(data, "product", path, bundle)
     if errors:
         raise CardLoadError(path, errors[0])
-    schedule = cast(dict[str, object], data.get("schedule") or {})
     try:
         return Product(
             id=cast(str, data["id"]),
@@ -43,7 +40,6 @@ def load_product(path: Path, bundle: OntologyBundle) -> Product:
             urls=tuple(_string_list(data.get("urls"))),
             notes=cast(str | None, data.get("notes")),
             concerns=_concerns(data.get("concerns"), path, bundle),
-            **_string_tuple_fields(schedule, schedule_assignment_fields(bundle)),
         )
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e
@@ -66,7 +62,6 @@ def _product_components(value: object) -> list[ProductComponent]:
                 label=cast(str | None, component_dict.get("label")),
                 amount=cast(str | None, component_dict.get("amount")),
                 notes=cast(str | None, component_dict.get("notes")),
-                primary=cast(bool | None, component_dict.get("primary")),
             )
         )
     return components
@@ -74,14 +69,6 @@ def _product_components(value: object) -> list[ProductComponent]:
 
 def _string_list(value: object) -> list[str]:
     return [item for item in value if isinstance(item, str)] if isinstance(value, (list, tuple)) else []
-
-
-def _string_tuple(value: object) -> tuple[str, ...]:
-    return tuple(item for item in value if isinstance(item, str)) if isinstance(value, (list, tuple)) else ()
-
-
-def _string_tuple_fields(data: dict[str, object], fields: tuple[str, ...]) -> dict[str, tuple[str, ...]]:
-    return {field: _string_tuple(data.get(field)) for field in fields}
 
 
 def _concerns(value: object, path: Path, bundle: OntologyBundle) -> tuple[Concern, ...]:
@@ -119,11 +106,12 @@ def canonical_product_filename(product: Product) -> str:
 
 def find_product_results(query: str, paths: Paths, bundle: OntologyBundle) -> list[tuple[float, str, str, Path]]:
     results: list[tuple[float, str, str, Path]] = []
+    errors: list[CardLoadError] = []
     for path in sorted(paths.products.glob("*.yaml")):
         try:
             product = load_product(path, bundle)
         except CardLoadError as e:
-            print(f"warning: skipping product card: {e.message}", file=sys.stderr)
+            errors.append(e)
             continue
         identity_values = [
             product.id,
@@ -137,6 +125,8 @@ def find_product_results(query: str, paths: Paths, bundle: OntologyBundle) -> li
         score = combined_search_score(query, identity_values, full_values)
         if score >= FIND_MIN_SCORE:
             results.append((score, product.id, format_product_name(product), path))
+    if errors:
+        _raise_product_registry_errors(paths.products, errors)
     return sorted(results, key=lambda item: (-item[0], item[2].casefold(), item[1]))
 
 
@@ -153,21 +143,26 @@ def collect_product_substance_refs(products: dict[str, Product], product_ids: se
 def load_product_registry(paths: Paths, bundle: OntologyBundle) -> dict[str, Product]:
     products: dict[str, Product] = {}
     product_files = sorted(paths.products.glob("*.yaml"))
-    skipped = 0
+    errors: list[CardLoadError] = []
     for pf in product_files:
         try:
             product = load_product(pf, bundle)
         except CardLoadError as e:
-            print(f"warning: skipping product card: {e.message}", file=sys.stderr)
-            skipped += 1
+            errors.append(e)
+            continue
+        previous = products.get(product.id)
+        if previous is not None:
+            errors.append(CardLoadError(pf, f"{pf}: duplicate product id {product.id!r}"))
             continue
         products[product.id] = product
-    if skipped:
-        print(
-            f"warning: loaded {len(products)}/{len(product_files)} product cards; {skipped} skipped",
-            file=sys.stderr,
-        )
+    if errors:
+        _raise_product_registry_errors(paths.products, errors)
     return products
+
+
+def _raise_product_registry_errors(directory: Path, errors: list[CardLoadError]) -> None:
+    details = "\n".join(f"- {error.message}" for error in errors)
+    raise CardLoadError(directory, f"{directory}: failed to load {len(errors)} product card(s):\n{details}")
 
 
 def product_component_substances(product: Product) -> list[str]:

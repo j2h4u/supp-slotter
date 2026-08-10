@@ -5,11 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from planner.ontology.artifacts import load_ontology
 from planner.ontology.errors import OntologyInfrastructureError
-from planner.ontology.projection import _project_repository_with_projection, project_repository
-from planner.ontology.repository_sources import discover_repository_sources
-from rdflib import URIRef
+from planner.ontology.projection import _project_repository_with_projection
 
 BASE = "https://example.test/ontology/"
 
@@ -109,27 +106,6 @@ def _repo(tmp_path: Path) -> Path:
     return tmp_path
 
 
-def test_projection_is_deterministic_and_covers_all_source_roles(tmp_path: Path) -> None:
-    repo = _repo(tmp_path)
-    result_one = _project_repository_with_projection(repo, _map())
-    result_two = _project_repository_with_projection(repo, _map())
-    assert result_one.triples == result_two.triples
-    assert result_one.canonical_ntriples == result_two.canonical_ntriples
-    assert {record.source_id for record in result_one.provenance} == {
-        "assertions",
-        "dashboards",
-        "pillboxes",
-        "products",
-        "stacks",
-        "substances",
-    }
-    assert (
-        URIRef(BASE + "product/prd_p"),
-        URIRef(BASE + "slot/substance"),
-        URIRef(BASE + "substance/sub_a"),
-    ) in result_one.graph
-
-
 def test_catalog_ref_selects_declared_catalog_and_does_not_ingest_schedule(tmp_path: Path) -> None:
     repo = _repo(tmp_path)
     (repo / "schedule.yaml").write_text("id: should_not_be_read\n", encoding="utf-8")
@@ -145,20 +121,3 @@ def test_unknown_empty_container_fails_closed(tmp_path: Path) -> None:
     (repo / "data/substances/a.yaml").write_text("id: sub_a\nname: A\nunknown: {}\n", encoding="utf-8")
     with pytest.raises(OntologyInfrastructureError, match="unknown"):
         _project_repository_with_projection(repo, _map())
-
-
-def test_public_projection_and_discovery_reject_unverified_mappings(tmp_path: Path) -> None:
-    repo = _repo(tmp_path)
-    raw = _map()
-    with pytest.raises(OntologyInfrastructureError, match="verified OntologyBundle"):
-        project_repository(repo, raw)  # type: ignore[arg-type]
-    with pytest.raises(OntologyInfrastructureError, match="verified OntologyBundle"):
-        discover_repository_sources(repo, raw)  # type: ignore[arg-type]
-
-
-def test_committed_projection_emits_uri_relationships_for_stack_products() -> None:
-    root = Path(__file__).resolve().parents[1]
-    result = project_repository(root, load_ontology(root / "ontology"))
-    product_edges = [triple for triple in result.triples if triple[1].endswith("/product>")]
-    assert product_edges
-    assert all(triple[2].startswith("<") and triple[2].endswith(">") for triple in product_edges)

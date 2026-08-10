@@ -25,6 +25,13 @@ from planner.maintenance_rewrites import (
     plan_substance_ref_rewrites,
     rewrite_stack_product_refs,
 )
+from planner.maintenance_substance_resolution import (
+    MaintenanceContract,
+    ReferenceResolution,
+    load_maintenance_contract,
+)
+from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.errors import OntologyInfrastructureError
 from planner.paths import Paths
 from planner.yaml_io import load_yaml
 
@@ -45,10 +52,21 @@ def run_auto_maintenance(
     *,
     suppress_output: bool = False,
     collect_errors: list[str] | None = None,
+    ontology: OntologyBundle | None = None,
 ) -> int:
     """Acquire the maintenance lock only when mutations are needed."""
     lock_acquired = False
-    needs = auto_maintenance_needed(paths)
+    try:
+        if ontology is None:
+            raise OntologyInfrastructureError("Auto-maintenance requires a verified ontology bundle")
+        contract = load_maintenance_contract(ontology)
+    except OntologyInfrastructureError as error:
+        message = f"auto-maintenance: ontology contract unavailable: {error}"
+        if collect_errors is not None:
+            collect_errors.append(message)
+        print(message, file=sys.stderr)
+        return 1
+    needs = auto_maintenance_needed(paths, contract=contract)
     if needs is None:
         return 1
     if needs:
@@ -64,6 +82,7 @@ def run_auto_maintenance(
             paths,
             suppress_output=suppress_output,
             collect_errors=collect_errors,
+            contract=contract,
         )
     finally:
         if lock_acquired:
@@ -75,14 +94,13 @@ def _run_auto_maintenance_unlocked(
     *,
     suppress_output: bool = False,
     collect_errors: list[str] | None = None,
+    contract: MaintenanceContract,
 ) -> int:
     """Normalize substances and products through a staged edit plan."""
-    data_dir = paths.data
-    stacks_path = paths.stacks_file
     edit_plan = EditPlan()
 
     sub_result = plan_card_dir(
-        data_dir / "substances",
+        paths.root / contract.substance_path,
         lambda data: canonical_substance_filename(substance_from_mapping(data)),
         "sub",
         edit_plan,
@@ -92,7 +110,7 @@ def _run_auto_maintenance_unlocked(
     substance_renames, substance_file_moves = sub_result
 
     prd_result = plan_card_dir(
-        data_dir / "products",
+        paths.root / contract.product_path,
         lambda data: canonical_product_filename(product_from_mapping(data)),
         "prd",
         edit_plan,
@@ -102,14 +120,15 @@ def _run_auto_maintenance_unlocked(
     product_renames, product_file_moves = prd_result
 
     if not plan_substance_ref_rewrites(
-        data_dir,
+        paths.root,
         substance_renames,
         product_renames,
         edit_plan,
         collect_errors=collect_errors,
+        contract=contract,
     ):
         return 1
-    _plan_stack_ref_rewrites(stacks_path, product_renames, edit_plan)
+    _plan_stack_ref_rewrites(paths.root / contract.stack_path, product_renames, contract.stack_products, edit_plan)
 
     if not edit_plan.stage():
         return 1
@@ -132,6 +151,7 @@ def _run_auto_maintenance_unlocked(
 def _plan_stack_ref_rewrites(
     stacks_path: Path,
     product_renames: dict[str, str],
+    resolution: ReferenceResolution,
     edit_plan: EditPlan,
 ) -> None:
     if not stacks_path.exists() or not product_renames:
@@ -141,7 +161,7 @@ def _plan_stack_ref_rewrites(
     if not isinstance(stacks_data, dict):
         return
 
-    rewrite_stack_product_refs(cast(dict[str, object], stacks_data), product_renames)
+    rewrite_stack_product_refs(cast(dict[str, object], stacks_data), product_renames, resolution)
     stacks_content = yaml.safe_dump(
         stacks_data,
         sort_keys=False,

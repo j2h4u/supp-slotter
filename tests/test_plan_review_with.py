@@ -29,9 +29,9 @@ def test_review_with_warning_fires_and_severity_flows_through(
                 "vit_k2_product": [("vit_k2_substance", [])],
             },
             traits={
-                "timing:neutral": {
-                    "label": "Neutral",
-                    "description": "Fixture neutral trait",
+                "timing:energy_like": {
+                    "label": "Energy-like",
+                    "description": "Fixture energy-like trait",
                     "applies_when": "Fixture",
                 },
             },
@@ -43,11 +43,11 @@ def test_review_with_warning_fires_and_severity_flows_through(
         "relations": [
             {
                 "id": "rel_fixture_review_with",
-                "type": "review_with",
+                "relation_type": "review_with",
                 "assertion_kind": "clinical_review_signal",
                 "semantic_family": "clinical_review_signal",
-                "source_selector": {"entity": {"id": vit_e_id}},
-                "target_selector": {"entity": {"id": vit_k2_id}},
+                "source_selector": {"entity": {"entity_id": vit_e_id}},
+                "target_selector": {"entity": {"entity_id": vit_k2_id}},
                 "severity": "medium",
                 "reason": "High-dose vitamin E can antagonize vitamin K-dependent clotting factors.",
             }

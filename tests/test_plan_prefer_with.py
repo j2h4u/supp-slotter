@@ -26,13 +26,13 @@ def test_substance_level_prefer_with_awards_colocation_bonus(
                 "sub_3918fe347e": {"stack": "daily"},
             },
             products={
-                "sub_9c0908e7f7": [("sub_9c0908e7f7", ["timing:wake"])],
-                "sub_3918fe347e": [("sub_3918fe347e", ["timing:wake"])],
+                "sub_9c0908e7f7": [("sub_9c0908e7f7", ["timing:energy_like"])],
+                "sub_3918fe347e": [("sub_3918fe347e", ["timing:energy_like"])],
             },
             traits={
-                "timing:wake": {
-                    "label": "Wake",
-                    "description": "Wake preference",
+                "timing:energy_like": {
+                    "label": "Energy-like",
+                    "description": "Energy-like preference",
                     "applies_when": "Fixture",
                     "effects": [{"match": {"near": "wake"}, "level": "prefer_strong"}],
                 },
@@ -67,14 +67,14 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
                 "citrulline_b": {"stack": "daily"},
             },
             products={
-                "sub_9c0908e7f7": [("sub_9c0908e7f7", ["timing:wake"])],
-                "citrulline_a": [("sub_3918fe347e", ["timing:wake"])],
-                "citrulline_b": [("sub_3918fe347e", ["timing:wake"])],
+                "sub_9c0908e7f7": [("sub_9c0908e7f7", ["timing:energy_like"])],
+                "citrulline_a": [("sub_3918fe347e", ["timing:energy_like"])],
+                "citrulline_b": [("sub_3918fe347e", ["timing:energy_like"])],
             },
             traits={
-                "timing:wake": {
-                    "label": "Wake",
-                    "description": "Wake preference",
+                "timing:energy_like": {
+                    "label": "Energy-like",
+                    "description": "Energy-like preference",
                     "applies_when": "Fixture",
                     "effects": [{"match": {"near": "wake"}, "level": "prefer_strong"}],
                 },
@@ -100,7 +100,7 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
             "product": "Sub 9C0908E7F7",
             "source": "Sub 9C0908E7F7",
             "target": "Sub 3918Fe347E",
-            "concern": "ambiguous prefer with",
+            "concern": "Companion product is ambiguous",
             "note": expected_note,
             "action": "Choose the intended companion product before relying on co-location.",
         }
