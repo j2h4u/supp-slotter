@@ -21,7 +21,6 @@ class SchedulingConstraintExecutionPlan:
     source_substance_ids: tuple[str, ...]
     target_substance_ids: tuple[str, ...]
     operation: str
-    effect_role: str
     executable: bool
     blocks_slots: bool
     scores_advisory: bool
@@ -122,7 +121,6 @@ def compile_scheduling_constraint_execution_plans(
                 source_substance_ids=source_ids,
                 target_substance_ids=target_ids,
                 operation=operation,
-                effect_role="blocking" if blocks_slots else "warning" if scores_advisory else "none",
                 executable=executable,
                 blocks_slots=blocks_slots,
                 scores_advisory=scores_advisory,
@@ -142,6 +140,13 @@ def compile_scheduling_constraint_execution_plans(
             )
         )
     return tuple(plans)
+
+
+def executable_blocking_plans(
+    plans: Iterable[SchedulingConstraintExecutionPlan],
+) -> tuple[SchedulingConstraintExecutionPlan, ...]:
+    """Return executable plans that contribute hard slot blocking."""
+    return tuple(plan for plan in plans if plan.executable and plan.blocks_slots)
 
 
 def _combine_selector_outcomes(source: str, target: str) -> str:

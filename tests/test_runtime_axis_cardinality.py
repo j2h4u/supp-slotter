@@ -73,17 +73,6 @@ def test_compiler_rejects_unknown_projection_target(tmp_path: Path) -> None:
         compile_ontology(root)
 
 
-def test_compiler_rejects_legacy_axis_cardinality_alias(tmp_path: Path) -> None:
-    root = _copy_repository_shape(tmp_path)
-    policy_path = root / "runtime-policy.yaml"
-    source = cast(dict[str, object], yaml.safe_load(policy_path.read_text(encoding="utf-8")))
-    axes = cast(list[dict[str, object]], source["assignment_axes"])
-    axes[0]["cardinality"] = "many"
-    policy_path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
-    with pytest.raises(OntologyInfrastructureError, match="cardinality"):
-        compile_ontology(root)
-
-
 @pytest.mark.parametrize(
     ("minimum", "maximum"),
     [(2, 1), (-1, 1), (0, -1)],

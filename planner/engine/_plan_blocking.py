@@ -8,6 +8,7 @@ from planner.engine._plan_types import BlockingContext
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.scheduling_constraint_execution import (
     SchedulingConstraintExecutionPlan,
+    executable_blocking_plans,
     interpret_constraint_component_pair,
 )
 
@@ -37,7 +38,7 @@ def slot_is_blocked(
     constraints_context = _SchedulingConstraintContext(
         slot_items=slot_items,
         active_components=blocking.active_components,
-        constraints=_approved_block_constraints(blocking),
+        constraints=executable_blocking_plans(blocking.scheduling_constraint_plans),
         runtime_program=blocking.runtime_program,
     )
     return _scheduling_constraint_blocks_item(
@@ -61,7 +62,7 @@ def blocking_constraint_diagnostics(
     context = _SchedulingConstraintContext(
         slot_items=slot_items,
         active_components=blocking.active_components,
-        constraints=_approved_block_constraints(blocking),
+        constraints=executable_blocking_plans(blocking.scheduling_constraint_plans),
         runtime_program=blocking.runtime_program,
     )
     matches = _matching_constraints(item, slot_name, context)
@@ -123,10 +124,3 @@ def _matching_constraints(
             ):
                 matched.append(constraint)
     return tuple(matched)
-
-
-def _approved_block_constraints(
-    blocking: BlockingContext,
-) -> tuple[SchedulingConstraintExecutionPlan, ...]:
-    """Select executable hard-block plans from the compiled runtime contract."""
-    return tuple(plan for plan in blocking.scheduling_constraint_plans if plan.executable and plan.blocks_slots)

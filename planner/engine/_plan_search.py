@@ -8,7 +8,7 @@ from planner.contracts import Slot, Substance
 from planner.engine._plan_blocking import slot_is_blocked
 from planner.engine._plan_types import AdvisorySlotEvaluation, BlockingContext
 from planner.ontology.runtime_program import RuntimeEffectScoring, RuntimeProgram
-from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
+from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan, executable_blocking_plans
 from planner.scheduling_constraint_matching import advisory_penalty_for_candidate, advisory_penalty_for_slot
 
 FLOAT_TIE_EPSILON = 1e-9
@@ -88,7 +88,7 @@ class _PlanSearch:
         self.slot_items: dict[str, list[str]] = {slot_name: [] for slot_name in search_input.slots}
         self.slot_counts: dict[str, int] = dict.fromkeys(search_input.slots, 0)
         plans = search_input.scheduling_constraint_plans
-        approved_block = tuple(plan for plan in plans if plan.executable and plan.blocks_slots)
+        approved_block = executable_blocking_plans(plans)
         self.advisory_constraints = tuple(plan for plan in plans if plan.executable and plan.scores_advisory)
         self.blocking = BlockingContext(
             active_components=search_input.active_components,

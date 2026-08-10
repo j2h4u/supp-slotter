@@ -22,7 +22,6 @@ def _rule(rule_id: str, source: str, target: str) -> SchedulingConstraintExecuti
         source_substance_ids=(source,),
         target_substance_ids=(target,),
         operation=policy.operation,
-        effect_role="advisory",
         executable=True,
         blocks_slots=False,
         scores_advisory=True,

@@ -43,7 +43,7 @@
     },
     {
       "path": "runtime-program.json",
-      "sha256": "22f18cc6bd736954a27d51477848ccfb749fe2f5bafe5dd370998c3f58c4b496"
+      "sha256": "e9a6f13f86161d25cef115afbc2f06ef6b15e62b4d6b8c9b9b08592ee32b49b9"
     },
     {
       "path": "runtime-vocabulary.yaml",

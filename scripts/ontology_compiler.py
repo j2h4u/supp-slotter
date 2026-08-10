@@ -1473,11 +1473,6 @@ def _add_card_slot(
 
 
 def _card_cardinality(source: Mapping[str, object], default_maximum: int | None) -> tuple[int | None, int | None, bool]:
-    legacy = set(source) & {"cardinality"}
-    if legacy:
-        raise OntologyInfrastructureError(
-            "Card field uses removed legacy cardinality fields: " + ", ".join(sorted(legacy))
-        )
     raw_multivalued = source.get("multivalued", True)
     if not isinstance(raw_multivalued, bool):
         raise OntologyInfrastructureError("Card field multivalued must be boolean")
@@ -2107,11 +2102,6 @@ def _validate_runtime_record_shapes(records: Mapping[str, Sequence[Mapping[str, 
         if any(not isinstance(identifier, str) or not identifier for identifier in ids) or len(set(ids)) != len(ids):
             raise OntologyInfrastructureError(f"Runtime policy {slot} has invalid or duplicate ids")
     for row in records["assignment_axes"]:
-        legacy = set(row) & {"cardinality", "multivalued"}
-        if legacy:
-            raise OntologyInfrastructureError(
-                "Runtime assignment axes use removed legacy cardinality fields: " + ", ".join(sorted(legacy))
-            )
         if not isinstance(row.get("order"), int) or isinstance(row.get("order"), bool):
             raise OntologyInfrastructureError("Runtime assignment axes require integer order")
         if "minimum_cardinality" not in row or "maximum_cardinality" not in row:

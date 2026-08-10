@@ -127,7 +127,6 @@ def scheduling_constraint_execution_plan_record(
         "source_substances": list(plan.source_substance_ids),
         "target_substances": list(plan.target_substance_ids),
         "operation": plan.operation,
-        "effect_role": plan.effect_role,
         "executable": plan.executable,
         "blocks_slots": plan.blocks_slots,
         "scores_advisory": plan.scores_advisory,
