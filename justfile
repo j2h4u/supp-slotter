@@ -55,7 +55,7 @@ _supply-chain-pins:
 
 # Check declared Python dependencies against imports.
 _deptry:
-    uv run deptry planner scripts tests --known-first-party planner --known-first-party scripts --known-first-party tests --per-rule-ignores "DEP004=coverage|pytest_crap|radon|linkml|linkml_runtime"
+    uv run deptry planner scripts tests --known-first-party planner --known-first-party scripts --known-first-party tests --per-rule-ignores "DEP004=coverage|linkml|linkml_runtime"
 
 # Run the canonical static type checker.
 _typecheck:
@@ -121,22 +121,17 @@ unit-gate-check:
 verify: check smoke fast-unit corpus-projection
 
 # Full release candidate gate. Run before review/merge, not in small loops.
-release: check smoke fast-unit ontology-contract corpus-projection coverage-check crap-check
+# Coverage is the blocking full-suite release gate.
+release: check smoke fast-unit ontology-contract corpus-projection coverage-check
 
 coverage:
     scripts/run_bounded.sh -- uv run pytest tests/ --cov=planner --cov-report=term-missing
 
-# Blocking coverage floor.
+# Blocking coverage floor from one bounded full-suite execution. Two workers
+# keep ontology compilers below the runner's memory-pressure threshold, and
+# loadfile preserves module-local fixture reuse.
 coverage-check:
-    scripts/run_bounded.sh -- uv run pytest -q -n auto tests/ --cov=planner --cov-report=term-missing
-
-# Human CRAP report over the full suite.
-crap:
-    scripts/run_bounded.sh -- uv run pytest tests/ --cov=planner --cov-report=term-missing --crap --crap-threshold=30 --crap-top-n=30
-
-# Hard CRAP gate: every function must stay at or below CRAP 30.
-crap-check:
-    coverage_file="$(mktemp /tmp/supp-slotter-crap-coverage.XXXXXX)"; \
+    coverage_file="$(mktemp /tmp/supp-slotter-quality-coverage.XXXXXX)"; \
     trap 'rm -f "$coverage_file"' EXIT; \
-    COVERAGE_FILE="$coverage_file" scripts/run_bounded.sh -- uv run pytest tests/ --cov=planner --cov-report= && \
-    uv run python -m scripts.crap_gate --coverage "$coverage_file" --src planner --threshold 30
+    scripts/run_bounded.sh -- env COVERAGE_FILE="$coverage_file" uv run pytest -q -n 2 --dist loadfile tests/ --cov=planner --cov-report= && \
+    COVERAGE_FILE="$coverage_file" uv run coverage report

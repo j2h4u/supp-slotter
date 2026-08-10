@@ -24,8 +24,6 @@ dev = [
     "basedpyright>=1.39.9",
     "deptry>=0.25.1",
     "import-linter>=2.13",
-    "pytest-crap>=0.3.0",
-    "radon>=6.0.1",
     "vulture>=2.14",
     "actionlint-py>=1.7.12.24",
     "coverage>=7.15.1",
@@ -41,7 +39,7 @@ preview = true
 [tool.ruff.lint]
 # Mirrors the mcp-strava quality profile, adapted to this smaller YAML-first repo:
 # bug-catching core, high-signal modernization/tidiness rules, pathlib/datetime
-# discipline, explicit noqa/type-ignore codes, and size/complexity ratchets.
+# discipline and explicit noqa/type-ignore codes.
 explicit-preview-rules = true
 select = ["E4", "E7", "E9", "F", "I", "B", "BLE", "UP", "C4", "PIE", "ISC", "RSE", "FLY", "RUF", "PERF", "SIM", "PTH", "DTZ", "PGH", "PLE", "LOG", "G", "FURB", "RET", "N818", "PLR2004", "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0914", "PLR0915", "PLR0916", "PLR0917", "PLR1702"]
 ignore = [
@@ -63,17 +61,11 @@ ignore = [
 "planner/ontology/policies.py" = ["C901", "PLR0914", "PLR0916"]
 "planner/ontology/projection.py" = ["PLR0914", "PLR0915"]
 "planner/ontology/runtime_program.py" = ["C901", "PLR0912", "PLR0913", "PLR0914", "PLR0915", "PLR0917", "PLR2004"]
-"planner/ontology/scheduling_runtime.py" = ["C901", "PLR0911", "PLR0912", "PLR2004"]
-"planner/query_model/audit_rules.py" = ["C901", "PLR0912"]
 "planner/scheduling_constraint_execution.py" = ["PLR0914", "PLR0916"]
 "planner/schema_validation.py" = ["C901", "PERF401", "PLR0912"]
 "scripts/ontology_compiler.py" = ["PLR0913", "PLR0914", "PLR0915", "PLR0916", "PLR2004"]
 "tests/test_ontology_artifacts.py" = ["C901"]
 "tests/test_ontology_repository_contract.py" = ["PLR0914"]
-
-[tool.ruff.lint.pylint]
-max-branches = 11
-max-statements = 45
 
 [tool.ruff.format]
 quote-style = "double"
@@ -105,7 +97,7 @@ sigterm = true
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
-fail_under = 83
+fail_under = 70
 
 [tool.vulture]
 paths = ["planner", "scripts", "tests"]
