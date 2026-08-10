@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import time
 from argparse import ArgumentParser
 from collections.abc import Callable, Sequence
 from pathlib import Path
@@ -12,7 +13,15 @@ from typing import Literal, cast
 
 DEFAULT_TEST_ROOT = Path("tests")
 PYTEST_MARKERS = "not integration and not slow"
-Suite = Literal["smoke", "fast-unit", "ontology-contract", "runtime-scenarios", "coverage", "all"]
+Suite = Literal[
+    "smoke",
+    "fast-unit",
+    "ontology-contract",
+    "runtime-scenarios",
+    "coverage",
+    "all",
+    "release",
+]
 
 # Keep the first development loop small while named suites remain ordinary
 # pytest invocations over a curated set of modules.
@@ -168,15 +177,13 @@ def suite_inventory() -> dict[str, object]:
                 "policy": "explicit repository RDF/SHACL projection gate",
             },
             "release": {
-                "selection": "just-recipe",
+                "selection": "fixed-release-stage-order",
                 "components": [
                     "check",
                     "smoke",
-                    "fast-unit",
                     "ontology-contract",
                     "runtime-scenarios",
-                    "corpus-projection",
-                    "coverage-check",
+                    "coverage",
                 ],
                 "policy": "rare full release-candidate gate; do not use for small edits",
             },
@@ -199,6 +206,18 @@ def _normalize_status(status: int) -> int:
     """Convert Python's negative signal return code to shell's 128+signal form."""
 
     return 128 + -status if status < 0 else status
+
+
+def _run_timed(command: Command, *, label: str, command_runner: CommandRunner) -> int:
+    """Run one command and report its bounded monotonic elapsed time."""
+
+    started = time.monotonic()
+    try:
+        status = _normalize_status(command_runner(command))
+    finally:
+        elapsed = max(0.0, time.monotonic() - started)
+        print(f"{label}: elapsed={elapsed:.3f}s", flush=True)
+    return status
 
 
 def _pytest_command(targets: Sequence[str | Path], *, coverage: bool = False) -> list[str]:
@@ -276,27 +295,14 @@ def _select_targets(test_root: Path, suite: Suite) -> list[str | Path] | None:
     return targets
 
 
-def run_unit_gate(
-    test_root: Path = DEFAULT_TEST_ROOT,
+def _run_ontology_groups(
+    test_root: Path,
+    targets: list[str | Path],
     *,
-    command_runner: CommandRunner = _run_command,
-    suite: Suite = "all",
+    command_runner: CommandRunner,
+    timing_prefix: str,
 ) -> int:
-    """Run planner validation, then the selected bounded pytest invocation(s)."""
-
-    planner_status = _normalize_status(command_runner([sys.executable, "-m", "planner", "check"]))
-    if planner_status != 0:
-        return planner_status
-
-    targets = _select_targets(test_root, suite)
-    if targets is None:
-        return 5
-
-    if suite != "ontology-contract":
-        print(f"Running {suite} suite ({len(targets)} targets)", flush=True)
-        return _normalize_status(command_runner(_pytest_command(targets, coverage=suite == "coverage")))
-
-    print(f"Running {suite} suite in {len(ONTOLOGY_CONTRACT_GROUPS)} groups", flush=True)
+    print(f"Running ontology-contract suite in {len(ONTOLOGY_CONTRACT_GROUPS)} groups", flush=True)
     for name, group in ONTOLOGY_CONTRACT_GROUPS:
         group_modules = {target for target in group if isinstance(target, Path)}
         group_targets: list[str | Path] = []
@@ -313,10 +319,105 @@ def run_unit_gate(
         if not group_targets:
             continue
         print(f"Running {name} group ({len(group_targets)} targets)", flush=True)
-        status = _normalize_status(command_runner(_pytest_command(group_targets)))
+        status = _run_timed(
+            _pytest_command(group_targets),
+            label=f"{timing_prefix + ' ' if timing_prefix else ''}ontology {name.split(maxsplit=1)[0]} pytest",
+            command_runner=command_runner,
+        )
         if status != 0:
             return status
     return 0
+
+
+def _run_release_suite(
+    test_root: Path,
+    *,
+    command_runner: CommandRunner,
+) -> int:
+    stage_targets = {
+        suite: _select_targets(test_root, suite)
+        for suite in ("smoke", "ontology-contract", "runtime-scenarios", "coverage")
+    }
+    if any(targets is None for targets in stage_targets.values()):
+        return 5
+
+    smoke_targets = cast(list[str | Path], stage_targets["smoke"])
+    ontology_targets = cast(list[str | Path], stage_targets["ontology-contract"])
+    runtime_targets = cast(list[str | Path], stage_targets["runtime-scenarios"])
+    coverage_targets = cast(list[str | Path], stage_targets["coverage"])
+    print("Running release suite in 6 stages", flush=True)
+    print(f"Running smoke stage ({len(smoke_targets)} targets)", flush=True)
+    status = _run_timed(
+        _pytest_command(smoke_targets),
+        label="release smoke pytest",
+        command_runner=command_runner,
+    )
+    if status != 0:
+        return status
+
+    status = _run_ontology_groups(
+        test_root,
+        ontology_targets,
+        command_runner=command_runner,
+        timing_prefix="release",
+    )
+    if status != 0:
+        return status
+
+    print(f"Running runtime-scenarios stage ({len(runtime_targets)} targets)", flush=True)
+    status = _run_timed(
+        _pytest_command(runtime_targets),
+        label="release runtime-scenarios pytest",
+        command_runner=command_runner,
+    )
+    if status != 0:
+        return status
+
+    print(f"Running coverage stage ({len(coverage_targets)} targets)", flush=True)
+    return _run_timed(
+        _pytest_command(coverage_targets, coverage=True),
+        label="release coverage pytest",
+        command_runner=command_runner,
+    )
+
+
+def run_unit_gate(
+    test_root: Path = DEFAULT_TEST_ROOT,
+    *,
+    command_runner: CommandRunner = _run_command,
+    suite: Suite = "all",
+) -> int:
+    """Run planner validation, then the selected bounded pytest invocation(s)."""
+
+    planner_status = _run_timed(
+        [sys.executable, "-m", "planner", "check"],
+        label="planner check",
+        command_runner=command_runner,
+    )
+    if planner_status != 0:
+        return planner_status
+
+    if suite == "release":
+        return _run_release_suite(test_root, command_runner=command_runner)
+
+    targets = _select_targets(test_root, suite)
+    if targets is None:
+        return 5
+
+    if suite != "ontology-contract":
+        print(f"Running {suite} suite ({len(targets)} targets)", flush=True)
+        return _run_timed(
+            _pytest_command(targets, coverage=suite == "coverage"),
+            label=f"{suite} pytest",
+            command_runner=command_runner,
+        )
+
+    return _run_ontology_groups(
+        test_root,
+        targets,
+        command_runner=command_runner,
+        timing_prefix="",
+    )
 
 
 def main() -> int:
@@ -328,7 +429,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--suite",
-        choices=("smoke", "fast-unit", "ontology-contract", "runtime-scenarios", "coverage", "all"),
+        choices=("smoke", "fast-unit", "ontology-contract", "runtime-scenarios", "coverage", "all", "release"),
         default="fast-unit",
         help="test suite to run; default is the fast development unit suite",
     )

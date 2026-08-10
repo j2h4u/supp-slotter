@@ -102,7 +102,9 @@ def test_fast_unit_suite_selects_curated_modules_in_one_invocation(
         str(tests_root / "test_plan_search.py"),
         str(tests_root / "test_warning_humanization.py"),
     ]
-    assert capsys.readouterr().out == "Running fast-unit suite (2 targets)\n"
+    output = capsys.readouterr().out
+    assert "Running fast-unit suite (2 targets)\n" in output
+    assert output.count("elapsed=") == 2
 
 
 def test_runtime_scenarios_selects_exact_modules_and_nodes_in_order(
@@ -137,7 +139,9 @@ def test_runtime_scenarios_selects_exact_modules_and_nodes_in_order(
     assert expected_targets == list(dict.fromkeys(expected_targets))
     assert "-n" not in pytest_command
     assert "--dist" not in pytest_command
-    assert capsys.readouterr().out == "Running runtime-scenarios suite (14 targets)\n"
+    output = capsys.readouterr().out
+    assert "Running runtime-scenarios suite (14 targets)\n" in output
+    assert output.count("elapsed=") == 2
 
 
 def test_runtime_scenarios_propagate_pytest_failure_without_followup_process(tmp_path: Path) -> None:
@@ -167,7 +171,8 @@ def test_runtime_scenarios_inventory_and_coverage_boundaries() -> None:
     }
     release_inventory = cast(dict[str, object], suites["release"])
     release_components = cast(list[str], release_inventory["components"])
-    assert release_components.count("runtime-scenarios") == 1
+    assert release_components == ["check", "smoke", "ontology-contract", "runtime-scenarios", "coverage"]
+    assert "fast-unit" not in release_components
     coverage_inventory = set(run_unit_gate._coverage_inventory_items())
     preexisting_module_overlaps = set(run_unit_gate.RUNTIME_SCENARIOS_MODULES) & (
         run_unit_gate.FAST_UNIT_MODULES | set(run_unit_gate.COVERAGE_ONLY_MODULES)
@@ -247,7 +252,9 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
     assert len(calls[1][6:-3]) == len(set(calls[1][6:-3]))
     assert run_unit_gate._coverage_inventory_items() == expected_inventory
     assert not set(expected_inventory) & {path.as_posix() for path in run_unit_gate.ONTOLOGY_CONTRACT_MODULES}
-    assert capsys.readouterr().out == "Running coverage suite (23 targets)\n"
+    output = capsys.readouterr().out
+    assert "Running coverage suite (23 targets)\n" in output
+    assert output.count("elapsed=") == 2
 
 
 def test_coverage_suite_propagates_pytest_failure_without_followup_process(tmp_path: Path) -> None:
@@ -330,6 +337,87 @@ def test_ontology_contract_group_failure_stops_following_groups(tmp_path: Path) 
 
     assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, suite="ontology-contract") == 17
     assert len(calls) == 2
+
+
+def _make_release_test_root(tmp_path: Path) -> Path:
+    module_paths = (
+        set(run_unit_gate.FAST_UNIT_MODULES)
+        | set(run_unit_gate.COVERAGE_ONLY_MODULES)
+        | set(run_unit_gate.ONTOLOGY_CONTRACT_MODULES)
+        | set(run_unit_gate.RUNTIME_SCENARIOS_MODULES)
+        | {Path(node_id.split("::", 1)[0]) for node_id in run_unit_gate.RELEASE_EXACT_NODE_IDS}
+    )
+    return _make_modules(tmp_path, [path.relative_to(Path("tests")).as_posix() for path in sorted(module_paths)])
+
+
+def test_release_suite_runs_six_ordered_pytest_stages_without_fast_unit(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    tests_root = _make_release_test_root(tmp_path)
+    calls: list[list[str]] = []
+
+    def runner(command: run_unit_gate.Command) -> int:
+        calls.append(list(command))
+        return 0
+
+    assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, suite="release") == 0
+    pytest_calls = [call for call in calls if len(call) > 2 and call[2:4] == ["pytest", "-q"]]
+    assert len(calls) == 7
+    assert calls[0] == [run_unit_gate.sys.executable, "-m", "planner", "check"]
+    assert len(pytest_calls) == 6
+    assert pytest_calls[0][6:] == list(run_unit_gate.SMOKE_NODE_IDS)
+
+    def target_name(target: str) -> str:
+        return target if "::" in target else Path(target).name
+
+    assert [[target_name(target) for target in call[6:]] for call in pytest_calls[1:4]] == [
+        [
+            "test_linkml_core_schema.py",
+            "test_ontology_compiler_outputs.py",
+            "tests/test_runtime_axis_cardinality.py::test_compiler_rejects_unknown_projection_target",
+        ],
+        [
+            "test_architecture_contracts.py",
+            "test_canonical_scheduling_policies.py",
+            "test_ontology_formal_runtime_assertions.py",
+            "test_ontology_ontoclean_contract.py",
+            "test_ontology_repository_contract.py",
+        ],
+        [
+            "test_ontology_artifacts.py",
+            "test_ontology_assertion_runtime.py",
+            "test_ontology_repository_projection.py",
+            "test_ontology_runtime_loader.py",
+            "test_ontology_shacl_fixtures.py",
+            "test_yaml_duplicate_keys.py",
+        ],
+    ]
+    runtime_targets = [
+        *(str(tests_root / path.relative_to(Path("tests"))) for path in run_unit_gate.RUNTIME_SCENARIOS_MODULES),
+        *run_unit_gate.RUNTIME_SCENARIOS_NODE_IDS,
+    ]
+    assert pytest_calls[4][6:] == runtime_targets
+    assert pytest_calls[5][-3:] == ["--cov=planner", "--cov-report=", "--cov-fail-under=0"]
+    assert pytest_calls[5].count("--cov=planner") == 1
+    assert pytest_calls[5].count("--cov-report=") == 1
+    assert pytest_calls[5].count("--cov-fail-under=0") == 1
+    assert not any("fast-unit" in target for target in pytest_calls[1][6:])
+    output = capsys.readouterr().out
+    assert output.count("elapsed=") == 7
+    assert "Running release suite in 6 stages\n" in output
+
+
+@pytest.mark.parametrize("failure_call", range(2, 8))
+def test_release_suite_fails_fast_at_each_pytest_stage(tmp_path: Path, *, failure_call: int) -> None:
+    tests_root = _make_release_test_root(tmp_path)
+    calls: list[list[str]] = []
+
+    def runner(command: run_unit_gate.Command) -> int:
+        calls.append(list(command))
+        return 29 if len(calls) == failure_call else 0
+
+    assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, suite="release") == 29
+    assert len(calls) == failure_call
 
 
 def test_smoke_suite_uses_one_short_node_invocation_without_discovery(tmp_path: Path) -> None:

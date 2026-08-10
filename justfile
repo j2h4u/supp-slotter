@@ -122,7 +122,14 @@ verify: check smoke fast-unit corpus-projection
 
 # Full release candidate gate. Run before review/merge, not in small loops.
 # Coverage is the blocking full-suite release gate.
-release: check smoke fast-unit ontology-contract runtime-scenarios corpus-projection coverage-check
+release: check _release-unit corpus-projection
+
+# One bounded release-unit run; the runner owns all six pytest stages.
+_release-unit:
+    coverage_file="$(mktemp /tmp/supp-slotter-quality-coverage.XXXXXX)"; \
+    trap 'rm -f "$coverage_file"' EXIT; \
+    scripts/run_bounded.sh -- env COVERAGE_FILE="$coverage_file" uv run python scripts/run_unit_gate.py --suite release && \
+    COVERAGE_FILE="$coverage_file" uv run coverage report
 
 # Blocking coverage floor from one bounded curated-suite execution.
 coverage-check:
