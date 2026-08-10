@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import NamedTuple
 
 from planner.engine._plan_types import BlockingContext
+from planner.ontology.runtime_program import RuntimeProgram
 from planner.scheduling_constraint_execution import (
     SchedulingConstraintExecutionPlan,
     interpret_constraint_component_pair,
@@ -15,6 +16,7 @@ class _SchedulingConstraintContext(NamedTuple):
     slot_items: dict[str, list[str]]
     active_components: dict[str, list[str]]
     constraints: tuple[SchedulingConstraintExecutionPlan, ...]
+    runtime_program: RuntimeProgram
 
 
 class SchedulingConstraintDiagnostic(NamedTuple):
@@ -36,6 +38,7 @@ def slot_is_blocked(
         slot_items=slot_items,
         active_components=blocking.active_components,
         constraints=_approved_block_constraints(blocking),
+        runtime_program=blocking.runtime_program,
     )
     return _scheduling_constraint_blocks_item(
         item,
@@ -59,6 +62,7 @@ def blocking_constraint_diagnostics(
         slot_items=slot_items,
         active_components=blocking.active_components,
         constraints=_approved_block_constraints(blocking),
+        runtime_program=blocking.runtime_program,
     )
     matches = _matching_constraints(item, slot_name, context)
     return tuple(
