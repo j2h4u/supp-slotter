@@ -33,6 +33,19 @@ FAST_UNIT_MODULES = frozenset({
     Path("tests/test_schemas.py"),
     Path("tests/test_warning_humanization.py"),
 })
+# Runtime-only scenario coverage.  These modules load committed artifacts but
+# do not invoke ontology generation, compiler, SHACL, or other heavy gates.
+COVERAGE_ONLY_MODULES = (
+    Path("tests/test_dashboard_review.py"),
+    Path("tests/test_loader_fail_closed.py"),
+    Path("tests/test_maintenance.py"),
+    Path("tests/test_review_command.py"),
+    Path("tests/test_review_substance_command.py"),
+    Path("tests/test_card_reference_integrity.py"),
+    Path("tests/test_scheduling_constraint_audit.py"),
+    Path("tests/test_pillbox_loader_contract.py"),
+    Path("tests/test_formal_uniqueness.py"),
+)
 ONTOLOGY_CONTRACT_MODULES = frozenset({
     Path("tests/test_ontology_artifacts.py"),
     Path("tests/test_ontology_assertion_runtime.py"),
@@ -73,12 +86,14 @@ CommandRunner = Callable[[Command], int]
 def _coverage_inventory_items() -> list[str]:
     """Return curated coverage targets without repeating full-module smoke nodes."""
 
-    fast_unit_items = sorted(path.as_posix() for path in FAST_UNIT_MODULES)
-    fast_unit_paths = {Path(item) for item in fast_unit_items}
+    coverage_modules = FAST_UNIT_MODULES | set(COVERAGE_ONLY_MODULES)
+    coverage_items = sorted(path.as_posix() for path in coverage_modules)
     unique_smoke_nodes = [
-        node_id for node_id in SMOKE_NODE_IDS if Path(node_id.split("::", 1)[0]) not in fast_unit_paths
+        node_id
+        for node_id in SMOKE_NODE_IDS
+        if Path(node_id.split("::", 1)[0]) not in coverage_modules
     ]
-    return [*fast_unit_items, *unique_smoke_nodes]
+    return [*coverage_items, *unique_smoke_nodes]
 
 
 def suite_inventory() -> dict[str, object]:
@@ -96,7 +111,7 @@ def suite_inventory() -> dict[str, object]:
                 "items": sorted(path.as_posix() for path in FAST_UNIT_MODULES),
             },
             "coverage": {
-                "selection": "fast-unit-modules-plus-unique-smoke-nodes",
+                "selection": "fast-unit-plus-coverage-only-modules-and-unique-smoke-nodes",
                 "items": _coverage_inventory_items(),
                 "pytest_flags": ["--cov=planner", "--cov-report=", "--cov-fail-under=0"],
             },
@@ -184,7 +199,13 @@ def _select_targets(test_root: Path, suite: Suite) -> list[str | Path] | None:
 
     selected_modules = _suite_modules(modules, suite, test_root)
     if suite == "coverage":
-        selected_modules = _suite_modules(modules, "fast-unit", test_root)
+        coverage_paths = FAST_UNIT_MODULES | set(COVERAGE_ONLY_MODULES)
+        selected_modules = [
+            module
+            for module in modules
+            if (module.resolve().relative_to(test_root.parent.resolve()) if module.is_absolute() else module)
+            in coverage_paths
+        ]
         selected_module_paths = {
             module.resolve().relative_to(test_root.parent.resolve()) if module.is_absolute() else module
             for module in selected_modules

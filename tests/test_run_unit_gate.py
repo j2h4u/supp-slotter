@@ -112,6 +112,7 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
         tmp_path,
         [
             *(path.relative_to(Path("tests")).as_posix() for path in run_unit_gate.FAST_UNIT_MODULES),
+            *(path.relative_to(Path("tests")).as_posix() for path in run_unit_gate.COVERAGE_ONLY_MODULES),
             "test_scheduler_reviewer_authority.py",
             "test_audit_command.py",
         ],
@@ -124,6 +125,29 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
 
     assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, suite="coverage") == 0
     assert len(calls) == 2
+    expected_inventory = [
+        "tests/test_card_reference_integrity.py",
+        "tests/test_dashboard_review.py",
+        "tests/test_formal_uniqueness.py",
+        "tests/test_loader_fail_closed.py",
+        "tests/test_maintenance.py",
+        "tests/test_pillbox_loader_contract.py",
+        "tests/test_plan_relation_scheduling.py",
+        "tests/test_plan_search.py",
+        "tests/test_product_validation.py",
+        "tests/test_read_model_relations.py",
+        "tests/test_relation_conflicts.py",
+        "tests/test_review_command.py",
+        "tests/test_review_substance_command.py",
+        "tests/test_run_unit_gate.py",
+        "tests/test_scheduler_reviewer_authority.py::test_reviewer_only_knowledge_does_not_change_slot_assignment",
+        "tests/test_scheduling_constraint_audit.py",
+        "tests/test_scheduling_constraint_runtime.py",
+        "tests/test_scheduling_units.py",
+        "tests/test_schemas.py",
+        "tests/test_warning_humanization.py",
+    ]
+    expected_coverage_modules = [Path(item) for item in expected_inventory if "::" not in item]
     assert calls[1] == [
         run_unit_gate.sys.executable,
         "-m",
@@ -131,7 +155,7 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
         "-q",
         "-m",
         run_unit_gate.PYTEST_MARKERS,
-        *(str(tests_root / path.relative_to(Path("tests"))) for path in sorted(run_unit_gate.FAST_UNIT_MODULES)),
+        *(str(tests_root / path.relative_to(Path("tests"))) for path in expected_coverage_modules),
         "tests/test_scheduler_reviewer_authority.py::test_reviewer_only_knowledge_does_not_change_slot_assignment",
         "--cov=planner",
         "--cov-report=",
@@ -143,7 +167,12 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
     )
     assert "-n" not in calls[1]
     assert "--dist" not in calls[1]
-    assert capsys.readouterr().out == "Running coverage suite (11 targets)\n"
+    smoke_node = expected_inventory[14]
+    assert calls[1].count(smoke_node) == 1
+    assert len(calls[1][6:-3]) == len(set(calls[1][6:-3]))
+    assert run_unit_gate._coverage_inventory_items() == expected_inventory
+    assert not set(expected_inventory) & {path.as_posix() for path in run_unit_gate.ONTOLOGY_CONTRACT_MODULES}
+    assert capsys.readouterr().out == "Running coverage suite (20 targets)\n"
 
 
 def test_coverage_suite_propagates_pytest_failure_without_followup_process(tmp_path: Path) -> None:
