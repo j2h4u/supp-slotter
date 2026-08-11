@@ -169,6 +169,12 @@
     "SchedulePresentationZeroEffect": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationZeroEffect"
     },
+    "SchedulingAssessment": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingAssessment"
+    },
+    "SchedulingAssessmentRecord": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingAssessmentRecord"
+    },
     "SchedulingConstraint": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraint"
     },
@@ -330,6 +336,9 @@
     },
     "concerns": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/concerns"
+    },
+    "conclusion": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/conclusion"
     },
     "condition": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/condition"
@@ -517,6 +526,9 @@
     "pathway": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/pathway"
     },
+    "policy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/policy"
+    },
     "precedence": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/precedence"
     },
@@ -640,6 +652,9 @@
     "schedule_value": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/schedule_value"
     },
+    "scheduling_assessment": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/scheduling_assessment"
+    },
     "scheduling_constraints": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/scheduling_constraints"
     },
@@ -739,6 +754,9 @@
     "source_selector_forms": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/source_selector_forms"
     },
+    "sources": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/sources"
+    },
     "ss": "https://j2h4u.github.io/supp-slotter/ontology/v1/",
     "stack": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/stack"
@@ -754,6 +772,9 @@
     },
     "substance": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/substance"
+    },
+    "summary": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/summary"
     },
     "supplies_identity": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/supplies_identity"

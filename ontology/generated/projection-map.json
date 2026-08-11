@@ -2355,6 +2355,74 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationZeroEffect"
     },
     {
+      "name": "SchedulingAssessment",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": false,
+          "name": "activity",
+          "range": "SchedulingAssessmentRecord",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": false,
+          "name": "intake",
+          "range": "SchedulingAssessmentRecord",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": false,
+          "name": "timing",
+          "range": "SchedulingAssessmentRecord",
+          "required": false
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingAssessment"
+    },
+    {
+      "name": "SchedulingAssessmentRecord",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "conclusion",
+          "range": "SchedulingAssessmentConclusion",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "policy",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "sources",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "summary",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingAssessmentRecord"
+    },
+    {
       "name": "SchedulingConstraint",
       "slots": [
         {
@@ -2981,6 +3049,14 @@
           "multivalued": false,
           "name": "schedule",
           "range": "CardSchedule",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "scheduling_assessment",
+          "range": "SchedulingAssessment",
           "required": false
         }
       ],
@@ -3651,6 +3727,96 @@
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_value",
               "source": "schedule.timing[]",
               "subject": "schedule.timing[]"
+            },
+            {
+              "kind": "inlined-node",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_assessment",
+              "source": "scheduling_assessment.activity",
+              "target": "SchedulingAssessmentRecord"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/conclusion",
+              "source": "scheduling_assessment.activity.conclusion",
+              "subject": "scheduling_assessment.activity"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/policy",
+              "source": "scheduling_assessment.activity.policy",
+              "subject": "scheduling_assessment.activity"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/sources",
+              "source": "scheduling_assessment.activity.sources[]",
+              "subject": "scheduling_assessment.activity"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/summary",
+              "source": "scheduling_assessment.activity.summary",
+              "subject": "scheduling_assessment.activity"
+            },
+            {
+              "kind": "inlined-node",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_assessment",
+              "source": "scheduling_assessment.intake",
+              "target": "SchedulingAssessmentRecord"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/conclusion",
+              "source": "scheduling_assessment.intake.conclusion",
+              "subject": "scheduling_assessment.intake"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/policy",
+              "source": "scheduling_assessment.intake.policy",
+              "subject": "scheduling_assessment.intake"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/sources",
+              "source": "scheduling_assessment.intake.sources[]",
+              "subject": "scheduling_assessment.intake"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/summary",
+              "source": "scheduling_assessment.intake.summary",
+              "subject": "scheduling_assessment.intake"
+            },
+            {
+              "kind": "inlined-node",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_assessment",
+              "source": "scheduling_assessment.timing",
+              "target": "SchedulingAssessmentRecord"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/conclusion",
+              "source": "scheduling_assessment.timing.conclusion",
+              "subject": "scheduling_assessment.timing"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/policy",
+              "source": "scheduling_assessment.timing.policy",
+              "subject": "scheduling_assessment.timing"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/sources",
+              "source": "scheduling_assessment.timing.sources[]",
+              "subject": "scheduling_assessment.timing"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/summary",
+              "source": "scheduling_assessment.timing.summary",
+              "subject": "scheduling_assessment.timing"
             }
           ],
           "maintenance": {

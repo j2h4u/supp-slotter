@@ -466,11 +466,11 @@
     ]
   },
   "provenance": {
-    "compiler_sha256": "f4e23c482b69eb0e0a746cf5ad606cc2d1dab3f7d5769792a393ae1227237b71",
+    "compiler_sha256": "f3824d55dc0f1653a99e0f7f462f0c06f4dfbd625f68010fce8815bbe59efbdb",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
     "source_sha256": "ff8a8efd3496c324a4151f5f2b8e8b642036871fefce0a527da7fd960cbdcfe8"
   },
   "schema_version": "2",
-  "source_hash": "6db632fd98110d9bb3315b628ead8b958d778c94b68864cd2c7440d65bddd442"
+  "source_hash": "08b83fac3efcde517c066a2198c2a6505e122d7143e5e9992c81935db99ebcc2"
 }

@@ -372,3 +372,31 @@ def test_substance_loader_accepts_known_and_registered_unused_terms(tmp_path: Pa
     assert substance.knowledge_assertions[0].value == "mineral"
     assert substance.schedule_assertions[0].axis == "intake"
     assert substance.schedule_assertions[0].value == "fat_meal_required"
+
+
+def test_substance_loader_joins_preference_assessment_to_same_axis_schedule_fact(tmp_path: Path) -> None:
+    path = tmp_path / "probe.yaml"
+    card = {
+        "id": "sub_zz0000zzzz",
+        "name": "Assessment join probe",
+        "schedule": {"intake": ["food_preferred"]},
+        "scheduling_assessment": {
+            "intake": {
+                "conclusion": "supports_preference",
+                "policy": "food_preferred",
+                "sources": ["https://example.test/source"],
+                "summary": "The source supports the same authored preference.",
+            }
+        },
+    }
+    path.write_text(yaml.safe_dump(card, sort_keys=False), encoding="utf-8")
+
+    substance = load_substance(path, ontology_bundle())
+
+    assert substance.scheduling_assessments[0].axis == "intake"
+    assert substance.scheduling_assessments[0].policy == "food_preferred"
+
+    card["scheduling_assessment"]["intake"]["policy"] = "empty_preferred"
+    path.write_text(yaml.safe_dump(card, sort_keys=False), encoding="utf-8")
+    with pytest.raises(CardLoadError, match="no matching schedule assertion"):
+        load_substance(path, ontology_bundle())

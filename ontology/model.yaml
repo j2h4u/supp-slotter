@@ -12,6 +12,12 @@ enums:
       safety:
       model_gap:
       data_quality:
+  SchedulingAssessmentConclusion:
+    permissible_values:
+      supports_preference:
+      supports_no_rule:
+      insufficient:
+      conflicting:
 classes:
   Ontology:
     description: Root metadata for a compiled ontology release.
@@ -38,6 +44,21 @@ classes:
     slots: [knowledge_category, knowledge_value]
   ScheduleAssertion:
     slots: [schedule_axis, schedule_value]
+  SchedulingAssessment:
+    description: Substance-only, review-facing scheduling evidence by formal axis.
+    slots: [intake, timing, activity]
+    slot_usage:
+      intake: {range: SchedulingAssessmentRecord, inlined: true, multivalued: false}
+      timing: {range: SchedulingAssessmentRecord, inlined: true, multivalued: false}
+      activity: {range: SchedulingAssessmentRecord, inlined: true, multivalued: false}
+  SchedulingAssessmentRecord:
+    description: One axis assessment; this metadata never contributes to scheduling scores.
+    slots: [conclusion, policy, sources, summary]
+    slot_usage:
+      conclusion: {required: true, range: SchedulingAssessmentConclusion, multivalued: false}
+      policy: {range: string, multivalued: false}
+      sources: {required: true, multivalued: true, minimum_cardinality: 1, inlined_as_list: true}
+      summary: {required: true, multivalued: false}
   Pillbox:
     is_a: IdentifiedNode
     annotations:
@@ -118,7 +139,7 @@ classes:
       prefer_with: {multivalued: true, minimum_cardinality: 1, inlined_as_list: true, range: string, pattern: '^sub_[a-z0-9]{10}$'}
   SubstanceCard:
     description: Source-facing canonical substance card contract.
-    slots: [id, name, form, aliases, notes, concerns, knowledge, schedule]
+    slots: [id, name, form, aliases, notes, concerns, knowledge, schedule, scheduling_assessment]
     slot_usage:
       id: {required: true, pattern: '^sub_[a-z0-9]{10}$'}
       name: {required: true, pattern: '^.+$'}
@@ -126,6 +147,7 @@ classes:
       concerns: {multivalued: true, range: CardConcern, inlined: true, inlined_as_list: true}
       knowledge: {range: CardKnowledge, inlined: true}
       schedule: {range: CardSchedule, inlined: true}
+      scheduling_assessment: {range: SchedulingAssessment, inlined: true, multivalued: false}
   ProductCard:
     description: Source-facing canonical product card contract.
     annotations:
@@ -166,6 +188,14 @@ slots:
   kind: {}
   knowledge_assertions: {multivalued: true, range: KnowledgeAssertion, inlined: true, inlined_as_list: true}
   schedule_assertions: {multivalued: true, range: ScheduleAssertion, inlined: true, inlined_as_list: true}
+  scheduling_assessment: {range: SchedulingAssessment, inlined: true}
+  intake: {}
+  timing: {}
+  activity: {}
+  conclusion: {range: SchedulingAssessmentConclusion}
+  policy:
+  sources: {multivalued: true}
+  summary:
   concern_kind: {range: ConcernKind}
   concern_text: {}
   knowledge_category: {}

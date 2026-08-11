@@ -7,7 +7,15 @@ from pathlib import Path
 from typing import cast
 
 from planner.cards._common import load_card_mapping, normalize_filename_part
-from planner.contracts import CardLoadError, Concern, ConcernKind, KnowledgeAssertion, ScheduleAssertion, Substance
+from planner.contracts import (
+    CardLoadError,
+    Concern,
+    ConcernKind,
+    KnowledgeAssertion,
+    ScheduleAssertion,
+    SchedulingAssessment,
+    Substance,
+)
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.runtime_program import axis_cardinality_violation
 from planner.ontology.schema_enums import schema_enum_values
@@ -28,6 +36,7 @@ def load_substance(path: Path, bundle: OntologyBundle) -> Substance:
         raise CardLoadError(path, errors[0])
     schedule = cast(dict[str, object], data.get("schedule") or {})
     knowledge = cast(dict[str, object], data.get("knowledge") or {})
+    schedule_assertions = _schedule_assertions(schedule, path, bundle)
     try:
         return Substance(
             id=cast(str, data["id"]),
@@ -38,7 +47,10 @@ def load_substance(path: Path, bundle: OntologyBundle) -> Substance:
             concerns=_concerns(data.get("concerns"), path, bundle),
             prefer_with=_string_tuple(schedule.get("prefer_with") or ()),
             knowledge_assertions=_knowledge_assertions(knowledge, path, bundle),
-            schedule_assertions=_schedule_assertions(schedule, path, bundle),
+            schedule_assertions=schedule_assertions,
+            scheduling_assessments=_scheduling_assessments(
+                data.get("scheduling_assessment"), path, bundle, schedule_assertions
+            ),
         )
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e
@@ -108,6 +120,84 @@ def _schedule_assertions(value: dict[str, object], path: Path, bundle: OntologyB
             for term in _canonical_terms(values, path, f"schedule.{axis_row.axis}", canonical_terms)
         )
     return tuple(assertions)
+
+
+def _scheduling_assessments(
+    value: object,
+    path: Path,
+    bundle: OntologyBundle,
+    schedule_assertions: tuple[ScheduleAssertion, ...],
+) -> tuple[SchedulingAssessment, ...]:
+    """Load review metadata and join preference policies to same-axis facts."""
+    if value is None:
+        return ()
+    if not isinstance(value, dict):
+        raise CardLoadError(path, f"{path}: scheduling_assessment must be a mapping")
+    assessment = cast(dict[str, object], value)
+    conclusion_values = frozenset(schema_enum_values(bundle, "SchedulingAssessmentConclusion"))
+    axis_rows = sorted(bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
+    assertions_by_axis: dict[str, tuple[str, ...]] = {
+        row.axis: tuple(item.value for item in schedule_assertions if item.axis == row.axis) for row in axis_rows
+    }
+    records: list[SchedulingAssessment] = []
+    for axis_row in axis_rows:
+        raw = assessment.get(axis_row.assignment_field)
+        if raw is None:
+            continue
+        records.append(
+            _scheduling_assessment_record(
+                raw,
+                axis=axis_row.axis,
+                path=path,
+                conclusion_values=conclusion_values,
+                schedule_values=assertions_by_axis.get(axis_row.axis, ()),
+            )
+        )
+    return tuple(records)
+
+
+def _scheduling_assessment_record(
+    value: object,
+    *,
+    axis: str,
+    path: Path,
+    conclusion_values: frozenset[str],
+    schedule_values: tuple[str, ...],
+) -> SchedulingAssessment:
+    if not isinstance(value, dict):
+        raise CardLoadError(path, f"{path}: scheduling_assessment.{axis} must be a mapping")
+    record = cast(dict[str, object], value)
+    conclusion = record.get("conclusion")
+    if not isinstance(conclusion, str) or conclusion not in conclusion_values:
+        raise CardLoadError(path, f"{path}: scheduling_assessment.{axis}.conclusion is not in ontology vocabulary")
+    policy = record.get("policy")
+    if conclusion == "supports_preference":
+        if not isinstance(policy, str) or not policy.strip():
+            raise CardLoadError(path, f"{path}: scheduling_assessment.{axis}.policy is required")
+        if policy not in schedule_values:
+            raise CardLoadError(
+                path,
+                f"{path}: scheduling_assessment.{axis}.policy {policy!r} has no matching schedule assertion",
+            )
+    elif policy is not None:
+        raise CardLoadError(path, f"{path}: scheduling_assessment.{axis}.policy is forbidden for {conclusion}")
+    sources = record.get("sources")
+    if (
+        not isinstance(sources, list)
+        or not sources
+        or any(not isinstance(source, str) or not source.strip() for source in sources)
+    ):
+        raise CardLoadError(path, f"{path}: scheduling_assessment.{axis}.sources must be non-empty")
+    summary = record.get("summary")
+    if not isinstance(summary, str) or not summary.strip():
+        raise CardLoadError(path, f"{path}: scheduling_assessment.{axis}.summary must be non-empty")
+    return SchedulingAssessment(
+        axis=axis,
+        conclusion=conclusion,
+        policy=policy if isinstance(policy, str) else None,
+        sources=tuple(cast(list[str], sources)),
+        summary=summary,
+    )
 
 
 def _canonical_terms(

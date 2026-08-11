@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 6db632fd98110d9bb3315b628ead8b958d778c94b68864cd2c7440d65bddd442
+# source-hash: 08b83fac3efcde517c066a2198c2a6505e122d7143e5e9992c81935db99ebcc2
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -175,6 +175,12 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationZeroEffect> a ss:SchemaClass ;
   ss:name "SchedulePresentationZeroEffect" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingAssessment> a ss:SchemaClass ;
+  ss:name "SchedulingAssessment" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingAssessmentRecord> a ss:SchemaClass ;
+  ss:name "SchedulingAssessmentRecord" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraint> a ss:SchemaClass ;
   ss:name "SchedulingConstraint" .
 
@@ -336,6 +342,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/concerns> a ss:SchemaSlot ;
   ss:name "concerns" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/conclusion> a ss:SchemaSlot ;
+  ss:name "conclusion" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/condition> a ss:SchemaSlot ;
   ss:name "condition" .
@@ -523,6 +532,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/pathway> a ss:SchemaSlot ;
   ss:name "pathway" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy> a ss:SchemaSlot ;
+  ss:name "policy" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/precedence> a ss:SchemaSlot ;
   ss:name "precedence" .
 
@@ -646,6 +658,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_value> a ss:SchemaSlot ;
   ss:name "schedule_value" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_assessment> a ss:SchemaSlot ;
+  ss:name "scheduling_assessment" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_constraints> a ss:SchemaSlot ;
   ss:name "scheduling_constraints" .
 
@@ -745,6 +760,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/source_selector_forms> a ss:SchemaSlot ;
   ss:name "source_selector_forms" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/sources> a ss:SchemaSlot ;
+  ss:name "sources" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/stack> a ss:SchemaSlot ;
   ss:name "stack" .
 
@@ -759,6 +777,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/substance> a ss:SchemaSlot ;
   ss:name "substance" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/summary> a ss:SchemaSlot ;
+  ss:name "summary" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/supplies_identity> a ss:SchemaSlot ;
   ss:name "supplies_identity" .

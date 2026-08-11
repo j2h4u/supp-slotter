@@ -905,6 +905,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     generated_schema_doc["$id"] = f"{base_iri}generated/schema.json"
     _apply_relation_type_enum(generated_schema_doc, relation_types)
     _apply_card_uniqueness(generated_schema_doc, schema_view, categories)
+    _apply_scheduling_assessment_schema(generated_schema_doc)
     generated_schema = _json_bytes_no_header(generated_schema_doc)
     card_schema = _catalog_schema(
         generated_schema_doc, base_iri, "card.schema.json", "SubstanceCard", "Supp Slotter canonical substance card"
@@ -1038,6 +1039,64 @@ def _apply_card_uniqueness(
         if not isinstance(property_schema, dict):
             raise OntologyInfrastructureError(f"Generated CardKnowledge field {field!r} is missing")
         property_schema["uniqueItems"] = True
+
+
+def _apply_scheduling_assessment_schema(generated_schema: dict[str, object]) -> None:
+    """Tighten the substance-only assessment record's conditional contract.
+
+    LinkML owns the classes, slots, and conclusion enum.  JSON Schema carries
+    the small conditional invariant that a preference conclusion requires a
+    policy while every other conclusion forbids it; the loader adds only the
+    cross-field join against the card's same-axis schedule assertion.
+    """
+    definitions = generated_schema.get("$defs")
+    if not isinstance(definitions, dict):
+        raise OntologyInfrastructureError("Generated LinkML schema has no class definitions")
+    record = definitions.get("SchedulingAssessmentRecord")
+    if not isinstance(record, dict):
+        raise OntologyInfrastructureError("Generated schema has no SchedulingAssessmentRecord")
+    properties = record.get("properties")
+    if not isinstance(properties, dict):
+        raise OntologyInfrastructureError("Generated SchedulingAssessmentRecord has no properties")
+    conclusion = properties.get("conclusion")
+    if not isinstance(conclusion, dict):
+        raise OntologyInfrastructureError("Generated SchedulingAssessmentRecord.conclusion is missing")
+    conclusion_definition = definitions.get("SchedulingAssessmentConclusion")
+    if not isinstance(conclusion_definition, dict) or not isinstance(conclusion_definition.get("enum"), list):
+        raise OntologyInfrastructureError("Generated scheduling assessment conclusion enum is missing")
+    conclusion_values = conclusion_definition["enum"]
+    if not conclusion_values or any(not isinstance(value, str) for value in conclusion_values):
+        raise OntologyInfrastructureError("Generated scheduling assessment conclusion enum is malformed")
+    if "supports_preference" not in conclusion_values:
+        raise OntologyInfrastructureError("SchedulingAssessmentConclusion must include supports_preference")
+    other_values = [value for value in conclusion_values if value != "supports_preference"]
+    for field in ("sources", "summary"):
+        field_schema = properties.get(field)
+        if not isinstance(field_schema, dict):
+            raise OntologyInfrastructureError(f"Generated SchedulingAssessmentRecord.{field} is missing")
+        field_schema["type"] = "string" if field == "summary" else "array"
+        if field == "summary":
+            field_schema["minLength"] = 1
+            field_schema["pattern"] = r"\S"
+        else:
+            field_schema["minItems"] = 1
+            field_schema["items"] = {"type": "string", "minLength": 1, "pattern": r"\S"}
+    policy = properties.get("policy")
+    if not isinstance(policy, dict):
+        raise OntologyInfrastructureError("Generated SchedulingAssessmentRecord.policy is missing")
+    policy.clear()
+    policy.update({"type": "string", "minLength": 1, "pattern": r"\S"})
+    record["oneOf"] = [
+        {
+            "properties": {"conclusion": {"const": "supports_preference"}},
+            "required": ["conclusion", "policy", "sources", "summary"],
+        },
+        {
+            "properties": {"conclusion": {"enum": other_values}},
+            "required": ["conclusion", "sources", "summary"],
+            "not": {"required": ["policy"]},
+        },
+    ]
 
 
 def _class_annotations(schema_view: SchemaView, class_name: str) -> Mapping[str, object]:

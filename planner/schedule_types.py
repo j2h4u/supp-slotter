@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 
 ProductTrackingState = str
 UsageState = str
@@ -123,6 +123,7 @@ class ScheduleNeutralComponent(TypedDict):
     substance: str
     status: str
     reason: str
+    assessment_states: NotRequired[dict[str, str]]
 
 
 class _ScheduleExplanationRequired(TypedDict):

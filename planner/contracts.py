@@ -71,6 +71,17 @@ class ScheduleAssertion:
 
 
 @dataclass(frozen=True, slots=True)
+class SchedulingAssessment:
+    """One substance-only, review-facing assessment for a formal axis."""
+
+    axis: str
+    conclusion: str
+    policy: str | None
+    sources: tuple[str, ...]
+    summary: str
+
+
+@dataclass(frozen=True, slots=True)
 class SlotObservation:
     """One authored effect-match observation exposed by a slot."""
 
@@ -155,6 +166,7 @@ class Substance:
     aliases: tuple[str, ...] = ()
     notes: str | None = None
     concerns: tuple[Concern, ...] = ()
+    scheduling_assessments: tuple[SchedulingAssessment, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

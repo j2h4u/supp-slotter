@@ -2091,6 +2091,132 @@
       "title": "SchedulePresentationZeroEffect",
       "type": "object"
     },
+    "SchedulingAssessment": {
+      "additionalProperties": false,
+      "description": "Substance-only, review-facing scheduling evidence by formal axis.",
+      "properties": {
+        "activity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SchedulingAssessmentRecord"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Authored card assertion field activity.",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "intake": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SchedulingAssessmentRecord"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Authored card assertion field intake.",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "timing": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SchedulingAssessmentRecord"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Authored card assertion field timing.",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        }
+      },
+      "title": "SchedulingAssessment",
+      "type": "object"
+    },
+    "SchedulingAssessmentConclusion": {
+      "description": "",
+      "enum": [
+        "supports_preference",
+        "supports_no_rule",
+        "insufficient",
+        "conflicting"
+      ],
+      "title": "SchedulingAssessmentConclusion",
+      "type": "string"
+    },
+    "SchedulingAssessmentRecord": {
+      "additionalProperties": false,
+      "description": "One axis assessment; this metadata never contributes to scheduling scores.",
+      "oneOf": [
+        {
+          "properties": {
+            "conclusion": {
+              "const": "supports_preference"
+            }
+          },
+          "required": [
+            "conclusion",
+            "policy",
+            "sources",
+            "summary"
+          ]
+        },
+        {
+          "not": {
+            "required": [
+              "policy"
+            ]
+          },
+          "properties": {
+            "conclusion": {
+              "enum": [
+                "supports_no_rule",
+                "insufficient",
+                "conflicting"
+              ]
+            }
+          },
+          "required": [
+            "conclusion",
+            "sources",
+            "summary"
+          ]
+        }
+      ],
+      "properties": {
+        "conclusion": {
+          "$ref": "#/$defs/SchedulingAssessmentConclusion"
+        },
+        "policy": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "summary": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        }
+      },
+      "required": [
+        "conclusion",
+        "sources",
+        "summary"
+      ],
+      "title": "SchedulingAssessmentRecord",
+      "type": "object"
+    },
     "SchedulingConstraint": {
       "additionalProperties": false,
       "description": "",
@@ -2775,6 +2901,16 @@
           "anyOf": [
             {
               "$ref": "#/$defs/CardSchedule"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scheduling_assessment": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SchedulingAssessment"
             },
             {
               "type": "null"

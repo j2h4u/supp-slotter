@@ -293,7 +293,9 @@ def _populate_explanations(
             ],
             "policy_contributions": _policy_contributions(chosen_trace, projection, output_input.substances),
             "neutral_components": _neutral_components(
-                output_input.active.active_components[item_id], output_input.substances
+                output_input.active.active_components[item_id],
+                output_input.substances,
+                output_input.ontology_bundle,
             ),
         }
         if advisory is not None and advisory.matched_constraint_ids:
@@ -354,18 +356,30 @@ def _policy_contributions(
 def _neutral_components(
     component_ids: list[str],
     substances: dict[str, Substance],
+    ontology_bundle: OntologyBundle | None = None,
 ) -> list[ScheduleNeutralComponent]:
     neutral: list[ScheduleNeutralComponent] = []
     for substance_id in sorted(set(component_ids)):
         substance = substances.get(substance_id)
         if substance is not None and substance.schedule_assertions:
             continue
-        neutral.append({
+        neutral_component: ScheduleNeutralComponent = {
             "substance_id": substance_id,
             "substance": format_substance_name(substance) if substance is not None else substance_id,
             "status": "no-scheduling-fact",
             "reason": "no-scheduling-fact",
-        })
+        }
+        if ontology_bundle is not None:
+            assessment_by_axis = (
+                {assessment.axis: assessment for assessment in substance.scheduling_assessments} if substance else {}
+            )
+            neutral_component["assessment_states"] = {
+                axis.axis: (
+                    assessment_by_axis[axis.axis].conclusion if axis.axis in assessment_by_axis else "unassessed"
+                )
+                for axis in sorted(ontology_bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
+            }
+        neutral.append(neutral_component)
     return neutral
 
 

@@ -7,6 +7,7 @@ from planner.contracts import (
     Product,
     ProductComponent,
     ScheduleAssertion,
+    SchedulingAssessment,
     SchedulingPolicy,
     Slot,
     SlotObservation,
@@ -161,12 +162,84 @@ def test_no_scheduling_fact_component_is_score_neutral() -> None:
 
     assert trace.score == 2
     assert [effect.vote_count for effect in trace.effects] == [1]
-    assert _neutral_components([neutral.id], {neutral.id: neutral}) == [{
-        "substance_id": neutral.id,
-        "substance": "Neutral",
-        "status": "no-scheduling-fact",
-        "reason": "no-scheduling-fact",
-    }]
+    assert _neutral_components([neutral.id], {neutral.id: neutral}) == [
+        {
+            "substance_id": neutral.id,
+            "substance": "Neutral",
+            "status": "no-scheduling-fact",
+            "reason": "no-scheduling-fact",
+        }
+    ]
+
+
+def test_neutral_journal_distinguishes_unassessed_and_researched_insufficient() -> None:
+    bundle = ontology_bundle()
+    researched = Substance(
+        "sub_researched",
+        "Researched",
+        scheduling_assessments=(SchedulingAssessment("intake", "insufficient", None, ("source",), "insufficient"),),
+    )
+    unassessed = Substance("sub_unassessed", "Unassessed")
+
+    rows = _neutral_components(
+        [researched.id, unassessed.id],
+        {researched.id: researched, unassessed.id: unassessed},
+        bundle,
+    )
+    by_id = {row["substance_id"]: row for row in rows}
+    assert by_id[researched.id]["assessment_states"] == {
+        "intake": "insufficient",
+        "timing": "unassessed",
+        "activity": "unassessed",
+    }
+    assert by_id[unassessed.id]["assessment_states"] == {
+        "intake": "unassessed",
+        "timing": "unassessed",
+        "activity": "unassessed",
+    }
+
+
+def test_assessment_metadata_does_not_change_slot_score() -> None:
+    bundle = ontology_bundle()
+    policy = SchedulingPolicy(
+        id="intake:food_preferred",
+        namespace="intake",
+        short_name="food_preferred",
+        label="Food preferred",
+        description="",
+        applies_when="fixture",
+        effects=(TraitEffect(TraitEffectMatch((("food", True),)), level="prefer"),),
+    )
+    without = Substance(
+        "sub_score_probe",
+        "Score probe",
+        schedule_assertions=(ScheduleAssertion("intake", "food_preferred"),),
+    )
+    with_metadata = replace(
+        without,
+        scheduling_assessments=(
+            SchedulingAssessment("intake", "supports_preference", "food_preferred", ("source",), "supports"),
+        ),
+    )
+    product = Product("prd_scoreprobe", "Score probe", (ProductComponent(without.id),))
+    plain_projection = project_schedule_assignments(
+        bundle.runtime_program, product, {without.id: without}, {policy.id: policy}
+    )
+    metadata_projection = project_schedule_assignments(
+        bundle.runtime_program,
+        product,
+        {with_metadata.id: with_metadata},
+        {policy.id: policy},
+    )
+    assert (
+        compute_slot_score(bundle.runtime_program, plain_projection, _slot(), {policy.id: policy}).score
+        == compute_slot_score(
+            bundle.runtime_program,
+            metadata_projection,
+            _slot(),
+            {policy.id: policy},
+        ).score
+    )
 
 
 def test_pre_and_post_workout_policies_score_different_slots() -> None:

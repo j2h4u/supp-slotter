@@ -52,6 +52,42 @@ def test_generated_card_schema_owns_identity_schedule_and_reference_constraints(
         assert schema_errors(card, "substance", Path("test"), ontology_bundle())
 
 
+def test_scheduling_assessment_schema_enforces_closed_shape_and_policy_condition() -> None:
+    base_record: dict[str, YamlValue] = {
+        "conclusion": "insufficient",
+        "sources": ["https://example.test/source"],
+        "summary": "The evidence was reviewed but does not establish a rule.",
+    }
+    valid = _make_substance_card(scheduling_assessment={"intake": base_record})
+    assert schema_errors(valid, "substance", Path("assessment-valid"), ontology_bundle()) == []
+    invalid_cards = (
+        _make_substance_card(scheduling_assessment={"unknown": base_record}),
+        _make_substance_card(scheduling_assessment={"intake": {**base_record, "owner": "x"}}),
+        _make_substance_card(
+            scheduling_assessment={"intake": {**base_record, "conclusion": "unknown"}},
+        ),
+        _make_substance_card(scheduling_assessment={"intake": {**base_record, "sources": []}}),
+        _make_substance_card(scheduling_assessment={"intake": {**base_record, "summary": "   "}}),
+        _make_substance_card(
+            scheduling_assessment={"intake": {**base_record, "conclusion": "supports_preference"}},
+        ),
+        _make_substance_card(
+            scheduling_assessment={"intake": {**base_record, "policy": "food_preferred"}},
+        ),
+    )
+    for card in invalid_cards:
+        assert schema_errors(card, "substance", Path("assessment-invalid"), ontology_bundle())
+
+
+def test_scheduling_assessment_conclusion_vocabulary_is_generated() -> None:
+    assert set(schema_enum_values(ontology_bundle(), "SchedulingAssessmentConclusion")) == {
+        "supports_preference",
+        "supports_no_rule",
+        "insufficient",
+        "conflicting",
+    }
+
+
 def test_generated_relation_schema_rejects_noncanonical_selector_shape() -> None:
     errors = schema_errors(
         {

@@ -1,10 +1,14 @@
 # Evidence Coverage Grooming
 
-> **Status: Deferred proposal / backlog context — non-authoritative and not implemented.**
-> This document proposes a future review surface. It does not change the current
-> ontology, card schema, planner, schedule, or medical interpretation of any card.
+> **Status: Small read-only subset implemented; broader proposal deferred.**
+> Substance cards now carry optional per-axis scheduling assessment states with
+> sources and summaries. The generated schedule journal exposes deterministic
+> `unassessed` versus researched conclusions for components without scheduling
+> facts, while assessment metadata is isolated from scheduler scoring and
+> placement. EvidenceQuestion catalogs, coverage scoring, grooming queues, and
+> workflow/task machinery remain deferred and are not implemented here.
 
-## Why this is deferred
+## Why the broader proposal is deferred
 
 This is separate from the MVP and would take multiple days of design, pilot
 annotation, and reader validation. The current slotter remains dose-agnostic:
