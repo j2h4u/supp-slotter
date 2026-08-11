@@ -120,8 +120,9 @@ classes:
     slots: [id, level, score]
     slot_usage: {level: {required: true}, score: {required: true}}
   RuntimeEffectScoringPolicy:
-    slots: [id, objective_function, balance_penalty_expression, tie_break, scores, balance_weight, prefer_with_bonus]
+    slots: [id, aggregation_mode, objective_function, balance_penalty_expression, tie_break, scores, balance_weight, prefer_with_bonus]
     slot_usage:
+      aggregation_mode: {required: true}
       objective_function: {required: true}
       balance_penalty_expression: {required: true}
       tie_break: {required: true}
@@ -248,6 +249,7 @@ slots:
   source_kind_values: {multivalued: true, range: RuntimeSourceKindValuePolicy, inlined: true, inlined_as_list: true}
   constraint_execution_policies: {multivalued: true, range: RuntimeConstraintExecutionPolicy, inlined: true, inlined_as_list: true}
   effect_scoring: {range: RuntimeEffectScoringPolicy, inlined: true}
+  aggregation_mode:
   objective_function:
   balance_penalty_expression:
   tie_break:

@@ -29,7 +29,12 @@ from planner.ontology.glue_capabilities import (
     SOURCE_KIND_ROLE_ASSIGNMENT,
 )
 from planner.ontology.presentation import load_review_presentation
-from planner.ontology.runtime_program import RuntimeAssignmentAxis, RuntimeProgram, axis_cardinality_violation
+from planner.ontology.runtime_program import (
+    IMPLEMENTED_AGGREGATION_MODE,
+    RuntimeAssignmentAxis,
+    RuntimeProgram,
+    axis_cardinality_violation,
+)
 
 
 def _assignment_axes(program: RuntimeProgram) -> tuple[RuntimeAssignmentAxis, ...]:
@@ -66,6 +71,12 @@ def _sources(
     # axis.  The projection boundary emits one uniform record shape and the
     # scheduler below only consumes that shape.
     source_kind = assignment_kinds[0]
+    component_ids = [component.substance for component in product.components]
+    if len(set(component_ids)) != len(component_ids):
+        raise OntologyInfrastructureError(
+            f"product {product.id!r} contains duplicate component substance references",
+            code=MALFORMED,
+        )
     rows: list[ScheduleAssignmentSource] = []
     rows.extend(
         ScheduleAssignmentSource(source_kind, substance.id, substance.id, substance.schedule_assertions)
@@ -97,7 +108,7 @@ def project_schedule_assignments(
     for axis_row in _assignment_axes(program):
         for policy_id in sorted({row.policy_id for row in rows if row.axis == axis_row.axis}):
             assignment_ids = tuple(row.assignment_id for row in rows if row.policy_id == policy_id)
-            groups.append(SchedulePolicyGroup(axis_row.axis, policy_id, assignment_ids, 1.0))
+            groups.append(SchedulePolicyGroup(axis_row.axis, policy_id, assignment_ids, float(len(assignment_ids))))
     return ScheduleProjection(tuple(rows), tuple(groups))
 
 
@@ -183,6 +194,11 @@ def compute_slot_score(
     slot: Slot,
     policies: dict[str, SchedulingPolicy],
 ) -> SlotScoreTrace:
+    if program.effect_scoring.aggregation_mode != IMPLEMENTED_AGGREGATION_MODE:
+        raise OntologyInfrastructureError(
+            "ontology effect scoring declares an unsupported aggregation mode",
+            code=MALFORMED,
+        )
     score = 0
     effects: list[ProjectedEffectTrace] = []
     rows_by_id = {row.assignment_id: row for row in projection.assignments}
@@ -211,6 +227,7 @@ def compute_slot_score(
                     original_level=effect.level,
                     projected_level=effect.level,
                     delta=delta,
+                    vote_count=len(group.assignment_ids),
                 )
             )
     return SlotScoreTrace(score, False, tuple(effects), ())

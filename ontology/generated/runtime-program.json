@@ -176,6 +176,7 @@
       }
     ],
     "effect_scoring": {
+      "aggregation_mode": "sum_unique_component_assignments",
       "balance_penalty_expression": "balance_weight * sum(slot_count^2)",
       "balance_weight": 0.5,
       "id": "effect_scoring",
@@ -468,8 +469,8 @@
     "compiler_sha256": "f4e23c482b69eb0e0a746cf5ad606cc2d1dab3f7d5769792a393ae1227237b71",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "66a6cf334327aa11b2f9d8d42f158b464b151863a1cad2e5c2f68a1924cd2012"
+    "source_sha256": "ff8a8efd3496c324a4151f5f2b8e8b642036871fefce0a527da7fd960cbdcfe8"
   },
   "schema_version": "2",
-  "source_hash": "f47bafbfa0202489b9ce1723d59d506f5ea91ba421c42db6cc54917d32b4ce63"
+  "source_hash": "6db632fd98110d9bb3315b628ead8b958d778c94b68864cd2c7440d65bddd442"
 }

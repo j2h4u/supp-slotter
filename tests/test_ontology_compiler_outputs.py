@@ -148,7 +148,7 @@ def test_committed_projection_matches_schema_and_authored_policy() -> None:
         yaml.safe_load((ONTOLOGY / "runtime-policy.yaml").read_text(encoding="utf-8")),
     )
     authored_scoring = cast(dict[str, object], authored_policy["effect_scoring"])
-    for key in ("prefer_with_bonus",):
+    for key in ("aggregation_mode", "prefer_with_bonus"):
         assert scoring[key] == authored_scoring[key]
 
     authored_constraints = cast(list[dict[str, object]], authored_policy["constraint_execution_policies"])

@@ -19,6 +19,7 @@ from planner.ontology.glue_capabilities import (
 IMPLEMENTED_OBJECTIVE_FUNCTION = "slot_score_plus_prefer_with_minus_quadratic_balance_penalty"
 IMPLEMENTED_BALANCE_PENALTY_EXPRESSION = "balance_weight * sum(slot_count^2)"
 IMPLEMENTED_TIE_BREAK = "stable_slot_order"
+IMPLEMENTED_AGGREGATION_MODE = "sum_unique_component_assignments"
 
 
 def _error(label: str, message: str) -> OntologyInfrastructureError:
@@ -28,7 +29,8 @@ def _error(label: str, message: str) -> OntologyInfrastructureError:
 def _validate_effect_scoring_interlock(effect_scoring: RuntimeEffectScoring) -> None:
     """Fail while decoding when the compiled ontology requests unsupported search math."""
     if (
-        effect_scoring.objective_function != IMPLEMENTED_OBJECTIVE_FUNCTION
+        effect_scoring.aggregation_mode != IMPLEMENTED_AGGREGATION_MODE
+        or effect_scoring.objective_function != IMPLEMENTED_OBJECTIVE_FUNCTION
         or effect_scoring.balance_penalty_expression != IMPLEMENTED_BALANCE_PENALTY_EXPRESSION
         or effect_scoring.tie_break != IMPLEMENTED_TIE_BREAK
     ):
@@ -36,6 +38,7 @@ def _validate_effect_scoring_interlock(effect_scoring: RuntimeEffectScoring) -> 
             "effect_scoring",
             "declares an objective not implemented by planner search: "
             f"objective_function={effect_scoring.objective_function!r}, "
+            f"aggregation_mode={effect_scoring.aggregation_mode!r}, "
             f"balance_penalty_expression={effect_scoring.balance_penalty_expression!r}, "
             f"tie_break={effect_scoring.tie_break!r}",
         )
@@ -233,6 +236,7 @@ class RuntimeEffectScore:
 @dataclass(frozen=True, slots=True)
 class RuntimeEffectScoring:
     id: str
+    aggregation_mode: str
     scores: tuple[RuntimeEffectScore, ...]
     objective_function: str
     balance_penalty_expression: str
@@ -821,6 +825,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     )
     scoring_obj = RuntimeEffectScoring(
         _str(scoring["id"], "effect_scoring.id"),
+        _str(scoring["aggregation_mode"], "effect_scoring.aggregation_mode"),
         cast(
             tuple[RuntimeEffectScore, ...],
             _typed_rows(

@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: f47bafbfa0202489b9ce1723d59d506f5ea91ba421c42db6cc54917d32b4ce63
+source_hash: 6db632fd98110d9bb3315b628ead8b958d778c94b68864cd2c7440d65bddd442
 categories:
   kind:
     allowed_predicates: &id005
@@ -1912,6 +1912,7 @@ runtime_policy:
     score_delta: -1
   effect_scoring:
     id: effect_scoring
+    aggregation_mode: sum_unique_component_assignments
     objective_function: slot_score_plus_prefer_with_minus_quadratic_balance_penalty
     balance_penalty_expression: balance_weight * sum(slot_count^2)
     tie_break: stable_slot_order
@@ -2168,6 +2169,9 @@ runtime_policy:
     - id: scoring_objective_function
       target: objective_function
       source: effect_scoring.objective_function
+    - id: scoring_aggregation_mode
+      target: aggregation_mode
+      source: effect_scoring.aggregation_mode
     - id: scoring_balance_penalty_expression
       target: balance_penalty_expression
       source: effect_scoring.balance_penalty_expression

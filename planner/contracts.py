@@ -123,6 +123,7 @@ class ProjectedEffectTrace:
     original_level: str | None
     projected_level: str | None
     delta: int
+    vote_count: int = 1
 
 
 @dataclass(frozen=True, slots=True)

@@ -1473,6 +1473,14 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
+          "name": "aggregation_mode",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
           "name": "balance_penalty_expression",
           "range": "string",
           "required": true

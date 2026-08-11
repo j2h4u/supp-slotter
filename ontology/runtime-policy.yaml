@@ -46,6 +46,7 @@ constraint_execution_policies:
       score_delta: -1
 effect_scoring:
   id: effect_scoring
+  aggregation_mode: sum_unique_component_assignments
   objective_function: slot_score_plus_prefer_with_minus_quadratic_balance_penalty
   balance_penalty_expression: balance_weight * sum(slot_count^2)
   tie_break: stable_slot_order
@@ -245,6 +246,9 @@ runtime_projection:
       - id: scoring_objective_function
         target: objective_function
         source: effect_scoring.objective_function
+      - id: scoring_aggregation_mode
+        target: aggregation_mode
+        source: effect_scoring.aggregation_mode
       - id: scoring_balance_penalty_expression
         target: balance_penalty_expression
         source: effect_scoring.balance_penalty_expression

@@ -50,6 +50,8 @@ SCHEDULE_COMMENTS = {
         "`slot` is the chosen slot; `components` lists the product substances that drove scheduling.",
         "`why_here` summarizes why this slot was selected.",
         "`review_tags` are readable traits aggregated from the product substances.",
+        "`policy_contributions` preserves component vote counts and chosen-slot score contributions.",
+        "`neutral_components` lists components with no authored scheduling fact for review only.",
     ],
 }
 

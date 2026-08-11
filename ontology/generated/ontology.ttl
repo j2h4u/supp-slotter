@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: f47bafbfa0202489b9ce1723d59d506f5ea91ba421c42db6cc54917d32b4ce63
+# source-hash: 6db632fd98110d9bb3315b628ead8b958d778c94b68864cd2c7440d65bddd442
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -255,6 +255,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/aggregation> a ss:SchemaSlot ;
   ss:name "aggregation" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/aggregation_mode> a ss:SchemaSlot ;
+  ss:name "aggregation_mode" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/aliases> a ss:SchemaSlot ;
   ss:name "aliases" .

@@ -1395,6 +1395,9 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
+        "aggregation_mode": {
+          "type": "string"
+        },
         "balance_penalty_expression": {
           "type": "string"
         },
@@ -1424,6 +1427,7 @@
       },
       "required": [
         "id",
+        "aggregation_mode",
         "objective_function",
         "balance_penalty_expression",
         "tie_break",

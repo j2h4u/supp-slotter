@@ -110,6 +110,21 @@ class ScheduleAssignmentExplanation(TypedDict):
     component_id: str | None
 
 
+class SchedulePolicyContribution(TypedDict):
+    policy_id: str
+    vote_count: int
+    substance_ids: list[str]
+    substances: list[str]
+    score_contribution: int
+
+
+class ScheduleNeutralComponent(TypedDict):
+    substance_id: str
+    substance: str
+    status: str
+    reason: str
+
+
 class _ScheduleExplanationRequired(TypedDict):
     components: list[str]
     pillbox: str
@@ -117,6 +132,8 @@ class _ScheduleExplanationRequired(TypedDict):
     why_here: list[str]
     review_tags: list[str]
     schedule_assignments: list[ScheduleAssignmentExplanation]
+    policy_contributions: list[SchedulePolicyContribution]
+    neutral_components: list[ScheduleNeutralComponent]
 
 
 class ScheduleExplanation(_ScheduleExplanationRequired, total=False):

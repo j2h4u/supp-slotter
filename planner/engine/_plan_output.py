@@ -21,7 +21,16 @@ from planner.cards.safety_warnings import SafetyConcernInput, collect_active_saf
 from planner.cards.schedule import build_placement_notes, build_schedule_summary
 from planner.cards.substance import format_substance_name
 from planner.cards.warnings import humanize_warning
-from planner.contracts import Pillbox, Product, SchedulingPolicy, Slot, SlotCandidateTrace, StackEntry, Substance
+from planner.contracts import (
+    Pillbox,
+    Product,
+    ScheduleProjection,
+    SchedulingPolicy,
+    Slot,
+    SlotCandidateTrace,
+    StackEntry,
+    Substance,
+)
 from planner.engine._plan_types import ActiveIndex, AdvisorySlotEvaluation
 from planner.engine._scheduling import build_substance_slot_names, render_slot_effects
 from planner.ontology.artifacts import OntologyBundle
@@ -38,8 +47,10 @@ from planner.schedule_types import (
     ScheduleData,
     ScheduleExplanation,
     ScheduleKeptTogether,
+    ScheduleNeutralComponent,
     SchedulePillbox,
     SchedulePlacementNote,
+    SchedulePolicyContribution,
     ScheduleSummary,
     ScheduleWarning,
 )
@@ -280,6 +291,10 @@ def _populate_explanations(
                 }
                 for row in sorted(projection.assignments, key=lambda value: value.assignment_id)
             ],
+            "policy_contributions": _policy_contributions(chosen_trace, projection, output_input.substances),
+            "neutral_components": _neutral_components(
+                output_input.active.active_components[item_id], output_input.substances
+            ),
         }
         if advisory is not None and advisory.matched_constraint_ids:
             explanation["advisory_penalty"] = advisory.penalty
@@ -293,6 +308,65 @@ def _component_names(component_ids: list[str], substances: dict[str, Substance])
         substance_dc = substances.get(substance_id)
         names.append(format_substance_name(substance_dc) if substance_dc is not None else substance_id)
     return names
+
+
+def _policy_contributions(
+    chosen_trace: SlotCandidateTrace,
+    projection: ScheduleProjection,
+    substances: dict[str, Substance],
+) -> list[SchedulePolicyContribution]:
+    """Aggregate chosen-slot effects while retaining every component vote."""
+    # Keep the projection type local to avoid widening the output builder's
+    # already large input surface; the only fields needed here are assignments.
+    assignments_by_id = {row.assignment_id: row for row in projection.assignments}
+    grouped: dict[str, dict[str, object]] = {}
+    for effect in chosen_trace.effects:
+        row = grouped.setdefault(
+            effect.policy_id,
+            {"assignment_ids": set(), "score": 0},
+        )
+        cast(set[str], row["assignment_ids"]).update(effect.assignment_ids)
+        row["score"] = cast(int, row["score"]) + effect.delta
+
+    contributions: list[SchedulePolicyContribution] = []
+    for policy_id in sorted(grouped):
+        row = grouped[policy_id]
+        assignment_ids = cast(set[str], row["assignment_ids"])
+        substance_id_set: set[str] = set()
+        for assignment_id in assignment_ids:
+            component_id = assignments_by_id[assignment_id].component_id
+            if component_id is not None:
+                substance_id_set.add(component_id)
+        substance_ids = sorted(substance_id_set)
+        contributions.append({
+            "policy_id": policy_id,
+            "vote_count": len(assignment_ids),
+            "substance_ids": substance_ids,
+            "substances": [
+                format_substance_name(substances[substance_id]) if substance_id in substances else substance_id
+                for substance_id in substance_ids
+            ],
+            "score_contribution": cast(int, row["score"]),
+        })
+    return contributions
+
+
+def _neutral_components(
+    component_ids: list[str],
+    substances: dict[str, Substance],
+) -> list[ScheduleNeutralComponent]:
+    neutral: list[ScheduleNeutralComponent] = []
+    for substance_id in sorted(set(component_ids)):
+        substance = substances.get(substance_id)
+        if substance is not None and substance.schedule_assertions:
+            continue
+        neutral.append({
+            "substance_id": substance_id,
+            "substance": format_substance_name(substance) if substance is not None else substance_id,
+            "status": "neutral",
+            "reason": "no-scheduling-fact",
+        })
+    return neutral
 
 
 def _append_intra_product_relation_conflicts(schedule: ScheduleData, active: ActiveIndex) -> None:

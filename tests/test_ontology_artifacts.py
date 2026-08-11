@@ -84,6 +84,7 @@ def _copy_repository_shape(tmp_path: Path) -> Path:  # noqa: PLR0912, PLR0914
 
 def test_committed_runtime_program_decodes() -> None:
     runtime = load_runtime_program(ONTOLOGY)
+    assert runtime.effect_scoring.aggregation_mode == "sum_unique_component_assignments"
     assert runtime.effect_scoring.prefer_with_bonus > 0
     assert runtime.constraint_execution_policy_for("separate_products_same_slot") is not None
     declared_roles = set(runtime.glue_contract.source_kind_roles)
@@ -149,6 +150,22 @@ def test_runtime_decode_rejects_unimplemented_objective_contract() -> None:
     scoring = cast(dict[str, object], projection["effect_scoring"])
     scoring["objective_function"] = "unimplemented_objective"
 
+    with pytest.raises(OntologyInfrastructureError, match="not implemented"):
+        decode_runtime_program(payload)
+
+
+def test_runtime_decode_rejects_missing_or_unknown_component_aggregation_mode() -> None:
+    payload = _runtime_payload()
+    projection = cast(dict[str, object], payload["projection"])
+    scoring = cast(dict[str, object], projection["effect_scoring"])
+    scoring.pop("aggregation_mode")
+    with pytest.raises(OntologyInfrastructureError, match="invalid closed shape"):
+        decode_runtime_program(payload)
+
+    payload = _runtime_payload()
+    projection = cast(dict[str, object], payload["projection"])
+    scoring = cast(dict[str, object], projection["effect_scoring"])
+    scoring["aggregation_mode"] = "collapse_policy_votes"
     with pytest.raises(OntologyInfrastructureError, match="not implemented"):
         decode_runtime_program(payload)
 

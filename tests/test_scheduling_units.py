@@ -63,6 +63,105 @@ def test_schedule_assignment_scores_are_direct_ontology_effects() -> None:
     assert trace.effects[0].policy_id == policy.id
 
 
+def test_unique_component_votes_accumulate_and_preserve_opposing_strengths() -> None:
+    bundle = ontology_bundle()
+    food_policy = SchedulingPolicy(
+        id="intake:food_preferred",
+        namespace="intake",
+        short_name="food_preferred",
+        label="Food preferred",
+        description="",
+        applies_when="fixture",
+        effects=(TraitEffect(TraitEffectMatch((("food", True),)), level="prefer"),),
+    )
+    empty_policy = SchedulingPolicy(
+        id="intake:empty_preferred",
+        namespace="intake",
+        short_name="empty_preferred",
+        label="Empty preferred",
+        description="",
+        applies_when="fixture",
+        effects=(
+            TraitEffect(TraitEffectMatch((("food", False),)), level="prefer"),
+            TraitEffect(TraitEffectMatch((("food", True),)), level="avoid"),
+        ),
+    )
+    substances = {
+        **{
+            f"sub_{index:010d}": Substance(
+                f"sub_{index:010d}",
+                f"Food {index}",
+                schedule_assertions=(ScheduleAssertion("intake", "food_preferred"),),
+            )
+            for index in range(5)
+        },
+        **{
+            f"sub_{index:010d}": Substance(
+                f"sub_{index:010d}",
+                f"Empty {index}",
+                schedule_assertions=(ScheduleAssertion("intake", "empty_preferred"),),
+            )
+            for index in range(5, 7)
+        },
+    }
+    product = Product("prd_votes", "Votes", tuple(ProductComponent(substance_id) for substance_id in substances))
+    policies = {food_policy.id: food_policy, empty_policy.id: empty_policy}
+    projection = project_schedule_assignments(bundle.runtime_program, product, substances, policies)
+
+    food_trace = compute_slot_score(bundle.runtime_program, projection, _slot(food=True), policies)
+    empty_trace = compute_slot_score(bundle.runtime_program, projection, _slot(food=False), policies)
+
+    assert food_trace.score == 6  # 5 * +2, plus 2 * -2 opposing votes.
+    assert empty_trace.score == 4  # 2 * +2; food votes have no matching effect.
+    assert [(effect.policy_id, effect.vote_count, effect.delta) for effect in food_trace.effects] == [
+        ("intake:empty_preferred", 2, -4),
+        ("intake:food_preferred", 5, 10),
+    ]
+
+
+def test_duplicate_typed_component_reference_fails_closed() -> None:
+    bundle = ontology_bundle()
+    substance = Substance("sub_duplicate", "Duplicate", schedule_assertions=())
+    product = Product(
+        "prd_duplicate",
+        "Duplicate",
+        (ProductComponent(substance.id), ProductComponent(substance.id)),
+    )
+
+    with pytest.raises(OntologyInfrastructureError, match="duplicate component substance"):
+        project_schedule_assignments(bundle.runtime_program, product, {substance.id: substance}, {})
+
+
+def test_no_scheduling_fact_component_is_score_neutral() -> None:
+    bundle = ontology_bundle()
+    scheduled = Substance(
+        "sub_scheduled",
+        "Scheduled",
+        schedule_assertions=(ScheduleAssertion("intake", "food_preferred"),),
+    )
+    neutral = Substance("sub_neutral", "Neutral")
+    policy = SchedulingPolicy(
+        id="intake:food_preferred",
+        namespace="intake",
+        short_name="food_preferred",
+        label="Food preferred",
+        description="",
+        applies_when="fixture",
+        effects=(TraitEffect(TraitEffectMatch((("food", True),)), level="prefer"),),
+    )
+    projection = project_schedule_assignments(
+        bundle.runtime_program,
+        Product("prd_neutral", "Neutral", (ProductComponent(scheduled.id), ProductComponent(neutral.id))),
+        {scheduled.id: scheduled, neutral.id: neutral},
+        {policy.id: policy},
+    )
+
+    trace = compute_slot_score(bundle.runtime_program, projection, _slot(food=True), {policy.id: policy})
+
+    assert trace.score == 2
+    assert [effect.vote_count for effect in trace.effects] == [1]
+
+
 def test_pre_and_post_workout_policies_score_different_slots() -> None:
     bundle = ontology_bundle()
     pre = SchedulingPolicy(
