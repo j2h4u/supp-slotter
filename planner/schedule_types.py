@@ -116,6 +116,7 @@ class SchedulePolicyContribution(TypedDict):
     substance_ids: list[str]
     substances: list[str]
     score_contribution: int
+    assessment_states: dict[str, str]
 
 
 class ScheduleNeutralComponent(TypedDict):

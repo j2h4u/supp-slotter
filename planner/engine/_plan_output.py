@@ -340,6 +340,25 @@ def _policy_contributions(
             if component_id is not None:
                 substance_id_set.add(component_id)
         substance_ids = sorted(substance_id_set)
+        assessment_states: dict[str, str] = {}
+        for assignment_id in sorted(assignment_ids):
+            assignment = assignments_by_id[assignment_id]
+            component_id = assignment.component_id
+            if component_id is None or component_id in assessment_states:
+                continue
+            substance = substances.get(component_id)
+            assessment_states[component_id] = (
+                next(
+                    (
+                        assessment.conclusion
+                        for assessment in substance.scheduling_assessments
+                        if assessment.axis == assignment.axis
+                    ),
+                    "unassessed",
+                )
+                if substance is not None
+                else "unassessed"
+            )
         contributions.append({
             "policy_id": policy_id,
             "vote_count": len(assignment_ids),
@@ -349,6 +368,7 @@ def _policy_contributions(
                 for substance_id in substance_ids
             ],
             "score_contribution": cast(int, row["score"]),
+            "assessment_states": assessment_states,
         })
     return contributions
 

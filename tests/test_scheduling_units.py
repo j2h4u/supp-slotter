@@ -15,7 +15,7 @@ from planner.contracts import (
     TraitEffect,
     TraitEffectMatch,
 )
-from planner.engine._plan_output import _neutral_components
+from planner.engine._plan_output import _neutral_components, _policy_contributions
 from planner.engine._scheduling import (
     compute_slot_score,
     project_schedule_assignments,
@@ -118,6 +118,54 @@ def test_unique_component_votes_accumulate_and_preserve_opposing_strengths() -> 
     assert [(effect.policy_id, effect.vote_count, effect.delta) for effect in food_trace.effects] == [
         ("intake:empty_preferred", 2, -4),
         ("intake:food_preferred", 5, 10),
+    ]
+
+
+def test_policy_contributions_render_backed_and_unassessed_states() -> None:
+    bundle = ontology_bundle()
+    policy = SchedulingPolicy(
+        id="intake:food_preferred",
+        namespace="intake",
+        short_name="food_preferred",
+        label="Food preferred",
+        description="",
+        applies_when="fixture",
+        effects=(TraitEffect(TraitEffectMatch((("food", True),)), level="prefer"),),
+    )
+    backed = Substance(
+        "sub_backed0000",
+        "Backed",
+        schedule_assertions=(ScheduleAssertion("intake", "food_preferred"),),
+        scheduling_assessments=(
+            SchedulingAssessment("intake", "supports_preference", "food_preferred", ("source",), "backed"),
+        ),
+    )
+    unassessed = Substance(
+        "sub_unassessed",
+        "Unassessed",
+        schedule_assertions=(ScheduleAssertion("intake", "food_preferred"),),
+    )
+    substances = {backed.id: backed, unassessed.id: unassessed}
+    product = Product(
+        "prd_assessment_states",
+        "Assessment states",
+        (ProductComponent(backed.id), ProductComponent(unassessed.id)),
+    )
+    projection = project_schedule_assignments(bundle.runtime_program, product, substances, {policy.id: policy})
+    trace = compute_slot_score(bundle.runtime_program, projection, _slot(), {policy.id: policy})
+
+    contributions = _policy_contributions(trace, projection, substances)
+
+    assert trace.score == 4
+    assert contributions == [
+        {
+            "policy_id": "intake:food_preferred",
+            "vote_count": 2,
+            "substance_ids": [backed.id, unassessed.id],
+            "substances": ["Backed", "Unassessed"],
+            "score_contribution": 4,
+            "assessment_states": {backed.id: "supports_preference", unassessed.id: "unassessed"},
+        }
     ]
 
 
