@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 08b83fac3efcde517c066a2198c2a6505e122d7143e5e9992c81935db99ebcc2
+source_hash: 56801ac0722d8ac58c4de3408f77854c5681a21fe6abcbf03291cf5240193f04
 categories:
   kind:
     allowed_predicates: &id005
@@ -1968,9 +1968,10 @@ runtime_policy:
       the active stack.
   - id: warning_missing_support_substance
     warning_type: missing_support_substance
-    label: Missing supporting substance
-    action_text: Review whether adding the supporting substance would improve this
-      target in the active stack.
+    label: Conditional support review
+    action_text: Review whether this support relationship is applicable in context;
+      absence from the tracked stack alone does not establish a need to add or supplement
+      it.
   - id: warning_review_with_substance_present
     warning_type: review_with_substance_present
     label: Active review pairing
@@ -2566,8 +2567,16 @@ ontology_assertions:
     target_selector:
       category: pathway
       term: omega3_eicosanoid
-    reason: Vitamin E helps protect long-chain omega-3 PUFA exposure from lipid peroxidation;
-      review antioxidant context when omega-3 intake is active.
+    reason: Vitamin E is a lipid-phase chain-breaking antioxidant that protects long-chain
+      PUFA from lipid peroxidation. Human evidence does not establish that ordinary
+      EPA/DHA intake requires extra vitamin E or that supplementation consistently
+      improves oxidative biomarkers; the planner cannot assess total EPA/DHA exposure,
+      dietary vitamin E, deficiency, or malabsorption.
+    action: Do not add supplemental vitamin E by default. Review dietary vitamin E/status
+      only if total EPA/DHA exposure is high or low intake, deficiency, or malabsorption
+      is plausible; if supplementation is considered, review dose and bleeding risk,
+      especially with nattokinase, anticoagulants, or antiplatelets.
+    severity: low
   rel_supports_007:
     id: rel_supports_007
     relation_type: supports

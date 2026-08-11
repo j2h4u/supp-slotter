@@ -43,6 +43,18 @@ def test_humanize_warning_missing_balance_known_substances() -> None:
     assert "missing" in concern.casefold()
 
 
+def test_humanize_warning_missing_support_uses_conditional_review_policy() -> None:
+    warning = warning_payload(type="missing_support_substance")
+
+    result = humanize_warning(warning, products={}, substances={}, ontology_bundle=ontology_bundle())
+
+    assert result["category"] == "Conditional support review"
+    assert result["action"] == (
+        "Review whether this support relationship is applicable in context; absence from the tracked stack alone "
+        "does not establish a need to add or supplement it."
+    )
+
+
 def test_humanize_warning_unknown_type_fails_closed() -> None:
     warning = warning_payload(type="totally_unknown_xyz", reason="something weird")
 

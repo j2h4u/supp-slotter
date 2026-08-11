@@ -25,6 +25,18 @@ def test_canonical_balance_assertion_retains_authored_review_metadata() -> None:
     assert row["action"] == "Review zinc/copper balance in long-term active stacks."
 
 
+def test_canonical_vitamin_e_support_assertion_retains_bounded_review_metadata() -> None:
+    bundle = ontology_bundle()
+    assertion = next(item for item in load_ontology_assertions(bundle) if item.id == "rel_supports_006")
+
+    assert assertion.severity == "low"
+    assert assertion.action == (
+        "Do not add supplemental vitamin E by default. Review dietary vitamin E/status only if total EPA/DHA "
+        "exposure is high or low intake, deficiency, or malabsorption is plausible; if supplementation is "
+        "considered, review dose and bleeding risk, especially with nattokinase, anticoagulants, or antiplatelets."
+    )
+
+
 def test_collect_relation_warnings_support_source_active_target_absent_no_warning() -> None:
     """Cofactor present but primary actor absent does not warn."""
     sub_src = make_substance("sub_src", "Src")

@@ -452,9 +452,9 @@
         "warning_type": "missing_balance_substance"
       },
       {
-        "action_text": "Review whether adding the supporting substance would improve this target in the active stack.",
+        "action_text": "Review whether this support relationship is applicable in context; absence from the tracked stack alone does not establish a need to add or supplement it.",
         "id": "warning_missing_support_substance",
-        "label": "Missing supporting substance",
+        "label": "Conditional support review",
         "warning_type": "missing_support_substance"
       },
       {
@@ -469,8 +469,8 @@
     "compiler_sha256": "f3824d55dc0f1653a99e0f7f462f0c06f4dfbd625f68010fce8815bbe59efbdb",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "ff8a8efd3496c324a4151f5f2b8e8b642036871fefce0a527da7fd960cbdcfe8"
+    "source_sha256": "8fdeb44ca600c0137082fa391175b6250b07506138d11247a576a62b01755865"
   },
   "schema_version": "2",
-  "source_hash": "08b83fac3efcde517c066a2198c2a6505e122d7143e5e9992c81935db99ebcc2"
+  "source_hash": "56801ac0722d8ac58c4de3408f77854c5681a21fe6abcbf03291cf5240193f04"
 }

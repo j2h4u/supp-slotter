@@ -94,8 +94,8 @@ warning_types:
     action_text: Review whether the paired balancing substance should be present in the active stack.
   - id: warning_missing_support_substance
     warning_type: missing_support_substance
-    label: Missing supporting substance
-    action_text: Review whether adding the supporting substance would improve this target in the active stack.
+    label: Conditional support review
+    action_text: Review whether this support relationship is applicable in context; absence from the tracked stack alone does not establish a need to add or supplement it.
   - id: warning_review_with_substance_present
     warning_type: review_with_substance_present
     label: Active review pairing

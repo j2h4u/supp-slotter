@@ -82,8 +82,9 @@ relations:
   target_selector:
     entity:
       name: Vitamin A
-- reason: Vitamin E helps protect long-chain omega-3 PUFA exposure from lipid peroxidation; review antioxidant context when
-    omega-3 intake is active.
+- severity: low
+  reason: Vitamin E is a lipid-phase chain-breaking antioxidant that protects long-chain PUFA from lipid peroxidation. Human evidence does not establish that ordinary EPA/DHA intake requires extra vitamin E or that supplementation consistently improves oxidative biomarkers; the planner cannot assess total EPA/DHA exposure, dietary vitamin E, deficiency, or malabsorption.
+  action: Do not add supplemental vitamin E by default. Review dietary vitamin E/status only if total EPA/DHA exposure is high or low intake, deficiency, or malabsorption is plausible; if supplementation is considered, review dose and bleeding risk, especially with nattokinase, anticoagulants, or antiplatelets.
   id: rel_supports_006
   relation_type: supports
   assertion_kind: ontology_assertion

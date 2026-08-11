@@ -105,7 +105,9 @@ def _write_relation_fixture(tmp_path: Path) -> Path:
                 "semantic_family": "biochemical_mechanism_assertion",
                 "source_selector": {"entity": {"name": "Selenium"}},
                 "target_selector": {"entity": {"name": "N-Acetyl Cysteine"}},
+                "severity": "low",
                 "reason": "Fixture support relation.",
+                "action": "Review fixture support relationship in context.",
             },
             {
                 "id": "rel_fixture_review_with",
@@ -331,6 +333,25 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     assert "Relation outcomes:" in review_result.output
     assert "Selenium" in review_result.output
     assert "N-Acetyl Cysteine" in review_result.output
+
+    plan_result = cmd_plan(data_root=tmp_path)
+
+    assert plan_result.exit_code == 0, plan_result
+    support_warnings = [
+        warning
+        for warning in plan_result.warnings
+        if warning.get("type") == "missing_support_substance"
+        and warning.get("source_name") == "Selenium"
+        and warning.get("target_name") == "N-Acetyl Cysteine"
+    ]
+    assert len(support_warnings) == 1
+    warning = support_warnings[0]
+    assert warning["type"] == "missing_support_substance"
+    assert warning["source_name"] == "Selenium"
+    assert warning["target_name"] == "N-Acetyl Cysteine"
+    assert warning["severity"] == "low"
+    assert warning["reason"] == "Fixture support relation."
+    assert warning["action"] == "Review fixture support relationship in context."
 
 
 def test_support_relation_accepts_active_supporter_from_another_product(
