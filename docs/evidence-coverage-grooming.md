@@ -149,6 +149,17 @@ cards with:
 - conflicting evidence; or
 - a product formulation that prevents applicability from being established.
 
+The generated per-product scheduling explanation journal (`schedule.yaml`) is
+also a read-only grooming input. Components with no scheduling assertion,
+repeated mixed or dissenting scheduling votes, or placements that are weakly
+explained are candidates for card research or enrichment. A missing scheduling
+fact is not proof that a card is incomplete: the substance may genuinely be
+scheduling-neutral. Grooming must adjudicate neutral versus unknown using
+medically grounded or biochemical evidence, not manufacturer directions;
+product instructions may be considered, but rank below that grounded evidence.
+This signal is review-only: it must not block or change scheduling, create
+lifecycle/owner/reviewer machinery, or invent scheduling facts.
+
 Hard-constraint grooming requires an explicit evidence-assessment link. A
 missing link is a grooming gap, not automatic invalidation and not scheduler
 behavior. The current planner remains unchanged.
