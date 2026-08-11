@@ -14,6 +14,7 @@ from planner.contracts import (
     TraitEffect,
     TraitEffectMatch,
 )
+from planner.engine._plan_output import _neutral_components
 from planner.engine._scheduling import (
     compute_slot_score,
     project_schedule_assignments,
@@ -160,6 +161,12 @@ def test_no_scheduling_fact_component_is_score_neutral() -> None:
 
     assert trace.score == 2
     assert [effect.vote_count for effect in trace.effects] == [1]
+    assert _neutral_components([neutral.id], {neutral.id: neutral}) == [{
+        "substance_id": neutral.id,
+        "substance": "Neutral",
+        "status": "no-scheduling-fact",
+        "reason": "no-scheduling-fact",
+    }]
 
 
 def test_pre_and_post_workout_policies_score_different_slots() -> None:

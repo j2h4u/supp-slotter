@@ -363,7 +363,7 @@ def _neutral_components(
         neutral.append({
             "substance_id": substance_id,
             "substance": format_substance_name(substance) if substance is not None else substance_id,
-            "status": "neutral",
+            "status": "no-scheduling-fact",
             "reason": "no-scheduling-fact",
         })
     return neutral
