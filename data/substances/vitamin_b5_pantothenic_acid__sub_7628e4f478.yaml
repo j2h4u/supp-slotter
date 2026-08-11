@@ -5,6 +5,17 @@ notes: 'Water-soluble vitamin, form pantothenic acid. Essential cofactor for CoA
   supplemental dose 5-15 mg/day; well-tolerated even at higher doses (UL not established). Mild GI discomfort possible on
   empty stomach — take with food. Source: NIH ODS (Pantothenic Acid Fact Sheet). Coenzyme B-Complex also supplies pantethine,
   an active B5-related form.'
+scheduling_assessment:
+  intake:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/PantothenicAcid-HealthProfessional/
+    summary: Research on pantothenate does not directly establish a general fed or fasted preference for this exact form.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/PantothenicAcid-HealthProfessional/
+    summary: No general clock-time rule was demonstrated for pantothenate supplementation.
 knowledge:
   context:
   - mitochondrial_health

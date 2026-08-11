@@ -3,6 +3,19 @@ name: Vitamin B7
 form: biotin
 notes: Coenzyme B-Complex component. NIH ODS describes biotin as a cofactor for carboxylases involved in fatty-acid, glucose,
   and amino-acid metabolism.
+scheduling_assessment:
+  intake:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Biotin-HealthProfessional/
+    - https://www.ncbi.nlm.nih.gov/books/NBK114297/
+    summary: Research on biotin does not directly establish a general fed or fasted preference for this exact form.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Biotin-HealthProfessional/
+    - https://www.ncbi.nlm.nih.gov/books/NBK114297/
+    summary: No general clock-time rule was demonstrated for biotin supplementation.
 concerns:
 - kind: safety
   text: Biotin can interfere with some lab immunoassays; NIH ODS/FDA highlight thyroid-test distortion and falsely low troponin

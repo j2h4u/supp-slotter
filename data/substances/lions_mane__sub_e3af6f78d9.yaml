@@ -6,6 +6,19 @@ aliases:
 notes: Medicinal mushroom extract. Active compounds include hericenones (fruiting body) and erinacines (mycelium). MSKCC describes
   supplemental Lion's Mane as promoted for cognitive health, mood, and immunity; clinical evidence is limited, while preclinical
   work covers neuroprotective, cognition-enhancing, immunomodulatory, and wound-healing effects.
+scheduling_assessment:
+  intake:
+    conclusion: insufficient
+    sources:
+    - https://doi.org/10.3389/fnut.2025.1641246
+    - https://doi.org/10.3389/fnut.2025.1405796
+    summary: Research on Lion's Mane does not directly establish a general fed or fasted preference for this exact extract.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://doi.org/10.3389/fnut.2025.1641246
+    - https://doi.org/10.3389/fnut.2025.1405796
+    summary: No general clock-time rule was demonstrated for Lion's Mane supplementation.
 knowledge:
   context:
   - neurocognitive_support

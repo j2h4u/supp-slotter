@@ -7,6 +7,19 @@ aliases:
 - IH6N
 notes: Esterified niacin form with reduced flushing profile compared to free niacin; releases niacin slowly. Used in Natural
   Factors BioCoenzymated Active B Complex and Country Life Coenzyme B-Complex.
+scheduling_assessment:
+  intake:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/
+    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.949
+    summary: Research on niacin and inositol hexaniacinate does not directly establish a general fed or fasted preference for this exact form.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/
+    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.949
+    summary: No general clock-time rule was demonstrated for inositol hexaniacinate supplementation.
 knowledge:
   context:
   - mitochondrial_health

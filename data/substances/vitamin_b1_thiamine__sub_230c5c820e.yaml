@@ -3,6 +3,19 @@ name: Vitamin B1
 form: thiamine
 notes: 'Coenzyme B-Complex component: thiamine cocarboxylase active/coenzymated B1 form. Review context: thiamin is a core
   cofactor for cellular energy metabolism and normal cell growth/function.'
+scheduling_assessment:
+  intake:
+    conclusion: insufficient
+    sources:
+    - https://ajcn.nutrition.org/article/S0002-9165%2823%2932783-7/fulltext
+    - https://ods.od.nih.gov/factsheets/Thiamin-HealthProfessional/
+    summary: Research on thiamin's metabolic role does not directly establish a general fed or fasted preference for this exact form.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ajcn.nutrition.org/article/S0002-9165%2823%2932783-7/fulltext
+    - https://ods.od.nih.gov/factsheets/Thiamin-HealthProfessional/
+    summary: No general clock-time rule was demonstrated for thiamin supplementation.
 knowledge:
   context:
   - mitochondrial_health

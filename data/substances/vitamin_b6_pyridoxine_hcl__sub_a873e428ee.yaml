@@ -2,6 +2,19 @@ id: sub_a873e428ee
 name: Vitamin B6
 form: pyridoxine HCl
 notes: Pyridoxine hydrochloride B6 form; may be present in multiple products simultaneously.
+scheduling_assessment:
+  intake:
+    conclusion: insufficient
+    sources:
+    - https://www.ncbi.nlm.nih.gov/books/NBK114313/
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
+    summary: Research on B6 forms does not directly establish a general fed or fasted preference for pyridoxine HCl specifically.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://www.ncbi.nlm.nih.gov/books/NBK114313/
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
+    summary: No general clock-time rule was demonstrated for pyridoxine HCl supplementation.
 concerns:
 - kind: safety
   text: 'Long-term high-dose pyridoxine HCl intake causes sensory neuropathy (vitamin B6 toxicity); HCl form can accumulate
