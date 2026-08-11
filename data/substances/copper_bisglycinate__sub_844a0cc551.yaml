@@ -19,3 +19,16 @@ knowledge:
   risk:
   - manual_review
   - narrow_therapeutic_window
+scheduling_assessment:
+  intake:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
+    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2008.718
+    summary: The cited evidence does not establish an intake preference for copper bisglycinate; it addresses copper generally and lacks a validated bisglycinate-specific comparator rule.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
+    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2008.718
+    summary: No general clock-time scheduling rule was demonstrated.

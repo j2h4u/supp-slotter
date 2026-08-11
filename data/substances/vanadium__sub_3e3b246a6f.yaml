@@ -13,3 +13,16 @@ knowledge:
   - mineral
   risk:
   - glucose_med_interaction
+scheduling_assessment:
+  intake:
+    conclusion: insufficient
+    sources:
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC4181337/
+    - https://www.efsa.europa.eu/en/press/news/080226-0
+    summary: The cited evidence does not establish an intake preference for vanadyl sulfate; it addresses vanadium generally or other forms and comparators.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC4181337/
+    - https://www.efsa.europa.eu/en/press/news/080226-0
+    summary: No general clock-time scheduling rule was demonstrated.

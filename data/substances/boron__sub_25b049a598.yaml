@@ -8,3 +8,14 @@ knowledge:
   - bone_mineral_metabolism_support
   kind:
   - mineral
+scheduling_assessment:
+  intake:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Boron-HealthProfessional/
+    summary: The cited evidence does not establish an intake preference for boron citrate/aspartate/glycinate; it addresses boron generally without a validated form-specific comparator rule.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Boron-HealthProfessional/
+    summary: No general clock-time scheduling rule was demonstrated.

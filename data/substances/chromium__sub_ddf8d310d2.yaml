@@ -12,3 +12,18 @@ knowledge:
   - mineral
   risk:
   - glucose_med_interaction
+scheduling_assessment:
+  intake:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Chromium-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/17499152/
+    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2008.718
+    summary: The cited evidence does not establish an intake preference for chromium nicotinate glycinate; it addresses chromium generally or other forms and comparators.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Chromium-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/17499152/
+    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2008.718
+    summary: No general clock-time scheduling rule was demonstrated.

@@ -20,3 +20,18 @@ knowledge:
   - mineral
   risk:
   - zinc_copper_balance_review
+scheduling_assessment:
+  intake:
+    conclusion: insufficient
+    sources:
+    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.924
+    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/1375057/
+    summary: The cited evidence does not establish an intake preference for zinc monomethionine / L-OptiZinc; it addresses zinc generally or other forms and comparators.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.924
+    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/1375057/
+    summary: No general clock-time scheduling rule was demonstrated.
