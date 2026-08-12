@@ -543,7 +543,9 @@ def _validate_repository_mappings(raw: object) -> dict[str, dict[str, object]]:
                 or any(not segment for segment in path.split("."))
             ):
                 raise OntologyInfrastructureError(f"Repository mapping {source_id!r} instruction path is unsafe")
-            allowed_instruction_keys = {"kind", "source", "predicate", "target", "subject", "token", "token_index"}
+            allowed_instruction_keys = {
+                "kind", "source", "predicate", "target", "subject", "token", "token_index", "datatype"
+            }
             if set(instruction) - allowed_instruction_keys:
                 raise OntologyInfrastructureError(
                     f"Repository mapping {source_id!r} instruction has unsupported fields"
@@ -552,6 +554,9 @@ def _validate_repository_mappings(raw: object) -> dict[str, dict[str, object]]:
                 not isinstance(instruction.get("target"), str) or not instruction["target"]
             ):
                 raise OntologyInfrastructureError(f"Repository mapping {source_id!r} reference target is invalid")
+            datatype = instruction.get("datatype")
+            if datatype is not None and datatype != "http://www.w3.org/2001/XMLSchema#date":
+                raise OntologyInfrastructureError(f"Repository mapping {source_id!r} has unsupported datatype")
             if kind == "inlined-node" and "target" not in instruction:
                 raise OntologyInfrastructureError(f"Repository mapping {source_id!r} inlined node target is invalid")
             if "subject" in instruction and (
@@ -1504,7 +1509,9 @@ def _add_card_slot(
         global_slot = schema_view.get_slot(field)
         if global_slot is None:
             raise OntologyInfrastructureError(f"Generated card field global slot is missing: {field!r}")
-        if global_slot.range is not None or bool(global_slot.multivalued):
+        if (global_slot.range is not None or bool(global_slot.multivalued)) and not (
+            class_name == "CardSchedule" and field in {"intake", "timing", "activity"}
+        ):
             raise OntologyInfrastructureError(f"Generated card field collides with global slot {field!r}")
         card_class = schema_view.get_class(class_name)
         if card_class is None or not isinstance(card_class.slot_usage, dict):
@@ -1527,7 +1534,8 @@ def _add_card_slot(
     schema = schema_view.schema
     if schema is None or not isinstance(schema.slots, dict) or not isinstance(schema.classes, dict):
         raise OntologyInfrastructureError("Generated LinkML schema is missing slot/class containers")
-    schema.slots[field] = definition
+    if field not in existing:
+        schema.slots[field] = definition
     schema.classes[class_name] = card_class
 
 

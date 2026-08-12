@@ -11,7 +11,7 @@
   "outputs": [
     {
       "path": "card.schema.json",
-      "sha256": "4bb19a4a3b0a75cb3b3783426bafafdd9bb10657deb54d95011ea538d479b852"
+      "sha256": "9f5518cd6539ece0ac0fc06dd08d0d7ee781ce9bc183d366b6ed177cb54910dc"
     },
     {
       "path": "context.json",
@@ -23,7 +23,7 @@
     },
     {
       "path": "ontology.ttl",
-      "sha256": "1bbef1d41ffb801fb05f88d0d795a7a5bd37da339c776d51dec453c72ddd56cb"
+      "sha256": "8acebb7580d1d30147e39f7ba1c363099917115f47045eba2130fd5f912ca084"
     },
     {
       "path": "pillboxes.schema.json",
@@ -31,31 +31,31 @@
     },
     {
       "path": "product.schema.json",
-      "sha256": "fe70e22e9d45fb64928622016d813ea7c5dc96aebcf243d75bd0b11d8c3cba2d"
+      "sha256": "903c0af4fc339936e987a4a543ef20fb34da09ecc961f6947aecbf84f8e3b3f0"
     },
     {
       "path": "projection-map.json",
-      "sha256": "1b03c440cd37f54d9e0044b5763e3b67bb606e6257df8a779e9f5dd59eb639bb"
+      "sha256": "296ed9125a6ab86a4c382cc8598f19aa0f17f8dc5cd83edfe5a256d76d92c7bb"
     },
     {
       "path": "relations.schema.json",
-      "sha256": "fa12f99f181e69ee763deb0401299b7b68be06aeabe1acd1854ecfe89e17cac4"
+      "sha256": "cd435916e2c99d62da7c35dc0d8cce9616b038cca5bce2cf310ebcf3b2ed78ae"
     },
     {
       "path": "runtime-program.json",
-      "sha256": "d7a21fc1151e3a35fc451302985102dff151a34c93f23e403e205e75e7a7d347"
+      "sha256": "1b1d0d490b4d37a58ab117cd8cb77cd523da4112df150a744ec77fbd672c6fd8"
     },
     {
       "path": "runtime-vocabulary.yaml",
-      "sha256": "2d9c86f7ca111028c54aa123fd9271e475617957d6964ad53223f8cad43fc255"
+      "sha256": "da953689b50cd202874a2daf22e11a6ac9719281874022d4dae4a93c07355ffb"
     },
     {
       "path": "schema.json",
-      "sha256": "8a8d77bb856b6c46753289fb3197b394aeae7e80df222183c26ee9a64e0d209d"
+      "sha256": "a72dba1e0db8e81d0e7a84fc7d5869a299d1177af4259013f8b54b5e1c35b3b1"
     },
     {
       "path": "shapes.ttl",
-      "sha256": "eff0607c002d787bfaffac465f43a5a34f2490f2d6568b281549671db2a036bb"
+      "sha256": "465423022e7ac0859e04f3652a15ba2049432d5fec5fbabbb536a442be5b823e"
     },
     {
       "path": "stacks.schema.json",
@@ -74,11 +74,11 @@
     },
     {
       "path": "ontology/manifest.yaml",
-      "sha256": "61139894170403a8df161735dbbea0ea45ad574eb4dee872781fe8bb1871a859"
+      "sha256": "8e6140691df8107ce94702e782d9f9aba0d27d33e21dfbe1432938bc456eac31"
     },
     {
       "path": "ontology/model.yaml",
-      "sha256": "5e2c0235fbb5e0267b65d6e15a31f0bd6407692583ee25fa2af3387d507fd215"
+      "sha256": "2c1e4ab99196532adabac1bee1829c2a453256c2e6377fbce2269fd4033d602b"
     },
     {
       "path": "ontology/ontoclean.yaml",

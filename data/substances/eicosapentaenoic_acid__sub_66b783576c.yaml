@@ -2,15 +2,27 @@ id: sub_66b783576c
 name: Eicosapentaenoic acid
 aliases:
 - EPA
-notes: 'Omega-3 fatty acid component listed as EPA on the Minami Healthy Foods nattokinase label. Vitamin E is relevant antioxidant
-  context for omega-3 PUFA intake. Source: Linus Pauling Institute Essential Fatty Acids.'
+semantic_enrichment_attempted_on: '2026-08-13'
+notes: 'Omega-3 fatty acid component listed as EPA on the Minami Healthy Foods nattokinase label. The active product is low-dose, phospholipid-rich krill oil; formulation, dose, and bleeding-medication context limit transferability. NIH ODS and human PK evidence do not establish a product-independent meal or clock-time rule. Vitamin E is relevant antioxidant context for omega-3 PUFA intake.'
 concerns:
 - kind: data_quality
   text: Minami Nattokinase lists EPA/fish oil but does not disclose EPA source form or amount; Nature's Truth Antarctic Krill
     Oil captures EPA amount separately in its product card.
-schedule:
+scheduling_assessment:
   intake:
-  - food_preferred
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/28344197/
+    - https://pubmed.ncbi.nlm.nih.gov/25884846/
+    summary: Food and formulation affect studied omega-3 absorption, but evidence is insufficient for a product-independent meal rule for this low-dose phospholipid-rich krill product.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/28344197/
+    - https://pubmed.ncbi.nlm.nih.gov/25884846/
+    summary: Meal-relative PK findings do not establish a morning or evening clock-time rule.
 knowledge:
   context:
   - skin_support

@@ -19,7 +19,7 @@ from typing import cast
 from urllib.parse import quote
 
 from rdflib import BNode, Graph, Literal, URIRef
-from rdflib.namespace import RDF
+from rdflib.namespace import RDF, XSD
 
 from planner.ontology.artifacts import OntologyBundle, _is_verified_bundle
 from planner.ontology.errors import OntologyInfrastructureError
@@ -240,7 +240,8 @@ def _project_document(  # noqa: C901, PLR0912, PLR0913, PLR0917
                     raise OntologyInfrastructureError(f"Path-token instruction is invalid at {path}")
                 obj = _literal(_path_token_value(source, path, token, token_index))
             else:
-                obj = _literal(leaf)
+                datatype = instruction.get("datatype")
+                obj = _literal(leaf, datatype if isinstance(datatype, str) else None)
             _emit(graph, emitted, triple_subject, predicate, obj, document, _display_path(path), repository_root)
 
 
@@ -545,10 +546,10 @@ def _emit(  # noqa: PLR0913, PLR0917
     )
 
 
-def _literal(value: object) -> Literal:
+def _literal(value: object, datatype: str | None = None) -> Literal:
     if isinstance(value, (Mapping, list)):
         value = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-    return Literal(value)
+    return Literal(value, datatype=XSD.date if datatype == str(XSD.date) else None)
 
 
 def _entity_iri(base_iri: str, root_class: str, value: object) -> str:

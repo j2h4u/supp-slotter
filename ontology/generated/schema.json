@@ -43,9 +43,7 @@
       "description": "A validation-ready concern embedded in a source card.",
       "properties": {
         "kind": {
-          "$ref": "#/$defs/ConcernKind",
-          "description": "Authored card assertion field kind.",
-          "pattern": "^[a-z][a-z0-9_]*$"
+          "$ref": "#/$defs/ConcernKind"
         },
         "text": {
           "type": "string"
@@ -2136,9 +2134,7 @@
             {
               "type": "null"
             }
-          ],
-          "description": "Authored card assertion field activity.",
-          "pattern": "^[a-z][a-z0-9_]*$"
+          ]
         },
         "intake": {
           "anyOf": [
@@ -2148,9 +2144,7 @@
             {
               "type": "null"
             }
-          ],
-          "description": "Authored card assertion field intake.",
-          "pattern": "^[a-z][a-z0-9_]*$"
+          ]
         },
         "timing": {
           "anyOf": [
@@ -2160,9 +2154,7 @@
             {
               "type": "null"
             }
-          ],
-          "description": "Authored card assertion field timing.",
-          "pattern": "^[a-z][a-z0-9_]*$"
+          ]
         }
       },
       "title": "SchedulingAssessment",
@@ -2275,12 +2267,7 @@
           ]
         },
         "effect": {
-          "description": "Authored card assertion field effect.",
-          "items": {
-            "pattern": "^[a-z][a-z0-9_]*$",
-            "type": "string"
-          },
-          "type": "array"
+          "type": "string"
         },
         "id": {
           "type": "string"
@@ -2884,6 +2871,24 @@
           },
           "type": [
             "array",
+            "null"
+          ]
+        },
+        "scheduling_assessment": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SchedulingAssessment"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "semantic_enrichment_attempted_on": {
+          "description": "Date of a bounded semantic/evidence enrichment attempt; not a completeness, freshness, safety, approval, or scheduling claim.",
+          "format": "date",
+          "type": [
+            "string",
             "null"
           ]
         }

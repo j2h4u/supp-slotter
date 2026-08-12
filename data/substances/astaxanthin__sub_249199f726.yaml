@@ -1,11 +1,24 @@
 id: sub_249199f726
 name: Astaxanthin
-notes: 'Carotenoid antioxidant from Haematococcus pluvialis microalgae (or krill). Soft food preference; evidence is
-  formulation/lipid-dependent and insufficient to establish fat_meal_required. Typical dose 4–12 mg/day. Sources:
-  examine.com (Astaxanthin); Fassett & Coombes 2011, Marine Drugs.'
+semantic_enrichment_attempted_on: '2026-08-13'
+notes: 'Carotenoid antioxidant from Haematococcus pluvialis microalgae (or krill). Soft food preference is bounded and formulation/lipid-sensitive; evidence is insufficient to establish fat_meal_required. Typical dose 4–12 mg/day. Human/formulation sources: https://pubmed.ncbi.nlm.nih.gov/19734684/ and https://pubmed.ncbi.nlm.nih.gov/12885395/.'
 schedule:
   intake:
   - food_preferred
+scheduling_assessment:
+  intake:
+    conclusion: supports_preference
+    policy: food_preferred
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/19734684/
+    - https://pubmed.ncbi.nlm.nih.gov/12885395/
+    summary: Human evidence supports a bounded soft food preference, but absorption is formulation and lipid sensitive and does not establish fat_meal_required.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/19734684/
+    - https://pubmed.ncbi.nlm.nih.gov/12885395/
+    summary: No clock-time comparison establishes a timing rule for astaxanthin.
 knowledge:
   context:
   - skin_support

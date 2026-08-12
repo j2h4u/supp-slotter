@@ -100,8 +100,8 @@
       "name": "CardConcern",
       "slots": [
         {
-          "inlined": true,
-          "inlined_as_list": true,
+          "inlined": false,
+          "inlined_as_list": false,
           "multivalued": false,
           "name": "kind",
           "range": "ConcernKind",
@@ -2405,7 +2405,7 @@
       "slots": [
         {
           "inlined": true,
-          "inlined_as_list": true,
+          "inlined_as_list": false,
           "multivalued": false,
           "name": "activity",
           "range": "SchedulingAssessmentRecord",
@@ -2413,7 +2413,7 @@
         },
         {
           "inlined": true,
-          "inlined_as_list": true,
+          "inlined_as_list": false,
           "multivalued": false,
           "name": "intake",
           "range": "SchedulingAssessmentRecord",
@@ -2421,7 +2421,7 @@
         },
         {
           "inlined": true,
-          "inlined_as_list": true,
+          "inlined_as_list": false,
           "multivalued": false,
           "name": "timing",
           "range": "SchedulingAssessmentRecord",
@@ -2488,9 +2488,9 @@
           "required": false
         },
         {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
           "name": "effect",
           "range": "string",
           "required": true
@@ -3025,6 +3025,22 @@
           "multivalued": true,
           "name": "schedule_assertions",
           "range": "ScheduleAssertion",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "scheduling_assessment",
+          "range": "SchedulingAssessment",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "semantic_enrichment_attempted_on",
+          "range": "date",
           "required": false
         }
       ],
@@ -3785,7 +3801,14 @@
             {
               "kind": "inlined-node",
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_assessment",
+              "source": "scheduling_assessment",
+              "target": "SchedulingAssessment"
+            },
+            {
+              "kind": "inlined-node",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/activity",
               "source": "scheduling_assessment.activity",
+              "subject": "scheduling_assessment",
               "target": "SchedulingAssessmentRecord"
             },
             {
@@ -3814,8 +3837,9 @@
             },
             {
               "kind": "inlined-node",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_assessment",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/intake",
               "source": "scheduling_assessment.intake",
+              "subject": "scheduling_assessment",
               "target": "SchedulingAssessmentRecord"
             },
             {
@@ -3844,8 +3868,9 @@
             },
             {
               "kind": "inlined-node",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_assessment",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/timing",
               "source": "scheduling_assessment.timing",
+              "subject": "scheduling_assessment",
               "target": "SchedulingAssessmentRecord"
             },
             {
@@ -3871,6 +3896,12 @@
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/summary",
               "source": "scheduling_assessment.timing.summary",
               "subject": "scheduling_assessment.timing"
+            },
+            {
+              "datatype": "http://www.w3.org/2001/XMLSchema#date",
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_enrichment_attempted_on",
+              "source": "semantic_enrichment_attempted_on"
             }
           ],
           "maintenance": {

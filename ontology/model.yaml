@@ -32,7 +32,7 @@ classes:
       label: {required: true}
   Substance:
     is_a: IdentifiedNode
-    slots: [aliases, form, notes, concerns, prefer_with, knowledge_assertions, schedule_assertions]
+    slots: [aliases, form, notes, concerns, prefer_with, knowledge_assertions, schedule_assertions, scheduling_assessment, semantic_enrichment_attempted_on]
   Product:
     is_a: IdentifiedNode
     slots: [brand, components, urls, notes, concerns]
@@ -193,9 +193,9 @@ slots:
   semantic_enrichment_attempted_on:
     description: Date of a bounded semantic/evidence enrichment attempt; not a completeness, freshness, safety, approval, or scheduling claim.
     range: date
-  intake: {}
-  timing: {}
-  activity: {}
+  intake: {range: SchedulingAssessmentRecord, inlined: true, multivalued: false}
+  timing: {range: SchedulingAssessmentRecord, inlined: true, multivalued: false}
+  activity: {range: SchedulingAssessmentRecord, inlined: true, multivalued: false}
   conclusion: {range: SchedulingAssessmentConclusion}
   policy:
   sources: {multivalued: true}

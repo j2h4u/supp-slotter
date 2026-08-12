@@ -1,9 +1,31 @@
 id: sub_4j9fttkil9
 name: Sodium
-notes: Generic sodium ion contribution. Product cards keep the concrete salt source in component labels and notes, for example
+semantic_enrichment_attempted_on: '2026-08-13'
+notes: >-
+  Generic sodium ion contribution. Product cards keep the concrete salt source in component labels and notes, for example
   sodium chloride, tribasic sodium citrate, or calculated sodium from sodium ascorbate. Sodium is an electrolyte context for
   extracellular fluid balance, blood volume, nerve/muscle function, and blood-pressure review; product dose and total diet
-  determine whether it is beneficial or excess.
+  determine whether it is beneficial or excess. Activity relevance is conditional on duration, environment, sweat, fluid,
+  and individual sodium loss. Sources: NATA PMID 28985128; ACSM PMID 17277604.
+scheduling_assessment:
+  intake:
+    conclusion: insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/28985128/
+    - https://pubmed.ncbi.nlm.nih.gov/17277604/
+    summary: Evidence does not establish a general meal-state preference for generic sodium across salt forms and total-diet contexts.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/28985128/
+    - https://pubmed.ncbi.nlm.nih.gov/17277604/
+    summary: No general clock-time rule was demonstrated for sodium.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/28985128/
+    - https://pubmed.ncbi.nlm.nih.gov/17277604/
+    summary: Activity relevance is conditional on duration, environment, sweat, fluid, and individual sodium loss; this does not support a universal any_workout placement.
 knowledge:
   context:
   - workout_performance

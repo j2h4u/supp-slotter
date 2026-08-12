@@ -6,7 +6,10 @@ from pathlib import Path
 
 import pytest
 from planner.ontology.errors import OntologyInfrastructureError
-from planner.ontology.projection import _project_repository_with_projection
+from planner.ontology.artifacts import load_ontology
+from planner.ontology.projection import _project_repository_with_projection, project_repository
+from rdflib import URIRef
+from rdflib.namespace import RDF, XSD
 
 BASE = "https://example.test/ontology/"
 
@@ -121,3 +124,21 @@ def test_unknown_empty_container_fails_closed(tmp_path: Path) -> None:
     (repo / "data/substances/a.yaml").write_text("id: sub_a\nname: A\nunknown: {}\n", encoding="utf-8")
     with pytest.raises(OntologyInfrastructureError, match="unknown"):
         _project_repository_with_projection(repo, _map())
+
+
+def test_scheduling_assessment_projects_one_typed_envelope_and_three_axes() -> None:
+    graph = project_repository(Path(__file__).resolve().parents[1], load_ontology(Path("ontology"))).graph
+    base = "https://j2h4u.github.io/supp-slotter/ontology/v1/"
+    substance = URIRef(base + "substance/sub_4j9fttkil9")
+    envelope_predicate = URIRef(base + "scheduling_assessment")
+    envelope = list(graph.objects(substance, envelope_predicate))
+    assert len(envelope) == 1
+    envelope_node = envelope[0]
+    assert (envelope_node, RDF.type, URIRef(base + "SchedulingAssessment")) in graph
+    for axis in ("intake", "timing", "activity"):
+        records = list(graph.objects(envelope_node, URIRef(base + axis)))
+        assert len(records) == 1
+        assert (records[0], RDF.type, URIRef(base + "SchedulingAssessmentRecord")) in graph
+    marker = list(graph.objects(substance, URIRef(base + "semantic_enrichment_attempted_on")))
+    assert len(marker) == 1
+    assert marker[0].datatype == XSD.date

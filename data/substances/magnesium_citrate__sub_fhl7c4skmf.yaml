@@ -1,12 +1,29 @@
 id: sub_fhl7c4skmf
 name: Magnesium
 form: citrate
-notes: Magnesium citrate component from the TiM Electrolyte Caps label. NIH ODS describes magnesium as a cofactor for more
+semantic_enrichment_attempted_on: '2026-08-13'
+notes: Magnesium citrate component from the TiM Electrolyte Caps label. Citrate tends to be more bioavailable than oxide or sulfate, but this is not meal or workout evidence. NIH ODS describes magnesium as a cofactor for more
   than 300 enzyme systems, including energy production, glucose and blood-pressure regulation, muscle/nerve function, calcium/potassium
   ion transport, normal heart rhythm, and bone structure.
-schedule:
+scheduling_assessment:
   intake:
-  - food_preferred
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/14596323/
+    summary: Magnesium citrate's formulation bioavailability does not establish a general fed or fasted preference.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/14596323/
+    summary: No general clock-time rule was demonstrated for magnesium citrate.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/14596323/
+    summary: The training product context does not establish pre-, during-, or post-workout placement for magnesium.
 knowledge:
   context:
   - workout_performance
