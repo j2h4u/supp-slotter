@@ -1,12 +1,17 @@
 # Evidence Coverage Grooming
 
-> **Status: Current scheduling-assessment subset implemented; broader coverage
+> **Status: Minimal active-card attempt queue and current scheduling-assessment subset implemented; broader coverage
 > proposal deferred.** Substance cards now carry optional per-axis
 > `scheduling_assessment` states with sources and summaries. The generated
 > schedule journal exposes deterministic `no-scheduling-fact` observations and
 > per-axis `unassessed` versus researched conclusions, while assessment metadata
-> is isolated from scheduler scoring and placement. Only the EvidenceQuestion
-> catalog, coverage scoring, derived grooming queue, and workflow/task
+> is isolated from scheduler scoring and placement. The minimal queue is exposed
+> by `python -m planner grooming next --limit N`: it includes only active,
+> reachable Substance cards with no `semantic_enrichment_attempted_on` field,
+> sorted by case-folded name then ID. A present ISO date excludes a card
+> permanently. This marker and queue are read-only and do not add expiry,
+> ownership, tasks, scores, auto-write, or product-level state. The
+> EvidenceQuestion catalog, coverage scoring, and broader workflow/task
 > machinery remain deferred and are not implemented here.
 
 The card lifecycle and event playbooks are authoritative in
@@ -143,9 +148,10 @@ separate workflow decision.
 an `assessed + insufficient` state, not a second form of `unassessed`. Coverage
 scoring is deferred; it is not a current planner or card field.
 
-## Deferred derived coverage and grooming
+## Deferred derived coverage and broader grooming
 
-Nothing in this section is implemented by the current subset. If the broader
+The minimal attempt queue described above is implemented; nothing else in this
+section is implemented by the current subset. If the broader
 proposal is approved, for a card with at least one applicable question:
 
 ```text

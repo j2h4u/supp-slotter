@@ -706,6 +706,9 @@
     "semantic_category": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/semantic_category"
     },
+    "semantic_enrichment_attempted_on": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/semantic_enrichment_attempted_on"
+    },
     "semantic_family": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/semantic_family"
     },

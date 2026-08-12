@@ -34,6 +34,11 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
              # For a new substance used by an active product, follow the bounded
              # evidence-enrichment rule in SKILL.md before adding schedule facts.
 
+# semantic_enrichment_attempted_on: "2026-01-31"  # Optional immutable queue marker.
+#   ISO 8601 calendar date (YYYY-MM-DD). This records that a bounded semantic/
+#   evidence enrichment attempt occurred; it does not assert completeness,
+#   freshness, safety, approval, or scheduling suitability.
+
 # ---------------------------------------------------------------------------
 # SCHEDULING — read by Planner
 # The schedule: section is the only data the Planner reads for slot placement.

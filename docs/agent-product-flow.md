@@ -6,8 +6,8 @@ It is the single authoritative lifecycle workflow for adding a Product, adding a
 Substance, or improving an existing Substance card. [docs/domain-model.md](domain-model.md)
 owns semantic meaning and field ownership; [SKILL.md](../SKILL.md) is the short
 operator entrypoint. [Evidence Coverage Grooming](evidence-coverage-grooming.md)
-is a specialized, deferred broader-coverage design, not a replacement for this
-workflow.
+documents the implemented minimal read-only queue and the deferred
+broader-coverage design; it is not a replacement for this workflow.
 
 ## Authoritative Card Lifecycle
 
@@ -185,6 +185,18 @@ omitted axis is `unassessed`; no
 Assessment metadata never contributes a score. Only the matching executable
 `schedule.*` assertion behind `supports_preference` contributes the ordinary
 planner score.
+
+### Minimal enrichment queue
+
+The read-only command `python -m planner grooming next --limit N` returns a
+bounded batch of active Substance cards whose
+`semantic_enrichment_attempted_on` field is absent. Results are sorted by
+case-folded card name and then stable Substance ID. The optional ISO
+`YYYY-MM-DD` field records that a bounded semantic/evidence enrichment attempt
+was made; it does not assert completeness, freshness, safety, approval, or any
+scheduling fact. Any present date permanently excludes the card from this
+minimal queue. The queue has no owners, tasks, scores, expiry, auto-write, or
+product-level marker, and it never affects scheduling.
 
 ### Research-state glossary
 

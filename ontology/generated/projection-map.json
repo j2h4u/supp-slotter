@@ -3058,6 +3058,14 @@
           "name": "scheduling_assessment",
           "range": "SchedulingAssessment",
           "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "semantic_enrichment_attempted_on",
+          "range": "date",
+          "required": false
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SubstanceCard"

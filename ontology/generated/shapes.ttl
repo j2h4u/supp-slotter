@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 26dc5f36507fa2d287dbd1728db470a2f2861059567ad82fb2e20a8367bc40d4
+# source-hash: cb6a278b7ad8cb3cfdf5c0a339a24387edd859439e4139936f31c67e2987664d
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -779,6 +779,7 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/SubstanceCard> <http://www.w3.org/ns/shacl#ignoredProperties> _:8c12ef56f19604704dc09988c2b92004ac5898306d02205a6ff2feb33880fac9 .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/SubstanceCard> <http://www.w3.org/ns/shacl#property> _:1036c5954ac1f64b9961386757d4e20133b1814845537b254a43fe674e5d9735 .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/SubstanceCard> <http://www.w3.org/ns/shacl#property> _:524d60c19d5877d10156c8d6fdad0d51d77453c7c09f0d9fda05816d2e59067b .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SubstanceCard> <http://www.w3.org/ns/shacl#property> _:64eadf9ce3e5bf193bd604366a9868249da4a341619a3c597a5dd77dbe80f91b .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/SubstanceCard> <http://www.w3.org/ns/shacl#property> _:7b3c858dfdfb731f533c7d595e6cea8681220da50409575958f8da81b46aea04 .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/SubstanceCard> <http://www.w3.org/ns/shacl#property> _:97197f2bd3109f476c0523bb78f519b83ae9464672e61a90418213035f435b65 .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/SubstanceCard> <http://www.w3.org/ns/shacl#property> _:9ce5b5c1b1ab847211642b297a1a2573b59bd925d137590af249ea97b79455a0 .
@@ -1494,6 +1495,11 @@ _:62ed04ce05677ff067feaaaa0286804e79637860e86843cbede6299fbc00b47b <http://www.w
 _:62ed04ce05677ff067feaaaa0286804e79637860e86843cbede6299fbc00b47b <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:62ed04ce05677ff067feaaaa0286804e79637860e86843cbede6299fbc00b47b <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
 _:62ed04ce05677ff067feaaaa0286804e79637860e86843cbede6299fbc00b47b <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/selector_form> .
+_:64eadf9ce3e5bf193bd604366a9868249da4a341619a3c597a5dd77dbe80f91b <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#date> .
+_:64eadf9ce3e5bf193bd604366a9868249da4a341619a3c597a5dd77dbe80f91b <http://www.w3.org/ns/shacl#description> "Date of a bounded semantic/evidence enrichment attempt; not a completeness, freshness, safety, approval, or scheduling claim." .
+_:64eadf9ce3e5bf193bd604366a9868249da4a341619a3c597a5dd77dbe80f91b <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:64eadf9ce3e5bf193bd604366a9868249da4a341619a3c597a5dd77dbe80f91b <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
+_:64eadf9ce3e5bf193bd604366a9868249da4a341619a3c597a5dd77dbe80f91b <http://www.w3.org/ns/shacl#path> <https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_enrichment_attempted_on> .
 _:653d93df824d47dc17509afe274b786c0c16604f5b814fe7a3945217c3dd2496 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> "source" .
 _:653d93df824d47dc17509afe274b786c0c16604f5b814fe7a3945217c3dd2496 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:d018365ec7b7612346294f45f3884558cf590c742f825e1f7e1aa4738c52bb4a .
 _:655a1580631f80558479ce887eb08cf618433cad7eaebe4ef8150841b2653ab0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> "balance" .

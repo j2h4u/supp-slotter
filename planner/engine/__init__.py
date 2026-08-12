@@ -3,11 +3,14 @@
 from planner.engine.audit import cmd_audit
 from planner.engine.check import cmd_check
 from planner.engine.find import cmd_find
+from planner.engine.grooming import cmd_grooming_next
 from planner.engine.plan import cmd_plan
 from planner.engine.results import (
     AuditResult,
     CheckResult,
     FindResult,
+    GroomingCandidate,
+    GroomingResult,
     PlanResult,
     ReviewResult,
     ShowResult,
@@ -19,12 +22,15 @@ __all__ = [
     "AuditResult",
     "CheckResult",
     "FindResult",
+    "GroomingCandidate",
+    "GroomingResult",
     "PlanResult",
     "ReviewResult",
     "ShowResult",
     "cmd_audit",
     "cmd_check",
     "cmd_find",
+    "cmd_grooming_next",
     "cmd_plan",
     "cmd_review",
     "cmd_review_substance",

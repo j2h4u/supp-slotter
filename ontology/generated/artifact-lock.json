@@ -11,11 +11,11 @@
   "outputs": [
     {
       "path": "card.schema.json",
-      "sha256": "deb2ab763e6fd1ec350e4dec5470f58df165d53a7fa27f09ce19308f36122e02"
+      "sha256": "b000e6ed577ff6b839962aa295d223d9408fd3f7a0d5ac4631dfd9e298507a76"
     },
     {
       "path": "context.json",
-      "sha256": "48a3ce23851f8ab0597feee26d99aa6806e58b7236c4230b497b8feaef736f56"
+      "sha256": "dcb3ed19fa1bc167f19621e4ae644cb7bae7ebbf69c00be4b5362052accc05d7"
     },
     {
       "path": "dashboard.schema.json",
@@ -23,7 +23,7 @@
     },
     {
       "path": "ontology.ttl",
-      "sha256": "ac7de44e9027da64033a3aa75a962f71838972c09328b92bb8b4be3483244541"
+      "sha256": "6fd0dde32bf4a7a167555bd47b2b42a3cb80fd68a5af646c465f7aba4cc745a0"
     },
     {
       "path": "pillboxes.schema.json",
@@ -31,31 +31,31 @@
     },
     {
       "path": "product.schema.json",
-      "sha256": "e59bc04ceb478b5de25855d52f90ecd04cbb1cbbf0ed7b90304584e4bafac334"
+      "sha256": "073d36b405964d9a1515de54d81896e18f2e18cf0cc8db10248163a722a11904"
     },
     {
       "path": "projection-map.json",
-      "sha256": "44192d81574151ba1e840e7e601e9bba8f1e68280dd5ce997967607fee580301"
+      "sha256": "b0e7bbc1979f6be911696a724c221a94c03389bfe48b0a3095da01ec7086ccf0"
     },
     {
       "path": "relations.schema.json",
-      "sha256": "8306b3304a6f10a446d03f643e921640757bf177fff811360fc85ecbb6386590"
+      "sha256": "75c72a786e43217bd22c569b1441ad0e50a51643110d768fc3e7799eb28a53b2"
     },
     {
       "path": "runtime-program.json",
-      "sha256": "d112fea1eb3286599c2608f50a9bed92ec80352183c626106594dffab9eb760d"
+      "sha256": "e75cec83c6aa29faacb8f10a459a8ea555272f222c9282ab5be2b2fee170c60a"
     },
     {
       "path": "runtime-vocabulary.yaml",
-      "sha256": "e460e08865c75985ceb3a5ccc44379fa02a771889ac6d16b006a8fdc825fa8a1"
+      "sha256": "2c06df7732684182f338dd84340d49cab4c2711b6641f3a6af1b41dbdc1bd475"
     },
     {
       "path": "schema.json",
-      "sha256": "5249ca2b80628c8dfa164ffe11db8170aa037ca5f3f918e1cea0181ecfaa90ab"
+      "sha256": "a32474d71ab5c73d8ff1bfa616987da2a8d7afb4473646e06c9fba4c5fea306b"
     },
     {
       "path": "shapes.ttl",
-      "sha256": "6b7daf85f3327405c3bebc6914766e5c31e2d7581aac9c9fa0bbb6ff39b14dfb"
+      "sha256": "ffeeb859abc6c02a173cfd99c1a9ed6a200e529c5e15abc3f7d10ad91ea22254"
     },
     {
       "path": "stacks.schema.json",
@@ -78,7 +78,7 @@
     },
     {
       "path": "ontology/model.yaml",
-      "sha256": "962844d6e780ab16eb280073e03ee4475b432cfccc7462ee277bee346f63ab1a"
+      "sha256": "5e2c0235fbb5e0267b65d6e15a31f0bd6407692583ee25fa2af3387d507fd215"
     },
     {
       "path": "ontology/ontoclean.yaml",

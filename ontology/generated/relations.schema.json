@@ -2916,6 +2916,14 @@
               "type": "null"
             }
           ]
+        },
+        "semantic_enrichment_attempted_on": {
+          "description": "Date of a bounded semantic/evidence enrichment attempt; not a completeness, freshness, safety, approval, or scheduling claim.",
+          "format": "date",
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "required": [
