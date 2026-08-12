@@ -31,6 +31,8 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
 # notes: ""  # Free-form notes about this substance — sourcing, dosing context,
              # label discrepancies, evidence caveats. Not shown in schedule output.
              # Use for anything an agent should know that doesn't fit structured fields.
+             # For a new substance used by an active product, follow the bounded
+             # evidence-enrichment rule in SKILL.md before adding schedule facts.
 
 # ---------------------------------------------------------------------------
 # SCHEDULING — read by Planner

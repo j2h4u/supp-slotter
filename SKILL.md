@@ -97,6 +97,24 @@ Use [docs/agent-product-flow.md#onboard-a-new-stack](docs/agent-product-flow.md#
 6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `planner audit` > Potential duplicate substance cards to review nearby forms before adding a new card.
 7. Add traits only when they affect current slot timing or express a reusable reviewer fact: intrinsic class, pharmacological effect, authored risk/pathway fact, or dashboard projection. See [ontology/vocabulary.yaml](ontology/vocabulary.yaml) for the canonical namespace vocabulary. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to inspect a card's current tags grouped by namespace before adding or changing tags.
 
+   When the new substance is used by an active product, make a bounded,
+   independent evidence-enrichment attempt after capturing the label facts and
+   identity/form. Search the scheduling axes that apply (meal state, clock/day
+   phase, and activity) plus important interaction/review context. Prefer
+   authoritative, systematic, or human evidence; manufacturer directions are
+   formulation evidence or leads, not sufficient general scheduling evidence.
+   Admit a `schedule:` fact only after adjudication at the project's
+   conservative threshold. If research finds no defensible rule, record the
+   per-axis `scheduling_assessment` conclusion `insufficient` with sources and
+   a concise summary; if evidence supports no rule, record
+   `supports_no_rule`. If an axis was not researched, omit it as unassessed.
+   Never describe an omitted or unsupported axis as an optimal slot: planner
+   balance placement is technical only.
+   Unavailable evidence does not block creating the card or product, but its
+   `insufficient`/unassessed state must remain visible for grooming. This
+   workflow does not add dose, owner/reviewer/lifecycle, automatic-task, or
+   vendor-precedence machinery.
+
    Namespace rule of thumb: if a slug affects slot assignment, put it under `schedule:`; otherwise put it under `knowledge:`. Use `kind:` for intrinsic classification and `context:` only for curated dashboard membership. For exact namespace semantics and cardinality, use [docs/domain-model.md#trait-ontology](docs/domain-model.md#trait-ontology).
 8. Avoid new `knowledge.effect` slugs ending in `_context` by default. Use `knowledge.context` for curated dashboard membership, `knowledge.risk` for safety or interaction flags, `knowledge.pathway` for biochemical routes, and precise effect names such as `*_support`, `*_inhibition`, `*_modulation`, or `*_cofactor` for reusable substance-level facts.
 9. Treat broad effect axes as reviewer selectors only. Do not use broad axes such as `bone_mineral_metabolism_support` as relation endpoints without first narrowing the model. Do not create an effect merely to duplicate an existing dashboard/context projection.
