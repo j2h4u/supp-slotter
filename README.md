@@ -37,28 +37,28 @@ Example schedule shape, using broadly available iHerb catalog examples rather th
 Daily
 
 Morning / empty stomach
-  • NOW Foods - NAC 600 mg
-  • Jarrow Formulas - Acetyl L-Carnitine 500 mg
+  • NOW Foods - NAC
+  • Jarrow Formulas - Acetyl L-Carnitine
 
 Morning / with breakfast
-  • California Gold Nutrition - Vitamin D3 5,000 IU
+  • California Gold Nutrition - Vitamin D3
   • Nordic Naturals - Ultimate Omega
-  • Doctor's Best - High Absorption CoQ10 100 mg
-  • NOW Foods - Astaxanthin 4 mg
+  • Doctor's Best - High Absorption CoQ10
+  • NOW Foods - Astaxanthin
 
 Day / with meal
   • Jarrow Formulas - Methyl B-12 & Methyl Folate
   • Jarrow Formulas - B-Right
-  • NOW Foods - Zinc Picolinate 50 mg
+  • NOW Foods - Zinc Picolinate
   • California Gold Nutrition - Buffered Gold C
 
 Before sleep / empty stomach
-  • NOW Foods - Magnesium Glycinate
+  • NOW Foods - Magnesium
 
 Training
 
 Pre-workout
-  • NOW Foods Sports - Creatine Monohydrate
+  • NOW Foods Sports - Creatine
   • Doctor's Best - L-Citrulline Powder
 
 Post-workout

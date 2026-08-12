@@ -18,9 +18,17 @@
 # id is assigned by `uv run python -m planner check` — do NOT set it manually.
 # Leave the field absent and run: uv run python -m planner check
 
-name: ""     # Required. Product name as it appears on the label.
+name: ""     # Required. Concise bottle-facing/commercial product title.
              # Convention: omit the brand name here (it goes in brand:).
-             # Example: "Acetyl L-Carnitine (ALCAR)", "Ultra-Mag", "Vitamin D3 5000 IU"
+             # Do not add chemical form, dose/strength, package count, or ontology
+             # qualifiers merely for technical completeness. Preserve genuine
+             # commercial names that inherently contain a form term.
+             # Route technical detail to the field that owns it:
+             #   chemical form -> substance.form or component.label
+             #   dose/strength -> component.amount
+             #   package count -> product notes
+             #   ontology semantics -> substance knowledge/notes
+             # Examples: "Acetyl L-Carnitine", "Ultra-Mag", "Vitamin D3"
 
 # brand: ""  # Manufacturer or brand name. Example: "Source Naturals", "Jarrow Formulas"
 

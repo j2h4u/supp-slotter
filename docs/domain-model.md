@@ -6,7 +6,18 @@
 
 **Substance** (`data/substances/*.yaml`) is an active ingredient or concrete chemical/form. It owns scheduling traits, substance-level notes, aliases, and unresolved concerns. It is the reusable catalog layer by default and should remain through normal onboarding. Use `form` when a named ingredient has distinct practical forms, for example `name: B6` plus `form: pyridoxine HCl`. Substance `id` is a stable opaque key such as `sub_3918fe347e`; it does not change when `name` or `form` changes. Filenames remain readable and include the stable id, for example `magnesium_glycinate__sub_7e02eab0d1.yaml`. Use `aliases` for abbreviations and synonyms such as `NAC`, `EPA`, or `Taxifolin`; aliases do not affect IDs.
 
-**Product** (`data/products/*.yaml`) is a physical label-backed item. It owns `brand`, formula components, component labels/amounts when known, product description URLs, product notes, and label ambiguity. A product may contain one or many substances. Product components are canonical as `sub_*` IDs; during drafting, `uv run python -m planner check` may rewrite exact substance name/form, alias, or filename-stem refs to IDs when the match is unique. Product `id` is a stable opaque key such as `prd_83dffd67bf`; it does not change when `brand` or `name` changes. Product filenames use readable parts plus the id, for example `minami_healthy_foods__nattokinase_13000fu__prd_83dffd67bf.yaml`; if the brand is genuinely unknown, use `unknown`. Product cards are user-specific stack state by default.
+**Product** (`data/products/*.yaml`) is a physical label-backed item. It owns `brand`, formula components, component labels/amounts when known, product description URLs, product notes, and label ambiguity. A product may contain one or many substances. Product components are canonical as `sub_*` IDs; during drafting, `uv run python -m planner check` may rewrite exact substance name/form, alias, or filename-stem refs to IDs when the match is unique. Product `id` is a stable opaque key such as `prd_83dffd67bf`; it does not change when `brand` or `name` changes. Product filenames use readable parts plus the id, for example `minami_healthy_foods__nattokinase__prd_83dffd67bf.yaml`; if the brand is genuinely unknown, use `unknown`. Product cards are user-specific stack state by default.
+
+`Product.name` is the concise bottle-facing or commercial product title. Do not synthesize it from technical fields or append chemical forms, dose/strength, package counts, or ontology qualifiers merely for completeness; preserve a genuine commercial name when the form term is inherently part of that name. Route detail to its owning field:
+
+| Detail | Owning field |
+| --- | --- |
+| Chemical form | `substance.form` or `component.label` |
+| Dose/strength | `component.amount` |
+| Package count | Product `notes` |
+| Ontology semantics | Substance `knowledge` / notes |
+
+Product filenames follow `brand` and `Product.name` plus the stable ID. They are readable provenance, not a second identity, and must never be used to synthesize or enrich `Product.name`.
 
 Product components may be label-stated or calculated from label-stated chemistry when the calculation is straightforward and high-confidence. Treat calculated components as first-class review facts, but make provenance explicit in the component `notes`. Example: sodium from sodium ascorbate can be listed as a Sodium component when the label gives sodium ascorbate mass and vitamin C equivalent, with the molar-mass calculation recorded in notes.
 

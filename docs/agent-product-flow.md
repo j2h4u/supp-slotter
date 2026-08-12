@@ -119,6 +119,7 @@ Start with one short onboarding pass:
 
 - Ask whether the user wants read-only orientation, extension, reference-only use, or replacement of current stack data.
 - Ask for the product list: brand, product name, source URL, and label photo/text when available.
+- Treat the product name as a concise bottle-facing/commercial title. Do not synthesize it from chemical form, dose/strength, package count, or ontology qualifiers; route those to `substance.form`/`component.label`, `component.amount`, product `notes`, and substance `knowledge`/notes respectively. Preserve genuine commercial names that inherently contain a form term.
 - Ask where each product belongs: `daily`, `training`, `inactive`, or intentionally unstacked (`tracked-unassigned`) when it is no longer on the shelf.
 - Ask whether dashboards should be created now or skipped until the first schedule exists.
 - Ask whether web research is allowed. Prefer official product pages, labels, or store pages, and save useful sources in product `urls`.
@@ -146,7 +147,7 @@ Practical quick start:
    For reference-style starts, keep product cards and only move `daily` and `training` IDs to `inactive`.
 3. Search before creating each ingredient: `uv run python -m planner find "<name form alias>"`. Reuse existing substance cards whenever they match the product label.
 4. Keep `data/substances/` unless the user explicitly asks for catalog replacement. Create missing substance cards only for real missing label components or forms.
-5. Create one product card per physical product from [schema/templates/product.yaml](../schema/templates/product.yaml), link each component to a concrete `sub_*` ID or draft it with an exact substance name+form, alias, or filename stem. `uv run python -m planner check` rewrites unique matches to `sub_*` and fails on unknown or ambiguous names. Save source URLs or label notes when available.
+5. Create one product card per physical product from [schema/templates/product.yaml](../schema/templates/product.yaml), using a concise bottle-facing/commercial `name`; do not append technical form, dose/strength, package count, or ontology qualifiers merely for completeness. Route those details to `substance.form`/`component.label`, `component.amount`, product `notes`, and substance `knowledge`/notes. Preserve genuine commercial names that inherently contain a form term. Link each component to a concrete `sub_*` ID or draft it with an exact substance name+form, alias, or filename stem. `uv run python -m planner check` rewrites unique matches to `sub_*` and fails on unknown or ambiguous names. Save source URLs or label notes when available.
 6. Add only the new user's products to `daily`, `training`, `inactive`, or leave products intentionally `tracked-unassigned` by omitting them from all stacks in `data/stacks.yaml`.
 7. Run `uv run python -m planner check`, then `uv run python -m planner` after at least one non-inactive product exists.
 8. Run `uv run python -m planner review` before stack recommendations. Use `uv run python -m planner audit --full` when the generic full-audit diagnostics are relevant to the current task.
