@@ -12,6 +12,16 @@ adjudicate, validate, and commit.
 
 **Substance** (`data/substances/*.yaml`) is an active ingredient or concrete chemical/form. It owns scheduling traits, substance-level notes, aliases, and unresolved concerns. It is the reusable catalog layer by default and should remain through normal onboarding. Use `form` when a named ingredient has distinct practical forms, for example `name: B6` plus `form: pyridoxine HCl`. Substance `id` is a stable opaque key such as `sub_3918fe347e`; it does not change when `name` or `form` changes. Filenames remain readable and include the stable id, for example `magnesium_glycinate__sub_7e02eab0d1.yaml`. Use `aliases` for abbreviations and synonyms such as `NAC`, `EPA`, or `Taxifolin`; aliases do not affect IDs.
 
+`semantic_enrichment_attempted_on` is an optional, immutable queue marker on a
+Substance card. It records that a bounded semantic/evidence enrichment attempt
+was made; it does not assert completeness, freshness, safety, approval, or any
+scheduling fact. The read-only grooming queue considers only active-reachable
+Substances without this marker. Its Product counts are distinct registered
+Product cards: active means the Product appears in any non-`inactive` stack,
+with repeated membership counted once. Its ROI ordering prioritizes gaps that
+could improve the greatest number of active Products; this is operational
+triage, not medical importance, quality, or recommendation scoring.
+
 **Product** (`data/products/*.yaml`) is a physical label-backed item. It owns `brand`, formula components, component labels/amounts when known, product description URLs, product notes, and label ambiguity. A product may contain one or many substances. Product components are canonical as `sub_*` IDs; during drafting, `uv run python -m planner check` may rewrite exact substance name/form, alias, or filename-stem refs to IDs when the match is unique. Product `id` is a stable opaque key such as `prd_83dffd67bf`; it does not change when `brand` or `name` changes. Product filenames use readable parts plus the id, for example `minami_healthy_foods__nattokinase__prd_83dffd67bf.yaml`; if the brand is genuinely unknown, use `unknown`. Product cards are user-specific stack state by default.
 
 `Product.name` is the concise bottle-facing or commercial product title. Do not synthesize it from technical fields or append chemical forms, dose/strength, package counts, or ontology qualifiers merely for completeness; preserve a genuine commercial name when the form term is inherently part of that name. Route detail to its owning field:

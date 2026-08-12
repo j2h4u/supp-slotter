@@ -188,15 +188,19 @@ planner score.
 
 ### Minimal enrichment queue
 
-The read-only command `python -m planner grooming next --limit N` returns a
-bounded batch of active Substance cards whose
-`semantic_enrichment_attempted_on` field is absent. Results are sorted by
-case-folded card name and then stable Substance ID. The optional ISO
+The read-only command `python -m planner grooming next --limit N` (default
+`N=10`) returns a bounded batch of active Substance cards whose
+`semantic_enrichment_attempted_on` field is absent. It prints
+`Grooming queue: {total} remaining, showing {shown}` and each candidate's
+unique total/active Product counts. Results are sorted by active Product count
+descending, total Product count descending, then case-folded card name and
+stable Substance ID. The optional ISO
 `YYYY-MM-DD` field records that a bounded semantic/evidence enrichment attempt
 was made; it does not assert completeness, freshness, safety, approval, or any
 scheduling fact. Any present date permanently excludes the card from this
 minimal queue. The queue has no owners, tasks, scores, expiry, auto-write, or
 product-level marker, and it never affects scheduling.
+The authoritative ownership and ROI boundary is [Domain Model](domain-model.md#core-objects).
 
 ### Research-state glossary
 

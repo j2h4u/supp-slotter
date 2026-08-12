@@ -151,6 +151,10 @@ def test_committed_projection_matches_schema_and_authored_policy() -> None:
     for key in ("aggregation_mode", "prefer_with_bonus"):
         assert scoring[key] == authored_scoring[key]
 
+    grooming = _json_mapping(runtime_projection["semantic_enrichment_grooming"])
+    authored_grooming = cast(dict[str, object], authored_policy["semantic_enrichment_grooming"])
+    assert grooming == authored_grooming
+
     authored_constraints = cast(list[dict[str, object]], authored_policy["constraint_execution_policies"])
     runtime_constraints = cast(list[dict[str, object]], runtime_projection["constraint_execution_policies"])
     assert runtime_constraints == authored_constraints

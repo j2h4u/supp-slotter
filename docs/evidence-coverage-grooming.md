@@ -6,13 +6,19 @@
 > schedule journal exposes deterministic `no-scheduling-fact` observations and
 > per-axis `unassessed` versus researched conclusions, while assessment metadata
 > is isolated from scheduler scoring and placement. The minimal queue is exposed
-> by `python -m planner grooming next --limit N`: it includes only active,
-> reachable Substance cards with no `semantic_enrichment_attempted_on` field,
-> sorted by case-folded name then ID. A present ISO date excludes a card
+> by `python -m planner grooming next --limit N` (default `N=10`): it includes
+> only active, reachable Substance cards with no
+> `semantic_enrichment_attempted_on` field. The header reports total remaining
+> and shown counts; each candidate reports unique total and active Product
+> counts. Queue ordering is active Product count descending, total Product count
+> descending, then case-folded name and ID. A present ISO date excludes a card
 > permanently. This marker and queue are read-only and do not add expiry,
 > ownership, tasks, scores, auto-write, or product-level state. The
 > EvidenceQuestion catalog, coverage scoring, and broader workflow/task
 > machinery remain deferred and are not implemented here.
+
+The authoritative marker ownership, distinct Product-count semantics, and
+operational (not medical) ROI principle are defined in the [Domain Model](domain-model.md#core-objects).
 
 The card lifecycle and event playbooks are authoritative in
 [Agent Product Flow](agent-product-flow.md#authoritative-card-lifecycle). This

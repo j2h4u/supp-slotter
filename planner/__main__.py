@@ -73,8 +73,8 @@ def main(data_root: Path | None = None) -> None:
     grooming_next.add_argument(
         "--limit",
         type=int,
-        default=8,
-        help="positive maximum number of cards",
+        default=None,
+        help="positive maximum number of cards (default from ontology policy)",
     )
 
     review_substance = sub.add_parser(

@@ -366,6 +366,15 @@
         "show_match_details": true
       }
     ],
+    "semantic_enrichment_grooming": {
+      "default_batch_size": 10,
+      "eligibility": "active_reachable_substance_without_semantic_enrichment_attempt",
+      "id": "semantic_enrichment_grooming",
+      "roi_order_desc": [
+        "active_unique_product_count",
+        "total_unique_product_count"
+      ]
+    },
     "slot_near_values": [
       "wake",
       "breakfast",
@@ -469,8 +478,8 @@
     "compiler_sha256": "f3824d55dc0f1653a99e0f7f462f0c06f4dfbd625f68010fce8815bbe59efbdb",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "8fdeb44ca600c0137082fa391175b6250b07506138d11247a576a62b01755865"
+    "source_sha256": "dd669e75b90eeaa50257b0ef4424edb5fe984e9ee722b17fe9031db1d53ecd9b"
   },
   "schema_version": "2",
-  "source_hash": "cb6a278b7ad8cb3cfdf5c0a339a24387edd859439e4139936f31c67e2987664d"
+  "source_hash": "000e9acb79b1b32e8a3ca66b66fa0e6632963edacfa7350caf0ae1a34a428350"
 }

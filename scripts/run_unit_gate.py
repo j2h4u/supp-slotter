@@ -34,6 +34,7 @@ FAST_UNIT_MODULES = frozenset({
     Path("tests/test_cli_surface.py"),
     Path("tests/test_dashboard_schema.py"),
     Path("tests/test_fact_labels.py"),
+    Path("tests/test_grooming_command.py"),
     Path("tests/test_plan_relation_scheduling.py"),
     Path("tests/test_plan_search.py"),
     Path("tests/test_product_validation.py"),

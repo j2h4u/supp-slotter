@@ -136,6 +136,9 @@
     "RuntimeSelectorFormCapability": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSelectorFormCapability"
     },
+    "RuntimeSemanticEnrichmentGroomingPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSemanticEnrichmentGroomingPolicy"
+    },
     "RuntimeSourceKindValuePolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSourceKindValuePolicy"
     },
@@ -361,6 +364,9 @@
     "declares_context": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/declares_context"
     },
+    "default_batch_size": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/default_batch_size"
+    },
     "default_message": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/default_message"
     },
@@ -384,6 +390,9 @@
     },
     "effects": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/effects"
+    },
+    "eligibility": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/eligibility"
     },
     "emitter": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/emitter"
@@ -628,6 +637,9 @@
     "risk_description": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/risk_description"
     },
+    "roi_order_desc": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/roi_order_desc"
+    },
     "role": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/role"
     },
@@ -708,6 +720,9 @@
     },
     "semantic_enrichment_attempted_on": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/semantic_enrichment_attempted_on"
+    },
+    "semantic_enrichment_grooming": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/semantic_enrichment_grooming"
     },
     "semantic_family": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/semantic_family"

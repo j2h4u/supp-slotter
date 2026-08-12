@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: cb6a278b7ad8cb3cfdf5c0a339a24387edd859439e4139936f31c67e2987664d
+# source-hash: 000e9acb79b1b32e8a3ca66b66fa0e6632963edacfa7350caf0ae1a34a428350
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -141,6 +141,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSelectorFormCapability> a ss:SchemaClass ;
   ss:name "RuntimeSelectorFormCapability" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSemanticEnrichmentGroomingPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeSemanticEnrichmentGroomingPolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSourceKindValuePolicy> a ss:SchemaClass ;
   ss:name "RuntimeSourceKindValuePolicy" .
@@ -367,6 +370,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/declares_context> a ss:SchemaSlot ;
   ss:name "declares_context" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/default_batch_size> a ss:SchemaSlot ;
+  ss:name "default_batch_size" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/default_message> a ss:SchemaSlot ;
   ss:name "default_message" .
 
@@ -390,6 +396,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/effects> a ss:SchemaSlot ;
   ss:name "effects" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/eligibility> a ss:SchemaSlot ;
+  ss:name "eligibility" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/emitter> a ss:SchemaSlot ;
   ss:name "emitter" .
@@ -634,6 +643,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/risk_description> a ss:SchemaSlot ;
   ss:name "risk_description" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/roi_order_desc> a ss:SchemaSlot ;
+  ss:name "roi_order_desc" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/role> a ss:SchemaSlot ;
   ss:name "role" .
 
@@ -714,6 +726,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_enrichment_attempted_on> a ss:SchemaSlot ;
   ss:name "semantic_enrichment_attempted_on" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_enrichment_grooming> a ss:SchemaSlot ;
+  ss:name "semantic_enrichment_grooming" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_family> a ss:SchemaSlot ;
   ss:name "semantic_family" .
