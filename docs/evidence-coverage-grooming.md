@@ -1,21 +1,33 @@
 # Evidence Coverage Grooming
 
-> **Status: Small read-only subset implemented; broader proposal deferred.**
-> Substance cards now carry optional per-axis scheduling assessment states with
-> sources and summaries. The generated schedule journal exposes deterministic
-> `unassessed` versus researched conclusions for components without scheduling
-> facts, while assessment metadata is isolated from scheduler scoring and
-> placement. EvidenceQuestion catalogs, coverage scoring, grooming queues, and
-> workflow/task machinery remain deferred and are not implemented here.
+> **Status: Current scheduling-assessment subset implemented; broader coverage
+> proposal deferred.** Substance cards now carry optional per-axis
+> `scheduling_assessment` states with sources and summaries. The generated
+> schedule journal exposes deterministic `no-scheduling-fact` observations and
+> per-axis `unassessed` versus researched conclusions, while assessment metadata
+> is isolated from scheduler scoring and placement. Only the EvidenceQuestion
+> catalog, coverage scoring, derived grooming queue, and workflow/task
+> machinery remain deferred and are not implemented here.
+
+The card lifecycle and event playbooks are authoritative in
+[Agent Product Flow](agent-product-flow.md#authoritative-card-lifecycle). This
+document remains the specialized, deferred design for broader evidence
+coverage/grooming; it does not add a second ingestion workflow or override the
+current scheduler and assessment boundaries.
+
+The current YAML contract and scheduler-score semantics are documented in
+[Agent Product Flow's current scheduling-assessment contract](agent-product-flow.md#current-scheduling-assessment-contract)
+and [research-state glossary](agent-product-flow.md#research-state-glossary).
 
 ## Why the broader proposal is deferred
 
-This is separate from the MVP and would take multiple days of design, pilot
-annotation, and reader validation. The current slotter remains dose-agnostic:
-its scheduling rules describe placement preferences and constraints, not dose,
-treatment, or clinical recommendations. Evidence grading must not enter current
-scheduling. A complete evidence record, or its absence, must not silently add,
-remove, strengthen, or weaken a scheduling rule in the MVP.
+The broader proposal is separate from the implemented MVP subset and would take
+multiple days of design, pilot annotation, and reader validation. The current
+slotter remains dose-agnostic: its scheduling rules describe placement
+preferences and constraints, not dose, treatment, or clinical recommendations.
+Evidence grading, coverage scoring, and derived grooming queues must not enter
+current scheduling. A complete evidence record, or its absence, must not
+silently add, remove, strengthen, or weaken a scheduling rule in the MVP.
 
 ## Problem to solve
 
@@ -61,10 +73,11 @@ carrier facts. They are weak evidence for timing tie-breakers unless independent
 evidence supports the same claim. Marketing is useful, if at all, only as a
 lead to investigate.
 
-## Minimal future ontology proposal
+## Deferred broader coverage design
 
-This is a deliberately small starting point, not a final design. Add an
-`EvidenceQuestion` catalog with these question IDs:
+The following is a deliberately small future design, not the current card
+contract. If broader coverage work is approved, add an `EvidenceQuestion`
+catalog with these question IDs:
 
 - `meal_absorption`
 - `meal_tolerability`
@@ -78,7 +91,8 @@ carrier, matrix, chemical form, or formulation makes the question meaningful.
 Record product applicability, including carrier and matrix, rather than
 assuming that substance-level evidence transfers to every product.
 
-Represent an assessment at claim level with the smallest useful fields:
+For that future design, represent an assessment at claim level with the smallest
+useful fields:
 
 - `coverage`: `unassessed`, `assessed`, or `not_applicable`;
 - `conclusion`: `supports_preference`, `supports_no_rule`, `conflicting`, or
@@ -106,13 +120,15 @@ At source level, `independence` is one of `independent`, `manufacturer`, or
 controlled human study, label, or marketing); independence must not be inferred
 from the type string.
 
-An assessment can record that literature was searched with no usable finding
-(for example, a `searched_no_evidence` note) and conclude `insufficient`. That
-state is different from `unassessed`. Avoid adding owner, reviewer, lifecycle,
-`review_pending`, or governance fields in this first proposal; those would be a
+The current implementation does not add these future `coverage`, `certainty`,
+applicability, or stable assessment-ID fields. Today, literature searched with
+no usable finding is serialized using the current `insufficient` conclusion,
+non-empty `sources`, and non-empty `summary`; that state is different from an
+omitted/unassessed axis. Avoid adding owner, reviewer, lifecycle,
+`review_pending`, or governance fields in this future design; those would be a
 separate workflow decision.
 
-### Normative assessment states
+### Deferred coverage-state model
 
 | State | Meaning | Coverage numerator | Coverage denominator |
 |---|---|---:|---:|
@@ -123,14 +139,14 @@ separate workflow decision.
 | `assessed + conflicting` | Relevant claims conflict and the synthesis preserves that conflict. | Yes | Yes |
 | `not_applicable` | The question does not apply at the stated substance, formulation, or product scope. | No | No |
 
-`searched_no_evidence` is a searched-result note or rendering label for an
-`assessed + insufficient` state, not a second form of `unassessed`. Coverage is
-therefore the proportion of applicable questions with an assessment, including
-assessed-but-insufficient and assessed-but-conflicting questions.
+`searched_no_evidence` is a future searched-result note or rendering label for
+an `assessed + insufficient` state, not a second form of `unassessed`. Coverage
+scoring is deferred; it is not a current planner or card field.
 
-## Derived coverage and grooming
+## Deferred derived coverage and grooming
 
-For a card with at least one applicable question:
+Nothing in this section is implemented by the current subset. If the broader
+proposal is approved, for a card with at least one applicable question:
 
 ```text
 coverage_score = assessed applicable questions / applicable questions
@@ -141,8 +157,8 @@ not average certainty, and do not call `coverage_score` a medical quality
 score. If no question is applicable, report that explicitly rather than
 manufacturing a zero. No card-level score may affect the planner score.
 
-Evidence metadata initially powers only grooming, explanations, and audit.
-For this proposal, **active cards** are cards reachable from current
+If implemented, the broader evidence metadata would power only grooming,
+explanations, and audit. For this proposal, **active cards** are cards reachable from current
 stacks/products through the existing runtime data. This definition adds no new
 lifecycle or status vocabulary. The derived grooming view should include active
 cards with:

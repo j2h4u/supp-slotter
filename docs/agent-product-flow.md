@@ -2,6 +2,259 @@
 
 This document is the guided product workflow for agents using this repository with a real person. It is for structured supplement-stack thinking and data maintenance. It is not medical advice.
 
+It is the single authoritative lifecycle workflow for adding a Product, adding a
+Substance, or improving an existing Substance card. [docs/domain-model.md](domain-model.md)
+owns semantic meaning and field ownership; [SKILL.md](../SKILL.md) is the short
+operator entrypoint. [Evidence Coverage Grooming](evidence-coverage-grooming.md)
+is a specialized, deferred broader-coverage design, not a replacement for this
+workflow.
+
+## Authoritative Card Lifecycle
+
+Use this pipeline for every new or changed Product, Substance, form, or related
+domain fact. The three event playbooks below choose the starting point and the
+applicable questions; they do not skip the common stages.
+
+1. **Capture the physical source first.** Transcribe the label, product,
+   manufacturer, source URL, component labels/forms, amounts, serving details,
+   and other material label facts losslessly. Keep `Product.name` a concise
+   bottle-facing/commercial title: do not append a chemical form, dose or
+   strength, package count, or ontology qualifier merely to make it complete.
+   Route those details to `substance.form`, `component.label`,
+   `component.amount`, product `notes`, or substance knowledge as appropriate.
+2. **Search and reuse identities.** Run `uv run python -m planner find` for
+   the product, substance, aliases, and form. Reuse an existing Product or
+   concrete Substance/form identity when it matches; do not create a duplicate
+   parent taxonomy card or a second form identity for spelling variation.
+3. **Inspect ontology placement for new active substances.** A new card is not
+   complete merely because its schema validates. Inspect existing vocabulary,
+   neighboring forms, mechanisms, dashboard selectors, relations, and active
+   stack matches. Prefer existing terms and choose deliberately among
+   `schedule`, `knowledge`, concerns, relations, and dashboards.
+4. **Separate evidence collection from adjudication.** A Luna/evidence worker
+   performs a bounded, independent search over the finite applicable questions
+   (meal state, day phase, activity, and important review/interaction context).
+   Luna collects sources and candidate claims; Sol/the expert adjudicates what
+   is admitted against the repository's conservative threshold. Luna may
+   implement only admitted facts. Manufacturer instructions establish
+   formulation/composition and can be useful leads, but do not outrank
+   independent medical or biochemical evidence for general scheduling or
+   recommendations.
+5. **Formalize each admitted result in its proper layer.** Use Product cards for
+   label/formulation facts; Substance `knowledge` for reusable substance
+   knowledge; Substance `schedule` for executable meal/time/activity assertions;
+   `scheduling_assessment` for the review state of each applicable axis;
+   `data/relations.yaml` for cross-substance links; dashboards for review
+   surfaces; `concerns` for bounded high-signal prose without a better
+   executable home; and no change when no admitted fact exists.
+6. **Validate behavior, not just structure.** Run the relevant bounded `just`
+   validation recipe, inspect real planner output, review warnings, relations,
+   dashboards, and the per-product schedule explanations. A balance or tie slot
+   is a technical placement outcome, never evidence that timing is optimal.
+7. **Preserve research state.** Record negative or insufficient research so the
+   same question is not repeatedly rediscovered. `insufficient`,
+   `supports_no_rule`, and `conflicting` are assessed states; an omitted axis
+   is `unassessed`, not a claim of neutrality or support.
+8. **Clean and commit the coherent cluster.** Inspect `git diff` and
+   `git status`, keep generated output separate from source edits, remove
+   temporary artifacts, and commit the complete related documentation/data
+   cluster only after the acceptance checklist below passes.
+
+### Event playbooks
+
+#### New Product using existing substances
+
+Capture the exact physical label and product identity, search/reuse the Product
+and every concrete Substance/form, then verify that the existing facts actually
+apply to the labelled form, carrier, and formulation. Do not blindly inherit a
+generic or form-mismatched scheduling or review claim. Add the product card,
+preserve non-scheduler label details in the correct fields, choose its stack
+state, validate, and inspect explanations. If no new substance or admitted
+fact is involved, do not manufacture enrichment merely to fill fields.
+
+#### New Product introducing new substances or forms
+
+Capture the exact minimal identity first: concise product name, component label,
+amount, and exact form. Create the missing concrete Substance/form only after
+identity reuse has been checked; let `planner check` assign stable IDs. For an
+active product, perform the mandatory bounded semantic enrichment attempt:
+inspect ontology placement and applicable evidence questions, separate Luna's
+search from Sol's adjudication, and record admitted knowledge, schedule facts,
+assessments, relations, dashboards, or concerns in their proper layers. Product
+creation is not blocked when evidence is unavailable, but the resulting
+`unassessed` or `insufficient` state must remain visible for grooming. Leave
+unsupported claims out.
+
+#### Improve or groom an existing Substance
+
+Start from a concrete signal: a journal `no-scheduling-fact` or assessment
+state, weak explanation, mixed votes, warning, active dashboard goal, or an
+explicit user question. Define one finite set of questions, check applicability
+to the substance/form/product, search independently, and adjudicate the result.
+Update the assessed state even when the conclusion is `insufficient`,
+`supports_no_rule`, or `conflicting`; do not reopen an assessed question without
+new evidence or changed applicability. Add an executable `schedule.*` fact only
+when an adjudicated same-axis result supports it, then inspect the planner's
+actual explanation and any global balance effects.
+
+### Mandatory completion handoff
+
+For every new active Substance or semantic enrichment, the task/commit report
+must include this finite handoff. It is procedural state, not a new repository
+artifact or entity:
+
+- label and exact Product/Substance/form identity captured;
+- ontology neighbors, existing terms, mechanisms, dashboards, relations, and
+  active-stack matches checked;
+- finite research questions/axes named, including applicability boundaries;
+- Luna's independent evidence packet and search limits;
+- Sol's admitted and rejected claims, with the reason for each boundary;
+- exact routing destinations for every admitted result, or an explicit no-change
+  decision;
+- every omitted/unassessed axis named;
+- targeted bounded checks run; and
+- real planner output, schedule journal, and explanation inspected.
+
+Tooling does not and cannot prove that research occurred: the schema validates
+only serialized outcomes. The Luna -> Sol -> Luna sequence is mandatory
+procedural policy for this workflow but is not tooling-enforced. The
+orchestrator must enforce this handoff; do not create approval IDs,
+owner/reviewer/lifecycle fields, evidence files, or new schemas to simulate it.
+
+### Fact routing and semantic stop rules
+
+- `schedule.*` is only for evidence-adjudicated meal, time, or activity facts
+  that deliberately affect slots. Dose-specific evidence does not become an
+  unconditional timing warning or rule; the current scheduler is dose-agnostic.
+- `scheduling_assessment` separates `unassessed`, `insufficient`,
+  `supports_no_rule`, `conflicting`, and `supports_preference`.
+  `supports_preference` must correspond to an executable same-axis fact.
+- `knowledge.effect` describes reusable functional/pharmacological effects;
+  `knowledge.pathway` biochemical pathway context; `knowledge.risk` safety or
+  interaction flags; `knowledge.context` curated review membership;
+  `knowledge.role` a contextual reviewer role; `knowledge.kind` an intrinsic
+  class; and `knowledge.quality` the quality of an authored assertion or data.
+  Prefer existing ontology terms over new slugs. Use
+  [domain-model.md#trait-ontology](domain-model.md#trait-ontology) for exact
+  cardinality and vocabulary.
+- Put cross-substance links in `data/relations.yaml`. Conditional support
+  recommendations are valid expected planner behavior when evidence-backed;
+  target a specific substance or mechanism, not a broad marketing category such
+  as `role:nootropic`. Wording must not assert deficiency or mandatory
+  supplementation when those conditions are unobserved.
+- Dashboards are review/load/candidate surfaces, not automatic recommendations
+  or scheduling inputs. Concerns are bounded prose for high-signal facts that
+  lack a better executable home.
+- Product/manufacturer instructions may establish composition and formulation
+  and serve as research leads. They do not outrank independent evidence for a
+  general scheduling or recommendation claim.
+
+### Current scheduling-assessment contract
+
+The current formal card contract is authored in
+[ontology/model.yaml](../ontology/model.yaml) and emitted in the generated
+[card schema](../ontology/generated/card.schema.json). The loader also checks
+that a `supports_preference` policy matches a schedule assertion on the same
+axis. A current shape example contains one admitted preference and one
+insufficient result:
+
+```yaml
+schedule:
+  intake:
+  - food_preferred
+scheduling_assessment:
+  intake:
+    conclusion: supports_preference
+    policy: food_preferred
+    sources:
+    - https://doi.org/10.1002/jps.2600550305
+    summary: Human fed and meal-absorption evidence supports a soft food preference for this form.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
+    summary: The bounded search did not establish a general clock-time preference.
+```
+
+The generated schema/loader enforce the closed conclusion set
+`supports_preference`, `supports_no_rule`, `insufficient`, and `conflicting`,
+non-empty `sources` and `summary`, and the same-axis policy match for
+`supports_preference`; `policy` is forbidden for the other conclusions. An
+omitted axis is `unassessed`; no
+`scheduling_assessment` block means no scheduling question was researched.
+Assessment metadata never contributes a score. Only the matching executable
+`schedule.*` assertion behind `supports_preference` contributes the ordinary
+planner score.
+
+### Research-state glossary
+
+- **`unassessed`** — no assessment was serialized for the axis. It has no
+  scheduler score effect and does not establish neutrality.
+- **`insufficient`** — the axis was searched, but evidence did not justify a
+  conclusion. It has no scheduler score effect and adds no schedule fact.
+- **`supports_no_rule`** — evidence was assessed and supports no executable
+  meal/time/activity rule. It has no scheduler score effect and adds no schedule
+  fact.
+- **`conflicting`** — relevant claims conflict and the synthesis preserves that
+  conflict. It has no scheduler score effect and adds no schedule fact.
+- **`supports_preference`** — adjudicated evidence supports a same-axis
+  executable preference. The assessment itself has no score effect; its matching
+  `schedule.*` assertion receives the normal policy contribution.
+- **`no-scheduling-fact`** — a generated journal observation that a component
+  has no authored scheduling assertion. It is not an assessment conclusion and
+  is not proof of neutrality; it contributes no schedule score.
+
+### Semantic-completion anti-example
+
+A card containing only `name` and `notes` can pass structural validation, but it
+is not semantically complete for active use. Attempt the bounded enrichment
+workflow and report the outcome, or explicitly report each applicable axis as
+unassessed. Never invent ontology facts, timing rules, or relations merely to
+satisfy completion.
+
+### Lifecycle stack-state glossary
+
+Use these terms for Product lifecycle state; the semantic ownership details are
+cross-referenced in [docs/domain-model.md](domain-model.md). Do not duplicate
+the generated dashboard state catalog here.
+
+- **`daily`** — active ordinary recurring stack.
+- **`training`** — active workout-adjacent stack.
+- **`inactive`** — on-shelf/owned and tracked, but not scheduled.
+- **`tracked-unassigned`** — Product card outside all stacks: depleted,
+  reference, candidate, or otherwise not currently scheduled.
+
+### Acceptance checklist for a changed active Product/Substance
+
+- [ ] Label facts are lossless, and names are clean and correctly routed.
+- [ ] Product/Substance/form identity reuse was searched and recorded by the
+      resulting diff or review note.
+- [ ] Applicable axes/questions were researched, or are visibly unassessed.
+- [ ] Evidence collection and expert adjudication are distinguishable.
+- [ ] Ontology placement was chosen intentionally using existing vocabulary.
+- [ ] No unsupported facts, broad relations, deficiency claims, or generic
+      marketing categories were added.
+- [ ] The schedule journal explains votes, assessment/no-effect placement, and
+      any `no-scheduling-fact` state.
+- [ ] Real planner output and explanations were inspected; balance/tie placement
+      was not described as optimal timing.
+- [ ] Validation uses the correct bounded `just` recipe; no full release gate is
+      added to a small documentation/card loop.
+- [ ] Stack state is correct according to the [lifecycle stack-state
+      glossary](#lifecycle-stack-state-glossary).
+
+### Compact illustrative example: Choline
+
+A label-only Choline card can be structurally valid yet semantically incomplete.
+The routing example is to research and, only if adjudicated, admit an
+acetylcholine-precursor/cholinergic-context fact in the appropriate knowledge
+layer; do not accept a generic “supports all nootropics” relation. Do not add
+AM/PM, food, or activity rules without comparative evidence. Preserve
+`insufficient` assessments when the search does not establish a rule, and use a
+mechanism-specific conditional review only when direct evidence supports it.
+This example describes the decision boundary, not current accepted Choline
+facts; check and adjudicate current evidence before writing any card.
+
 ## Decision Loop
 
 Treat the product as a guided decision loop, not as a YAML editor:
@@ -82,7 +335,7 @@ Prefer a small first proposal over broad coverage. Default to one clear active c
 
 Rank candidate additions by safety, relevance to concern clusters, evidence-to-impact ratio, overlap across multiple axes, cofactor/synergy support, low antagonism, low redundancy, and low pill burden.
 
-Use existing active products first. If a useful substance is not on the shelf, treat it as a candidate and possible knowledge-base enrichment, not an automatic stack edit. Put it in `inactive` only for on-shelf/owned holdovers. If it is depleted or no longer owned, keep its card and leave it out of all stacks (`tracked-unassigned`).
+Use existing active products first. If a useful substance is not on the shelf, treat it as a candidate and possible knowledge-base enrichment, not an automatic stack edit. Use the [lifecycle stack-state glossary](#lifecycle-stack-state-glossary) for `daily`, `training`, `inactive`, and `tracked-unassigned` placement.
 
 Proposal structure:
 
@@ -120,7 +373,7 @@ Start with one short onboarding pass:
 - Ask whether the user wants read-only orientation, extension, reference-only use, or replacement of current stack data.
 - Ask for the product list: brand, product name, source URL, and label photo/text when available.
 - Treat the product name as a concise bottle-facing/commercial title. Do not synthesize it from chemical form, dose/strength, package count, or ontology qualifiers; route those to `substance.form`/`component.label`, `component.amount`, product `notes`, and substance `knowledge`/notes respectively. Preserve genuine commercial names that inherently contain a form term.
-- Ask where each product belongs: `daily`, `training`, `inactive`, or intentionally unstacked (`tracked-unassigned`) when it is no longer on the shelf.
+- Ask where each product belongs, using the [lifecycle stack-state glossary](#lifecycle-stack-state-glossary), including intentionally unstacked (`tracked-unassigned`) products.
 - Ask whether dashboards should be created now or skipped until the first schedule exists.
 - Ask whether web research is allowed. Prefer official product pages, labels, or store pages, and save useful sources in product `urls`.
 - Ask about user-specific constraints that should become review warnings. Do not make medical decisions.
@@ -147,7 +400,7 @@ Practical quick start:
    For reference-style starts, keep product cards and only move `daily` and `training` IDs to `inactive`.
 3. Search before creating each ingredient: `uv run python -m planner find "<name form alias>"`. Reuse existing substance cards whenever they match the product label.
 4. Keep `data/substances/` unless the user explicitly asks for catalog replacement. Create missing substance cards only for real missing label components or forms.
-5. Create one product card per physical product from [schema/templates/product.yaml](../schema/templates/product.yaml), using a concise bottle-facing/commercial `name`; do not append technical form, dose/strength, package count, or ontology qualifiers merely for completeness. Route those details to `substance.form`/`component.label`, `component.amount`, product `notes`, and substance `knowledge`/notes. Preserve genuine commercial names that inherently contain a form term. Link each component to a concrete `sub_*` ID or draft it with an exact substance name+form, alias, or filename stem. `uv run python -m planner check` rewrites unique matches to `sub_*` and fails on unknown or ambiguous names. Save source URLs or label notes when available. For each newly created substance used by an active product, make the bounded evidence-enrichment attempt described in [SKILL.md](../SKILL.md#add-or-enrich-a-substance): capture label identity/form first, research applicable scheduling axes and important review/interaction context, and keep any `insufficient` or unassessed state visible for grooming. Do not treat balance placement as an optimal slot.
+5. Create one product card per physical product from [schema/templates/product.yaml](../schema/templates/product.yaml), using a concise bottle-facing/commercial `name`; do not append technical form, dose/strength, package count, or ontology qualifiers merely for completeness. Route those details to `substance.form`/`component.label`, `component.amount`, product `notes`, and substance `knowledge`/notes. Preserve genuine commercial names that inherently contain a form term. Link each component to a concrete `sub_*` ID or draft it with an exact substance name+form, alias, or filename stem. `uv run python -m planner check` rewrites unique matches to `sub_*` and fails on unknown or ambiguous names. Save source URLs or label notes when available. For each newly created substance used by an active product, follow the bounded evidence-enrichment attempt in [Authoritative Card Lifecycle](agent-product-flow.md#authoritative-card-lifecycle): capture label identity/form first, research applicable scheduling axes and important review/interaction context, and keep any `insufficient` or unassessed state visible for grooming. Do not treat balance placement as an optimal slot.
 6. Add only the new user's products to `daily`, `training`, `inactive`, or leave products intentionally `tracked-unassigned` by omitting them from all stacks in `data/stacks.yaml`.
 7. Run `uv run python -m planner check`, then `uv run python -m planner` after at least one non-inactive product exists.
 8. Run `uv run python -m planner review` before stack recommendations. Use `uv run python -m planner audit --full` when the generic full-audit diagnostics are relevant to the current task.

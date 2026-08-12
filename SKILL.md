@@ -75,59 +75,36 @@ Use [docs/agent-product-flow.md#onboard-a-new-stack](docs/agent-product-flow.md#
 
 `find`, `review`, `review-substance`, and `audit` are read-only. The default command regenerates `schedule.yaml`; that is expected disposable output, not a source-data edit. `check` and the default command may also write deterministic source maintenance changes such as missing stable IDs or normalized filenames. Inspect `git status --short` and `git diff` when you need to distinguish generated output from source-data changes.
 
-### Add Or Enrich A Product
+### Add, change, or groom cards
 
-1. Search existing products and substances first with `uv run python -m planner find "<name form brand>"`. It is read-only, accepts multiple words, does fuzzy partial matching, and searches card text, filenames, IDs, aliases, brands, forms, and URLs.
-2. Create or update missing concrete substances before linking product components.
-3. Product `components[].substance` is canonical as a `sub_*` ID. During drafting, it may use an exact substance name+form, alias, or filename stem; `uv run python -m planner check` rewrites unique matches to `sub_*` and fails on unknown or ambiguous names.
-4. For a new product: copy [schema/templates/product.yaml](schema/templates/product.yaml) to `data/products/<slug>.yaml`. The template has all fields with inline comments explaining conventions. Fill all applicable fields. Do not add fields outside [ontology/generated/product.schema.json](ontology/generated/product.schema.json).
-   Keep `Product.name` as a concise bottle-facing/commercial title. Do not append chemical form, dose/strength, package count, or ontology qualifiers merely for completeness; route form to `substance.form`/`component.label`, dose to `component.amount`, package count to product `notes`, and semantics to substance `knowledge`/notes. Preserve genuine commercial names that inherently contain a form term.
-5. If the label gives a mineral salt/form, preserve the exact label form in component `label` or `notes`. Link a concrete form card only when that form affects review or scheduling; otherwise link the generic element card.
-6. Leave excipients, flavor systems, proprietary blends, and non-specific label lines in product `notes` unless they need scheduler, dashboard, relation, or reusable review behavior.
-7. Edit the product card and stacks as needed, following [docs/domain-model.md](docs/domain-model.md).
-8. Run `uv run python -m planner`, then `uv run python -m planner review` (advisory). Run `uv run python -m planner audit --full` when the generic full-audit diagnostics are relevant to the current task.
+The normative lifecycle, event playbooks, fact routing, evidence boundary, and
+acceptance checklist live in
+[docs/agent-product-flow.md#authoritative-card-lifecycle](docs/agent-product-flow.md#authoritative-card-lifecycle).
+Use that workflow for new Products, new Substances/forms, and existing-card
+grooming; this skill is only the quick operator surface.
 
-### Add Or Enrich A Substance
+Quick rules:
 
-1. **Always** search before creating: `uv run python -m planner find "<name form alias>"`. This read-only command does fuzzy matching across names, forms, aliases, IDs, and notes. Do NOT use grep, glob, or `ls` as the first check for whether a substance exists — these miss aliases and alternate spellings. If `find` returns no results, there is no indexed match; inspect likely cards when form, alias, or spelling ambiguity remains.
-2. Before filling or changing traits on an existing substance, run `uv run python -m planner review-substance data/substances/<card>.yaml`. Read the grouped checklist from the canonical ontology vocabulary, not from memory. Use `--compact` only for a quick current-state scan; full output is the editing checklist. The vocabulary is grouped by namespace (`kind`, `role`, `quality`, `effect`, `risk`, `pathway`, and scheduling axes); `context` membership is resolved through dashboard `selectors:`. The planner's active-fact review projection currently includes only `context`, `effect`, `kind`, `role`, and `quality`; authored `risk` and `pathway` facts remain reviewer-only data. Substance cards store traits in nested `schedule:` / `knowledge:` sections. The command shows namespace headings once, short trait names under them, and the descriptions/application rules from ontology artifacts. Use it for traits and `concerns`; add substance-to-substance links separately in [data/relations.yaml](data/relations.yaml).
-3. For a new substance: copy [schema/templates/substance.yaml](schema/templates/substance.yaml) to `data/substances/<slug>.yaml` — use only lowercase letters, digits, and underscores; no `sub_*` ID in the filename. Do NOT generate or invent an ID. The template has all fields with inline comments explaining conventions. At minimum fill `name`; fill all other applicable fields before saving. Run `uv run python -m planner check` — it assigns a stable ID and renames the file to `<slug>__sub_<id>.yaml` automatically. Use `git status --short` or `uv run python -m planner find "<name form>"` to get the renamed path, then run `uv run python -m planner review-substance data/substances/<new-card>.yaml` before adding traits.
-4. Reuse existing concrete forms when they match; use aliases for spelling variants.
-5. Prefer concrete `name + form` cards when the source gives the form. A no-`form` card is only a temporary unknown-form placeholder when the source does not disclose the form.
-6. Do not create parent taxonomy cards such as generic `Magnesium` just because several forms exist. Use `planner audit` > Potential duplicate substance cards to review nearby forms before adding a new card.
-7. Add traits only when they affect current slot timing or express a reusable reviewer fact: intrinsic class, pharmacological effect, authored risk/pathway fact, or dashboard projection. See [ontology/vocabulary.yaml](ontology/vocabulary.yaml) for the canonical namespace vocabulary. Run `uv run python -m planner review-substance data/substances/<card>.yaml` to inspect a card's current tags grouped by namespace before adding or changing tags.
-
-   When the new substance is used by an active product, make a bounded,
-   independent evidence-enrichment attempt after capturing the label facts and
-   identity/form. Search the scheduling axes that apply (meal state, clock/day
-   phase, and activity) plus important interaction/review context. Prefer
-   authoritative, systematic, or human evidence; manufacturer directions are
-   formulation evidence or leads, not sufficient general scheduling evidence.
-   Admit a `schedule:` fact only after adjudication at the project's
-   conservative threshold. If research finds no defensible rule, record the
-   per-axis `scheduling_assessment` conclusion `insufficient` with sources and
-   a concise summary; if evidence supports no rule, record
-   `supports_no_rule`. If an axis was not researched, omit it as unassessed.
-   Never describe an omitted or unsupported axis as an optimal slot: planner
-   balance placement is technical only.
-   Unavailable evidence does not block creating the card or product, but its
-   `insufficient`/unassessed state must remain visible for grooming. This
-   workflow does not add dose, owner/reviewer/lifecycle, automatic-task, or
-   vendor-precedence machinery.
-
-   Namespace rule of thumb: if a slug affects slot assignment, put it under `schedule:`; otherwise put it under `knowledge:`. Use `kind:` for intrinsic classification and `context:` only for curated dashboard membership. For exact namespace semantics and cardinality, use [docs/domain-model.md#trait-ontology](docs/domain-model.md#trait-ontology).
-8. Avoid new `knowledge.effect` slugs ending in `_context` by default. Use `knowledge.context` for curated dashboard membership, `knowledge.risk` for safety or interaction flags, `knowledge.pathway` for biochemical routes, and precise effect names such as `*_support`, `*_inhibition`, `*_modulation`, or `*_cofactor` for reusable substance-level facts.
-9. Treat broad effect axes as reviewer selectors only. Do not use broad axes such as `bone_mineral_metabolism_support` as relation endpoints without first narrowing the model. Do not create an effect merely to duplicate an existing dashboard/context projection.
-10. Put all substance-to-substance relations in [data/relations.yaml](data/relations.yaml), never in substance cards. The file is grouped by ontology relation type: `balance`, `supports`, and `review_with`.
-11. Choose one canonical selector shape for each relation endpoint:
-   - `{entity: {entity_id: sub_XXXXXXXXXX}}` targets one concrete substance card.
-   - `{entity: {name: Zinc}}` targets substances whose exact authored `name` is `Zinc`.
-   - `{category: effect, term: pde5_inhibition}` targets every substance carrying that registered ontology term. Use category selectors only when future members should inherit the relation. `planner review` shows concrete active endpoint matches.
-   Slot-blocking rules belong in ontology scheduling constraints, not `data/relations.yaml`.
-   Do not add mirrors; relation directionality is declared in `ontology/relations.yaml` and consumed through generated ontology artifacts.
-12. Add relation `action` only when the source gives a concrete review action; otherwise let the planner use the default wording.
-    Add `severity` (`critical`, `high`, `medium`, `low`) only when the operator needs a review priority above baseline. Leave it unset for routine entries — the planner uses default warning wording when severity is absent.
-13. Run `uv run python -m planner check`. Run `uv run python -m planner review` when concerns, relations, dashboards, or active stack membership changed. Run `uv run python -m planner audit` when structural diagnostics matter. Run `uv run python -m planner` when traits, relations, dashboard clusters, `prefer_with`, or active-product substances changed.
+- Search first with `uv run python -m planner find "<product substance form alias>"`;
+  reuse matching Product/Substance/form identities and do not use grep/glob as
+  the identity check.
+- Draft from [schema/templates/](schema/templates/), keep
+  `Product.name` concise and bottle-facing, preserve exact label forms and
+  amounts in their component fields, and let `planner check` assign stable IDs
+  and normalize `sub_*` references.
+- Before changing Substance traits, run
+  `uv run python -m planner review-substance data/substances/<card>.yaml`; use
+  the generated vocabulary checklist and [docs/domain-model.md#trait-ontology](docs/domain-model.md#trait-ontology).
+- Keep `schedule.*` for admitted executable meal/time/activity facts;
+  `knowledge.*` for reusable reviewer knowledge; relations in
+  [data/relations.yaml](data/relations.yaml); dashboards for review surfaces;
+  and concerns for bounded prose with no better home.
+- For a new active Substance, perform the bounded evidence attempt and the
+  [mandatory completion handoff](docs/agent-product-flow.md#mandatory-completion-handoff);
+  retain `unassessed`/`insufficient` states because unavailable evidence does
+  not block card creation. Validate with `uv run python -m planner check`, then
+  run only the relevant bounded planner/review/audit commands for the changed
+  surface.
 
 ### Update Stacks
 

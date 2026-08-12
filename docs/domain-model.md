@@ -2,6 +2,12 @@
 
 `supp-slotter` is a YAML-first supplement slot planner. It separates shelf state from product labels and substance scheduling rules.
 
+For the normative sequence used when adding or changing cards, follow
+[Agent Product Flow](agent-product-flow.md#authoritative-card-lifecycle). This
+document is the semantic ownership reference: it defines what each field and
+layer means, while the lifecycle document defines when to search, research,
+adjudicate, validate, and commit.
+
 ## Core Objects
 
 **Substance** (`data/substances/*.yaml`) is an active ingredient or concrete chemical/form. It owns scheduling traits, substance-level notes, aliases, and unresolved concerns. It is the reusable catalog layer by default and should remain through normal onboarding. Use `form` when a named ingredient has distinct practical forms, for example `name: B6` plus `form: pyridoxine HCl`. Substance `id` is a stable opaque key such as `sub_3918fe347e`; it does not change when `name` or `form` changes. Filenames remain readable and include the stable id, for example `magnesium_glycinate__sub_7e02eab0d1.yaml`. Use `aliases` for abbreviations and synonyms such as `NAC`, `EPA`, or `Taxifolin`; aliases do not affect IDs.
