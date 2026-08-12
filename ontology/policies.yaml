@@ -258,4 +258,4 @@ schedule_presentation:
       - {key: quality, label: Quality memberships}
   zero_effect:
     condition: no_nonzero_effects
-    template: No strict timing driver; placed in an available compatible slot.
+    template: No nonzero chosen-slot scheduling effect. Placement reflects compatible-slot feasibility, global load balance, and stable tie-breaking; it is not evidence for this clock time or meal condition.

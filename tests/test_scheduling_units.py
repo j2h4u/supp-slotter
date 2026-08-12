@@ -333,7 +333,9 @@ def test_empty_projection_is_neutral() -> None:
         {},
     )
     assert (trace.score, trace.blocked, trace.effects, trace.diagnostics) == (0, False, (), ())
-    assert render_slot_effects(trace, bundle) == [load_review_presentation(bundle).zero_effect_template]
+    assert render_slot_effects(trace, bundle) == [
+        "No nonzero chosen-slot scheduling effect. Placement reflects compatible-slot feasibility, global load balance, and stable tie-breaking; it is not evidence for this clock time or meal condition."
+    ]
 
 
 def test_nonzero_effect_rendering_does_not_use_zero_effect_template() -> None:

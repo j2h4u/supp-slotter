@@ -12,13 +12,13 @@ scheduling_assessment:
     sources:
     - https://doi.org/10.3389/fnut.2025.1641246
     - https://doi.org/10.3389/fnut.2025.1405796
-    summary: Research on Lion's Mane does not directly establish a general fed or fasted preference for this exact extract.
+    summary: Human studies use heterogeneous fruiting-body powders/extracts, mycelium, and blends; no fed-vs-fasted comparison was found. GLS discloses only 500 mg extract without source, extraction, or marker identity, limiting applicability.
   timing:
     conclusion: insufficient
     sources:
     - https://doi.org/10.3389/fnut.2025.1641246
     - https://doi.org/10.3389/fnut.2025.1405796
-    summary: No general clock-time rule was demonstrated for Lion's Mane supplementation.
+    summary: Protocols use varying administration times, including an after-breakfast acute study, but no clock-time comparison. Product-specific sleep outcomes do not establish evening dosing for the unidentified GLS extract.
 knowledge:
   context:
   - neurocognitive_support

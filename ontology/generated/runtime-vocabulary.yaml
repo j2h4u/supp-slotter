@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 56801ac0722d8ac58c4de3408f77854c5681a21fe6abcbf03291cf5240193f04
+source_hash: 26dc5f36507fa2d287dbd1728db470a2f2861059567ad82fb2e20a8367bc40d4
 categories:
   kind:
     allowed_predicates: &id005
@@ -1736,7 +1736,9 @@ schedule_presentation:
       label: Quality memberships
   zero_effect:
     condition: no_nonzero_effects
-    template: No strict timing driver; placed in an available compatible slot.
+    template: No nonzero chosen-slot scheduling effect. Placement reflects compatible-slot
+      feasibility, global load balance, and stable tie-breaking; it is not evidence
+      for this clock time or meal condition.
 scheduling_constraints:
   sc_calcium_iron_separate_slots:
     operation: separate_products_same_slot
