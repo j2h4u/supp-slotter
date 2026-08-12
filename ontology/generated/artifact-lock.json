@@ -23,7 +23,7 @@
     },
     {
       "path": "ontology.ttl",
-      "sha256": "8acebb7580d1d30147e39f7ba1c363099917115f47045eba2130fd5f912ca084"
+      "sha256": "b211e6aca9707001ceda2f37a2eec6d66bfcad0dfe2fd308bf95663b574e267b"
     },
     {
       "path": "pillboxes.schema.json",
@@ -43,11 +43,11 @@
     },
     {
       "path": "runtime-program.json",
-      "sha256": "1b1d0d490b4d37a58ab117cd8cb77cd523da4112df150a744ec77fbd672c6fd8"
+      "sha256": "fae182fef2fba1ba71dc355e538930fc6449589642e317570ff09faedbd6d45a"
     },
     {
       "path": "runtime-vocabulary.yaml",
-      "sha256": "da953689b50cd202874a2daf22e11a6ac9719281874022d4dae4a93c07355ffb"
+      "sha256": "04e1231423044ba3e93ccd6b0e044b6de5fa86a27156cf05c38014a7c2228458"
     },
     {
       "path": "schema.json",
@@ -55,7 +55,7 @@
     },
     {
       "path": "shapes.ttl",
-      "sha256": "465423022e7ac0859e04f3652a15ba2049432d5fec5fbabbb536a442be5b823e"
+      "sha256": "99771dba814ef20ac823ba75e3a5d318cb8158e9e221eeb7abbb1b5e5297d5d1"
     },
     {
       "path": "stacks.schema.json",
@@ -66,7 +66,7 @@
   "sources": [
     {
       "path": "data/relations.yaml",
-      "sha256": "b2aa41d498dc864da7583c604a0d543a1b3f5cd0fbd714538487774cd3068c3a"
+      "sha256": "823a507a3b42605c38f3cd2ea889426db883a79e6b0c05a6c18d417db7e81fc8"
     },
     {
       "path": "ontology/constraints/semantic.ttl",

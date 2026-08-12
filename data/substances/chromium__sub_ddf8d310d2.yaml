@@ -1,12 +1,12 @@
 id: sub_ddf8d310d2
 name: Chromium
+semantic_enrichment_attempted_on: '2026-08-13'
 notes: Generic elemental chromium contribution. Product cards keep the concrete source form in component labels and notes.
   NIH ODS describes trivalent chromium as an insulin-action / glucose-metabolism review context, but evidence for routine
   glycemic benefit is mixed and not clinically decisive for healthy users.
 concerns:
 - kind: safety
-  text: Review if insulin, metformin, other antidiabetes medication, or levothyroxine is present; NIH ODS notes possible additive
-    hypoglycemia risk with antidiabetes medications and reduced levothyroxine absorption when co-administered.
+  text: Review if insulin, metformin, or other antidiabetes medication is present because additive hypoglycemia is possible. NIH ODS reports reduced levothyroxine absorption specifically with chromium picolinate co-administered with levothyroxine; this does not establish a fixed interval for generic chromium or chromium nicotinate glycinate.
 knowledge:
   kind:
   - mineral

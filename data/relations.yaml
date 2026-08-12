@@ -59,8 +59,7 @@ relations:
   target_selector:
     entity:
       name: Calcium
-- severity: critical
-  reason: Mg-dependent hydroxylase required for 25(OH)D → 1,25(OH)2D conversion; without Mg, D3 activation is blocked.
+- reason: 'Magnesium participates as a cofactor in vitamin D hydroxylation and calcium homeostasis; this biochemical relationship does not imply that vitamin D3 supplementation is blocked. Sources: https://pubmed.ncbi.nlm.nih.gov/30541089/; https://pubmed.ncbi.nlm.nih.gov/29480918/.'
   id: rel_supports_004
   relation_type: supports
   assertion_kind: ontology_assertion

@@ -1,13 +1,24 @@
 id: sub_646e568f61
 name: Krill Oil
-notes: 'Omega-3 oil from Antarctic krill (Euphausia superba). EPA and DHA are primarily phospholipid-bound, yielding higher
-  bioavailability than triglyceride-form fish oil. Food may support tolerability/absorption, but extra dietary fat is not
-  established as required. Typical dose 500–2000 mg/day (providing ~150–500 mg EPA+DHA). Mild platelet-inhibiting and blood-thinning effect at
-  higher doses — caution with concurrent fibrinolytic/anticoagulant supplements (e.g., Nattokinase). Sources: examine.com
-  (Krill Oil); Ulven & Holven 2015, Nutrients; NIH ODS (Omega-3 Fatty Acids).'
-schedule:
+semantic_enrichment_attempted_on: '2026-08-13'
+notes: 'Omega-3 oil from Antarctic krill (Euphausia superba). Human relative-bioavailability findings versus fish oil are mixed and formulation- and dose-dependent; the active product discloses 100 mg phospholipids without an EPA/DHA carrier split. Extra dietary fat is not established as required. Preserve bleeding-medication review without a categorical blood-thinning claim. Sources: PMID 30799231; PMID 25884846; PMID 26328782; NIH ODS Omega-3 Fatty Acids.'
+scheduling_assessment:
   intake:
-  - food_preferred
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/30799231/
+    - https://pubmed.ncbi.nlm.nih.gov/25884846/
+    - https://pubmed.ncbi.nlm.nih.gov/26328782/
+    summary: Human food and relative-bioavailability evidence is mixed across formulations; it is insufficient for a product-independent meal preference for this krill oil.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/30799231/
+    - https://pubmed.ncbi.nlm.nih.gov/25884846/
+    - https://pubmed.ncbi.nlm.nih.gov/26328782/
+    summary: No comparative morning or evening rule was demonstrated for krill oil.
 knowledge:
   context:
   - skin_support

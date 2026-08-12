@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 01f16d353dd82807c595e791ec2c59514bd7d2d634aa7f287a1a16ba08a06879
+source_hash: bdb144d62fd4983102f573ae041b777ba74346003b38c01e5268dc1406d1280f
 categories:
   kind:
     allowed_predicates: &id005
@@ -2552,9 +2552,9 @@ ontology_assertions:
     target_selector:
       entity:
         entity_id: sub_2476bf9d4b
-    reason: Mg-dependent hydroxylase required for 25(OH)D → 1,25(OH)2D conversion;
-      without Mg, D3 activation is blocked.
-    severity: critical
+    reason: 'Magnesium participates as a cofactor in vitamin D hydroxylation and calcium
+      homeostasis; this biochemical relationship does not imply that vitamin D3 supplementation
+      is blocked. Sources: https://pubmed.ncbi.nlm.nih.gov/30541089/; https://pubmed.ncbi.nlm.nih.gov/29480918/.'
   rel_supports_005:
     id: rel_supports_005
     relation_type: supports

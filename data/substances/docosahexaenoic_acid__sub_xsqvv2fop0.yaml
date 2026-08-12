@@ -1,12 +1,24 @@
 id: sub_xsqvv2fop0
 name: Docosahexaenoic acid
+semantic_enrichment_attempted_on: '2026-08-13'
 aliases:
 - DHA
-notes: 'Omega-3 fatty acid component listed as DHA on Nature''s Truth Antarctic Krill Oil. Source: Nature''s Truth/iHerb product
-  label.'
-schedule:
+notes: 'Omega-3 fatty acid component listed as DHA on Nature''s Truth Antarctic Krill Oil. Meal effects are formulation- and dose-dependent; no product-independent meal rule is established for the active low-dose krill reference. Source: Nature''s Truth/iHerb product label.'
+scheduling_assessment:
   intake:
-  - food_preferred
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/30799231/
+    - https://pubmed.ncbi.nlm.nih.gov/26328782/
+    summary: Food effects vary by omega-3 chemical form and product; evidence is insufficient for a product-independent DHA meal preference.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/30799231/
+    - https://pubmed.ncbi.nlm.nih.gov/26328782/
+    summary: No comparative clock-time rule was demonstrated for DHA.
 knowledge:
   context:
   - skin_support

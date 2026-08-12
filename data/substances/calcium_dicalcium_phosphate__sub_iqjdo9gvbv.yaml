@@ -1,12 +1,28 @@
 id: sub_iqjdo9gvbv
 name: Calcium
 form: dicalcium phosphate
-notes: Dicalcium phosphate component from the TiM Electrolyte Caps label. Calcium supports bone/tooth mineral structure and
+semantic_enrichment_attempted_on: '2026-08-13'
+notes: Dicalcium phosphate component from the TiM Electrolyte Caps label; TiM's 24 mg total calcium is split across dicalcium phosphate and calcium lactate, with per-source contribution unresolved. Calcium supports bone/tooth mineral structure and
   mediates muscle function, blood clotting, nerve transmission, vascular contraction/dilation, and hormone secretion; vitamin
   D supports active calcium absorption.
-schedule:
+scheduling_assessment:
   intake:
-  - food_preferred
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/calcium-HealthProfessional/
+    - https://ods.od.nih.gov/factsheets/Calcium-Consumer/
+    summary: Calcium form and dose affect food dependence; direct fed-versus-fasted evidence for this low-dose dicalcium phosphate component is insufficient for a schedule preference.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/calcium-HealthProfessional/
+    - https://ods.od.nih.gov/factsheets/Calcium-Consumer/
+    summary: No comparative morning or evening rule was demonstrated for calcium.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/calcium-HealthProfessional/
+    summary: The active electrolyte product is in training, but evidence does not establish pre-, during-, or post-workout calcium placement.
 knowledge:
   context:
   - workout_performance
