@@ -2545,7 +2545,15 @@
           "multivalued": false,
           "name": "entity_id",
           "range": "Substance",
-          "required": true
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "name",
+          "range": "string",
+          "required": false
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintEntitySelector"
@@ -2645,6 +2653,14 @@
           "multivalued": false,
           "name": "entity",
           "range": "SchedulingConstraintEntitySelector",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "scope",
+          "range": "SchedulingConstraintScope",
           "required": false
         },
         {

@@ -151,10 +151,30 @@ class ActiveFactIndexEntry(TypedDict):
     products: list[str]
 
 
-class ScheduleKeptTogether(TypedDict):
-    pair: list[str]
-    together: bool
-    slot: str | None
+class SchedulePairwiseEndpoint(TypedDict):
+    """One resolved product/component endpoint in the pairwise journal."""
+
+    product: str
+    component: str
+    substance_id: str
+
+
+class SchedulePairwiseJournalEntry(TypedDict, total=False):
+    """One ontology-derived pairwise scheduling decision."""
+
+    kind: str
+    products: list[str]
+    endpoints: list[SchedulePairwiseEndpoint]
+    slots: list[str | None]
+    state: str
+    satisfied: bool
+    rule_id: str
+    source_field: str
+    bonus_contribution: int
+    constraint_id: str
+    disposition: str
+    rationale: str
+    action: str
 
 
 class ScheduleData(TypedDict):
@@ -165,7 +185,7 @@ class ScheduleData(TypedDict):
     risks: list[DashboardReviewEntryWithMembers]
     warnings: list[ScheduleWarning]
     active_fact_index: list[ActiveFactIndexEntry]
-    kept_together: list[ScheduleKeptTogether]
+    pairwise_journal: list[SchedulePairwiseJournalEntry]
     explanations: dict[str, ScheduleExplanation]
 
 

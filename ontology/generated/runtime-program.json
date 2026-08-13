@@ -475,11 +475,11 @@
     ]
   },
   "provenance": {
-    "compiler_sha256": "2f23e1e5509cbf291e28b882e24b527595ed2cb626b18d2666231db7d633db05",
+    "compiler_sha256": "7ffa18ca9cc9de184a6f38ac137f152e186fba47c24b3bb205e04c5ecb122bea",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
     "source_sha256": "dd669e75b90eeaa50257b0ef4424edb5fe984e9ee722b17fe9031db1d53ecd9b"
   },
   "schema_version": "2",
-  "source_hash": "bdb144d62fd4983102f573ae041b777ba74346003b38c01e5268dc1406d1280f"
+  "source_hash": "933e1e3c4e0804bb3f0513cd011501158086bcde1561969accdb7839ba393e82"
 }

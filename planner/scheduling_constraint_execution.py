@@ -87,6 +87,8 @@ def compile_scheduling_constraint_execution_plans(
             grammar=grammar,
         )
         _handler_for_operation(constraint.id, operation)
+        _validate_selector_scope(constraint.id, constraint.source_selector, substances)
+        _validate_selector_scope(constraint.id, constraint.target_selector, substances)
         source_resolution = resolve_selector(constraint.source_selector, substances, ontology_bundle)
         target_resolution = resolve_selector(constraint.target_selector, substances, ontology_bundle)
         source_ids, source_outcome = source_resolution.substance_ids, source_resolution.outcome
@@ -140,6 +142,47 @@ def compile_scheduling_constraint_execution_plans(
             )
         )
     return tuple(plans)
+
+
+def _validate_selector_scope(
+    constraint_id: str,
+    selector: RelationSelector,
+    substances: Mapping[str, Substance],
+) -> None:
+    """Require an explicit exact-form scope for ambiguous entity IDs.
+
+    Resolution itself remains delegated to the generic selector resolver.  This
+    guard only prevents an exact ID from silently becoming an accidental
+    family-wide rule when sibling substance cards share its name.
+    """
+
+    if selector.scope not in {None, "exact_form"}:
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: unsupported selector scope {selector.scope!r}",
+            code=MALFORMED,
+        )
+    if selector.scope is not None and selector.entity_id is None:
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: exact_form scope requires entity_id",
+            code=MALFORMED,
+        )
+    if selector.entity_id is None or selector.entity_id not in substances:
+        return
+    substance = substances[selector.entity_id]
+    sibling_ids = tuple(
+        sorted(
+            substance_id
+            for substance_id, candidate in substances.items()
+            if candidate.name == substance.name and substance_id != selector.entity_id
+        )
+    )
+    if sibling_ids and selector.scope != "exact_form":
+        siblings = ", ".join(sibling_ids)
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: entity_id selector {selector.entity_id!r} "
+            f"has same-name sibling substance cards [{siblings}]; declare scope: exact_form",
+            code=MALFORMED,
+        )
 
 
 def executable_blocking_plans(

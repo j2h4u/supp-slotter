@@ -73,17 +73,18 @@ def _write_audit_fixture(tmp_path: Path) -> Path:
             "knowledge": {"kind": ["mineral"]},
         },
     )
-    for substance_id in (
-        "sub_vvmld46dbz",
-        "sub_ses5czfzi1",
-        "sub_8554n79hve",
-        "sub_844a0cc551",
-        "sub_844a87d72b",
-        "sub_5723eafac4",
-    ):
+    constraint_anchors = {
+        "sub_vvmld46dbz": {"name": "Calcium", "form": "calcium ascorbate"},
+        "sub_ses5czfzi1": {"name": "Iron", "form": "Ferrochel ferrous bisglycinate chelate"},
+        "sub_8554n79hve": {"name": "Zinc", "form": "citrate"},
+        "sub_844a0cc551": {"name": "Copper", "form": "bisglycinate"},
+        "sub_844a87d72b": {"name": "Vitamin E", "form": "tocopherol"},
+        "sub_5723eafac4": {"name": "Vitamin E", "form": "tocotrienols"},
+    }
+    for substance_id, fields in constraint_anchors.items():
         write_yaml(
             temp_data / f"substances/constraint_{substance_id}__{substance_id}.yaml",
-            {"id": substance_id, "name": substance_id},
+            {"id": substance_id, **fields},
         )
     write_yaml(
         temp_data / "products/fixture_active_product__prd_0000000100.yaml",

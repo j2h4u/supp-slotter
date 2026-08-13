@@ -65,7 +65,9 @@ def cmd_grooming_next(limit: int | None = None, data_root: Path | None = None) -
 def _grooming_next_inner(
     paths: Paths, bundle: OntologyBundle, limit: int | None
 ) -> tuple[int, list[GroomingCandidate], int, int]:
-    resolved_limit = limit if limit is not None else bundle.runtime_program.semantic_enrichment_grooming.default_batch_size
+    resolved_limit = (
+        limit if limit is not None else bundle.runtime_program.semantic_enrichment_grooming.default_batch_size
+    )
     schema_result = validate_schemas(paths, bundle)
     if schema_result != 0:
         return schema_result, [], 0, resolved_limit
@@ -96,16 +98,10 @@ def _grooming_next_inner(
         _print_errors([f"grooming next: {error.message if isinstance(error, CardLoadError) else error}"])
         return 1, [], 0, resolved_limit
 
-    grooming_policy = bundle.runtime_program.semantic_enrichment_grooming
     active_ids = read_model.active_substance_ids()
+    grooming_policy = bundle.runtime_program.semantic_enrichment_grooming
     product_ids_by_substance = _product_ids_by_substance(products)
-    inactive_stack_name = bundle.runtime_program.glue_contract.inactive_stack_name
-    active_product_ids = {
-        product_id
-        for stack_name, product_ids in stacks_data.items()
-        if stack_name != inactive_stack_name
-        for product_id in product_ids
-    }
+    active_product_ids = _active_product_ids(bundle, stacks_data)
     all_candidates = [
         GroomingCandidate(
             substance.id,
@@ -138,6 +134,17 @@ def _product_ids_by_substance(products: dict[str, Product]) -> dict[str, set[str
         for component in product.components:
             product_ids_by_substance.setdefault(component.substance, set()).add(product.id)
     return product_ids_by_substance
+
+
+def _active_product_ids(bundle: OntologyBundle, stacks_data: dict[str, list[str]]) -> set[str]:
+    """Return products in stacks that are eligible for grooming counts."""
+    inactive_stack_name = bundle.runtime_program.glue_contract.inactive_stack_name
+    return {
+        product_id
+        for stack_name, product_ids in stacks_data.items()
+        if stack_name != inactive_stack_name
+        for product_id in product_ids
+    }
 
 
 def _grooming_metric(candidate: GroomingCandidate, metric: str) -> int:

@@ -544,7 +544,14 @@ def _validate_repository_mappings(raw: object) -> dict[str, dict[str, object]]:
             ):
                 raise OntologyInfrastructureError(f"Repository mapping {source_id!r} instruction path is unsafe")
             allowed_instruction_keys = {
-                "kind", "source", "predicate", "target", "subject", "token", "token_index", "datatype"
+                "kind",
+                "source",
+                "predicate",
+                "target",
+                "subject",
+                "token",
+                "token_index",
+                "datatype",
             }
             if set(instruction) - allowed_instruction_keys:
                 raise OntologyInfrastructureError(
@@ -3307,7 +3314,8 @@ def _normalize_constraint_selector(
         owner_id=constraint_id,
         raw=raw,
         known_terms=known_terms,
-        allow_entity_name=False,
+        allow_entity_name=True,
+        allow_scope=True,
     )
 
 
@@ -3318,19 +3326,31 @@ def _normalize_relation_selector(
     raw: object,
     known_terms: set[tuple[str, str]],
     allow_entity_name: bool,
+    allow_scope: bool = False,
 ) -> dict[str, object]:
     if not isinstance(raw, Mapping):
         raise OntologyInfrastructureError(f"{owner_kind} {owner_id!r} selector must be a mapping")
     selector = cast(Mapping[str, object], raw)
     entity = selector.get("entity")
-    if isinstance(entity, Mapping) and set(selector) == {"entity"}:
+    selector_fields = {"entity", "scope"} if allow_scope else {"entity"}
+    if isinstance(entity, Mapping) and "entity" in selector and set(selector) <= selector_fields:
         entity_map = cast(Mapping[str, object], entity)
         if set(entity_map) not in ({"entity_id"}, {"name"}):
             raise OntologyInfrastructureError(f"{owner_kind} {owner_id!r} entity selector is invalid")
         field = next(iter(entity_map))
         if field == "name" and not allow_entity_name:
             raise OntologyInfrastructureError(f"{owner_kind} {owner_id!r} entity selector requires stable entity_id")
-        return {"entity": {field: _required_string(entity_map, field)}}
+        normalized_entity: dict[str, object] = {"entity": {field: _required_string(entity_map, field)}}
+        if "scope" in selector:
+            if not allow_scope:
+                raise OntologyInfrastructureError(f"{owner_kind} {owner_id!r} selector has unsupported scope")
+            scope = _required_string(selector, "scope")
+            if scope != "exact_form":
+                raise OntologyInfrastructureError(f"{owner_kind} {owner_id!r} selector has unsupported scope")
+            if field != "entity_id":
+                raise OntologyInfrastructureError(f"{owner_kind} {owner_id!r} selector scope requires entity_id")
+            normalized_entity["scope"] = scope
+        return normalized_entity
     if set(selector) == {"category", "term"}:
         category = _required_string(selector, "category")
         term = _required_string(selector, "term")
@@ -3986,6 +4006,8 @@ def _ttl_selector_facts(selector: Mapping[str, object]) -> list[tuple[str, objec
             return [("name", entity_map["name"])]
     if "category" in selector and "term" in selector:
         return [("category", selector["category"]), ("term", selector["term"])]
+    if "scope" in selector:
+        return [("scope", selector["scope"])]
     return []
 
 
@@ -4016,6 +4038,8 @@ def _ttl_selector_node_lines(
                 lines.append(f"<{entity_uri}> ss:entity_id <{base_iri}substance/{_ttl_iri_path(str(value))}> .")
             else:
                 lines.append(f"<{entity_uri}> ss:{predicate} {_ttl_value(value)} .")
+        if "scope" in selector:
+            lines.append(f"<{selector_uri}> ss:scope {_ttl_value(selector['scope'])} .")
         lines.append("")
         return lines
     for predicate, value in _ttl_selector_facts(selector):

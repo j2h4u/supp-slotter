@@ -150,6 +150,7 @@ def hydrate_selector(
     path: Path,
     label: str,
     allow_entity_name: bool,
+    allow_scope: bool = False,
 ) -> RelationSelector:
     """Hydrate one schema-shaped selector into the canonical runtime DTO.
 
@@ -161,7 +162,8 @@ def hydrate_selector(
         raise CardLoadError(path, f"{label} selector must be a mapping")
     selector = cast(Mapping[object, object], raw)
     if "entity" in selector:
-        if set(selector) != {"entity"}:
+        allowed_selector_fields = {"entity", "scope"} if allow_scope else {"entity"}
+        if not set(selector) <= allowed_selector_fields:
             raise CardLoadError(path, f"malformed {label} selector")
         entity = selector["entity"]
         if not isinstance(entity, Mapping):
@@ -175,7 +177,8 @@ def hydrate_selector(
             raise CardLoadError(path, "entity selector requires exactly one non-empty entity_id/name")
         if entity_name is not None and not allow_entity_name:
             raise CardLoadError(path, f"{label} entity selector requires stable entity_id")
-        return RelationSelector(entity_id=entity_id, entity_name=entity_name)
+        scope = _hydrate_selector_scope(selector, path=path, label=label, allow_scope=allow_scope)
+        return RelationSelector(entity_id=entity_id, entity_name=entity_name, scope=scope)
 
     if set(selector) != {"category", "term"}:
         raise CardLoadError(path, f"{label} selector requires non-empty category and term")
@@ -202,6 +205,20 @@ def resolve_selector(
     if selector.category is None or selector.term is None:
         return SelectorResolution((), "malformed_selector")
     return _resolve_term_selector(selector, substances, ontology_bundle)
+
+
+def _hydrate_selector_scope(
+    selector: Mapping[object, object],
+    *,
+    path: Path,
+    label: str,
+    allow_scope: bool,
+) -> str | None:
+    if "scope" not in selector:
+        return None
+    if not allow_scope:
+        raise CardLoadError(path, f"{label} selector does not support scope")
+    return _optional_non_empty_string(selector.get("scope"), path, "scope")
 
 
 def selector_identity_key(

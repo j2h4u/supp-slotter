@@ -519,9 +519,13 @@ _PROJECTION_RECORDS: Mapping[str, type[object]] = {
     "dashboard_state_catalog.usage_truth_table": RuntimeDashboardUsageTruthState,
     "dashboard_state_catalog.product_tracking_truth_table": RuntimeDashboardProductTrackingTruthState,
 }
-_MAPPING_RECORD_PATHS = frozenset(
-    {"glue_contract", "effect_scoring", "prefer_with_policy", "semantic_enrichment_grooming", "dashboard_state_catalog"}
-)
+_MAPPING_RECORD_PATHS = frozenset({
+    "glue_contract",
+    "effect_scoring",
+    "prefer_with_policy",
+    "semantic_enrichment_grooming",
+    "dashboard_state_catalog",
+})
 RUNTIME_PROJECTION_FIELDS: Mapping[str, frozenset[str]] = MappingProxyType({
     "": frozenset(
         field.name
@@ -602,9 +606,7 @@ def _dimension(row: Mapping[str, object], label: str) -> RuntimeEffectMatchDimen
     )
 
 
-def _semantic_enrichment_grooming(
-    row: Mapping[str, object], label: str
-) -> RuntimeSemanticEnrichmentGroomingPolicy:
+def _semantic_enrichment_grooming(row: Mapping[str, object], label: str) -> RuntimeSemanticEnrichmentGroomingPolicy:
     eligibility = _str(row["eligibility"], f"{label}.eligibility")
     if eligibility != SUPPORTED_GROOMING_ELIGIBILITY:
         raise _error(f"{label}.eligibility", f"unsupported eligibility {eligibility!r}")
@@ -616,9 +618,7 @@ def _semantic_enrichment_grooming(
     batch_size = _int(row["default_batch_size"], f"{label}.default_batch_size")
     if batch_size <= 0:
         raise _error(f"{label}.default_batch_size", "must be positive")
-    return RuntimeSemanticEnrichmentGroomingPolicy(
-        _str(row["id"], f"{label}.id"), eligibility, metrics, batch_size
-    )
+    return RuntimeSemanticEnrichmentGroomingPolicy(_str(row["id"], f"{label}.id"), eligibility, metrics, batch_size)
 
 
 def _policy(row: Mapping[str, object], label: str) -> RuntimeConstraintExecutionPolicy:

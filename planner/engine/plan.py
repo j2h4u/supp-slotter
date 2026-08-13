@@ -202,6 +202,7 @@ def _write_successful_plan(
             candidate_traces_by_item=runtime.feasibility.candidate_traces_by_item,
             ontology_bundle=runtime.inputs.ontology_bundle,
             advisory_by_slot=search.advisory_by_slot,
+            scheduling_constraint_plans=runtime.inputs.scheduling_constraint_plans,
         )
     )
 
@@ -222,7 +223,7 @@ def _write_successful_plan(
     slot_loads = schedule_slot_loads(schedule)
     print(f"\nschedule written to {paths.schedule_file}")
     print(f"slot loads: {slot_loads}")
-    print(f"kept_together pairs: {len(runtime.prefer_pairs)} declared, {search.prefer_pairs_together} together")
+    print(f"prefer-together pairs: {len(runtime.prefer_pairs)} declared, {search.prefer_pairs_together} together")
     print(f"warnings: {len(schedule['warnings'])}")
     return PlanResult(
         exit_code=0,

@@ -140,7 +140,7 @@ def test_runtime_scenarios_selects_exact_modules_and_nodes_in_order(
     assert "-n" not in pytest_command
     assert "--dist" not in pytest_command
     output = capsys.readouterr().out
-    assert "Running runtime-scenarios suite (14 targets)\n" in output
+    assert "Running runtime-scenarios suite (15 targets)\n" in output
     assert output.count("elapsed=") == 2
 
 
@@ -248,7 +248,9 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
     )
     assert "-n" not in calls[1]
     assert "--dist" not in calls[1]
-    smoke_node = "tests/test_scheduler_reviewer_authority.py::test_reviewer_only_knowledge_does_not_change_slot_assignment"
+    smoke_node = (
+        "tests/test_scheduler_reviewer_authority.py::test_reviewer_only_knowledge_does_not_change_slot_assignment"
+    )
     assert calls[1].count(smoke_node) == 1
     assert len(calls[1][6:-3]) == len(set(calls[1][6:-3]))
     assert run_unit_gate._coverage_inventory_items() == expected_inventory

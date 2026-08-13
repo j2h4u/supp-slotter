@@ -2310,14 +2310,60 @@
     "SchedulingConstraintEntitySelector": {
       "additionalProperties": false,
       "description": "Stable identity selector used by executable scheduling constraints.",
+      "oneOf": [
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "name"
+                ]
+              }
+            ]
+          },
+          "properties": {
+            "entity_id": {},
+            "name": {}
+          },
+          "required": [
+            "entity_id"
+          ]
+        },
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "entity_id"
+                ]
+              }
+            ]
+          },
+          "properties": {
+            "entity_id": {},
+            "name": {}
+          },
+          "required": [
+            "name"
+          ]
+        }
+      ],
       "properties": {
         "entity_id": {
-          "type": "string"
+          "pattern": "\\S",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "pattern": "\\S",
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
-      "required": [
-        "entity_id"
-      ],
       "title": "SchedulingConstraintEntitySelector",
       "type": "object"
     },
@@ -2424,6 +2470,14 @@
       "title": "SchedulingConstraintRecord",
       "type": "object"
     },
+    "SchedulingConstraintScope": {
+      "description": "",
+      "enum": [
+        "exact_form"
+      ],
+      "title": "SchedulingConstraintScope",
+      "type": "string"
+    },
     "SchedulingConstraintSelector": {
       "additionalProperties": false,
       "description": "",
@@ -2459,12 +2513,18 @@
                 "required": [
                   "entity"
                 ]
+              },
+              {
+                "required": [
+                  "scope"
+                ]
               }
             ]
           },
           "properties": {
             "category": {},
             "entity": {},
+            "scope": {},
             "term": {}
           },
           "required": [
@@ -2489,6 +2549,9 @@
               "type": "null"
             }
           ]
+        },
+        "scope": {
+          "$ref": "#/$defs/SchedulingConstraintScope"
         },
         "term": {
           "type": [

@@ -8,7 +8,7 @@ from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import WARNING_EMITTER_INTRA_PRODUCT_CONSTRAINT_CONFLICT
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.warning_policy import warning_policy_for_emitter
-from planner.query_model.session import SurrealSession
+from planner.query_model.session import SurrealSession, id_str
 from planner.scheduling_constraint_execution import interpret_execution_component_pair
 
 
@@ -52,8 +52,9 @@ def collect_intra_product_scheduling_constraint_conflicts(
                 continue
             pair_key = frozenset([source_id, target_id])
             for matching_row in _matching_rows_for_pair(rows, source_id, target_id, runtime_program):
-                constraint_id = matching_row.get("id")
-                if not isinstance(constraint_id, str):
+                raw_constraint_id = matching_row.get("id")
+                constraint_id = id_str(raw_constraint_id) if raw_constraint_id is not None else ""
+                if not constraint_id.strip():
                     raise OntologyInfrastructureError(
                         f"scheduling constraint execution row has invalid id: {constraint_id!r}",
                         code=MALFORMED,
@@ -79,7 +80,7 @@ def collect_intra_product_scheduling_constraint_conflicts(
                     "type": warning_type,
                     "item": item_id,
                     "product": product_id,
-                    "relation": operation,
+                    "relation": "",
                     "source_substance": source_id,
                     "target_substance": target_id,
                     "message": warning_policy.default_message,
@@ -112,15 +113,16 @@ def _constraint_matches_pair(
     runtime_program: RuntimeProgram,
 ) -> bool:
     """Delegate execution-grammar interpretation to the scheduler's one seam."""
-    constraint_id = row.get("id")
+    raw_constraint_id = row.get("id")
+    constraint_id = id_str(raw_constraint_id) if raw_constraint_id is not None else ""
     operation = row.get("operation")
     direction = row.get("match_direction")
     aggregation = row.get("aggregation")
     source_ids = row.get("source_substances")
     target_ids = row.get("target_substances")
-    if not isinstance(constraint_id, str) or not constraint_id.strip():
+    if not constraint_id.strip():
         raise OntologyInfrastructureError(
-            f"scheduling constraint execution row has invalid source id: {constraint_id!r}",
+            f"scheduling constraint execution row has invalid id: {constraint_id!r}",
             code=MALFORMED,
         )
     if not isinstance(operation, str) or not operation.strip():

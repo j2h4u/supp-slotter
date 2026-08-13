@@ -45,11 +45,20 @@ def test_substance_level_prefer_with_awards_colocation_bonus(
     creatine_product = "Sub 9C0908E7F7"
     citrulline_product = "Sub 3918Fe347E"
 
-    assert schedule["kept_together"] == [
+    assert schedule["pairwise_journal"] == [
         {
-            "pair": sorted([citrulline_product, creatine_product], key=str.casefold),
-            "together": True,
-            "slot": schedule["explanations"][creatine_product]["slot"],
+            "kind": "prefer_together",
+            "products": [citrulline_product, creatine_product],
+            "endpoints": [
+                {"product": creatine_product, "component": "Sub 9C0908E7F7", "substance_id": "sub_9c0908e7f7"},
+                {"product": citrulline_product, "component": "Sub 3918Fe347E", "substance_id": "sub_3918fe347e"},
+            ],
+            "slots": [schedule["explanations"][creatine_product]["slot"]] * 2,
+            "state": "together",
+            "satisfied": True,
+            "rule_id": "prefer_with_policy",
+            "source_field": "prefer_with",
+            "bonus_contribution": 3,
         }
     ]
     assert schedule["explanations"][creatine_product]["slot"] == schedule["explanations"][citrulline_product]["slot"]
@@ -93,7 +102,7 @@ def test_ambiguous_substance_level_prefer_with_awards_no_bonus(
         .default_message
     )
 
-    assert schedule["kept_together"] == []
+    assert schedule["pairwise_journal"] == []
     assert ambiguous_warnings == [
         {
             "category": "Companion product is ambiguous",

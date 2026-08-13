@@ -15,6 +15,11 @@ imports:
   - runtime-protocol
   - vocabulary-model
 
+enums:
+  SchedulingConstraintScope:
+    permissible_values:
+      exact_form:
+
 classes:
   SchedulingConstraint:
     slots: [id, key, effect, condition, action, rationale]
@@ -122,7 +127,7 @@ classes:
       score_delta: {range: integer, required: false}
 
   SchedulingConstraintSelector:
-    slots: [entity, category, term]
+    slots: [entity, category, term, scope]
     exactly_one_of:
       - slot_conditions:
           entity: {required: true}
@@ -132,6 +137,7 @@ classes:
           entity: {maximum_cardinality: 0}
           category: {required: true}
           term: {required: true}
+          scope: {maximum_cardinality: 0}
     slot_usage:
       entity:
         range: SchedulingConstraintEntitySelector
@@ -139,12 +145,21 @@ classes:
         inlined: true
       category: {range: string, required: false}
       term: {range: string, required: false}
+      scope: {range: SchedulingConstraintScope, required: false}
 
   SchedulingConstraintEntitySelector:
     description: Stable identity selector used by executable scheduling constraints.
-    slots: [entity_id]
+    slots: [entity_id, name]
+    exactly_one_of:
+      - slot_conditions:
+          entity_id: {required: true}
+          name: {maximum_cardinality: 0}
+      - slot_conditions:
+          entity_id: {maximum_cardinality: 0}
+          name: {required: true}
     slot_usage:
-      entity_id: {required: true, range: Substance}
+      entity_id: {required: false, range: Substance, pattern: '\S'}
+      name: {required: false, pattern: '\S'}
 
 slots:
   id: {identifier: true, required: true}
@@ -166,6 +181,7 @@ slots:
   category:
     range: string
   term:
+  scope:
   name:
   expression:
   weight: {range: decimal}

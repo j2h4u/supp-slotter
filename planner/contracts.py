@@ -220,12 +220,18 @@ class Dashboard:
 
 @dataclass(frozen=True, slots=True)
 class RelationSelector:
-    """A canonical relation endpoint: exactly one entity or category/term pair."""
+    """A canonical endpoint: exactly one entity or category/term pair.
+
+    ``scope`` is scheduling-constraint metadata.  Generic selector resolution
+    deliberately ignores it; the scheduling compiler validates the only
+    supported value (``exact_form``) before resolving the selector.
+    """
 
     entity_id: str | None = None
     entity_name: str | None = None
     category: str | None = None
     term: str | None = None
+    scope: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

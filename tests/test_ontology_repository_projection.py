@@ -5,8 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.artifacts import load_ontology
+from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.projection import _project_repository_with_projection, project_repository
 from rdflib import URIRef
 from rdflib.namespace import RDF, XSD

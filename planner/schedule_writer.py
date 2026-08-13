@@ -41,9 +41,10 @@ SCHEDULE_COMMENTS = {
         "Detailed review warnings.",
         "Warnings are prompts for human review; they are not medical advice.",
     ],
-    "kept_together": [
-        "Product pairs the planner tried to place in the same slot.",
-        "`together` says whether they landed together.",
+    "pairwise_journal": [
+        "Ontology-derived pairwise scheduling decisions.",
+        "Includes prefer-together bonuses, hard/advisory separations, and intra-product conflicts.",
+        "Each row retains resolved product/component endpoints and the final slot state.",
     ],
     "explanations": [
         "Per-product placement explanation.",

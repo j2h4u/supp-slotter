@@ -676,6 +676,9 @@
     "schema_version": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/schema_version"
     },
+    "scope": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/scope"
+    },
     "score": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/score"
     },

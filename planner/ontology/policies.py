@@ -368,7 +368,18 @@ def _validate_relation_ids_before_projection(relations: list[Relation]) -> None:
 
 
 def _constraint_selector(raw: object) -> RelationSelector:
-    return hydrate_selector(raw, path=ROOT / "ontology", label="constraint", allow_entity_name=False)
+    selector = hydrate_selector(
+        raw,
+        path=ROOT / "ontology",
+        label="constraint",
+        allow_entity_name=True,
+        allow_scope=True,
+    )
+    if selector.scope not in {None, "exact_form"}:
+        raise CardLoadError(ROOT / "ontology", "constraint selector has unsupported scope")
+    if selector.scope is not None and selector.entity_id is None:
+        raise CardLoadError(ROOT / "ontology", "constraint selector scope requires entity_id")
+    return selector
 
 
 def _assertion_selector(raw: object) -> RelationSelector:

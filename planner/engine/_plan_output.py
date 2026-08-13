@@ -9,6 +9,7 @@ relation warnings, and humanize-rewrite of the raw warning stream.
 
 from __future__ import annotations
 
+from itertools import combinations
 from pathlib import Path
 from typing import NamedTuple, cast
 
@@ -38,6 +39,7 @@ from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import WARNING_EMITTER_TRAIT_REVIEW_ASSIGNMENT
 from planner.ontology.policies import readable_policies
 from planner.ontology.presentation import load_review_presentation
+from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.warning_policy import warning_policy_for_emitter
 from planner.query_model import StackReadModel
 from planner.query_model.relation_warnings import RelationWarningRow
@@ -46,13 +48,18 @@ from planner.schedule_types import (
     DashboardReviewResult,
     ScheduleData,
     ScheduleExplanation,
-    ScheduleKeptTogether,
     ScheduleNeutralComponent,
+    SchedulePairwiseEndpoint,
+    SchedulePairwiseJournalEntry,
     SchedulePillbox,
     SchedulePlacementNote,
     SchedulePolicyContribution,
     ScheduleSummary,
     ScheduleWarning,
+)
+from planner.scheduling_constraint_execution import (
+    SchedulingConstraintExecutionPlan,
+    interpret_constraint_component_pair,
 )
 
 
@@ -73,6 +80,7 @@ class ScheduleOutputInput(NamedTuple):
     candidate_traces_by_item: dict[str, tuple[SlotCandidateTrace, ...]]
     ontology_bundle: OntologyBundle
     advisory_by_slot: dict[str, AdvisorySlotEvaluation]
+    scheduling_constraint_plans: tuple[SchedulingConstraintExecutionPlan, ...]
 
 
 class _SchedulePillboxContext(NamedTuple):
@@ -83,6 +91,15 @@ class _SchedulePillboxContext(NamedTuple):
     item_id_sequence: list[str]
     products: dict[str, Product]
     substances: dict[str, Substance]
+
+
+class _ConstraintPairContext(NamedTuple):
+    left_id: str
+    right_id: str
+    left_components: list[str]
+    right_components: list[str]
+    output_input: ScheduleOutputInput
+    runtime_program: RuntimeProgram
 
 
 def build_schedule_output(
@@ -99,9 +116,8 @@ def build_schedule_output(
     products = output_input.products
     substances = output_input.substances
     policies = output_input.policies
-    prefer_pairs = output_input.prefer_pairs
     read_model = output_input.read_model
-    schedule = _initial_schedule(output_input.pillboxes, assignment, active, products, prefer_pairs)
+    schedule = _initial_schedule(output_input.pillboxes, assignment, active, products)
     pillbox_context = _SchedulePillboxContext(
         schedule=schedule,
         assignment=assignment,
@@ -136,6 +152,7 @@ def build_schedule_output(
     )
 
     _populate_explanations(schedule, output_input)
+    schedule["pairwise_journal"] = _build_pairwise_journal(output_input)
     _append_intra_product_relation_conflicts(schedule, active)
 
     schedule["warnings"].extend(
@@ -199,7 +216,6 @@ def _initial_schedule(
     assignment: dict[str, str],
     active: ActiveIndex,
     products: dict[str, Product],
-    prefer_pairs: set[frozenset[str]],
 ) -> ScheduleData:
     return {
         "summary": cast(ScheduleSummary, {"take": {}}),
@@ -208,22 +224,7 @@ def _initial_schedule(
         "benefits": cast(list[DashboardReviewEntryWithMembers], []),
         "risks": cast(list[DashboardReviewEntryWithMembers], []),
         "warnings": cast(list[ScheduleWarning], []),
-        "kept_together": cast(
-            list[ScheduleKeptTogether],
-            [
-                {
-                    "pair": sorted(
-                        [format_item_product_name(item_id, active.item_products, products) for item_id in sorted(pair)],
-                        key=str.casefold,
-                    ),
-                    "together": (assignment[sorted(pair)[0]] == assignment[sorted(pair)[1]]),
-                    "slot": assignment[sorted(pair)[0]]
-                    if assignment[sorted(pair)[0]] == assignment[sorted(pair)[1]]
-                    else None,
-                }
-                for pair in sorted(prefer_pairs, key=lambda item_pair: sorted(item_pair))
-            ],
-        ),
+        "pairwise_journal": cast(list[SchedulePairwiseJournalEntry], []),
         "explanations": cast(dict[str, ScheduleExplanation], {}),
         "active_fact_index": [],
     }
@@ -401,6 +402,194 @@ def _neutral_components(
             }
         neutral.append(neutral_component)
     return neutral
+
+
+def _build_pairwise_journal(output_input: ScheduleOutputInput) -> list[SchedulePairwiseJournalEntry]:
+    """Project resolved prefer-with and separation decisions onto the winner.
+
+    The search intentionally keeps hard-block diagnostics out of its hot path.
+    Replaying the resolved execution grammar against the winning assignment
+    here makes successful separations observable, including rules whose
+    same-slot candidate was rejected before it could become a winner.
+    """
+
+    journal: list[SchedulePairwiseJournalEntry] = []
+    journal.extend(_prefer_pair_journal(output_input))
+    journal.extend(_separate_pair_journal(output_input))
+    journal.extend(_intra_product_journal(output_input))
+    return journal
+
+
+def _prefer_pair_journal(output_input: ScheduleOutputInput) -> list[SchedulePairwiseJournalEntry]:
+    runtime_program = output_input.ontology_bundle.runtime_program
+    policy = runtime_program.prefer_with_policy
+    bonus = runtime_program.effect_scoring.prefer_with_bonus
+    rows: list[SchedulePairwiseJournalEntry] = []
+    for pair in sorted(output_input.prefer_pairs, key=lambda item_pair: tuple(sorted(item_pair))):
+        item_ids = tuple(
+            sorted(
+                pair,
+                key=lambda item_id: format_item_product_name(
+                    item_id, output_input.active.item_products, output_input.products
+                ).casefold(),
+            )
+        )
+        endpoints = _prefer_endpoints(cast(tuple[str, str], item_ids), output_input)
+        product_names = [
+            format_item_product_name(item_id, output_input.active.item_products, output_input.products)
+            for item_id in item_ids
+        ]
+        slots: list[str | None] = [output_input.assignment[item_id] for item_id in item_ids]
+        together = len(set(slots)) == 1
+        rows.append({
+            "kind": "prefer_together",
+            "products": product_names,
+            "endpoints": endpoints,
+            "slots": slots,
+            "state": "together" if together else "apart",
+            "satisfied": together,
+            "rule_id": policy.id,
+            "source_field": policy.source_field,
+            "bonus_contribution": bonus if together else 0,
+        })
+    return rows
+
+
+def _prefer_endpoints(
+    item_ids: tuple[str, str],
+    output_input: ScheduleOutputInput,
+) -> list[SchedulePairwiseEndpoint]:
+    """Resolve the authored prefer_with edge(s) that created one item pair."""
+
+    left_id, right_id = item_ids
+    component_sets = output_input.active.active_components
+    endpoints: list[SchedulePairwiseEndpoint] = []
+    for source_item, target_item in ((left_id, right_id), (right_id, left_id)):
+        target_components = set(component_sets[target_item])
+        for source_id in component_sets[source_item]:
+            source = output_input.substances.get(source_id)
+            if source is None:
+                continue
+            for target_id in source.prefer_with:
+                if target_id not in target_components:
+                    continue
+                endpoints.append(_pairwise_endpoint(source_item, source_id, output_input))
+                endpoints.append(_pairwise_endpoint(target_item, target_id, output_input))
+                return endpoints
+    return endpoints
+
+
+def _separate_pair_journal(output_input: ScheduleOutputInput) -> list[SchedulePairwiseJournalEntry]:
+    item_ids = tuple(sorted(output_input.active.active_components))
+    runtime_program = output_input.ontology_bundle.runtime_program
+    rows: list[SchedulePairwiseJournalEntry] = []
+    relevant_plans = tuple(
+        plan
+        for plan in output_input.scheduling_constraint_plans
+        if plan.executable and (plan.blocks_slots or plan.scores_advisory)
+    )
+    for left_id, right_id in combinations(item_ids, 2):
+        left_components = output_input.active.active_components[left_id]
+        right_components = output_input.active.active_components[right_id]
+        for plan in sorted(relevant_plans, key=lambda item: item.id):
+            matched = _constraint_endpoints(
+                plan,
+                _ConstraintPairContext(
+                    left_id,
+                    right_id,
+                    left_components,
+                    right_components,
+                    output_input,
+                    runtime_program,
+                ),
+            )
+            if matched is None:
+                continue
+            endpoints, ordered_slots = matched
+            apart = ordered_slots[0] != ordered_slots[1]
+            rows.append({
+                "kind": "separate_constraint",
+                "products": [
+                    format_item_product_name(item_id, output_input.active.item_products, output_input.products)
+                    for item_id in (left_id, right_id)
+                ],
+                "endpoints": endpoints,
+                "slots": list(ordered_slots),
+                "state": "apart" if apart else "together",
+                "satisfied": apart,
+                "constraint_id": plan.id,
+                "disposition": "hard" if plan.blocks_slots else "advisory",
+                "rationale": plan.rationale or "",
+                "action": plan.action or "",
+            })
+    return rows
+
+
+def _constraint_endpoints(
+    plan: SchedulingConstraintExecutionPlan,
+    context: _ConstraintPairContext,
+) -> tuple[list[SchedulePairwiseEndpoint], tuple[str, str]] | None:
+    """Return deterministic source/target endpoints for a matched item pair."""
+
+    # The execution function is the single source of truth for directed versus
+    # symmetric matching.  Try authored direction first, then its reverse so
+    # symmetric rules still get stable endpoint labels.
+    for source_item, target_item, source_components, target_components in (
+        (context.left_id, context.right_id, context.left_components, context.right_components),
+        (context.right_id, context.left_id, context.right_components, context.left_components),
+    ):
+        if not interpret_constraint_component_pair(plan, source_components, target_components, context.runtime_program):
+            continue
+        source_id = next((item for item in source_components if item in plan.source_substance_ids), None)
+        target_id = next((item for item in target_components if item in plan.target_substance_ids), None)
+        if source_id is None or target_id is None:
+            continue
+        return [
+            _pairwise_endpoint(source_item, source_id, context.output_input),
+            _pairwise_endpoint(target_item, target_id, context.output_input),
+        ], (context.output_input.assignment[context.left_id], context.output_input.assignment[context.right_id])
+    return None
+
+
+def _intra_product_journal(output_input: ScheduleOutputInput) -> list[SchedulePairwiseJournalEntry]:
+    rows: list[SchedulePairwiseJournalEntry] = []
+    for item_id in sorted(output_input.active.active_components):
+        conflicts = output_input.active.intra_product_relation_conflicts_by_item.get(item_id, [])
+        if not conflicts:
+            continue
+        product_name = format_item_product_name(item_id, output_input.active.item_products, output_input.products)
+        rows.extend(
+            {
+                "kind": "intra_product_conflict",
+                "products": [product_name],
+                "endpoints": [
+                    _pairwise_endpoint(item_id, conflict["source_substance"], output_input),
+                    _pairwise_endpoint(item_id, conflict["target_substance"], output_input),
+                ],
+                "slots": [output_input.assignment[item_id]],
+                "state": "unresolvable",
+                "satisfied": False,
+                "constraint_id": conflict["constraint_id"],
+                "disposition": "hard",
+                "rationale": conflict["message"],
+                "action": conflict["action"],
+            }
+            for conflict in conflicts
+        )
+    return rows
+
+
+def _pairwise_endpoint(
+    item_id: str,
+    substance_id: str,
+    output_input: ScheduleOutputInput,
+) -> SchedulePairwiseEndpoint:
+    substance = output_input.substances.get(substance_id)
+    return {
+        "product": format_item_product_name(item_id, output_input.active.item_products, output_input.products),
+        "component": format_substance_name(substance) if substance is not None else substance_id,
+        "substance_id": substance_id,
+    }
 
 
 def _append_intra_product_relation_conflicts(schedule: ScheduleData, active: ActiveIndex) -> None:
