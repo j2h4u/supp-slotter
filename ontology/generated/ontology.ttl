@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 933e1e3c4e0804bb3f0513cd011501158086bcde1561969accdb7839ba393e82
+# source-hash: a3b6c4e8b4ee59bde07c8215957535adc46247a96c15d9f1733c58d8293ceffc
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -855,6 +855,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/usage_truth_table> a ss:SchemaSlot ;
   ss:name "usage_truth_table" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/use_pattern> a ss:SchemaSlot ;
+  ss:name "use_pattern" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/value> a ss:SchemaSlot ;
   ss:name "value" .

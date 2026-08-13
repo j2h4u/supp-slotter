@@ -1,6 +1,7 @@
 id: prd_bb212cffc2
 name: Coenzyme B-Complex
 brand: Country Life
+use_pattern: not_every_day
 urls:
 - https://countrylifevitamins.com/products/coenzyme-b-complex-caps
 components:

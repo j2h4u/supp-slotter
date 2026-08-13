@@ -9,8 +9,11 @@
 #
 # STACKS
 # ------
-# daily     Products taken every day regardless of training. Maps to the "daily"
-#           pillbox with morning_empty / morning_food / day_food / evening_empty.
+# daily     Ordinary active routing stack. Maps to the "daily" physical pillbox
+#           with morning_empty / morning_food / day_food / evening_empty. A product
+#           marked `use_pattern: not_every_day` remains in daily; presentation
+#           separates it in the generated view, with no frequency or calendar model
+#           implied.
 # training  Products taken on workout days only. Maps to the "training" pillbox
 #           with pre_workout / post_workout slots.
 # inactive  Products that are on the shelf but not currently scheduled. Excluded
@@ -45,6 +48,8 @@ daily:
 - prd_d0u8k66ypy
 - prd_w2s970gps4
 - prd_8mvv1w128a
+- prd_7ae9a92d3b
+- prd_htuhz2s2gt
 training:
 - prd_20bf2df267
 - prd_cfce0b36b6
@@ -57,7 +62,6 @@ inactive:
 - prd_qmgu4q8ipo
 - prd_sbhmi6szff
 - prd_a6342d7725
-- prd_7ae9a92d3b
 - prd_91a71b69f0
 - prd_7a4ee33852
 - prd_55d65df796

@@ -62,6 +62,10 @@ components:
 #   label: ""
 #   amount: ""
 
+# Optional presentation marker. Omit for the daily-base presentation. This
+# does not change stack routing, slot scoring, constraints, or dose/frequency.
+# use_pattern: not_every_day
+
 # ---------------------------------------------------------------------------
 # NOTES & CONCERNS
 # ---------------------------------------------------------------------------

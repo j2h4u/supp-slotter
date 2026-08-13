@@ -784,6 +784,14 @@
           "name": "urls",
           "range": "string",
           "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "use_pattern",
+          "range": "ProductUsePattern",
+          "required": false
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Product"
@@ -845,6 +853,14 @@
           "multivalued": true,
           "name": "urls",
           "range": "string",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "use_pattern",
+          "range": "ProductUsePattern",
           "required": false
         }
       ],
@@ -3629,6 +3645,11 @@
               "kind": "sequence",
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/urls",
               "source": "urls[]"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/use_pattern",
+              "source": "use_pattern"
             }
           ],
           "maintenance": {

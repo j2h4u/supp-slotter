@@ -18,9 +18,11 @@ def substance_from_mapping(data: dict[str, object]) -> Substance:
 def product_from_mapping(data: dict[str, object]) -> Product:
     name_raw = data.get("name")
     brand_raw = data.get("brand")
+    use_pattern_raw = data.get("use_pattern")
     return Product(
         id=str(data["id"]),
         name=name_raw if isinstance(name_raw, str) else "",
         components=(),
         brand=brand_raw if isinstance(brand_raw, str) else None,
+        use_pattern=use_pattern_raw if isinstance(use_pattern_raw, str) else None,
     )

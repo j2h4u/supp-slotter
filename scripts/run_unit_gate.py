@@ -65,6 +65,7 @@ RUNTIME_SCENARIOS_MODULES = (
     Path("tests/test_find_command.py"),
     Path("tests/test_plan_pairwise_journal.py"),
     Path("tests/test_plan_prefer_with.py"),
+    Path("tests/test_non_daily_presentation.py"),
     Path("tests/test_plan_review_with.py"),
     Path("tests/test_relation_review.py"),
     Path("tests/test_stack_validation.py"),

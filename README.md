@@ -67,6 +67,13 @@ Post-workout
 
 The full generated `schedule.yaml` also includes placement notes, warnings, kept-together products, benefit/risk clusters, and an active fact index for review.
 
+Products may optionally set `use_pattern: not_every_day` for presentation. The
+marker keeps the product in the ordinary `daily` stack and physical schedule;
+it only places the active product in `summary.usage_groups.not_every_day` and
+the corresponding human view section. Omission places it in
+`summary.usage_groups.daily_base`. This is not a numeric frequency or dose
+model.
+
 ## Who It Helps
 
 - People with more than a few bottles and no desire to keep the whole interaction graph in their head.

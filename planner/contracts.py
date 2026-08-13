@@ -187,6 +187,7 @@ class Product:
     urls: tuple[str, ...] = ()
     notes: str | None = None
     concerns: tuple[Concern, ...] = ()
+    use_pattern: str | None = None
 
 
 class StackEntry(TypedDict):

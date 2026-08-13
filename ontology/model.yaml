@@ -18,6 +18,9 @@ enums:
       supports_no_rule:
       insufficient:
       conflicting:
+  ProductUsePattern:
+    permissible_values:
+      not_every_day:
 classes:
   Ontology:
     description: Root metadata for a compiled ontology release.
@@ -35,7 +38,7 @@ classes:
     slots: [aliases, form, notes, concerns, prefer_with, knowledge_assertions, schedule_assertions, scheduling_assessment, semantic_enrichment_attempted_on]
   Product:
     is_a: IdentifiedNode
-    slots: [brand, components, urls, notes, concerns]
+    slots: [brand, components, urls, notes, concerns, use_pattern]
   ProductComponent:
     slots: [substance, label, amount, notes]
   Concern:
@@ -155,11 +158,12 @@ classes:
       component_uniqueness: required
       component_uniqueness_source: components[]
       component_uniqueness_field: substance
-    slots: [id, name, components, brand, urls, notes, concerns]
+    slots: [id, name, components, brand, urls, notes, concerns, use_pattern]
     slot_usage:
       id: {required: true, pattern: '^prd_[a-z0-9]{10}$'}
       name: {required: true, pattern: '^.+$'}
       components: {required: true, minimum_cardinality: 1, multivalued: true, range: ProductComponent, inlined: true, inlined_as_list: true}
+      use_pattern: {range: ProductUsePattern, multivalued: false}
       concerns: {multivalued: true, range: CardConcern, inlined: true, inlined_as_list: true}
 slots:
   schema_version: {}
@@ -186,6 +190,7 @@ slots:
   substance: {required: true, range: Substance, inlined: false}
   amount: {}
   concerns: {multivalued: true, range: Concern, inlined: true, inlined_as_list: true}
+  use_pattern: {range: ProductUsePattern, multivalued: false}
   kind: {}
   knowledge_assertions: {multivalued: true, range: KnowledgeAssertion, inlined: true, inlined_as_list: true}
   schedule_assertions: {multivalued: true, range: ScheduleAssertion, inlined: true, inlined_as_list: true}

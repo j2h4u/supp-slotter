@@ -40,6 +40,7 @@ def load_product(path: Path, bundle: OntologyBundle) -> Product:
             urls=tuple(_string_list(data.get("urls"))),
             notes=cast(str | None, data.get("notes")),
             concerns=_concerns(data.get("concerns"), path, bundle),
+            use_pattern=cast(str | None, data.get("use_pattern")),
         )
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e

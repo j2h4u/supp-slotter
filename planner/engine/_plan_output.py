@@ -192,7 +192,14 @@ def build_schedule_output(
         list[SchedulePlacementNote],
         build_placement_notes(cast(dict[str, object], schedule)),
     )
-    schedule["summary"] = cast(ScheduleSummary, build_schedule_summary(cast(dict[str, object], schedule)))
+    schedule["summary"] = cast(
+        ScheduleSummary,
+        build_schedule_summary(
+            cast(dict[str, object], schedule),
+            products=products,
+            stack_entries=output_input.stack_entries,
+        ),
+    )
 
     return schedule, raw_warnings
 
@@ -218,7 +225,7 @@ def _initial_schedule(
     products: dict[str, Product],
 ) -> ScheduleData:
     return {
-        "summary": cast(ScheduleSummary, {"take": {}}),
+        "summary": cast(ScheduleSummary, {"take": {}, "usage_groups": {"daily_base": [], "not_every_day": []}}),
         "placement_notes": cast(list[SchedulePlacementNote], []),
         "pillboxes": cast(dict[str, SchedulePillbox], build_empty_schedule_pillboxes(pillboxes)),
         "benefits": cast(list[DashboardReviewEntryWithMembers], []),

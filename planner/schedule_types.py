@@ -100,6 +100,7 @@ class SchedulePlacementNote(TypedDict):
 
 class ScheduleSummary(TypedDict):
     take: dict[str, list[str]]
+    usage_groups: dict[str, list[str]]
 
 
 class ScheduleAssignmentExplanation(TypedDict):

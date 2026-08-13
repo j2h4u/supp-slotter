@@ -755,6 +755,9 @@
             "array",
             "null"
           ]
+        },
+        "use_pattern": {
+          "$ref": "#/$defs/ProductUsePattern"
         }
       },
       "required": [
@@ -812,6 +815,9 @@
             "array",
             "null"
           ]
+        },
+        "use_pattern": {
+          "$ref": "#/$defs/ProductUsePattern"
         }
       },
       "required": [
@@ -853,6 +859,14 @@
       ],
       "title": "ProductComponent",
       "type": "object"
+    },
+    "ProductUsePattern": {
+      "description": "",
+      "enum": [
+        "not_every_day"
+      ],
+      "title": "ProductUsePattern",
+      "type": "string"
     },
     "RelationAssertionCatalog": {
       "additionalProperties": false,

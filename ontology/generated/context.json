@@ -852,6 +852,9 @@
     "usage_truth_table": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/usage_truth_table"
     },
+    "use_pattern": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/use_pattern"
+    },
     "value": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/value"
     },

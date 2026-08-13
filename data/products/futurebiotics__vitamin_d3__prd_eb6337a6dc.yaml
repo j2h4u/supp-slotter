@@ -1,6 +1,7 @@
 id: prd_eb6337a6dc
 name: Vitamin D3
 brand: Futurebiotics
+use_pattern: not_every_day
 urls:
 - https://futurebiotics.com/products/vitamin-d3-10-000iu-250mcg
 components:

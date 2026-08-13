@@ -120,6 +120,7 @@ repository_projection:
         - {kind: slot, source: id, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
         - {kind: alias, source: name, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/label}
         - {kind: slot, source: brand, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/brand}
+        - {kind: slot, source: use_pattern, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/use_pattern}
         - {kind: sequence, source: "urls[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/urls}
         - {kind: inlined-node, source: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/components, target: ProductComponent}
         - {kind: reference, source: "components[].substance", subject: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/substance, target: Substance}
