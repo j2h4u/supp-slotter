@@ -123,6 +123,11 @@ proven neutrality. Remove or narrow an existing heuristic when it is clearly
 wrong, form-inapplicable, mechanistically direction-ambiguous without
 convergence, or contradicted by stronger evidence.
 
+A coherent, applicable weak heuristic may be more useful than leaving an axis
+without guidance, but it does not override stronger contrary evidence or resolve
+genuinely bidirectional evidence or unknown-form mechanisms. This focused
+reconsideration does not imply an automatic or broad re-review.
+
 For example, a nattokinase enzyme/gastric rationale is not automatically
 directional: acid buffering, proteases, gastric emptying, enteric versus
 quick-release formulation, and uncertain absorption can compete. This example

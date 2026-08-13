@@ -1,6 +1,8 @@
 id: prd_vitamealc8
 name: Vitamin C
 brand: VitaMeal
+urls:
+- https://vitameal.com/catalog/product-239/
 components:
 - substance: sub_vcnaasc800
   label: L-sodium ascorbate, including vitamin C

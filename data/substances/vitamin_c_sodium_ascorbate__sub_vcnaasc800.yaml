@@ -1,15 +1,27 @@
 id: sub_vcnaasc800
 name: Vitamin C
 form: sodium ascorbate
+semantic_enrichment_attempted_on: '2026-08-13'
 aliases:
 - L-ascorbate sodium
 - L-аскорбат натрия
-notes: Sodium ascorbate vitamin C form from VitaMeal Vitamin C. Product label lists L-sodium ascorbate 900 mg, including vitamin
-  C 800 mg. Reviewer context mirrors buffered vitamin C antioxidant and collagen-hydroxylation cofactor roles. Sodium counter-ion
-  is not modeled as a separate component until the label exposes a meaningful sodium amount.
+notes: Sodium ascorbate vitamin C form from VitaMeal Vitamin C. Product label lists L-sodium ascorbate 900 mg, including vitamin C 800 mg and approximately 104 mg sodium. Buffered vitamin C antioxidant and collagen-hydroxylation context is retained; sodium is separately modeled on the Product component.
 schedule:
   intake:
   - food_preferred
+scheduling_assessment:
+  intake:
+    conclusion: supports_preference
+    policy: food_preferred
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/
+    - https://vitameal.com/catalog/product-239/
+    summary: Low-confidence soft food/tolerance heuristic for this exact 900 mg sodium-ascorbate product; food may support adherence and GI comfort, but this is not an absorption requirement or universal co-schedule.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/
+    summary: No comparative clock-time rule was demonstrated for sodium ascorbate.
 knowledge:
   context:
   - connective_tissue_support

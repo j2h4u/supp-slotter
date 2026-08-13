@@ -1,4 +1,18 @@
 name: Phospholipids
-notes: Generic phospholipids disclosed on the Psalae Antarctiv Krill oil label. The
-  label does not identify a specific phospholipid such as phosphatidylcholine.
+semantic_enrichment_attempted_on: '2026-08-13'
+notes: Generic phospholipids disclosed on the active Psalae Antarctiv Krill oil label at 100 mg per softgel. The label does not identify a specific phospholipid or carrier allocation; do not duplicate the parent Krill Oil, EPA, or DHA scheduling evidence on this component card.
 id: sub_t8sx7e49j7
+scheduling_assessment:
+  intake:
+    conclusion: insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/30799231/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC4374210/
+    - https://pubmed.ncbi.nlm.nih.gov/26328782/
+    summary: No standalone meal rule is established for the generic 100 mg Psalae phospholipid component; species/carrier allocation is unresolved and parent Krill Oil/EPA/DHA evidence must not be duplicated.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/30799231/
+    - https://pubmed.ncbi.nlm.nih.gov/26328782/
+    summary: No comparative clock-time rule was demonstrated for generic phospholipids.
