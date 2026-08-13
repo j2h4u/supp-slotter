@@ -12,13 +12,13 @@ scheduling_assessment:
     sources:
     - https://ods.od.nih.gov/factsheets/Potassium-HealthProfessional/
     - https://pubmed.ncbi.nlm.nih.gov/1875495/
-    summary: No direct fed-versus-fasted absorption evidence establishes a meal preference for potassium citrate; GI tolerance and pharmacologic dose contexts do not transfer to the active low-dose electrolyte component.
+    summary: No direct fed-versus-fasted absorption evidence establishes a meal preference for potassium citrate; GI tolerance and pharmacologic dose contexts do not transfer to the active low-dose electrolyte component, and practice may vary by tolerability.
   timing:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Potassium-HealthProfessional/
     - https://pubmed.ncbi.nlm.nih.gov/1875495/
-    summary: No comparative clock-time rule was demonstrated for potassium citrate.
+    summary: No comparative clock-time rule was demonstrated for potassium citrate; pharmacologic urinary-alkalinization timing does not transfer to this low-dose electrolyte.
   activity:
     conclusion: insufficient
     sources:

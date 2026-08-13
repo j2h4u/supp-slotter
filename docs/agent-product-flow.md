@@ -97,6 +97,37 @@ new evidence or changed applicability. Add an executable `schedule.*` fact only
 when an adjudicated same-axis result supports it, then inspect the planner's
 actual explanation and any global balance effects.
 
+#### Practical evidence calibration
+
+This practical slotter may use weak but transparent scheduling heuristics. Direct
+human fed-versus-fasted, clock-time, or activity comparisons are preferred, but
+their absence does not by itself require deleting a useful soft heuristic. A
+soft preference may be admitted when lower-tier evidence converges on a coherent
+direction that applies to the exact substance, form, and product: for example, a
+plausible mechanism together with formulation facts, established practice, or
+manufacturer guidance. Manufacturer guidance is corroborating lower-tier support,
+never decisive by itself, and the independent-grounded-evidence-over-vendor
+hierarchy remains in force.
+
+Material changes to this calibration standard or to a product's form, carrier,
+dose disclosure, or applicability trigger re-review of affected soft
+preferences; they do not silently rewrite existing scheduling facts.
+
+The `scheduling_assessment` sources and summary must disclose the evidence basis,
+limitations, applicability, and whether the preference is mechanistic or
+heuristic. Weak evidence can justify only a soft preference; it never justifies a
+hard constraint, safety claim, universal medical recommendation, or dose-derived
+planner weight. Keep `insufficient` when mechanisms point both ways, formulation
+is materially unknown, or no direction can be justified; `insufficient` is not
+proven neutrality. Remove or narrow an existing heuristic when it is clearly
+wrong, form-inapplicable, mechanistically direction-ambiguous without
+convergence, or contradicted by stronger evidence.
+
+For example, a nattokinase enzyme/gastric rationale is not automatically
+directional: acid buffering, proteases, gastric emptying, enteric versus
+quick-release formulation, and uncertain absorption can compete. This example
+sets the evidence boundary, not a final card decision.
+
 ### Mandatory completion handoff
 
 For every new active Substance or semantic enrichment, the task/commit report
@@ -265,9 +296,11 @@ A label-only Choline card can be structurally valid yet semantically incomplete.
 The routing example is to research and, only if adjudicated, admit an
 acetylcholine-precursor/cholinergic-context fact in the appropriate knowledge
 layer; do not accept a generic “supports all nootropics” relation. Do not add
-AM/PM, food, or activity rules without comparative evidence. Preserve
-`insufficient` assessments when the search does not establish a rule, and use a
-mechanism-specific conditional review only when direct evidence supports it.
+AM/PM, food, or activity rules without comparative evidence or convergent,
+applicable lower-tier support documented under Practical evidence calibration.
+Preserve `insufficient` assessments when the search does not establish a rule,
+and use a mechanism-specific conditional review only when the evidence supports
+it.
 This example describes the decision boundary, not current accepted Choline
 facts; check and adjudicate current evidence before writing any card.
 

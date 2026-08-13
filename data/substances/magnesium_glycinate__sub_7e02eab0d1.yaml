@@ -12,13 +12,13 @@ scheduling_assessment:
     sources:
     - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
     - https://pubmed.ncbi.nlm.nih.gov/40918053/
-    summary: No direct controlled evidence establishes a fed-versus-fasted preference for magnesium glycinate; tolerability is dose and product dependent.
+    summary: No direct controlled evidence establishes a fed-versus-fasted preference for magnesium glycinate; tolerability and practical meal choice are dose- and product-dependent, with no universal requirement.
   timing:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
     - https://pubmed.ncbi.nlm.nih.gov/40918053/
-    summary: No comparative evening or clock-time rule was demonstrated for magnesium glycinate.
+    summary: No comparative evening or clock-time rule was demonstrated; a bounded sleep-recovery trial does not establish a general timing rule.
 knowledge:
   context:
   - sleep_recovery

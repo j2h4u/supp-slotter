@@ -1,10 +1,8 @@
 id: sub_7628e4f478
 name: Vitamin B5
 form: pantothenic acid
-notes: 'Water-soluble vitamin, form pantothenic acid. Essential cofactor for CoA synthesis and fatty acid metabolism. Typical
-  supplemental dose 5-15 mg/day; well-tolerated even at higher doses (UL not established). Mild GI discomfort possible on
-  empty stomach — take with food. Source: NIH ODS (Pantothenic Acid Fact Sheet). Coenzyme B-Complex also supplies pantethine,
-  an active B5-related form.'
+semantic_enrichment_attempted_on: '2026-08-13'
+notes: 'Water-soluble vitamin. The active Coenzyme B-Complex supplies calcium D-pantothenate plus pantethine, 50 mg total per 2 capsules. Pantothenic acid is an essential cofactor for CoA synthesis and fatty-acid metabolism; no exact-form meal, GI, high-dose-tolerance, or vascular scheduling rule is established. Source: NIH ODS (Pantothenic Acid Fact Sheet).'
 scheduling_assessment:
   intake:
     conclusion: insufficient
@@ -19,7 +17,6 @@ scheduling_assessment:
 knowledge:
   context:
   - mitochondrial_health
-  - vascular_health
   effect:
   - fatty_acid_metabolism_support
   kind:

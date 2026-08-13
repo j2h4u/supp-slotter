@@ -11,19 +11,19 @@ scheduling_assessment:
     sources:
     - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
     - https://pubmed.ncbi.nlm.nih.gov/14596323/
-    summary: Magnesium citrate's formulation bioavailability does not establish a general fed or fasted preference.
+    summary: Citrate formulation bioavailability does not establish a general fed or fasted preference; tolerability and any practical meal choice remain product- and person-dependent.
   timing:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
     - https://pubmed.ncbi.nlm.nih.gov/14596323/
-    summary: No general clock-time rule was demonstrated for magnesium citrate.
+    summary: No general clock-time rule was demonstrated; formulation bioavailability is not clock evidence.
   activity:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
     - https://pubmed.ncbi.nlm.nih.gov/14596323/
-    summary: The training product context does not establish pre-, during-, or post-workout placement for magnesium.
+    summary: The training product context and formulation evidence do not establish pre-, during-, or post-workout placement for magnesium.
 knowledge:
   context:
   - workout_performance

@@ -29,6 +29,9 @@ current scheduler and assessment boundaries.
 The current YAML contract and scheduler-score semantics are documented in
 [Agent Product Flow's current scheduling-assessment contract](agent-product-flow.md#current-scheduling-assessment-contract)
 and [research-state glossary](agent-product-flow.md#research-state-glossary).
+For the practical threshold for admitting a transparent soft heuristic when
+ideal comparative evidence is absent, follow [Agent Product Flow's practical
+evidence calibration](agent-product-flow.md#practical-evidence-calibration).
 
 ## Why the broader proposal is deferred
 
@@ -59,7 +62,8 @@ The following distinctions are essential:
   while supporting no meal, timing, or exercise rule.
 - Vendor/manufacturer evidence is lower priority than independent medical
   evidence. A label can describe a formulation accurately without establishing
-  a general timing effect.
+  a general timing effect; it may only corroborate a convergent soft heuristic
+  under the practical calibration policy.
 
 This proposal borrows concepts from evidence and gap-mapping practice, but is
 not a GRADE implementation. See the [Cochrane GRADE chapter](https://training.cochrane.org/handbook/current/chapter-14),
@@ -80,9 +84,14 @@ weighting system:
 7. Marketing material.
 
 Official labels are useful mainly for formulation, composition, serving, and
-carrier facts. They are weak evidence for timing tie-breakers unless independent
-evidence supports the same claim. Marketing is useful, if at all, only as a
-lead to investigate.
+carrier facts. They are weak evidence for timing tie-breakers and cannot decide
+one alone; they may corroborate a coherent, applicable lower-tier synthesis
+under the practical calibration policy. Marketing is useful, if at all, only as
+a lead to investigate.
+
+Material changes to the calibration standard or to a product's form, carrier,
+dose disclosure, or applicability trigger re-review of affected soft
+preferences; existing scheduling facts are not silently rewritten.
 
 ## Deferred broader coverage design
 

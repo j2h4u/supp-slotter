@@ -3,11 +3,10 @@ name: Eicosapentaenoic acid
 aliases:
 - EPA
 semantic_enrichment_attempted_on: '2026-08-13'
-notes: 'Omega-3 fatty acid component listed as EPA on the Minami Healthy Foods nattokinase label. The active product is low-dose, phospholipid-rich krill oil; formulation, dose, and bleeding-medication context limit transferability. NIH ODS and human PK evidence do not establish a product-independent meal or clock-time rule. Vitamin E is relevant antioxidant context for omega-3 PUFA intake.'
+notes: 'Omega-3 fatty acid component listed as EPA on the active Psalae krill-oil label at 80 mg per softgel. The EPA amount is known; carrier allocation/source form remains unresolved. Formulation, dose, and bleeding-medication context limit transferability. NIH ODS and human PK evidence do not establish a product-independent meal or clock-time rule. Vitamin E is relevant antioxidant context for omega-3 PUFA intake.'
 concerns:
 - kind: data_quality
-  text: Minami Nattokinase lists EPA/fish oil but does not disclose EPA source form or amount; Nature's Truth Antarctic Krill
-    Oil captures EPA amount separately in its product card.
+  text: The active Psalae krill-oil label discloses 80 mg EPA per softgel, but the EPA carrier allocation/source form remains unresolved; Minami Nattokinase lists EPA/fish oil without a per-component amount.
 scheduling_assessment:
   intake:
     conclusion: insufficient
@@ -15,14 +14,14 @@ scheduling_assessment:
     - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
     - https://pubmed.ncbi.nlm.nih.gov/28344197/
     - https://pubmed.ncbi.nlm.nih.gov/25884846/
-    summary: Food and formulation affect studied omega-3 absorption, but evidence is insufficient for a product-independent meal rule for this low-dose phospholipid-rich krill product.
+    summary: Food and formulation affect studied omega-3 absorption in bidirectional and product-dependent ways; no direct comparison establishes a universal meal requirement for the active low-dose phospholipid-rich krill product. Its 80 mg EPA per softgel is known, but carrier allocation/source form remains unresolved.
   timing:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
     - https://pubmed.ncbi.nlm.nih.gov/28344197/
     - https://pubmed.ncbi.nlm.nih.gov/25884846/
-    summary: Meal-relative PK findings do not establish a morning or evening clock-time rule.
+    summary: Meal-relative PK findings do not establish a morning or evening clock-time rule; no clock preference is justified for the exact form and dose.
 knowledge:
   context:
   - skin_support

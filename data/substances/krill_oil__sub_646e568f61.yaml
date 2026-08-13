@@ -1,16 +1,21 @@
 id: sub_646e568f61
 name: Krill Oil
 semantic_enrichment_attempted_on: '2026-08-13'
-notes: 'Omega-3 oil from Antarctic krill (Euphausia superba). Human relative-bioavailability findings versus fish oil are mixed and formulation- and dose-dependent; the active product discloses 100 mg phospholipids without an EPA/DHA carrier split. Extra dietary fat is not established as required. Preserve bleeding-medication review without a categorical blood-thinning claim. Sources: PMID 30799231; PMID 25884846; PMID 26328782; NIH ODS Omega-3 Fatty Acids.'
+notes: 'Omega-3 oil from Antarctic krill (Euphausia superba). Human relative-bioavailability findings versus fish oil are mixed and formulation- and dose-dependent. The active Psalae product discloses 100 mg phospholipids per softgel; inactive Nature''s Truth label/practice is corroborating only, and its formulation cannot be transferred to Psalae. Extra dietary fat is not established as required. Preserve bleeding-medication review without a categorical blood-thinning claim. Sources: PMID 30799231; PMID 25884846; PMID 26328782; NIH ODS Omega-3 Fatty Acids.'
+schedule:
+  intake:
+  - food_preferred
 scheduling_assessment:
   intake:
-    conclusion: insufficient
+    conclusion: supports_preference
+    policy: food_preferred
     sources:
     - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
     - https://pubmed.ncbi.nlm.nih.gov/30799231/
     - https://pubmed.ncbi.nlm.nih.gov/25884846/
     - https://pubmed.ncbi.nlm.nih.gov/26328782/
-    summary: Human food and relative-bioavailability evidence is mixed across formulations; it is insufficient for a product-independent meal preference for this krill oil.
+    - https://naturestruthproducts.ca/products/100-pure-red-krill-oil-1000-mg/
+    summary: 'Low-confidence soft food heuristic: human relative-bioavailability evidence and formulation-dependent lipid handling are mixed; inactive Nature''s Truth label/practice corroborates a with-food direction only, while the active Psalae product discloses 100 mg phospholipids per softgel and its own carrier/formulation limits transfer. This is not a universal requirement.'
   timing:
     conclusion: insufficient
     sources:
