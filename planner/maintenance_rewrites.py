@@ -16,86 +16,87 @@ from planner.contracts import CardLoadError
 from planner.maintenance_atomic import EditPlan, EditPlanEntry
 from planner.maintenance_mapping import product_from_mapping, substance_from_mapping
 from planner.maintenance_substance_resolution import (
-    MaintenanceContract,
-    ReferenceResolution,
-    has_draft_reference,
-    resolve_references,
-    rewrite_references,
+    product_has_draft_component_ref,
+    resolve_product_component_refs,
 )
 from planner.paths import strip_root_prefix
 
 
 @dataclass
 class _ProductSubstanceRewriteContext:
-    repository_root: Path
+    products_dir: Path
+    substances_dir: Path
     substance_renames: dict[str, str]
     product_renames: dict[str, str]
     plan: EditPlan
     errors: list[str]
-    contract: MaintenanceContract
 
 
-def plan_substance_ref_rewrites(  # noqa: PLR0913
+def plan_substance_ref_rewrites(
     data_dir: Path,
     substance_renames: dict[str, str],
     product_renames: dict[str, str],
     plan: EditPlan,
     *,
     collect_errors: list[str] | None = None,
-    contract: MaintenanceContract,
 ) -> bool:
     errors = collect_errors if collect_errors is not None else []
     error_count = len(errors)
     context = _ProductSubstanceRewriteContext(
-        repository_root=data_dir,
+        products_dir=data_dir / "products",
+        substances_dir=data_dir / "substances",
         substance_renames=substance_renames,
         product_renames=product_renames,
         plan=plan,
         errors=errors,
-        contract=contract,
     )
     if not _plan_product_substance_ref_rewrites(
         context,
     ):
         return False
     if substance_renames:
-        _plan_substance_prefer_with_rewrites(context)
+        _plan_substance_prefer_with_rewrites(
+            data_dir / "substances",
+            substance_renames,
+            plan,
+        )
     return len(errors) == error_count
 
 
-def rewrite_stack_product_refs(
-    stacks_data: dict[str, object], product_renames: dict[str, str], resolution: ReferenceResolution
-) -> None:
-    rewrite_references(stacks_data, resolution, product_renames)
+def rewrite_stack_product_refs(stacks_data: dict[str, object], product_renames: dict[str, str]) -> None:
+    for stack_name, items in stacks_data.items():
+        if not isinstance(items, list):
+            continue
+        new_items: list[object] = []
+        for item in cast(list[object], items):
+            if isinstance(item, str):
+                new_items.append(product_renames.get(item, item))
+            else:
+                new_items.append(item)
+        stacks_data[stack_name] = new_items
 
 
 def _plan_product_substance_ref_rewrites(
     context: _ProductSubstanceRewriteContext,
 ) -> bool:
-    products_dir = context.repository_root / context.contract.product_path
-    if not products_dir.exists():
+    if not context.products_dir.exists():
         return True
 
-    for path in sorted(products_dir.glob("*.yaml")):
+    for path in sorted(context.products_dir.glob("*.yaml")):
         try:
-            card = cast(
-                dict[str, object],
-                load_card_mapping(path, context.contract.product_substance.source_entity_class.casefold()),
-            )
+            card = cast(dict[str, object], load_card_mapping(path, "product"))
         except CardLoadError as e:
             print(f"warning: skipping {path}: {strip_root_prefix(e.message)}", file=sys.stderr)
             continue
 
-        resolution = context.contract.product_substance
-        renamed = rewrite_references(card, resolution, context.substance_renames)
+        renamed = _rewrite_product_components(card, context.substance_renames)
         resolved = False
-        if has_draft_reference(card, resolution):
-            resolved = resolve_references(
-                document_path=path,
-                document=card,
-                collection_dir=context.repository_root / resolution.source_path,
-                resolution=resolution,
-                identity_renames=context.substance_renames,
+        if product_has_draft_component_ref(card):
+            resolved = resolve_product_component_refs(
+                product_path=path,
+                product=card,
+                substances_dir=context.substances_dir,
+                substance_renames=context.substance_renames,
                 errors=context.errors,
             )
         if not renamed and not resolved:
@@ -106,28 +107,52 @@ def _plan_product_substance_ref_rewrites(
     return not context.errors
 
 
-def _plan_substance_prefer_with_rewrites(context: _ProductSubstanceRewriteContext) -> None:
-    for resolution in context.contract.substance_preferences:
-        substances_dir = context.repository_root / resolution.document_path
-        for path in sorted(substances_dir.glob("*.yaml")):
-            _plan_substance_preference_file(context, path, resolution)
-
-
-def _plan_substance_preference_file(
-    context: _ProductSubstanceRewriteContext, path: Path, resolution: ReferenceResolution
+def _plan_substance_prefer_with_rewrites(
+    substances_dir: Path,
+    substance_renames: dict[str, str],
+    plan: EditPlan,
 ) -> None:
-    try:
-        substance = cast(dict[str, object], load_card_mapping(path, resolution.target_entity_class.casefold()))
-    except CardLoadError as e:
-        print(f"warning: skipping {path}: {strip_root_prefix(e.message)}", file=sys.stderr)
-        return
+    for path in sorted(substances_dir.glob("*.yaml")):
+        try:
+            substance = cast(dict[str, object], load_card_mapping(path, "substance"))
+        except CardLoadError as e:
+            print(f"warning: skipping {path}: {strip_root_prefix(e.message)}", file=sys.stderr)
+            continue
 
-    changed = rewrite_references(substance, resolution, context.substance_renames)
-    if not changed:
-        return
+        schedule_raw = substance.get("schedule")
+        if not isinstance(schedule_raw, dict):
+            continue
+        schedule = cast(dict[str, object], schedule_raw)
+        prefer_with = schedule.get("prefer_with")
+        if not isinstance(prefer_with, list):
+            continue
 
-    final_path = _planned_substance_path(path, substance, context.substance_renames)
-    _upsert_card_edit(context.plan, final_path, substance, path if final_path != path else None)
+        rewritten = [substance_renames.get(item, item) if isinstance(item, str) else item for item in prefer_with]
+        if rewritten == prefer_with:
+            continue
+
+        schedule["prefer_with"] = rewritten
+        final_path = _planned_substance_path(path, substance, substance_renames)
+        _upsert_card_edit(plan, final_path, substance, path if final_path != path else None)
+
+
+def _rewrite_product_components(
+    card: dict[str, object],
+    substance_renames: dict[str, str],
+) -> bool:
+    changed = False
+    components = card.get("components")
+    if not isinstance(components, list):
+        return False
+    for member_obj in components:
+        if not isinstance(member_obj, dict):
+            continue
+        member = cast(dict[str, object], member_obj)
+        old_ref = member.get("substance")
+        if isinstance(old_ref, str) and old_ref in substance_renames:
+            member["substance"] = substance_renames[old_ref]
+            changed = True
+    return changed
 
 
 def _planned_product_path(path: Path, card: dict[str, object], renames: dict[str, str]) -> Path:

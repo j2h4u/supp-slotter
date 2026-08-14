@@ -1,30 +1,21 @@
 id: sub_e3af6f78d9
 name: Lion's Mane
-semantic_enrichment_attempted_on: '2026-08-13'
 aliases:
 - Hericium erinaceus
 - Lion's Mane mushroom
-notes: Medicinal mushroom extract. Active compounds include hericenones (fruiting body) and erinacines (mycelium). MSKCC describes
-  supplemental Lion's Mane as promoted for cognitive health, mood, and immunity; clinical evidence is limited, while preclinical
-  work covers neuroprotective, cognition-enhancing, immunomodulatory, and wound-healing effects.
-scheduling_assessment:
+notes: Medicinal mushroom extract. Active compounds include hericenones (fruiting
+  body) and erinacines (mycelium). MSKCC describes supplemental Lion's Mane as promoted
+  for cognitive health, mood, and immunity; clinical evidence is limited, while
+  preclinical work covers neuroprotective, cognition-enhancing, immunomodulatory,
+  and wound-healing effects. Better with food to reduce occasional GI sensitivity.
+schedule:
   intake:
-    conclusion: insufficient
-    sources:
-    - https://doi.org/10.3389/fnut.2025.1641246
-    - https://doi.org/10.3389/fnut.2025.1405796
-    summary: Human studies use heterogeneous fruiting-body powders/extracts, mycelium, and blends; no fed-vs-fasted comparison was found. GLS discloses only 500 mg extract without source, extraction, or marker identity, limiting applicability.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://doi.org/10.3389/fnut.2025.1641246
-    - https://doi.org/10.3389/fnut.2025.1405796
-    summary: Protocols use varying administration times, including an after-breakfast acute study, but no clock-time comparison. Product-specific sleep outcomes do not establish evening dosing for the unidentified GLS extract.
+  - food_preferred
 knowledge:
-  context:
-  - neurocognitive_support
+  is:
+  - nootropic
   effect:
   - neurotrophic_support
   - immune_modulation_context
-  role:
-  - nootropic
+  context:
+  - neurocognitive_support

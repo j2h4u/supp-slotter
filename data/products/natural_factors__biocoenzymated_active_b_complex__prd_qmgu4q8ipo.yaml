@@ -28,10 +28,9 @@ components:
 - substance: sub_fd899525d3
   label: Biotin
   amount: 250 mcg
-- substance: sub_7628e4f478
+- substance: sub_yd7dqo36dn
   label: Pantothenic acid (Vitamin B5) as calcium D-pantothenate
   amount: 100 mg
-  notes: Exact product label form preserved at Product level; routed to canonical Vitamin B5 card.
 - substance: sub_p62urjkldd
   label: Choline as choline dihydrogen citrate
   amount: 50 mg

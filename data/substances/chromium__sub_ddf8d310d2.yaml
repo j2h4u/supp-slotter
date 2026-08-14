@@ -1,29 +1,19 @@
 id: sub_ddf8d310d2
 name: Chromium
-semantic_enrichment_attempted_on: '2026-08-13'
-notes: Generic elemental chromium contribution. Product cards keep the concrete source form in component labels and notes.
-  NIH ODS describes trivalent chromium as an insulin-action / glucose-metabolism review context, but evidence for routine
-  glycemic benefit is mixed and not clinically decisive for healthy users.
+notes: Generic elemental chromium contribution. Product cards keep the concrete
+  source form in component labels and notes. NIH ODS describes trivalent chromium
+  as an insulin-action / glucose-metabolism review context, but evidence for
+  routine glycemic benefit is mixed and not clinically decisive for healthy users.
 concerns:
 - kind: safety
-  text: Review if insulin, metformin, or other antidiabetes medication is present because additive hypoglycemia is possible. NIH ODS reports reduced levothyroxine absorption specifically with chromium picolinate co-administered with levothyroxine; this does not establish a fixed interval for generic chromium or chromium nicotinate glycinate.
+  text: Review if insulin, metformin, other antidiabetes medication, or levothyroxine
+    is present; NIH ODS notes possible additive hypoglycemia risk with antidiabetes
+    medications and reduced levothyroxine absorption when co-administered.
+schedule:
+  intake:
+  - food_preferred
 knowledge:
-  kind:
+  is:
   - mineral
   risk:
   - glucose_med_interaction
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Chromium-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/17499152/
-    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2008.718
-    summary: The cited evidence does not establish an intake preference for chromium nicotinate glycinate; it addresses chromium generally or other forms and comparators.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Chromium-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/17499152/
-    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2008.718
-    summary: No general clock-time scheduling rule was demonstrated.

@@ -9,7 +9,6 @@ from typing import cast
 
 import yaml
 from planner.engine import CheckResult, cmd_check, cmd_plan
-from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
 
 
 @dataclass(frozen=True, slots=True)
@@ -26,7 +25,6 @@ class PlannerFixtureOptions:
 
 
 _DEFAULT_PLANNER_OPTIONS = PlannerFixtureOptions()
-_ONTOLOGY_ROOT = Path(__file__).resolve().parents[1] / "ontology"
 
 
 def fixture_id(prefix: str, seed: str) -> str:
@@ -70,7 +68,7 @@ def group_trait_ids(trait_ids: list[str]) -> dict[str, list[str]]:
     return groups
 
 
-def group_policies(traits: dict[str, dict[str, object]]) -> dict[str, dict[str, object]]:
+def group_trait_defs(traits: dict[str, dict[str, object]]) -> dict[str, dict[str, object]]:
     grouped: dict[str, dict[str, object]] = {}
     for trait_id, trait in traits.items():
         namespace, short_name = trait_id.split(":", 1)
@@ -86,11 +84,9 @@ def group_items_by_stack(stack_items: dict[str, dict[str, object]]) -> dict[str,
     return stacks
 
 
-def flatten_policies(traits_data: dict[str, dict[str, object]]) -> dict[str, object]:
+def flatten_trait_defs(traits_data: dict[str, dict[str, object]]) -> dict[str, object]:
     return {
-        f"{namespace}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{name}": trait
-        for namespace, entries in traits_data.items()
-        for name, trait in entries.items()
+        f"{namespace}:{name}": trait for namespace, entries in traits_data.items() for name, trait in entries.items()
     }
 
 
@@ -116,6 +112,7 @@ def write_minimal_planner_fixture(
 ) -> None:
     stack_items = fixture_input.stack_items
     products = fixture_input.products
+    traits = fixture_input.traits
     substance_prefer_with = options.substance_prefer_with
     substance_relations = options.substance_relations
 
@@ -144,7 +141,6 @@ def write_minimal_planner_fixture(
         {
             "daily": {
                 "label": "Daily",
-                "stack": "daily",
                 "slots": {
                     "morning_empty": {
                         "label": "Morning empty",
@@ -162,7 +158,6 @@ def write_minimal_planner_fixture(
             },
             "training": {
                 "label": "Training",
-                "stack": "training",
                 "slots": {
                     "pre_workout": {
                         "label": "Pre-workout",
@@ -180,6 +175,7 @@ def write_minimal_planner_fixture(
             },
         },
     )
+    write_yaml(tmp_path / "data/traits/fixture.yaml", group_trait_defs(traits))
     write_yaml(tmp_path / "data/stacks.yaml", group_items_by_stack(normalized_stack_items))
     _write_relation_groups(tmp_path, substance_ids, substance_relations or {})
     _write_substance_cards(
@@ -188,7 +184,6 @@ def write_minimal_planner_fixture(
         substance_ids,
         substance_prefer_with or {},
     )
-    _write_scheduling_constraint_reference_cards(tmp_path)
     _write_product_cards(tmp_path, products, substance_ids, product_ids)
 
 
@@ -197,23 +192,24 @@ def _write_relation_groups(
     substance_ids: dict[str, str],
     substance_relations: dict[str, list[dict[str, object]]],
 ) -> None:
-    relation_entries: list[dict[str, object]] = []
+    relation_groups: dict[str, list[dict[str, str]]] = {
+        "balance": [],
+        "supports": [],
+        "competes": [],
+        "review_with": [],
+    }
     for source_id, relations in substance_relations.items():
         for relation in relations:
-            relation_type = cast(str, relation["relation_type"])
-            if relation_type not in {"balance", "supports", "review_with"}:
+            relation_type = cast(str, relation["type"])
+            if relation_type not in relation_groups:
                 continue
             for target in cast(list[str], relation.get("substances", [])):
-                relation_entries.append({
-                    "id": f"rel_fixture_{len(relation_entries)}",
-                    "relation_type": relation_type,
-                    "assertion_kind": "ontology_assertion",
-                    "semantic_family": "biochemical_mechanism_assertion",
-                    "source_selector": {"entity": {"entity_id": substance_ids[source_id]}},
-                    "target_selector": {"entity": {"entity_id": substance_ids.get(target, target)}},
+                relation_groups[relation_type].append({
+                    "source_substance": substance_ids[source_id],
+                    "target_substance": substance_ids.get(target, target),
                     "reason": cast(str, relation["reason"]),
                 })
-    write_yaml(tmp_path / "data/relations.yaml", {"relations": relation_entries})
+    write_yaml(tmp_path / "data/relations.yaml", relation_groups)
 
 
 def _write_substance_cards(
@@ -225,7 +221,8 @@ def _write_substance_cards(
     substance_components: dict[str, list[str]] = {
         component_id: trait_ids for component_ids in products.values() for component_id, trait_ids in component_ids
     }
-    schedule_namespaces, knowledge_namespaces = _fixture_card_namespaces()
+    schedule_namespaces = {"intake", "timing", "activity"}
+    knowledge_namespaces = {"is", "effect", "risk", "context", "pathway"}
     for substance_id, trait_ids in substance_components.items():
         normalized_substance_id = substance_ids[substance_id]
         substance: dict[str, object] = {
@@ -233,18 +230,8 @@ def _write_substance_cards(
             "name": substance_id.replace("_", " ").title(),
         }
         grouped = group_trait_ids(trait_ids)
-        schedule: dict[str, list[str]] = {}
-        knowledge: dict[str, list[str]] = {}
-        for namespace, slugs in grouped.items():
-            schedule_namespace = namespace.removeprefix("schedule.")
-            if schedule_namespace in schedule_namespaces:
-                schedule[schedule_namespace] = slugs
-            elif namespace in knowledge_namespaces:
-                knowledge[namespace] = slugs
-            else:
-                knowledge[namespace] = slugs
-        # Preserve unknown namespaces in the card.  The generated schema is
-        # the normal validation boundary and must reject them explicitly.
+        schedule: dict[str, list[str]] = {ns: slugs for ns, slugs in grouped.items() if ns in schedule_namespaces}
+        knowledge: dict[str, list[str]] = {ns: slugs for ns, slugs in grouped.items() if ns in knowledge_namespaces}
         if substance_id in substance_prefer_with:
             schedule["prefer_with"] = [
                 substance_ids.get(target, target) for target in substance_prefer_with[substance_id]
@@ -257,61 +244,6 @@ def _write_substance_cards(
             tmp_path / "data/substances" / f"{substance_id}__{normalized_substance_id}.yaml",
             substance,
         )
-
-
-def _write_scheduling_constraint_reference_cards(tmp_path: Path) -> None:
-    """Include canonical constraint anchors in the isolated mini-corpus.
-
-    The planner intentionally compiles every canonical scheduling constraint
-    against the loaded substance corpus and fails closed when a required
-    selector is empty.  Fixture products need not contain these anchors, but
-    the mini-corpus must still represent the six authored entities used by
-    the constraint catalog so an empty fixture is not mistaken for malformed
-    ontology data.
-    """
-
-    anchors = (
-        ("sub_8554n79hve", "Zinc", "citrate"),
-        ("sub_844a0cc551", "Copper", "bisglycinate"),
-        ("sub_vvmld46dbz", "Calcium", "calcium ascorbate"),
-        ("sub_ses5czfzi1", "Iron", "Ferrochel ferrous bisglycinate chelate"),
-        ("sub_844a87d72b", "Vitamin E", "tocopherol"),
-        ("sub_5723eafac4", "Vitamin E", "tocotrienols"),
-    )
-    for substance_id, name, form in anchors:
-        write_yaml(
-            tmp_path / "data/substances" / f"constraint_anchor__{substance_id}.yaml",
-            {"id": substance_id, "name": name, "form": form},
-        )
-
-
-def _fixture_card_namespaces() -> tuple[set[str], set[str]]:
-    """Read fixture card containers from authored ontology catalogs.
-
-    The helper intentionally has no fallback vocabulary.  An unknown fixture
-    namespace is written into the knowledge envelope so normal generated
-    schema validation reports it instead of silently translating or dropping
-    the term.
-    """
-
-    runtime = cast(dict[str, object], yaml.safe_load((_ONTOLOGY_ROOT / "runtime-policy.yaml").read_text()))
-    axes = runtime.get("assignment_axes", [])
-    schedule = {
-        cast(str, row["assignment_field"])
-        for row in axes
-        if isinstance(row, dict) and isinstance(row.get("assignment_field"), str)
-    }
-    vocabulary = cast(dict[str, object], yaml.safe_load((_ONTOLOGY_ROOT / "vocabulary.yaml").read_text()))
-    categories = vocabulary.get("semantic_categories", {})
-    knowledge: set[str] = set()
-    if isinstance(categories, dict):
-        for raw in categories.values():
-            if not isinstance(raw, dict) or not isinstance(raw.get("allowed_predicates"), list):
-                continue
-            for predicate in cast(list[object], raw["allowed_predicates"]):
-                if isinstance(predicate, str) and predicate.startswith("knowledge."):
-                    knowledge.add(predicate.removeprefix("knowledge."))
-    return schedule, knowledge
 
 
 def _write_product_cards(

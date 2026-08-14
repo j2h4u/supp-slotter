@@ -1,29 +1,19 @@
 id: sub_6yp50f6ach
 name: Vitamin B3
 form: inositol hexaniacinate
-semantic_enrichment_attempted_on: '2026-08-13'
 aliases:
 - inositol hexanicotinate
 - IHN
 - IH6N
-notes: 'Marketed as a flush-free esterified niacin form; inositol hexaniacinate absorption is variable and generally lower than nicotinic acid or nicotinamide, so efficacy and meal behavior are not equivalent. Used in Natural Factors BioCoenzymated Active B Complex and Country Life Coenzyme B-Complex.'
-scheduling_assessment:
+notes: Esterified niacin form with reduced flushing profile compared to free niacin;
+  releases niacin slowly. Used in Natural Factors BioCoenzymated Active B Complex.
+schedule:
   intake:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/
-    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.949
-    summary: Research on niacin and inositol hexaniacinate does not directly establish a general fed or fasted preference for this exact form.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/
-    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.949
-    summary: No general clock-time rule was demonstrated for inositol hexaniacinate supplementation.
+  - food_preferred
 knowledge:
+  is:
+  - vitamin
   context:
   - mitochondrial_health
-  kind:
-  - vitamin
   pathway:
   - nad_metabolism

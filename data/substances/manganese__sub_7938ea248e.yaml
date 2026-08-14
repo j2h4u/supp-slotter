@@ -1,26 +1,17 @@
 id: sub_7938ea248e
 name: Manganese
-semantic_enrichment_attempted_on: '2026-08-13'
-notes: Generic elemental manganese contribution. Product cards keep the concrete source form in component labels and notes.
-  NIH ODS describes manganese as a cofactor for enzymes including manganese superoxide dismutase, arginase, and pyruvate carboxylase,
-  with roles in reactive oxygen species scavenging, bone formation, amino-acid/cholesterol/glucose/carbohydrate metabolism,
-  and immune response.
+notes: Generic elemental manganese contribution. Product cards keep the concrete
+  source form in component labels and notes. NIH ODS describes manganese as a
+  cofactor for enzymes including manganese superoxide dismutase, arginase, and
+  pyruvate carboxylase, with roles in reactive oxygen species scavenging, bone
+  formation, amino-acid/cholesterol/glucose/carbohydrate metabolism, and immune
+  response.
+schedule:
+  intake:
+  - food_preferred
 knowledge:
+  is:
+  - mineral
   effect:
   - antioxidant_enzyme_cofactor
   - bone_mineral_metabolism_support
-  kind:
-  - mineral
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/1957822/
-    summary: The cited evidence does not establish an intake preference for generic manganese across registered forms; it does not validate a form-specific comparator rule.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/1957822/
-    summary: No general clock-time scheduling rule was demonstrated.

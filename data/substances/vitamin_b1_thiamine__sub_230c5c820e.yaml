@@ -1,28 +1,19 @@
 id: sub_230c5c820e
 name: Vitamin B1
 form: thiamine
-semantic_enrichment_attempted_on: '2026-08-13'
-notes: 'Coenzyme B-Complex component: active product supplies thiamine hydrochloride plus thiamine cocarboxylase chloride, 50 mg total per 2 capsules. Generic thiamine context is retained without asserting whole-card active/coenzymated superiority. Thiamin is a core cofactor for cellular energy metabolism and normal cell growth/function.'
-scheduling_assessment:
+notes: 'Coenzyme B-Complex component: thiamine cocarboxylase active/coenzymated B1
+  form. Review context: thiamin is a core cofactor for cellular energy metabolism
+  and normal cell growth/function.'
+schedule:
   intake:
-    conclusion: insufficient
-    sources:
-    - https://ajcn.nutrition.org/article/S0002-9165%2823%2932783-7/fulltext
-    - https://ods.od.nih.gov/factsheets/Thiamin-HealthProfessional/
-    summary: Research on thiamin's metabolic role does not directly establish a general fed or fasted preference for this exact form.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ajcn.nutrition.org/article/S0002-9165%2823%2932783-7/fulltext
-    - https://ods.od.nih.gov/factsheets/Thiamin-HealthProfessional/
-    summary: No general clock-time rule was demonstrated for thiamin supplementation.
+  - food_preferred
 knowledge:
+  is:
+  - vitamin
+  effect:
+  - cellular_function_support
   context:
   - mitochondrial_health
   - neurocognitive_support
-  effect:
-  - cellular_function_support
-  kind:
-  - vitamin
   pathway:
   - thiamine_energy_metabolism

@@ -1,20 +1,21 @@
 id: sub_8554n79hve
 name: Zinc
 form: citrate
-notes: Zinc citrate form listed on Solgar Skin, Nails & Hair Advanced MSM Formula. Human absorption studies distinguish citrate
-  from oxide; kept as a separate review card without adding scheduling behavior.
+notes: Zinc citrate form listed on Solgar Skin, Nails & Hair Advanced MSM Formula.
+  Human absorption studies distinguish citrate from oxide; kept as a separate
+  review card without adding scheduling behavior.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  context:
-  - skin_support
+  is:
+  - mineral
   effect:
   - dna_synthesis_support
   - immune_function_support
   - skin_barrier_context
   - wound_healing_support
-  kind:
-  - mineral
   risk:
   - zinc_copper_balance_review
+  context:
+  - skin_support

@@ -3,17 +3,20 @@ name: Passionflower
 form: flowering tops extract
 aliases:
 - Passiflora
-notes: 'Passionflower flowering tops extract listed in the Natural Balance Happy Sleeper proprietary blend. Review context:
-  commonly positioned for anxiety/sleep support, but evidence is limited enough to treat this as calming/sleep context rather
+notes: 'Passionflower flowering tops extract listed in the Natural Balance Happy Sleeper
+  proprietary blend. Review context: commonly positioned for anxiety/sleep support,
+  but evidence is limited enough to treat this as calming/sleep context rather
   than a strong efficacy claim.'
 schedule:
   intake:
   - food_preferred
+  timing:
+  - sleep_support
 knowledge:
-  context:
-  - sleep_recovery
+  is:
+  - botanical
   effect:
   - calming_context
   - sleep_context
-  kind:
-  - botanical
+  context:
+  - sleep_recovery

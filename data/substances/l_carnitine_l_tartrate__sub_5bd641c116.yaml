@@ -1,48 +1,39 @@
 id: sub_5bd641c116
 name: L-Carnitine
 form: L-tartrate
-semantic_enrichment_attempted_on: '2026-08-13'
 aliases:
 - LCLT
-notes: 'L-tartrate salt form of L-carnitine. The active Primecraft product exposes 530 mg L-carnitine per capsule; higher-dose exercise protocols do not transfer directly. LCLT supports peripheral mitochondrial fatty-acid transport context; recovery and TMAO implications remain bounded, host-context-dependent review topics. Sources: FDA GRN 000993; PMID 15591001; PMC8704793; Primecraft label.'
+notes: 'L-tartrate salt form of L-carnitine; does NOT cross the blood-brain barrier
+  — no nootropic or central stimulant action (contrast: ALCAR). Mechanism is peripheral:
+  replenishes muscle carnitine stores, supports mitochondrial fatty acid oxidation,
+  and reduces exercise-induced oxidative damage/DOMS. Typical dose 1–3 g/day, commonly
+  pre- or post-workout on empty stomach for absorption. TMAO production via gut microbiome
+  is a shared concern with all L-carnitine forms; caution in cardiovascular risk profiles.
+  Sources: examine.com (L-Carnitine L-Tartrate), Kraemer et al. 2003 (J Strength Cond
+  Res).'
 concerns:
 - kind: safety
-  text: TMAO cardiovascular risk is gut-microbiome and host-context dependent; surface as cardiometabolic review context rather
-    than treating L-carnitine as directly harmful in isolation.
-scheduling_assessment:
+  text: TMAO cardiovascular risk is gut-microbiome and host-context dependent; surface
+    as cardiometabolic review context rather than treating L-carnitine as directly
+    harmful in isolation.
+schedule:
   intake:
-    conclusion: insufficient
-    sources:
-    - https://www.fda.gov/media/154598/download?attachment=
-    - https://pubmed.ncbi.nlm.nih.gov/15591001/
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC8704793/
-    - https://primekraft.ru/catalog/aminokisloty/zhiroszhigatel-l-carnitine-l-tartrate/l-carnitine-kapsuly/l-carnitine-l-tartrate-kapsuly-90-sht-/
-    summary: No fed-versus-fasted comparison establishes an intake preference for the active Primecraft LCLT product; its 530 mg L-carnitine exposure is not equivalent to higher-dose protocols.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC8704793/
-    - https://pubmed.ncbi.nlm.nih.gov/15591001/
-    summary: Acute pre/post protocols and pharmacokinetic sampling do not establish a superior clock time or an empty-stomach requirement.
+  - empty_preferred
   activity:
-    conclusion: insufficient
-    sources:
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC8704793/
-    - https://www.mdpi.com/2072-6643/17/17/2784
-    summary: Exercise-context evidence is heterogeneous and dose/form dependent; active training membership does not establish any workout placement.
+  - any_workout
 knowledge:
+  is:
+  - ergogenic
+  effect:
+  - mitochondrial_fatty_acid_transport
+  - exercise_recovery_support
+  risk:
+  - manual_review
+  - tmao_cardiometabolic_review
   context:
   - mitochondrial_health
   - sleep_recovery
   - workout_performance
-  effect:
-  - mitochondrial_fatty_acid_transport
-  - exercise_recovery_support
   pathway:
   - carnitine_shuttle
   - tmao_precursor
-  risk:
-  - manual_review
-  - tmao_cardiometabolic_review
-  role:
-  - ergogenic

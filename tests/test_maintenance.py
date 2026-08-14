@@ -1,6 +1,7 @@
 """Regression tests for maintenance, io error handling, and auto-maintenance sentinel changes.
 
 Covers:
+  - EH1/EH2: load_yaml / load_schema descriptive error wrapping
   - C1: guarded stacks.yaml write in maintenance pipeline
   - EH9: vocal load_global_relations on non-mapping data
   - EH10: auto_maintenance_needed None vs False disambiguation
@@ -8,9 +9,7 @@ Covers:
 
 from __future__ import annotations
 
-from dataclasses import replace
 from pathlib import Path
-from types import SimpleNamespace
 from typing import NotRequired, TypedDict, cast
 
 import pytest
@@ -22,15 +21,10 @@ from planner.maintenance import (
 )
 from planner.maintenance_atomic import EditPlan
 from planner.maintenance_card_plan import plan_card_dir
-from planner.maintenance_substance_resolution import (
-    load_maintenance_contract,
-    load_reference_resolution,
-    rewrite_references,
-)
-from planner.ontology.errors import OntologyInfrastructureError
 from planner.paths import Paths
+from planner.schema_validation import load_schema
+from planner.yaml_io import load_yaml
 
-from tests.helpers import ontology_bundle
 from tests.planner_fixture import (
     PlannerFixtureInput,
     check_in_temp_dir,
@@ -89,6 +83,44 @@ def _minimal_product(
     }
 
 
+# ---------------------------------------------------------------------------
+# Task 1 — EH1/EH2: load_yaml and load_schema descriptive errors
+# ---------------------------------------------------------------------------
+
+
+def test_load_yaml_missing_file_raises_card_load_error(tmp_path: Path) -> None:
+    absent = tmp_path / "absent.yaml"
+    with pytest.raises(CardLoadError) as exc_info:
+        load_yaml(absent)
+    assert str(absent) in exc_info.value.message
+
+
+def test_load_yaml_malformed_yaml_raises_card_load_error(tmp_path: Path) -> None:
+    bad = tmp_path / "bad.yaml"
+    bad.write_text(":\n  - bad: [")
+    with pytest.raises(CardLoadError) as exc_info:
+        load_yaml(bad)
+    assert "invalid YAML" in exc_info.value.message
+
+
+def test_load_schema_missing_raises_runtime_error_naming_schema(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("planner.schema_validation.SCHEMA_DIR", tmp_path)
+    with pytest.raises(RuntimeError) as exc_info:
+        load_schema("nope")
+    assert "nope.schema.json" in str(exc_info.value)
+
+
+def test_load_schema_malformed_json_raises_runtime_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    bad_schema = tmp_path / "bad.schema.json"
+    bad_schema.write_text("{not json")
+    monkeypatch.setattr("planner.schema_validation.SCHEMA_DIR", tmp_path)
+    with pytest.raises(RuntimeError) as exc_info:
+        load_schema("bad")
+    assert "bad.schema.json" in str(exc_info.value)
+
+
 def test_auto_maintenance_rewrites_nested_prefer_with_and_product_refs(
     tmp_path: Path,
 ) -> None:
@@ -108,7 +140,7 @@ def test_auto_maintenance_rewrites_nested_prefer_with_and_product_refs(
         {"name": "Source Product", "components": [{"substance": "source"}]},
     )
 
-    result = run_auto_maintenance(Paths.from_root(tmp_path), suppress_output=True, ontology=ontology_bundle())
+    result = run_auto_maintenance(Paths.from_root(tmp_path), suppress_output=True)
 
     assert result == 0
     source_cards = list(substances_dir.glob("source__sub_*.yaml"))
@@ -125,26 +157,6 @@ def test_auto_maintenance_rewrites_nested_prefer_with_and_product_refs(
     assert "schedule" in source
     assert source["schedule"]["prefer_with"] == [friend["id"]]
     assert product["components"][0]["substance"] == source["id"]
-
-
-def test_auto_maintenance_fails_closed_without_verified_bundle(tmp_path: Path) -> None:
-    products_dir = tmp_path / "data" / "products"
-    products_dir.mkdir(parents=True)
-    product = products_dir / "draft.yaml"
-    original: dict[str, object] = {"name": "Draft", "components": [{"substance": "source"}]}
-    _write_yaml(product, original)
-
-    assert run_auto_maintenance(Paths.from_root(tmp_path), suppress_output=True) == 1
-    assert yaml.safe_load(product.read_text()) == original
-
-
-def test_rewrite_reference_path_is_contract_driven() -> None:
-    contract = load_maintenance_contract(ontology_bundle())
-    resolution = replace(contract.product_substance, reference_path="ingredients[].substance")
-    document: dict[str, object] = {"ingredients": [{"substance": "old"}]}
-
-    assert rewrite_references(document, resolution, {"old": "new"})
-    assert document == {"ingredients": [{"substance": "new"}]}
 
 
 def test_plan_card_dir_adds_ids_and_plans_canonical_renames(tmp_path: Path) -> None:
@@ -190,8 +202,8 @@ def test_check_resolves_product_component_name_to_substance_id(tmp_path: Path) -
             stack_items={"magnesium_product": {"product": "magnesium_product", "stack": "daily"}},
             products={"magnesium_product": [("magnesium_glycinate", [])]},
             traits={
-                "kind:mineral": {
-                    "label": "Mineral",
+                "is:fixture": {
+                    "label": "Fixture",
                     "description": "Fixture trait for validation.",
                     "applies_when": "Use only in tests.",
                 },
@@ -239,7 +251,7 @@ def test_auto_maintenance_resolves_component_alias_to_substance_id(tmp_path: Pat
         },
     )
 
-    result = run_auto_maintenance(Paths.from_root(tmp_path), suppress_output=True, ontology=ontology_bundle())
+    result = run_auto_maintenance(Paths.from_root(tmp_path), suppress_output=True)
 
     assert result == 0
     product_cards = list(products_dir.glob("unknown__b6_product__prd_abc1234567.yaml"))
@@ -277,7 +289,6 @@ def test_auto_maintenance_rejects_ambiguous_component_name(tmp_path: Path) -> No
         Paths.from_root(tmp_path),
         suppress_output=True,
         collect_errors=errors,
-        ontology=ontology_bundle(),
     )
 
     assert result == 1
@@ -311,7 +322,6 @@ def test_auto_maintenance_rejects_unknown_component_name(tmp_path: Path) -> None
         Paths.from_root(tmp_path),
         suppress_output=True,
         collect_errors=errors,
-        ontology=ontology_bundle(),
     )
 
     assert result == 1
@@ -363,7 +373,7 @@ def test_run_auto_maintenance_returns_1_when_stacks_write_fails(
     data_dir.chmod(0o555)
 
     try:
-        result = run_auto_maintenance(Paths.from_root(tmp_path), ontology=ontology_bundle())
+        result = run_auto_maintenance(Paths.from_root(tmp_path))
     finally:
         data_dir.chmod(0o755)
 
@@ -412,7 +422,7 @@ def test_run_auto_maintenance_rolls_back_on_partial_stage_failure(
 
     monkeypatch.setattr(_maint.EditPlan, "stage", _patched_stage)
 
-    result = _maint.run_auto_maintenance(Paths.from_root(tmp_path), ontology=ontology_bundle())
+    result = _maint.run_auto_maintenance(Paths.from_root(tmp_path))
 
     assert result == 1
 
@@ -430,48 +440,46 @@ def test_run_auto_maintenance_rolls_back_on_partial_stage_failure(
 
 
 # ---------------------------------------------------------------------------
-# Task 3 — EH9: load_global_relations ignores non-mapping top-level
+# Task 3 — EH9: load_global_relations warns on non-mapping top-level
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("document", [["a list at top level"], {"balance": []}])
-def test_load_global_relations_rejects_malformed_document(tmp_path: Path, document: object) -> None:
-    from planner.cards.relations import load_global_relations
-
-    data_dir = tmp_path / "data"
-    data_dir.mkdir()
-    rel_path = data_dir / "relations.yaml"
-    _write_yaml(rel_path, document)
-    paths = Paths.from_root(tmp_path)
-
-    with pytest.raises(CardLoadError, match=r"top-level|missing required"):
-        load_global_relations(paths, ontology_bundle(), {})
-
-
-def test_load_global_relations_rejects_unknown_ontology_relation_type(
+def test_load_global_relations_warns_on_non_mapping(
     tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     from planner.cards.relations import load_global_relations
 
     data_dir = tmp_path / "data"
     data_dir.mkdir()
     rel_path = data_dir / "relations.yaml"
-    relations_doc: dict[str, object] = {
-        "relations": [
-            {
-                "id": "rel_unknown",
-                "relation_type": "not_in_ontology",
-                "source_selector": {"entity": {"entity_id": "sub_src"}},
-                "target_selector": {"entity": {"entity_id": "sub_tgt"}},
-                "reason": "unknown relation type should not be silently dropped",
-            }
-        ]
-    }
-    _write_yaml(rel_path, relations_doc)
+    rel_path.write_text("- a list at top level\n")
     paths = Paths.from_root(tmp_path)
 
-    with pytest.raises(CardLoadError, match="not in ontology relation_types"):
-        load_global_relations(paths, ontology_bundle(), {})
+    result = load_global_relations(paths)
+
+    assert result == []
+    captured = capsys.readouterr()
+    assert "expected mapping, got list" in captured.err
+
+
+def test_load_global_relations_quiet_on_mapping(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    from planner.cards.relations import load_global_relations
+
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    rel_path = data_dir / "relations.yaml"
+    _write_yaml(rel_path, {"balance": []})
+    paths = Paths.from_root(tmp_path)
+
+    result = load_global_relations(paths)
+
+    assert result == []
+    captured = capsys.readouterr()
+    assert captured.err == ""
 
 
 # ---------------------------------------------------------------------------
@@ -491,9 +499,7 @@ def test_auto_maintenance_needed_returns_none_on_card_load_error(
     broken = substances_dir / "broken.yaml"
     broken.write_text(":\n  - bad: [")
 
-    from planner.maintenance_substance_resolution import load_maintenance_contract
-
-    result = auto_maintenance_needed(Paths.from_root(tmp_path), contract=load_maintenance_contract(ontology_bundle()))
+    result = auto_maintenance_needed(Paths.from_root(tmp_path))
 
     assert result is None
 
@@ -510,147 +516,35 @@ def test_run_auto_maintenance_returns_1_without_acquiring_lock_on_load_error(
     broken.write_text(":\n  - bad: [")
 
     paths = Paths.from_root(tmp_path)
-    result = run_auto_maintenance(paths, suppress_output=True, ontology=ontology_bundle())
+    result = run_auto_maintenance(paths, suppress_output=True)
 
     assert result == 1
     assert not paths.maintenance_lock.exists()
 
 
-def _metadata_bundle(
-    *,
-    collection_path: str,
-    identity_pattern: str,
-    target_class: str = "Entry",
-    schema_artifact: str = "schema.json",
-    label: str = "Entry",
-) -> object:
-    base = "https://example.test/"
-    projection = {
-        "repository_projection": {
-            "sources": [
-                {
-                    "id": "containers",
-                    "locator": {"kind": "flat_root", "path": "data/containers"},
-                    "root_class": "Container",
-                    "documents": {
-                        "root_class": "Container",
-                        "document_shape": "mapping",
-                        "identity": {"source": "id", "predicate": base + "id"},
-                        "instructions": [
-                            {
-                                "kind": "inlined-node",
-                                "source": "members[]",
-                                "predicate": base + "members",
-                                "target": "Member",
-                            },
-                            {
-                                "kind": "reference",
-                                "source": "members[].entry",
-                                "subject": "members[]",
-                                "predicate": base + "entry",
-                                "target": target_class,
-                            },
-                        ],
-                    },
-                },
-                {
-                    "id": "entries",
-                    "locator": {"kind": "flat_root", "path": collection_path},
-                    "root_class": target_class,
-                    "documents": {
-                        "root_class": target_class,
-                        "document_shape": "mapping",
-                        "identity": {"source": "id", "predicate": base + "id"},
-                        "maintenance": {
-                            "role": "target",
-                            "label": label,
-                            "schema_artifact": schema_artifact,
-                        },
-                        "instructions": [
-                            {"kind": "slot", "source": "form", "predicate": base + "form"},
-                            {"kind": "slot", "source": "id", "predicate": base + "id"},
-                            {"kind": "alias", "source": "name", "predicate": base + "name"},
-                            {"kind": "sequence", "source": "aliases[]", "predicate": base + "aliases"},
-                        ],
-                    },
-                },
-            ]
-        }
-    }
-    schema = {
-        "$defs": {
-            f"{target_class}Card": {
-                "properties": {
-                    "aliases": {"type": ["array", "null"]},
-                    "form": {"type": ["string", "null"]},
-                    "id": {"pattern": identity_pattern, "type": "string"},
-                    "name": {"type": "string"},
-                }
-            }
-        }
-    }
-    schema["$ref"] = f"#/$defs/{target_class}Card"
-    return SimpleNamespace(projection_map=projection, decoded={schema_artifact: schema})
-
-
-def test_reference_resolution_rejects_unverified_bundle(tmp_path: Path) -> None:
-    bundle = _metadata_bundle(collection_path="data/alternate_entries", identity_pattern=r"^ent_[0-9]{3}$")
-    with pytest.raises(OntologyInfrastructureError, match="verified OntologyBundle"):
-        load_reference_resolution(bundle)  # type: ignore[arg-type]
-
-
-def test_reference_resolution_identity_pattern_requires_verified_bundle(tmp_path: Path) -> None:
-    with pytest.raises(OntologyInfrastructureError, match="verified OntologyBundle"):
-        load_reference_resolution(
-            _metadata_bundle(collection_path="data/entries", identity_pattern=r"^item_[0-9]{3}$")  # type: ignore[arg-type]
-        )
-
-
-def test_reference_resolution_follows_renamed_projection_and_schema_metadata(
-    monkeypatch: pytest.MonkeyPatch,
+def test_auto_maintenance_needed_still_returns_false_when_clean(
+    tmp_path: Path,
 ) -> None:
-    import planner.maintenance_substance_resolution as resolution_module
+    from planner.cards.product import canonical_product_filename
+    from planner.cards.substance import canonical_substance_filename
+    from planner.contracts import Product as ProductContract
+    from planner.contracts import Substance
 
-    monkeypatch.setattr(resolution_module, "_is_verified_bundle", lambda _bundle: True)
-    bundle = _metadata_bundle(
-        collection_path="data/renamed_entries",
-        identity_pattern=r"^ren_[0-9]{3}$",
-        target_class="RenamedEntry",
-        schema_artifact="renamed.schema.json",
-        label="Renamed entry",
-    )
+    substances_dir = tmp_path / "data" / "substances"
+    substances_dir.mkdir(parents=True)
+    products_dir = tmp_path / "data" / "products"
+    products_dir.mkdir(parents=True)
 
-    resolution = load_reference_resolution(bundle)  # type: ignore[arg-type]
+    sub_data = _minimal_substance("sub_abc1234567", "Magnesium Glycinate")
+    sub_contract = Substance(id="sub_abc1234567", name="Magnesium Glycinate")
+    sub_filename = canonical_substance_filename(sub_contract)
+    _write_yaml(substances_dir / sub_filename, sub_data)
 
-    assert resolution.target_entity_class == "RenamedEntry"
-    assert resolution.entity_label == "Renamed entry"
-    assert resolution.source_path == "data/renamed_entries"
-    assert resolution.target_schema_artifact == "renamed.schema.json"
-    assert resolution.identity_pattern.fullmatch("ren_123") is not None
-    assert resolution.identity_pattern.fullmatch("ent_123") is None
+    prd_data = _minimal_product("prd_abc1234567", "Mag Glycinate 400")
+    prd_contract = ProductContract(id="prd_abc1234567", name="Mag Glycinate 400", components=())
+    prd_filename = canonical_product_filename(prd_contract)
+    _write_yaml(products_dir / prd_filename, prd_data)
 
+    result = auto_maintenance_needed(Paths.from_root(tmp_path))
 
-def test_reference_resolution_fails_on_missing_or_ambiguous_projection_metadata(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    import planner.maintenance_substance_resolution as resolution_module
-
-    monkeypatch.setattr(resolution_module, "_is_verified_bundle", lambda _bundle: True)
-    missing = _metadata_bundle(collection_path="data/entries", identity_pattern=r"^ent_[0-9]{3}$")
-    missing_projection = cast(dict[str, object], missing.projection_map)
-    repository = cast(dict[str, object], missing_projection["repository_projection"])
-    missing_source = cast(dict[str, object], cast(list[object], repository["sources"])[1])
-    cast(dict[str, object], missing_source["documents"]).pop("maintenance")
-    with pytest.raises(OntologyInfrastructureError, match="maintenance metadata"):
-        load_reference_resolution(missing)  # type: ignore[arg-type]
-
-    ambiguous = _metadata_bundle(collection_path="data/entries", identity_pattern=r"^ent_[0-9]{3}$")
-    ambiguous_projection = cast(dict[str, object], ambiguous.projection_map)
-    ambiguous_repository = cast(dict[str, object], ambiguous_projection["repository_projection"])
-    sources = cast(list[dict[str, object]], ambiguous_repository["sources"])
-    duplicate = dict(sources[1])
-    duplicate["id"] = "other_entries"
-    duplicate["locator"] = {"kind": "flat_root", "path": "data/other_entries"}
-    sources.append(duplicate)
-    with pytest.raises(OntologyInfrastructureError, match="exactly one source"):
-        load_reference_resolution(ambiguous)  # type: ignore[arg-type]
+    assert result is False

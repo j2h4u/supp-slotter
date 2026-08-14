@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from planner.contracts import SchedulingPolicy
-from planner.ontology.policies import load_scheduling_policies, readable_policies
-
-from tests.helpers import ontology_bundle
+import pytest
+from planner.cards.traits import load_traits, readable_traits
+from planner.contracts import CardLoadError, TraitDef
 
 
 def _write_trait_file(path: Path, text: str) -> None:
@@ -13,9 +12,12 @@ def _write_trait_file(path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
-def test_load_scheduling_policies_uses_ontology_bundle_source_of_truth(tmp_path: Path) -> None:
-    """Local traits files are not a scheduling policy source of truth."""
+def test_load_traits_reads_split_directory(tmp_path: Path) -> None:
     traits_dir = tmp_path / "traits"
+    _write_trait_file(
+        traits_dir / "classes.yaml",
+        "is:\n  mineral:\n    label: Mineral\n    description: Fixture class.\n    applies_when: Fixture only.\n",
+    )
     _write_trait_file(
         traits_dir / "risks.yaml",
         "risk:\n"
@@ -25,16 +27,44 @@ def test_load_scheduling_policies_uses_ontology_bundle_source_of_truth(tmp_path:
         "    applies_when: Fixture only.\n",
     )
 
-    del traits_dir
-    policies = load_scheduling_policies(ontology_bundle())
+    trait_defs = load_traits(traits_dir)
 
-    assert policies["risk:manual_review"].label == "Requires manual review"
-    assert policies["risk:manual_review"].description != "Fixture risk."
+    assert set(trait_defs) == {"is:mineral", "risk:manual_review"}
 
 
-def test_readable_policies_filters_internal_namespaces_and_uses_labels() -> None:
-    policies = {
-        "intake:with_food": SchedulingPolicy(
+def test_load_traits_rejects_duplicate_namespace(tmp_path: Path) -> None:
+    traits_dir = tmp_path / "traits"
+    _write_trait_file(
+        traits_dir / "one.yaml",
+        "risk:\n  one:\n    label: One\n    description: Fixture.\n    applies_when: Fixture only.\n",
+    )
+    _write_trait_file(
+        traits_dir / "two.yaml",
+        "risk:\n  two:\n    label: Two\n    description: Fixture.\n    applies_when: Fixture only.\n",
+    )
+
+    with pytest.raises(CardLoadError, match="namespace 'risk' is already defined"):
+        load_traits(traits_dir)
+
+
+def test_load_traits_rejects_single_file_registry(tmp_path: Path) -> None:
+    traits_file = tmp_path / "traits.yaml"
+    traits_file.write_text(
+        "risk:\n"
+        "  manual_review:\n"
+        "    label: Manual review\n"
+        "    description: Fixture.\n"
+        "    applies_when: Fixture only.\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(CardLoadError, match="expected trait directory"):
+        load_traits(traits_file)
+
+
+def test_readable_traits_filters_internal_namespaces_and_uses_labels() -> None:
+    trait_defs = {
+        "intake:with_food": TraitDef(
             id="intake:with_food",
             namespace="intake",
             short_name="with_food",
@@ -42,7 +72,7 @@ def test_readable_policies_filters_internal_namespaces_and_uses_labels() -> None
             description="Fixture.",
             applies_when="Fixture.",
         ),
-        "activity:workout": SchedulingPolicy(
+        "activity:workout": TraitDef(
             id="activity:workout",
             namespace="activity",
             short_name="workout",
@@ -52,19 +82,18 @@ def test_readable_policies_filters_internal_namespaces_and_uses_labels() -> None
         ),
     }
 
-    labels = readable_policies(
+    labels = readable_traits(
         {
             "activity:workout",
             "context:review",
             "intake:with_food",
-            "kind:mineral",
+            "is:mineral",
             "pathway:methylation",
             "risk:manual_review",
-            "timing:energy_like",
+            "timing:wake",
             "unknown:raw",
         },
-        policies,
-        ontology_bundle(),
+        trait_defs,
     )
 
-    assert labels == ["With food", "Workout"]
+    assert labels == ["unknown:raw", "With food", "Workout"]

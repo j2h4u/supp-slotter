@@ -28,11 +28,11 @@ def _write_product_validation_fixture(tmp_path: Path) -> Path:
         tmp_path,
         PlannerFixtureInput(
             stack_items={"prd_aaa0000001": {"stack": "daily"}},
-            products={"prd_aaa0000001": [("sub_aaa0000001", ["timing:energy_like"])]},
+            products={"prd_aaa0000001": [("sub_aaa0000001", ["timing:wake"])]},
             traits={
-                "timing:energy_like": {
-                    "label": "Energy-like",
-                    "description": "Fixture energy-like timing.",
+                "timing:wake": {
+                    "label": "Wake",
+                    "description": "Fixture wake timing.",
                     "applies_when": "Fixture only.",
                 }
             },

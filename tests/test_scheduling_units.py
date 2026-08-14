@@ -1,433 +1,324 @@
-from dataclasses import replace
-from typing import cast
+"""Unit tests for scheduling internals.
 
-import pytest
+No live data directory access — no DATA_DIR reads, no disk YAML.
+"""
+
+from __future__ import annotations
+
 from planner.contracts import (
-    Concern,
     Product,
     ProductComponent,
-    ScheduleAssertion,
-    SchedulingAssessment,
-    SchedulingPolicy,
-    Slot,
-    SlotObservation,
+    Relation,
     Substance,
+    TraitDef,
     TraitEffect,
     TraitEffectMatch,
 )
-from planner.engine._plan_output import _neutral_components, _policy_contributions
-from planner.engine._scheduling import (
-    compute_slot_score,
-    project_schedule_assignments,
-    render_slot_effects,
-    slot_matches,
+from planner.domain_constants import LEVEL_SCORES
+from planner.engine._plan_blocking import slot_is_blocked
+from planner.engine._plan_types import BlockingContext
+from planner.engine._scheduling import compute_slot_score, effective_stack_item_traits
+
+from tests.scheduling_fixtures import (
+    NO_TRAIT_SOURCES,
+    SubstanceTraitOverrides,
+    make_slot,
+    make_substance,
+    make_trait_def,
 )
-from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
-from planner.ontology.presentation import load_review_presentation
 
-from tests.helpers import ontology_bundle
-
-
-def _slot(*, food: bool = True, near: str = "breakfast") -> Slot:
-    return Slot(
-        "slot",
-        "Slot",
-        1,
-        (SlotObservation("near", near), SlotObservation("food", food)),
-        "daily",
-        "Daily",
-        "daily",
-    )
+# ---------------------------------------------------------------------------
+# SI-04: compute_slot_score
+# ---------------------------------------------------------------------------
 
 
-def test_schedule_assignment_scores_are_direct_ontology_effects() -> None:
-    bundle = ontology_bundle()
-    policy = SchedulingPolicy(
-        id="intake:food_preferred",
-        namespace="intake",
-        short_name="food_preferred",
-        label="Food preferred",
-        description="",
-        applies_when="fixture",
-        effects=(TraitEffect(TraitEffectMatch((("food", True),)), level="prefer"),),
-    )
-    substance = Substance("sub_a", "A", schedule_assertions=(ScheduleAssertion("intake", "food_preferred"),))
-    product = Product("prd_a", "A", (ProductComponent("sub_a"),))
-    projection = project_schedule_assignments(
-        bundle.runtime_program, product, {"sub_a": substance}, {policy.id: policy}
-    )
-    slot = _slot(food=True)
-    assert slot_matches(bundle.runtime_program, slot, TraitEffectMatch((("food", True),)))
-    assert not slot_matches(bundle.runtime_program, slot, TraitEffectMatch((("food", False),)))
-    trace = compute_slot_score(bundle.runtime_program, projection, slot, {policy.id: policy})
-    assert trace.blocked is False
-    assert trace.score > 0
-    assert trace.effects[0].policy_id == policy.id
+def test_compute_slot_score_prefer_strong_match() -> None:
+    slot = make_slot(near="breakfast", food=True)
+    match = TraitEffectMatch(near="breakfast", food=True)
+    effect = TraitEffect(match=match, level="prefer_strong")
+    trait = make_trait_def("intake:with_food", effects=(effect,))
+    trait_defs = {"intake:with_food": trait}
+
+    score, blocked, _ = compute_slot_score({"intake:with_food"}, slot, trait_defs, NO_TRAIT_SOURCES)
+
+    assert score == LEVEL_SCORES["prefer_strong"]
+    assert score > 0
+    assert blocked is False
 
 
-def test_unique_component_votes_accumulate_and_preserve_opposing_strengths() -> None:
-    bundle = ontology_bundle()
-    food_policy = SchedulingPolicy(
-        id="intake:food_preferred",
-        namespace="intake",
-        short_name="food_preferred",
-        label="Food preferred",
-        description="",
-        applies_when="fixture",
-        effects=(TraitEffect(TraitEffectMatch((("food", True),)), level="prefer"),),
-    )
-    empty_policy = SchedulingPolicy(
-        id="intake:empty_preferred",
-        namespace="intake",
-        short_name="empty_preferred",
-        label="Empty preferred",
-        description="",
-        applies_when="fixture",
-        effects=(
-            TraitEffect(TraitEffectMatch((("food", False),)), level="prefer"),
-            TraitEffect(TraitEffectMatch((("food", True),)), level="avoid"),
+def test_compute_slot_score_avoid_match() -> None:
+    slot = make_slot(near="breakfast", food=True)
+    match = TraitEffectMatch(near="breakfast")
+    effect = TraitEffect(match=match, level="avoid")
+    trait = make_trait_def("intake:empty_stomach", effects=(effect,))
+    trait_defs = {"intake:empty_stomach": trait}
+
+    score, blocked, _ = compute_slot_score({"intake:empty_stomach"}, slot, trait_defs, NO_TRAIT_SOURCES)
+
+    assert score == LEVEL_SCORES["avoid"]
+    assert score < 0
+    assert blocked is False
+
+
+def test_compute_slot_score_block_on_matching_slot() -> None:
+    slot = make_slot(near="sleep", food=False)
+    match = TraitEffectMatch(near="sleep")
+    effect = TraitEffect(match=match, block=True)
+    trait = make_trait_def("effect:stimulant", effects=(effect,))
+    trait_defs = {"effect:stimulant": trait}
+
+    score, blocked, _ = compute_slot_score({"effect:stimulant"}, slot, trait_defs, NO_TRAIT_SOURCES)
+
+    assert blocked is True
+    assert score == 0
+
+
+def test_compute_slot_score_empty_traits() -> None:
+    slot = make_slot()
+    score, blocked, _ = compute_slot_score(set(), slot, {}, NO_TRAIT_SOURCES)
+
+    assert score == 0
+    assert blocked is False
+
+
+def test_compute_slot_score_no_matching_effects() -> None:
+    slot = make_slot(near="breakfast", food=True)
+    match = TraitEffectMatch(near="sleep")
+    effect = TraitEffect(match=match, level="prefer_strong")
+    trait = make_trait_def("intake:night_only", effects=(effect,))
+    trait_defs = {"intake:night_only": trait}
+
+    score, blocked, _ = compute_slot_score({"intake:night_only"}, slot, trait_defs, NO_TRAIT_SOURCES)
+
+    assert score == 0
+    assert blocked is False
+
+
+def test_compute_slot_score_food_axis_match() -> None:
+    # food=False match fires on a food=False slot regardless of near value (wildcard).
+    slot = make_slot(near="breakfast", food=False)
+    match = TraitEffectMatch(near=None, food=False)
+    effect = TraitEffect(match=match, level="prefer_strong")
+    trait = make_trait_def("intake:empty_stomach_food_axis", effects=(effect,))
+    trait_defs = {"intake:empty_stomach_food_axis": trait}
+
+    score, blocked, _ = compute_slot_score({"intake:empty_stomach_food_axis"}, slot, trait_defs, NO_TRAIT_SOURCES)
+
+    assert score == LEVEL_SCORES["prefer_strong"]
+    assert blocked is False
+
+
+def test_compute_slot_score_food_axis_mismatch() -> None:
+    # food=False effect does not fire on a food=True slot — discriminant blocks accumulation.
+    slot = make_slot(near="breakfast", food=True)
+    match = TraitEffectMatch(near=None, food=False)
+    effect = TraitEffect(match=match, level="prefer_strong")
+    trait = make_trait_def("intake:empty_stomach_food_axis", effects=(effect,))
+    trait_defs = {"intake:empty_stomach_food_axis": trait}
+
+    score, blocked, _ = compute_slot_score({"intake:empty_stomach_food_axis"}, slot, trait_defs, NO_TRAIT_SOURCES)
+
+    assert score == 0
+    assert blocked is False
+
+
+def test_compute_slot_score_food_axis_block() -> None:
+    # block path fires when food axis matches — blocked is True.
+    slot = make_slot(near="breakfast", food=False)
+    match = TraitEffectMatch(near=None, food=False)
+    effect = TraitEffect(match=match, block=True)
+    trait = make_trait_def("effect:food_blocker", effects=(effect,))
+    trait_defs = {"effect:food_blocker": trait}
+
+    _, blocked, _ = compute_slot_score({"effect:food_blocker"}, slot, trait_defs, NO_TRAIT_SOURCES)
+
+    assert blocked is True
+
+
+def test_scheduling_traits_exclude_risk_and_knowledge_effect() -> None:
+    """effective_stack_item_traits must not include risk: or knowledge.effect: slugs.
+
+    Only schedule.* fields (intake, timing, activity) contribute to the scheduling
+    traits set. knowledge.* fields (risk, effect, is_, context, pathway) are
+    Reviewer-only and must not appear in the effective set that drives slot assignment.
+    """
+    sub = make_substance(
+        "sub_zz9999zzzz",
+        "Test Mineral",
+        traits=SubstanceTraitOverrides(
+            intake=("food_preferred",),
+            timing=("sleep_support",),
+            risk=("manual_review",),
+            effect=("vasodilator",),
+            is_=("mineral",),
         ),
+    )
+    substances = {"sub_zz9999zzzz": sub}
+
+    product = Product(
+        id="prd_test",
+        name="Test Product",
+        components=(ProductComponent(substance="sub_zz9999zzzz"),),
+    )
+
+    trait_defs: dict[str, TraitDef] = {}  # empty — no scoring rules needed for this assertion
+
+    effective, _primary, _secondary_only, _trait_sources = effective_stack_item_traits(product, substances, trait_defs)
+
+    # schedule.* fields ARE included
+    assert "intake:food_preferred" in effective, "intake: slug must be in scheduling traits"
+    assert "timing:sleep_support" in effective, "timing: slug must be in scheduling traits"
+    # knowledge.* fields are NOT included
+    assert "risk:manual_review" not in effective, (
+        "risk: slugs must be excluded from scheduling traits (knowledge: field)"
+    )
+    assert "effect:vasodilator" not in effective, (
+        "effect: slugs must be excluded from scheduling traits (knowledge: field)"
+    )
+    assert "is:mineral" not in effective, "is: slugs must be excluded from scheduling traits (knowledge: field)"
+
+
+def test_make_substance_factory_accepts_timing() -> None:
+    """make_substance factory passes timing kwarg to Substance."""
+    sub = make_substance("sub_zz8888zzzz", traits=SubstanceTraitOverrides(timing=("sleep_support",)))
+    assert sub.timing == ("sleep_support",), f"Expected timing=('sleep_support',), got {sub.timing!r}"
+
+
+# ---------------------------------------------------------------------------
+# Class-level competes (slot_is_blocked)
+# ---------------------------------------------------------------------------
+
+
+def _make_class_competes_rel() -> Relation:
+    return Relation(
+        type="competes",
+        reason="Minerals and fat-soluble vitamins compete on intake requirements.",
+        source_class="mineral",
+        target_class="fat_soluble",
+    )
+
+
+def _product_with_primary_component(product_id: str, name: str, substance_id: str) -> Product:
+    return Product(
+        id=product_id,
+        name=name,
+        components=(ProductComponent(substance=substance_id, primary=True),),
+    )
+
+
+def _class_competes_blocked(
+    new_product: Product,
+    existing_product: Product,
+    substances: dict[str, Substance],
+    global_relations: list[Relation],
+    competes_pairs: set[frozenset[str]],
+) -> bool:
+    slot_name = "breakfast"
+    new_substance_id = new_product.components[0].substance
+    existing_substance_id = existing_product.components[0].substance
+    active_components: dict[str, list[str]] = {
+        existing_product.id: [existing_substance_id],
+        new_product.id: [new_substance_id],
+    }
+    blocking = BlockingContext(active_components, substances, global_relations, competes_pairs)
+    return slot_is_blocked(
+        new_product.id,
+        slot_name,
+        {slot_name: [existing_product.id]},
+        blocking,
+    )
+
+
+def test_class_level_competes_blocks_slot() -> None:
+    """A mineral and a fat_soluble substance must not share a slot."""
+    mineral_sub = make_substance("sub_mineral0001", "Zinc", traits=SubstanceTraitOverrides(is_=("mineral",)))
+    fat_sol_sub = make_substance("sub_fatsoluble1", "Vitamin D", traits=SubstanceTraitOverrides(is_=("fat_soluble",)))
+    mineral_prd = Product(
+        id="prd_mineral0001",
+        name="Zinc Product",
+        components=(ProductComponent(substance="sub_mineral0001", primary=True),),
+    )
+    fat_sol_prd = Product(
+        id="prd_fatsoluble1",
+        name="Vitamin D Product",
+        components=(ProductComponent(substance="sub_fatsoluble1", primary=True),),
     )
     substances = {
-        **{
-            f"sub_{index:010d}": Substance(
-                f"sub_{index:010d}",
-                f"Food {index}",
-                schedule_assertions=(ScheduleAssertion("intake", "food_preferred"),),
-            )
-            for index in range(5)
-        },
-        **{
-            f"sub_{index:010d}": Substance(
-                f"sub_{index:010d}",
-                f"Empty {index}",
-                schedule_assertions=(ScheduleAssertion("intake", "empty_preferred"),),
-            )
-            for index in range(5, 7)
-        },
+        "sub_mineral0001": mineral_sub,
+        "sub_fatsoluble1": fat_sol_sub,
     }
-    product = Product("prd_votes", "Votes", tuple(ProductComponent(substance_id) for substance_id in substances))
-    policies = {food_policy.id: food_policy, empty_policy.id: empty_policy}
-    projection = project_schedule_assignments(bundle.runtime_program, product, substances, policies)
-
-    food_trace = compute_slot_score(bundle.runtime_program, projection, _slot(food=True), policies)
-    empty_trace = compute_slot_score(bundle.runtime_program, projection, _slot(food=False), policies)
-
-    assert food_trace.score == 6  # 5 * +2, plus 2 * -2 opposing votes.
-    assert empty_trace.score == 4  # 2 * +2; food votes have no matching effect.
-    assert [(effect.policy_id, effect.vote_count, effect.delta) for effect in food_trace.effects] == [
-        ("intake:empty_preferred", 2, -4),
-        ("intake:food_preferred", 5, 10),
-    ]
-
-
-def test_policy_contributions_render_backed_and_unassessed_states() -> None:
-    bundle = ontology_bundle()
-    policy = SchedulingPolicy(
-        id="intake:food_preferred",
-        namespace="intake",
-        short_name="food_preferred",
-        label="Food preferred",
-        description="",
-        applies_when="fixture",
-        effects=(TraitEffect(TraitEffectMatch((("food", True),)), level="prefer"),),
-    )
-    backed = Substance(
-        "sub_backed0000",
-        "Backed",
-        schedule_assertions=(ScheduleAssertion("intake", "food_preferred"),),
-        scheduling_assessments=(
-            SchedulingAssessment("intake", "supports_preference", "food_preferred", ("source",), "backed"),
-        ),
-    )
-    unassessed = Substance(
-        "sub_unassessed",
-        "Unassessed",
-        schedule_assertions=(ScheduleAssertion("intake", "food_preferred"),),
-    )
-    substances = {backed.id: backed, unassessed.id: unassessed}
-    product = Product(
-        "prd_assessment_states",
-        "Assessment states",
-        (ProductComponent(backed.id), ProductComponent(unassessed.id)),
-    )
-    projection = project_schedule_assignments(bundle.runtime_program, product, substances, {policy.id: policy})
-    trace = compute_slot_score(bundle.runtime_program, projection, _slot(), {policy.id: policy})
-
-    contributions = _policy_contributions(trace, projection, substances)
-
-    assert trace.score == 4
-    assert contributions == [
-        {
-            "policy_id": "intake:food_preferred",
-            "vote_count": 2,
-            "substance_ids": [backed.id, unassessed.id],
-            "substances": ["Backed", "Unassessed"],
-            "score_contribution": 4,
-            "assessment_states": {backed.id: "supports_preference", unassessed.id: "unassessed"},
-        }
-    ]
-
-
-def test_duplicate_typed_component_reference_fails_closed() -> None:
-    bundle = ontology_bundle()
-    substance = Substance("sub_duplicate", "Duplicate", schedule_assertions=())
-    product = Product(
-        "prd_duplicate",
-        "Duplicate",
-        (ProductComponent(substance.id), ProductComponent(substance.id)),
-    )
-
-    with pytest.raises(OntologyInfrastructureError, match="duplicate component substance"):
-        project_schedule_assignments(bundle.runtime_program, product, {substance.id: substance}, {})
-
-
-def test_no_scheduling_fact_component_is_score_neutral() -> None:
-    bundle = ontology_bundle()
-    scheduled = Substance(
-        "sub_scheduled",
-        "Scheduled",
-        schedule_assertions=(ScheduleAssertion("intake", "food_preferred"),),
-    )
-    neutral = Substance("sub_neutral", "Neutral")
-    policy = SchedulingPolicy(
-        id="intake:food_preferred",
-        namespace="intake",
-        short_name="food_preferred",
-        label="Food preferred",
-        description="",
-        applies_when="fixture",
-        effects=(TraitEffect(TraitEffectMatch((("food", True),)), level="prefer"),),
-    )
-    projection = project_schedule_assignments(
-        bundle.runtime_program,
-        Product("prd_neutral", "Neutral", (ProductComponent(scheduled.id), ProductComponent(neutral.id))),
-        {scheduled.id: scheduled, neutral.id: neutral},
-        {policy.id: policy},
-    )
-
-    trace = compute_slot_score(bundle.runtime_program, projection, _slot(food=True), {policy.id: policy})
-
-    assert trace.score == 2
-    assert [effect.vote_count for effect in trace.effects] == [1]
-    assert _neutral_components([neutral.id], {neutral.id: neutral}) == [
-        {
-            "substance_id": neutral.id,
-            "substance": "Neutral",
-            "status": "no-scheduling-fact",
-            "reason": "no-scheduling-fact",
-        }
-    ]
-
-
-def test_neutral_journal_distinguishes_unassessed_and_researched_insufficient() -> None:
-    bundle = ontology_bundle()
-    researched = Substance(
-        "sub_researched",
-        "Researched",
-        scheduling_assessments=(SchedulingAssessment("intake", "insufficient", None, ("source",), "insufficient"),),
-    )
-    unassessed = Substance("sub_unassessed", "Unassessed")
-
-    rows = _neutral_components(
-        [researched.id, unassessed.id],
-        {researched.id: researched, unassessed.id: unassessed},
-        bundle,
-    )
-    by_id = {row["substance_id"]: row for row in rows}
-    assert by_id[researched.id]["assessment_states"] == {
-        "intake": "insufficient",
-        "timing": "unassessed",
-        "activity": "unassessed",
+    slot_name = "breakfast"
+    # mineral already placed in slot
+    slot_items: dict[str, list[str]] = {slot_name: [mineral_prd.id]}
+    active_components: dict[str, list[str]] = {
+        mineral_prd.id: ["sub_mineral0001"],
+        fat_sol_prd.id: ["sub_fatsoluble1"],
     }
-    assert by_id[unassessed.id]["assessment_states"] == {
-        "intake": "unassessed",
-        "timing": "unassessed",
-        "activity": "unassessed",
+    global_relations = [_make_class_competes_rel()]
+    blocking = BlockingContext(active_components, substances, global_relations, set())
+
+    result = slot_is_blocked(
+        fat_sol_prd.id,
+        slot_name,
+        slot_items,
+        blocking,
+    )
+
+    assert result is True, "mineral ↔ fat_soluble class-level competes must block co-placement"
+
+
+def test_class_level_competes_does_not_block_unrelated_classes() -> None:
+    """An amino substance is not blocked by the mineral ↔ fat_soluble rule."""
+    mineral_sub = make_substance("sub_mineral0002", "Magnesium", traits=SubstanceTraitOverrides(is_=("mineral",)))
+    amino_sub = make_substance("sub_amino00001", "Glycine", traits=SubstanceTraitOverrides(is_=("amino",)))
+    mineral_prd = Product(
+        id="prd_mineral0002",
+        name="Magnesium Product",
+        components=(ProductComponent(substance="sub_mineral0002", primary=True),),
+    )
+    amino_prd = Product(
+        id="prd_amino00001",
+        name="Glycine Product",
+        components=(ProductComponent(substance="sub_amino00001", primary=True),),
+    )
+    substances = {
+        "sub_mineral0002": mineral_sub,
+        "sub_amino00001": amino_sub,
     }
+    slot_name = "breakfast"
+    slot_items: dict[str, list[str]] = {slot_name: [mineral_prd.id]}
+    active_components: dict[str, list[str]] = {
+        mineral_prd.id: ["sub_mineral0002"],
+        amino_prd.id: ["sub_amino00001"],
+    }
+    global_relations = [_make_class_competes_rel()]
+    blocking = BlockingContext(active_components, substances, global_relations, set())
 
-
-def test_assessment_metadata_does_not_change_slot_score() -> None:
-    bundle = ontology_bundle()
-    policy = SchedulingPolicy(
-        id="intake:food_preferred",
-        namespace="intake",
-        short_name="food_preferred",
-        label="Food preferred",
-        description="",
-        applies_when="fixture",
-        effects=(TraitEffect(TraitEffectMatch((("food", True),)), level="prefer"),),
-    )
-    without = Substance(
-        "sub_score_probe",
-        "Score probe",
-        schedule_assertions=(ScheduleAssertion("intake", "food_preferred"),),
-    )
-    with_metadata = replace(
-        without,
-        scheduling_assessments=(
-            SchedulingAssessment("intake", "supports_preference", "food_preferred", ("source",), "supports"),
-        ),
-    )
-    product = Product("prd_scoreprobe", "Score probe", (ProductComponent(without.id),))
-    plain_projection = project_schedule_assignments(
-        bundle.runtime_program, product, {without.id: without}, {policy.id: policy}
-    )
-    metadata_projection = project_schedule_assignments(
-        bundle.runtime_program,
-        product,
-        {with_metadata.id: with_metadata},
-        {policy.id: policy},
-    )
-    assert (
-        compute_slot_score(bundle.runtime_program, plain_projection, _slot(), {policy.id: policy}).score
-        == compute_slot_score(
-            bundle.runtime_program,
-            metadata_projection,
-            _slot(),
-            {policy.id: policy},
-        ).score
+    result = slot_is_blocked(
+        amino_prd.id,
+        slot_name,
+        slot_items,
+        blocking,
     )
 
-
-def test_pre_and_post_workout_policies_score_different_slots() -> None:
-    bundle = ontology_bundle()
-    pre = SchedulingPolicy(
-        id="activity:pre_workout",
-        namespace="activity",
-        short_name="pre_workout",
-        label="Pre-workout",
-        description="",
-        applies_when="fixture",
-        effects=(TraitEffect(TraitEffectMatch((("near", "workout_before"),)), level="prefer"),),
-    )
-    post = SchedulingPolicy(
-        id="activity:post_workout",
-        namespace="activity",
-        short_name="post_workout",
-        label="Post-workout",
-        description="",
-        applies_when="fixture",
-        effects=(TraitEffect(TraitEffectMatch((("near", "workout_after"),)), level="prefer"),),
-    )
-    product = Product("training", "Training", (ProductComponent("sub_pre"),))
-    substance = Substance("sub_pre", "Pre", schedule_assertions=(ScheduleAssertion("activity", "pre_workout"),))
-    projection = project_schedule_assignments(
-        bundle.runtime_program, product, {substance.id: substance}, {pre.id: pre, post.id: post}
-    )
-    before = compute_slot_score(
-        bundle.runtime_program, projection, _slot(near="workout_before"), {pre.id: pre, post.id: post}
-    )
-    after = compute_slot_score(
-        bundle.runtime_program, projection, _slot(near="workout_after"), {pre.id: pre, post.id: post}
-    )
-    assert before.score > after.score
+    assert result is False, "amino class is not covered by mineral ↔ fat_soluble rule"
 
 
-def test_empty_projection_is_neutral() -> None:
-    bundle = ontology_bundle()
-    trace = compute_slot_score(
-        bundle.runtime_program,
-        project_schedule_assignments(bundle.runtime_program, Product("p", "P", ()), {}, {}),
-        _slot(),
-        {},
-    )
-    assert (trace.score, trace.blocked, trace.effects, trace.diagnostics) == (0, False, (), ())
-    assert render_slot_effects(trace, bundle) == [
-        "No nonzero chosen-slot scheduling effect. Placement reflects compatible-slot feasibility, global load balance, and stable tie-breaking; it is not evidence for this clock time or meal condition."
-    ]
+def test_class_level_competes_symmetric() -> None:
+    """Blocking is symmetric: swapping item and existing still returns True."""
+    mineral_sub = make_substance("sub_mineral0003", "Copper", traits=SubstanceTraitOverrides(is_=("mineral",)))
+    fat_sol_sub = make_substance("sub_fatsoluble2", "Vitamin K", traits=SubstanceTraitOverrides(is_=("fat_soluble",)))
+    mineral_prd = _product_with_primary_component("prd_mineral0003", "Copper Product", "sub_mineral0003")
+    fat_sol_prd = _product_with_primary_component("prd_fatsoluble2", "Vitamin K Product", "sub_fatsoluble2")
+    substances = {
+        "sub_mineral0003": mineral_sub,
+        "sub_fatsoluble2": fat_sol_sub,
+    }
+    global_relations = [_make_class_competes_rel()]
+    shared_competes_pairs: set[frozenset[str]] = set()
 
+    result_a = _class_competes_blocked(fat_sol_prd, mineral_prd, substances, global_relations, shared_competes_pairs)
+    result_b = _class_competes_blocked(mineral_prd, fat_sol_prd, substances, global_relations, shared_competes_pairs)
 
-def test_nonzero_effect_rendering_does_not_use_zero_effect_template() -> None:
-    bundle = ontology_bundle()
-    policy = SchedulingPolicy(
-        id="intake:food_preferred",
-        namespace="intake",
-        short_name="food_preferred",
-        label="Food preferred",
-        description="",
-        applies_when="fixture",
-        effects=(TraitEffect(TraitEffectMatch((("food", True),)), level="prefer"),),
-    )
-    substance = Substance("sub_a", "A", schedule_assertions=(ScheduleAssertion("intake", "food_preferred"),))
-    projection = project_schedule_assignments(
-        bundle.runtime_program,
-        Product("prd_a", "A", (ProductComponent("sub_a"),)),
-        {"sub_a": substance},
-        {policy.id: policy},
-    )
-    trace = compute_slot_score(bundle.runtime_program, projection, _slot(food=True), {policy.id: policy})
-    rendered = render_slot_effects(trace, bundle)
-    assert rendered and rendered != [load_review_presentation(bundle).zero_effect_template]
-    assert policy.id in rendered[0]
-
-
-def test_authored_zero_effect_template_mutation_changes_runtime_output() -> None:
-    source = ontology_bundle()
-    decoded = cast(dict[str, object], _thaw(cast(dict[str, object], source.decoded)))
-    vocabulary = cast(dict[str, object], decoded["runtime-vocabulary.yaml"])
-    presentation = cast(dict[str, object], vocabulary["schedule_presentation"])
-    zero_effect = cast(dict[str, object], presentation["zero_effect"])
-    zero_effect["template"] = "Authored neutral placement explanation."
-    bundle = replace(source, decoded=decoded)
-    trace = compute_slot_score(
-        bundle.runtime_program,
-        project_schedule_assignments(bundle.runtime_program, Product("p", "P", ()), {}, {}),
-        _slot(),
-        {},
-    )
-    assert render_slot_effects(trace, bundle) == ["Authored neutral placement explanation."]
-
-
-def test_zero_effect_presentation_metadata_fails_closed() -> None:
-    source = ontology_bundle()
-    decoded = cast(dict[str, object], _thaw(cast(dict[str, object], source.decoded)))
-    vocabulary = cast(dict[str, object], decoded["runtime-vocabulary.yaml"])
-    presentation = cast(dict[str, object], vocabulary["schedule_presentation"])
-    presentation.pop("zero_effect")
-    with pytest.raises(OntologyInfrastructureError) as raised:
-        load_review_presentation(replace(source, decoded=decoded))
-    assert raised.value.code == MALFORMED
-
-
-def test_concerns_do_not_change_schedule_placement() -> None:
-    bundle = ontology_bundle()
-    policy = SchedulingPolicy(
-        id="intake:food_preferred",
-        namespace="intake",
-        short_name="food_preferred",
-        label="Food preferred",
-        description="",
-        applies_when="fixture",
-        effects=(TraitEffect(TraitEffectMatch((("food", True),)), level="prefer"),),
-    )
-    substance = Substance("sub_a", "A", schedule_assertions=(ScheduleAssertion("intake", "food_preferred"),))
-    plain = Product("prd_a", "A", (ProductComponent("sub_a"),))
-    annotated = Product(
-        "prd_a",
-        "A",
-        (ProductComponent("sub_a"),),
-        concerns=(Concern("safety", "Authored annotation only."),),
-    )
-    slots = (_slot(food=True), _slot(food=False))
-
-    def placement(product: Product) -> tuple[int, ...]:
-        projection = project_schedule_assignments(
-            bundle.runtime_program, product, {substance.id: substance}, {policy.id: policy}
-        )
-        return tuple(
-            compute_slot_score(bundle.runtime_program, projection, slot, {policy.id: policy}).score for slot in slots
-        )
-
-    assert placement(annotated) == placement(plain)
-
-
-def _thaw(value: object) -> object:
-    if isinstance(value, dict):
-        mapping = cast(dict[str, object], value)
-        return {key: _thaw(item) for key, item in mapping.items()}
-    if isinstance(value, list):
-        return [_thaw(item) for item in cast(list[object], value)]
-    if isinstance(value, tuple):
-        return tuple(_thaw(item) for item in cast(tuple[object, ...], value))
-    return value
+    assert result_a is True, "fat_soluble blocked by mineral (direction 1)"
+    assert result_b is True, "mineral blocked by fat_soluble (direction 2) — symmetric"
