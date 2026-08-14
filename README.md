@@ -17,9 +17,9 @@ Supplement stacks rarely fail because one bottle is hard to understand. They fai
 | Combination products hide many active ingredients | One product card expands into concrete substances |
 | Timing rules conflict | The planner separates food, empty-stomach, sleep, and workout slots |
 | Forms matter | Magnesium glycinate, citrate, oxide, and threonate can be separate facts |
-| Interactions are easy to forget | Relations and risk flags stay in one review surface |
+| Interactions are easy to forget | Relations and review facts stay in one review surface |
 | AI chat loses context | Cards, schedules, and warnings are inspectable in git |
-| A new shelf makes old plans stale | Regenerate `schedule.yaml` from source data |
+| A new shelf makes old plans stale | Regenerate `schedule.yaml` from source cards and ontology |
 
 The goal is simple: make supplement planning boring enough to trust and structured enough for a careful agent to help.
 
@@ -37,28 +37,28 @@ Example schedule shape, using broadly available iHerb catalog examples rather th
 Daily
 
 Morning / empty stomach
-  • NOW Foods - NAC 600 mg
-  • Jarrow Formulas - Acetyl L-Carnitine 500 mg
+  • NOW Foods - NAC
+  • Jarrow Formulas - Acetyl L-Carnitine
 
 Morning / with breakfast
-  • California Gold Nutrition - Vitamin D3 5,000 IU
+  • California Gold Nutrition - Vitamin D3
   • Nordic Naturals - Ultimate Omega
-  • Doctor's Best - High Absorption CoQ10 100 mg
-  • NOW Foods - Astaxanthin 4 mg
+  • Doctor's Best - High Absorption CoQ10
+  • NOW Foods - Astaxanthin
 
 Day / with meal
   • Jarrow Formulas - Methyl B-12 & Methyl Folate
   • Jarrow Formulas - B-Right
-  • NOW Foods - Zinc Picolinate 50 mg
+  • NOW Foods - Zinc Picolinate
   • California Gold Nutrition - Buffered Gold C
 
 Before sleep / empty stomach
-  • NOW Foods - Magnesium Glycinate
+  • NOW Foods - Magnesium
 
 Training
 
 Pre-workout
-  • NOW Foods Sports - Creatine Monohydrate
+  • NOW Foods Sports - Creatine
   • Doctor's Best - L-Citrulline Powder
 
 Post-workout
@@ -66,6 +66,13 @@ Post-workout
 ```
 
 The full generated `schedule.yaml` also includes placement notes, warnings, kept-together products, benefit/risk clusters, and an active fact index for review.
+
+Products may optionally set `use_pattern: not_every_day` for presentation. The
+marker keeps the product in the ordinary `daily` stack and physical schedule;
+it only places the active product in `summary.usage_groups.not_every_day` and
+the corresponding human view section. Omission places it in
+`summary.usage_groups.daily_base`. This is not a numeric frequency or dose
+model.
 
 ## Who It Helps
 
@@ -80,7 +87,7 @@ The full generated `schedule.yaml` also includes placement notes, warnings, kept
 - Separates product-label facts from reusable substance and form knowledge.
 - Schedules products into daily and training pillboxes.
 - Keeps multi-ingredient products together instead of pretending their components can be split.
-- Surfaces review prompts for relations, risks, pathways, and dashboard coverage.
+- Surfaces review prompts for authored concerns, relations, fact memberships, and dashboard coverage.
 - Lets agents draft product components by exact substance names, then normalizes them to stable `sub_*` IDs through `planner check`.
 - Keeps generated output disposable: edit source cards, regenerate the schedule.
 
@@ -106,6 +113,18 @@ uv run python -m planner check
 ```
 
 `uv run python -m planner` regenerates `schedule.yaml`. That is expected; `schedule.yaml` is the report, not the source of truth.
+
+### Canonical ontology
+
+The runtime ontology source of truth is `ontology/`. The manifest at
+`ontology/manifest.yaml` owns the LinkML modules, scheduling policies,
+constraints, assertion inputs, and custom shapes. The checked-in files under
+`ontology/generated/` are deterministic build artifacts; regenerate them with
+`uv run python scripts/generate_ontology.py` and do not edit them by hand.
+
+Product and substance cards remain under `data/products/` and
+`data/substances/`; they reference the generated canonical vocabulary when
+`planner check` validates them.
 
 ## Bring Your Own Stack
 
@@ -148,10 +167,10 @@ That flow keeps the system from turning into a giant undifferentiated supplement
 | Command | Use it for |
 |---|---|
 | `uv run python -m planner` | Regenerate `schedule.yaml` and print the compact pillbox view |
-| `uv run python -m planner check` | Validate cards, references, stacks, traits, and deterministic maintenance |
-| `uv run python -m planner review` | Review active concerns, relations, risk flags, pathways, and dashboard coverage |
+| `uv run python -m planner check` | Validate cards, references, stacks, canonical ontology terms, and deterministic maintenance |
+| `uv run python -m planner review` | Review authored concerns, relations, fact memberships, and dashboard coverage |
 | `uv run python -m planner audit` | Inspect structural diagnostics such as duplicates, unused traits, and empty clusters |
-| `uv run python -m planner audit --full` | Add source/amount drilldown when labels, URLs, or component amounts matter |
+| `uv run python -m planner audit --full` | Include the generic full-audit diagnostics |
 | `uv run python -m planner find "<words>"` | Search products and substances by name, alias, form, ID, URL, or card text |
 | `uv run python -m planner review-substance <path>` | Show the trait checklist and relation context for one substance card |
 
@@ -167,13 +186,13 @@ YAML is the source of truth because it is readable, reviewable, and easy for an 
 | Pillboxes | `data/pillboxes.yaml` | Slots such as breakfast, empty stomach, sleep, and workout timing |
 | Relations | `data/relations.yaml` | Substance-to-substance review and scheduling relations |
 | Dashboards | `data/dashboards/` | Goal/risk clusters for review surfaces |
-| Traits | `data/traits/` | Registered scheduling and knowledge axes |
+| Ontology | `ontology/` | Canonical scheduling/review vocabulary, policies, constraints, relations, manifest, and generated runtime artifacts |
 
 Default ownership baseline:
 
 - `data/substances/` is reusable catalog knowledge and should generally stay across user onboarding unless a full catalog replacement is requested.
 - `data/products/`, `data/stacks.yaml`, and `data/dashboards/` are personal stack state by default.
-- `schedule.yaml` is a generated report and should be regenerated from source data.
+- `schedule.yaml` is a generated report and should be regenerated from source cards plus the canonical ontology.
 
 The runtime also builds an in-memory SurrealDB read model for graph-style queries. SurrealDB is a query layer, not persistent storage.
 
@@ -191,13 +210,23 @@ Most useful entry points:
 
 ## Development
 
-Run the full local gate:
+Run the static and ontology gate:
 
 ```bash
 just check
 ```
 
-That runs Ruff, Pyright, planner validation, and the test suite.
+That runs the static checks, type checks, planner validation, and ontology
+artifact checks; it does not run the test suite. Use the default test and
+release-verification gate for that:
+
+```bash
+just verify
+```
+
+`just verify` adds the bounded smoke and fast-unit suites plus repository
+ontology projection verification. The full release-candidate gate is
+`just release`.
 
 ## Non-Goals
 

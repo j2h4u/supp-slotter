@@ -4,17 +4,18 @@ aliases:
 - grape seed extract
 - Vitis vinifera extract
 - proanthocyanidin source
-notes: Polyphenol/proanthocyanidin source from grape seeds or skins. Mild antiplatelet
-  potential at therapeutic doses; multivitamin-blend doses are usually sub-therapeutic.
+notes: Polyphenol/proanthocyanidin source from grape seeds or skins. Mild antiplatelet potential at therapeutic doses; multivitamin-blend
+  doses are usually sub-therapeutic.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - antioxidant
-  - flavonoid
+  context:
+  - antioxidant_protection
   effect:
   - vascular_polyphenol_context
   - endothelial_context
-  context:
-  - antioxidant_protection
+  kind:
+  - flavonoid
+  role:
+  - antioxidant

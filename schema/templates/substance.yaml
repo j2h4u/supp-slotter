@@ -31,11 +31,18 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
 # notes: ""  # Free-form notes about this substance — sourcing, dosing context,
              # label discrepancies, evidence caveats. Not shown in schedule output.
              # Use for anything an agent should know that doesn't fit structured fields.
+             # For a new substance used by an active product, follow the bounded
+             # evidence-enrichment rule in SKILL.md before adding schedule facts.
+
+# semantic_enrichment_attempted_on: "2026-01-31"  # Optional immutable queue marker.
+#   ISO 8601 calendar date (YYYY-MM-DD). This records that a bounded semantic/
+#   evidence enrichment attempt occurred; it does not assert completeness,
+#   freshness, safety, approval, or scheduling suitability.
 
 # ---------------------------------------------------------------------------
 # SCHEDULING — read by Planner
-# The schedule: section is the only data the Planner reads (plus knowledge.is:
-# narrowly, for class-level competes). Putting a slug under knowledge:effect or
+# The schedule: section is the only data the Planner reads for slot placement.
+# Putting a slug under knowledge:effect or
 # knowledge:risk does NOT affect slot assignment — it only surfaces in
 # `planner review`.
 # ---------------------------------------------------------------------------
@@ -49,44 +56,47 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
 #                             # (any other effect slug goes under knowledge.effect)
 #   activity:                 # MAX ONE slug. Training-context specificity.
 #   - pre_workout             # Values: pre_workout | post_workout | any_workout
-#                             # Substances with activity: MUST be in the training stack.
+#                             # Activity terms are soft workout-slot preferences;
+#                             # they do not require training-stack membership.
 #   prefer_with:              # Substance IDs (sub_*) to co-schedule when possible.
 #   - sub_xxxxxxxxxx          # Planner awards a bonus for placing prefer_with pairs together.
 
 # ---------------------------------------------------------------------------
 # KNOWLEDGE — read by Reviewer
-# These fields do not affect slot assignment. They surface in `planner review`
-# for a smart agent to interpret. Trait-backed namespaces are validated against
-# data/traits/. context: is validated against data/dashboards/.
+# These fields do not affect slot assignment. The active fact namespaces surface
+# in `planner review` for a smart agent to interpret; authored risk/pathway facts
+# remain reviewer-only data. Trait-backed namespaces are validated against the
+# canonical ontology vocabulary.
 # ---------------------------------------------------------------------------
 
 # knowledge:
-#   is:                       # Structural classification. Used for class-level
-#   - mineral                 # competes rules and dashboard/context membership.
-#                             # See data/traits/classes.yaml for valid slugs.
+#   kind:                     # Structural classification. Used for class-level
+#   - mineral                 # intrinsic class for review/dashboard/context membership.
+#                             # See ontology/vocabulary.yaml for valid slugs.
 #   effect:                   # Non-scheduling pharmacological effects.
-#   - vasodilator             # See data/traits/effects.yaml for valid slugs.
+#   - vasodilator             # See ontology/vocabulary.yaml for valid slugs.
 #                             # Examples: vasodilator, cholinergic_support,
 #                             # pde5_inhibition, fibrinolytic
-#   risk:                     # Safety / interaction flags surfaced by `planner review`.
-#   - manual_review           # NOT used for slot assignment. See data/traits/risks.yaml.
+#   risk:                     # Authored reviewer-only safety / interaction facts;
+#                             # not part of the active fact projection in `planner review`.
+#   - manual_review           # NOT used for slot assignment or active-fact rendering.
+#                             # See ontology/vocabulary.yaml.
 #                             # Examples: manual_review, bleeding_med_interaction,
 #                             # hypotension_med_interaction
-#   context:                  # Curated review-context membership for dashboard views.
-#   - vascular_health         # See data/dashboards/ for valid context names.
-#   pathway:                  # Metabolic pathway membership.
-#   - methylation_cycle       # See data/traits/pathways.yaml for valid slugs.
+#   pathway:                  # Authored reviewer-only metabolic pathway membership;
+#                             # not part of the active fact projection in `planner review`.
+#   - methylation_cycle       # See ontology/vocabulary.yaml for valid slugs.
 
 # ---------------------------------------------------------------------------
 # CONCERNS
 # Documented caveats, safety notes, and data quality issues. These appear in
-# planner review > Safety / Data Quality / Model Gaps with active/inactive/
-# knowledge-only membership labels. Add one entry per distinct concern. Do not
-# over-flag — only add what is actionable or genuinely uncertain.
+# planner review > Safety / Data Quality / Model Gaps by concern kind. Add one
+# entry per distinct concern. Do not over-flag — only add what is actionable or
+# genuinely uncertain.
 # ---------------------------------------------------------------------------
 
 # concerns:
-# - kind: safety        # safety | model_gap | data_quality
+# - kind: safety        # See ontology/model.yaml ConcernKind.
 #   text: ""            # Specific concern text. State the mechanism, the source
 #                       # if known, and whether it is currently relevant.
 #

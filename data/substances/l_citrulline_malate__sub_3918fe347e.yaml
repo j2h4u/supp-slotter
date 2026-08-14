@@ -1,34 +1,50 @@
 id: sub_3918fe347e
 name: L-Citrulline
 form: malate
-notes: 'L-Citrulline bonded with malic acid (2:1 ratio typical). Converted to arginine
-  in the kidneys, raising plasma arginine and nitric oxide production → vasodilation,
-  improved blood flow, reduced exercise fatigue. Typical pre-workout dose 6–8 g citrulline
-  malate (≈4–5 g citrulline equivalent), taken 30–60 min before exercise. Sources:
-  examine.com (Citrulline); Pérez-Guisado & Jakeman 2010 (J Strength Cond Res); NIH
-  MedlinePlus.'
+semantic_enrichment_attempted_on: '2026-08-13'
+notes: 'L-Citrulline bonded with malic acid; the active unbranded product states 5 g with unresolved malate ratio and product metadata. Genius Pre is a registered but inactive product whose label states 6 g of 2:1 citrulline malate. Acute pre-exercise studies support only a low-confidence heuristic; no superiority over chronic random-time daily dosing is established. Converted to arginine and studied in nitric-oxide/exercise contexts. Sources: PMID 17953788; PMID 39662304; PMC13304508.'
 concerns:
 - kind: safety
-  text: Additive hypotensive effect when combined with PDE5 inhibitors (tadalafil,
-    sildenafil) or other vasodilators — directly relevant if tadalafil is active in
-    the stack. Monitor for symptomatic hypotension.
+  text: Possible additive hypotension with PDE5 inhibitors or other vasodilators; this is a bounded review concern, not a demonstrated universal interaction threshold or timing rule.
 schedule:
-  intake:
-  - empty_preferred
   activity:
   - pre_workout
+scheduling_assessment:
+  intake:
+    conclusion: insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/17953788/
+    - https://pubmed.ncbi.nlm.nih.gov/39662304/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC13304508/
+    summary: No direct fed-versus-fasted comparison establishes a meal preference for the active unbranded 5 g malate product; its malate ratio is unresolved, while the registered Genius Pre comparator is inactive.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/17953788/
+    - https://pubmed.ncbi.nlm.nih.gov/39662304/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC13304508/
+    summary: Acute study administration around exercise does not establish a superior clock time or necessity for pre-workout dosing over chronic random-time daily use.
+  activity:
+    conclusion: supports_preference
+    policy: pre_workout
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/17953788/
+    - https://pubmed.ncbi.nlm.nih.gov/39662304/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC13304508/
+    summary: Low-confidence soft pre-workout heuristic from exercise-context studies; no superiority over chronic random-time dosing is established, and this task makes no product, stack, or pillbox representation change.
 knowledge:
-  is:
-  - amino
-  - ergogenic
-  effect:
-  - nitric_oxide_support
-  - vasodilator
-  risk:
-  - manual_review
-  - hypotension_med_interaction
   context:
   - vascular_health
   - workout_performance
+  effect:
+  - nitric_oxide_support
+  - vasodilator
+  kind:
+  - amino
   pathway:
   - nitric_oxide_cgmp
+  risk:
+  - manual_review
+  - hypotension_med_interaction
+  role:
+  - ergogenic

@@ -2,13 +2,10 @@ id: sub_wnyygv7y7l
 name: Vitamin B1
 form: thiamine HCl
 notes: Thiamine hydrochloride form listed on Life Extension Mega Benfotiamine.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
-  is:
-  - vitamin
   context:
   - mitochondrial_health
+  kind:
+  - vitamin
   pathway:
   - thiamine_energy_metabolism

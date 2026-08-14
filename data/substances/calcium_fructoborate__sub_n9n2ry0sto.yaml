@@ -4,18 +4,18 @@ form: fructoborate
 aliases:
 - calcium fructoborate
 - FruiteX-B
-notes: Calcium-fructose-boron complex; sometimes used as a co-source of calcium and
-  boron in joint and women's-health formulas including Country Life Core Daily-1.
-  Review context - treat as a calcium source for bone-mineral, clotting, nerve/muscle,
+notes: Calcium-fructose-boron complex; sometimes used as a co-source of calcium and boron in joint and women's-health formulas
+  including Country Life Core Daily-1. Review context - treat as a calcium source for bone-mineral, clotting, nerve/muscle,
   and vitamin-D/calcium-axis review while preserving the fructoborate form.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - electrolyte
-  - mineral
   effect:
   - bone_mineral_metabolism_support
+  kind:
+  - mineral
   pathway:
   - vitamin_d_calcium_axis
+  quality:
+  - electrolyte

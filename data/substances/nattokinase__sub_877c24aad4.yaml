@@ -1,32 +1,39 @@
 id: sub_877c24aad4
 name: Nattokinase
-notes: 'Serine protease derived from Bacillus subtilis natto fermentation. Fibrinolytic
-  enzyme — degrades fibrin and may reduce blood viscosity. Typical dose 100–2000 FU,
-  often 2000 FU/day. Take on an empty stomach — food protein and stomach contents
-  compete with enzymatic activity; enteric-coated capsules improve delivery past stomach
-  acid. Sources: examine.com (Nattokinase); Kurosawa et al. 2015 (Scientific Reports);
-  NIH NCCIH.'
+semantic_enrichment_attempted_on: '2026-08-13'
+notes: 'Serine protease derived from Bacillus subtilis natto fermentation. FU is an activity-unit label; registered products differ materially, including active Airboy quick-release 6000 FU per 2 capsules (manufacturer/formulation not independently verified) and unassigned Minami 13000 FU. Empty-stomach use is a low-confidence soft heuristic, not established by human fed-versus-fasted comparison; the Airboy product is not the human NSK-SD preparation. Competing gastric, food, protease, and formulation mechanisms limit transfer. Preserve bounded bleeding/medication/procedure review; do not claim clot treatment or blood-viscosity reduction. Sources: PMID 17520440; PMID 23709455; NIH DSLD label 82020.'
 concerns:
 - kind: model_gap
-  text: Enteric coating significantly affects delivery — no trait captures formulation-dependent
-    intake requirements
+  text: Formulation and delivery may affect exposure, but enteric superiority is not established for the active quick-release Airboy product; no trait captures formulation-dependent intake requirements.
 - kind: safety
-  text: Contraindicated with anticoagulants (warfarin, heparin) and antiplatelet drugs
-    including aspirin; do not take within several days of surgery. Fibrinolytic action
-    potentiates bleeding risk — review if aspirin or other antiplatelets are in the
-    active stack.
+  text: Review anticoagulants, antiplatelets, bleeding history, and planned procedures because human evidence includes coagulation-marker effects; this is not a categorical contraindication or fixed surgery-day interval.
 schedule:
   intake:
   - empty_preferred
+scheduling_assessment:
+  intake:
+    conclusion: supports_preference
+    policy: empty_preferred
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/17520440/
+    - https://pubmed.ncbi.nlm.nih.gov/23709455/
+    - https://api.ods.od.nih.gov/dsld/s3/pdf/82020.pdf
+    summary: Low-confidence soft empty-stomach heuristic from enzyme/gastric rationale and product-label direction; no human fed-versus-fasted comparison establishes it for exact Airboy quick-release 6000 FU per 2 capsules, which is not the human NSK-SD preparation, and competing mechanisms remain.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/23709455/
+    - https://api.ods.od.nih.gov/dsld/s3/pdf/82020.pdf
+    summary: No comparative clock-time rule was demonstrated; pharmacokinetic sampling times are not administration-time evidence.
 knowledge:
-  is:
-  - enzyme
+  context:
+  - vascular_health
   effect:
   - fibrinolytic
+  kind:
+  - enzyme
+  pathway:
+  - fibrinolysis_coagulation
   risk:
   - manual_review
   - bleeding_med_interaction
-  context:
-  - vascular_health
-  pathway:
-  - fibrinolysis_coagulation

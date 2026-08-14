@@ -6,30 +6,31 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
-import yaml
-
 from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance, load_substance_registry
-from planner.cards.traits import load_traits
-from planner.contracts import CardLoadError, Substance, TraitDef
+from planner.contracts import CardLoadError, SchedulingPolicy, Substance
 from planner.engine._types import SubstanceRelationMatchRow
+from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
+from planner.ontology.policies import load_scheduling_policies
+from planner.ontology.presentation import load_relation_type_order, load_review_presentation
 from planner.paths import ROOT, Paths, display_path, strip_root_prefix
 from planner.query_model import build_stack_read_model
 from planner.query_model.surreal import SurrealLoadContext
 
 SubstanceRelationMatch = tuple[SubstanceRelationMatchRow, list[str]]
-ContextDashboardDetails = dict[str, tuple[str, str] | None]
 
 
 @dataclass(frozen=True, slots=True)
 class SubstanceReviewModel:
     path: Path
     substance: Substance
-    trait_defs: dict[str, TraitDef]
+    policies: dict[str, SchedulingPolicy]
+    namespace_order: tuple[str, ...]
     substance_slugs_by_namespace: dict[str, set[str]]
     current_traits: set[str]
     relation_matches: list[SubstanceRelationMatch]
-    context_dashboards: ContextDashboardDetails
+    relation_type_order: tuple[str, ...]
 
 
 def resolve_substance_review_path(target: str, paths: Paths) -> tuple[Path | None, str | None]:
@@ -57,38 +58,50 @@ def resolve_substance_review_path(target: str, paths: Paths) -> tuple[Path | Non
 def build_substance_review_model(
     path: Path,
     paths: Paths,
+    bundle: OntologyBundle,
 ) -> tuple[SubstanceReviewModel | None, list[str]]:
     try:
-        substance = load_substance(path)
+        substance = load_substance(path, bundle)
     except CardLoadError as e:
         return None, [strip_root_prefix(e.message)]
 
     try:
-        trait_defs = load_traits(paths.traits)
+        policies = load_scheduling_policies(bundle)
     except CardLoadError as e:
         return None, [strip_root_prefix(e.message)]
-    if not trait_defs:
-        return None, ["data/traits/: no traits found"]
+    if not policies:
+        return None, ["canonical ontology has no scheduling policies"]
 
-    substance_slugs = _substance_slugs_by_namespace(substance)
-    current_traits = {f"{namespace}:{slug}" for namespace, slugs in substance_slugs.items() for slug in slugs}
-    review_substances = load_substance_registry(paths)
+    substance_slugs = _substance_slugs_by_namespace(substance, bundle)
+    current_traits = {
+        f"{namespace}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{slug}"
+        for namespace, slugs in substance_slugs.items()
+        for slug in slugs
+    }
+    review_substances = load_substance_registry(paths, bundle)
+    relation_type_order = load_relation_type_order(bundle)
+    try:
+        global_relations = load_global_relations(paths, bundle, review_substances)
+    except CardLoadError as e:
+        return None, [strip_root_prefix(e.message)]
     read_model = build_stack_read_model(
         review_substances,
-        load_global_relations(paths),
+        global_relations,
         context=SurrealLoadContext(
-            trait_defs=trait_defs,
+            policies=policies,
             stacks_data=None,
             pillbox_stack_names=None,
             dashboards=None,
         ),
+        ontology_bundle=bundle,
     )
 
     return (
         SubstanceReviewModel(
             path=path,
             substance=substance,
-            trait_defs=trait_defs,
+            policies=policies,
+            namespace_order=load_review_presentation(bundle).namespace_order,
             substance_slugs_by_namespace=substance_slugs,
             current_traits=current_traits,
             relation_matches=cast(
@@ -98,47 +111,17 @@ def build_substance_review_model(
                     substance.name,
                 ),
             ),
-            context_dashboards=_context_dashboards(paths, substance_slugs),
+            relation_type_order=relation_type_order,
         ),
         [],
     )
 
 
-def _substance_slugs_by_namespace(substance: Substance) -> dict[str, set[str]]:
+def _substance_slugs_by_namespace(substance: Substance, bundle: OntologyBundle) -> dict[str, set[str]]:
     slugs_by_namespace: dict[str, set[str]] = {}
-    for field, namespace in [
-        ("intake", "intake"),
-        ("timing", "timing"),
-        ("activity", "activity"),
-        ("is_", "is"),
-        ("effect", "effect"),
-        ("risk", "risk"),
-        ("context", "context"),
-        ("pathway", "pathway"),
-    ]:
-        slugs_by_namespace[namespace] = set(cast(tuple[str, ...], getattr(substance, field)))
+    del bundle
+    for assertion in substance.schedule_assertions:
+        slugs_by_namespace.setdefault(assertion.axis, set()).add(assertion.value)
+    for assertion in substance.knowledge_assertions:
+        slugs_by_namespace.setdefault(assertion.category, set()).add(assertion.value)
     return slugs_by_namespace
-
-
-def _context_dashboards(
-    paths: Paths,
-    slugs_by_namespace: dict[str, set[str]],
-) -> ContextDashboardDetails:
-    details: ContextDashboardDetails = {}
-    for slug in slugs_by_namespace.get("context", set()):
-        yaml_path = paths.dashboards / f"{slug}.yaml"
-        if not yaml_path.exists():
-            details[slug] = None
-            continue
-        raw_data = cast(object, yaml.safe_load(yaml_path.read_text(encoding="utf-8")))
-        if not isinstance(raw_data, dict):
-            details[slug] = (slug, "")
-            continue
-        data = cast(dict[str, object], raw_data)
-        name = data.get("name", slug)
-        desc = data.get("description", "")
-        details[slug] = (
-            name if isinstance(name, str) else slug,
-            desc if isinstance(desc, str) else "",
-        )
-    return details

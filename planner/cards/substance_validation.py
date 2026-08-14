@@ -2,24 +2,42 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
 from planner.cards._common import load_card_mapping
 from planner.cards.substance import canonical_substance_filename
 from planner.contracts import CardLoadError, Substance
+from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.substance_fields import (
+    canonical_terms_by_predicate,
+    knowledge_category_fields,
+    schedule_assignment_fields,
+)
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue
+
+
+@dataclass(frozen=True, slots=True)
+class _CanonicalTermContext:
+    terms_by_predicate: Mapping[str, frozenset[str]]
+    schedule_fields: tuple[str, ...]
+    knowledge_fields: tuple[str, ...]
+    schedule_axis_by_field: tuple[tuple[str, str], ...]
 
 
 def check_substances(
     substance_files: list[Path],
     trait_ids: set[str],
     paths: Paths,
+    bundle: OntologyBundle,
     *,
     prefer_with_registry: dict[str, Path] | None = None,
 ) -> tuple[list[str], list[str], dict[str, Path]]:
+    canonical_terms: _CanonicalTermContext | None = None
     errors: list[str] = []
     info: list[str] = []
     seen_ids: dict[str, Path] = {}
@@ -32,7 +50,10 @@ def check_substances(
             errors.append(e.message)
             continue
 
-        errors.extend(schema_errors(substance, "substance", sf))
+        if canonical_terms is None:
+            canonical_terms = _canonical_term_context(bundle)
+
+        errors.extend(schema_errors(substance, "substance", sf, bundle))
         _validate_substance_identity(sf, substance, seen_ids, errors)
         sid_raw = substance.get("id")
         if not isinstance(sid_raw, str):
@@ -43,8 +64,7 @@ def check_substances(
         sched_raw = cast(dict[str, YamlValue], sched_raw) if isinstance(sched_raw, dict) else {}
         know_raw = cast(dict[str, YamlValue], know_raw) if isinstance(know_raw, dict) else {}
         _collect_prefer_with_refs(sf, sid_raw, sched_raw, prefer_with_refs, errors)
-        _validate_schedule_traits(sf, sched_raw, trait_ids, errors)
-        _validate_review_traits(sf, know_raw, trait_ids, paths, errors)
+        _validate_canonical_terms(sf, sched_raw, know_raw, canonical_terms, errors)
 
     target_ids = prefer_with_registry or seen_ids
     for sf, _source, target in prefer_with_refs:
@@ -97,65 +117,67 @@ def _collect_prefer_with_refs(
             prefer_with_refs.append((path, substance_id, other))
 
 
-def _validate_schedule_traits(
+def _validate_canonical_terms(
     path: Path,
     schedule: dict[str, YamlValue],
-    trait_ids: set[str],
-    errors: list[str],
-) -> None:
-    for namespace in ("intake", "timing", "activity"):
-        ns_raw = schedule.get(namespace) or []
-        if not isinstance(ns_raw, list):
-            continue
-        for slug in ns_raw:
-            if not isinstance(slug, str):
-                continue
-            _validate_registered_trait(path, namespace, slug, trait_ids, errors)
-
-
-def _validate_review_traits(
-    path: Path,
     knowledge: dict[str, YamlValue],
-    trait_ids: set[str],
-    paths: Paths,
+    context: _CanonicalTermContext,
     errors: list[str],
 ) -> None:
-    for namespace in ("is", "effect", "risk", "pathway", "context"):
-        ns_raw = knowledge.get(namespace) or []
-        if not isinstance(ns_raw, list):
+    schedule_axis_by_field = dict(context.schedule_axis_by_field)
+    for field in context.schedule_fields:
+        axis = schedule_axis_by_field.get(field)
+        if axis is None:
             continue
-        for slug in ns_raw:
-            if not isinstance(slug, str):
-                continue
-            if namespace == "context":
-                _validate_context_dashboard(path, slug, paths, errors)
-            else:
-                _validate_registered_trait(path, namespace, slug, trait_ids, errors)
+        _append_unknown_schedule_term_errors(
+            path, axis, schedule.get(field), context.terms_by_predicate.get(f"schedule.{axis}", frozenset()), errors
+        )
+    for category in context.knowledge_fields:
+        _append_unknown_term_errors(
+            path,
+            category,
+            knowledge.get(category),
+            context.terms_by_predicate.get(f"knowledge.{category}", frozenset()),
+            errors,
+        )
 
 
-def _validate_registered_trait(
-    path: Path,
-    namespace: str,
-    slug: str,
-    trait_ids: set[str],
-    errors: list[str],
-) -> None:
-    full_id = f"{namespace}:{slug}"
-    if full_id in trait_ids:
-        return
-    errors.append(
-        f"{path}: Unknown trait '{slug}' under namespace '{namespace}:' "
-        f"— register it in data/traits/ under '{namespace}:' first "
-        f"(with label and description)."
+def _canonical_term_context(bundle: OntologyBundle) -> _CanonicalTermContext:
+    assignment_axes = tuple(
+        (row.assignment_field, row.axis)
+        for row in sorted(bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
+    )
+    return _CanonicalTermContext(
+        terms_by_predicate=canonical_terms_by_predicate(bundle),
+        schedule_fields=schedule_assignment_fields(bundle),
+        knowledge_fields=knowledge_category_fields(bundle),
+        schedule_axis_by_field=assignment_axes,
     )
 
 
-def _validate_context_dashboard(
+def _append_unknown_schedule_term_errors(
     path: Path,
-    slug: str,
-    paths: Paths,
+    axis: str,
+    values: YamlValue | None,
+    known: frozenset[str],
     errors: list[str],
 ) -> None:
-    if (paths.dashboards / f"{slug}.yaml").exists():
+    if not isinstance(values, list):
         return
-    errors.append(f"{path}: Unknown review context '{slug}' — create data/dashboards/{slug}.yaml first.")
+    errors.extend(
+        f"{path}: term '{axis}:{term}' is not in canonical ontology vocabulary"
+        for term in values
+        if isinstance(term, str) and term not in known
+    )
+
+
+def _append_unknown_term_errors(
+    path: Path, category: str, values: YamlValue | None, known: frozenset[str], errors: list[str]
+) -> None:
+    if not isinstance(values, list):
+        return
+    errors.extend(
+        f"{path}: term '{category}:{term}' is not in canonical ontology vocabulary"
+        for term in values
+        if isinstance(term, str) and term not in known
+    )

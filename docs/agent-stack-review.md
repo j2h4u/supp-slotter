@@ -13,17 +13,16 @@ uv run python -m planner review
 uv run python -m planner
 ```
 
-Use `planner review` first. Its `Review brief` is the intake surface: active
-concerns, actionable relation count, active relation context, risk-flag count,
-and dashboard coverage summary. Use the detailed sections below it for
-concerns, relations, risk flags, pathways, and dashboard counts.
+Use `planner review` first. Its `Review brief` is the intake surface: authored
+concerns, relation review, active fact membership, and dashboard coverage
+summary. Use the detailed sections below it for concerns, relations, active
+fact memberships, and dashboard counts.
 
 Use `schedule.yaml` for generated slot placement, humanized warnings, placement
 notes, and explanations. Do not edit it directly.
 
-Use `planner audit --full` only when product source URLs, label notes, forms,
-or component amounts matter for the current review. Unknown amounts are
-acceptable when the current question does not depend on them.
+Use `planner audit --full` only when its generic full-audit diagnostics matter
+for the current review.
 
 ## Source Completion
 
@@ -81,7 +80,7 @@ Pass to the review:
 
 - `planner review` brief and relevant detailed sections;
 - slot layout from `schedule.yaml`;
-- source-completion findings from `planner audit --full` only when relevant;
+- generic full-audit diagnostics from `planner audit --full` only when relevant;
 - user context from `docs/private/`;
 - explicit framing that this is informational analysis, not medical advice.
 

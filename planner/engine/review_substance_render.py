@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from planner.cards.substance import format_substance_name
-from planner.cards.traits import NAMESPACE_ORDER, grouped_trait_defs, print_trait_details
+from planner.contracts import CardLoadError
 from planner.engine._types import SubstanceRelationMatchRow
 from planner.engine.review_substance_model import SubstanceReviewModel
-from planner.paths import display_path
+from planner.ontology.policies import grouped_policies, print_policy_details
+from planner.paths import ROOT, display_path
 
 
 def render_substance_review(
@@ -52,12 +53,12 @@ def _print_central_relation_matches(model: SubstanceReviewModel) -> None:
         print("  none matched; add links in data/relations.yaml if needed.")
         return
 
-    print("Note: balance/competes are symmetric; supports/review_with are directional.")
+    print("Note: relation directionality is ontology-defined.")
     grouped: dict[str, list[tuple[SubstanceRelationMatchRow, list[str]]]] = {}
     for row, matched_by in model.relation_matches:
         grouped.setdefault(row["type"], []).append((row, matched_by))
 
-    for relation_type in ("balance", "competes", "supports", "review_with"):
+    for relation_type in _relation_type_render_order(grouped, model.relation_type_order):
         relation_group = grouped.get(relation_type)
         if not relation_group:
             continue
@@ -73,17 +74,28 @@ def _print_central_relation_matches(model: SubstanceReviewModel) -> None:
                 print(f"    action: {action}")
 
 
+def _relation_type_render_order(
+    grouped: dict[str, list[tuple[SubstanceRelationMatchRow, list[str]]]],
+    relation_type_order: tuple[str, ...],
+) -> tuple[str, ...]:
+    unknown_relation_types = sorted(set(grouped) - set(relation_type_order))
+    if unknown_relation_types:
+        raise CardLoadError(
+            ROOT / "ontology",
+            "relation matches contain unranked ontology relation types: " + ", ".join(unknown_relation_types),
+        )
+    return relation_type_order
+
+
 def _print_trait_checklist(model: SubstanceReviewModel) -> None:
-    registered_by_namespace = grouped_trait_defs(model.trait_defs)
-    all_namespaces = list(NAMESPACE_ORDER) + sorted(ns for ns in registered_by_namespace if ns not in NAMESPACE_ORDER)
+    registered_by_namespace = grouped_policies(model.policies, model.namespace_order)
+    all_namespaces = list(model.namespace_order) + sorted(
+        ns for ns in registered_by_namespace if ns not in model.namespace_order
+    )
 
     for namespace in all_namespaces:
         substance_slugs = model.substance_slugs_by_namespace.get(namespace, set())
         print(f"\n{namespace}")
-        if namespace == "context":
-            _print_context_namespace(model, substance_slugs)
-            continue
-
         registered_traits = registered_by_namespace.get(namespace, [])
         registered_short_names = {trait.short_name for trait in registered_traits}
         unknown_slugs = sorted(
@@ -98,7 +110,7 @@ def _print_trait_checklist(model: SubstanceReviewModel) -> None:
             marker = "x" if trait.id in model.current_traits else " "
             label_text = f" - {trait.label}" if trait.label else ""
             print(f"  [{marker}] {trait.short_name}{label_text}")
-            print_trait_details(trait)
+            print_policy_details(trait)
 
         if unknown_slugs:
             print("  unknown")
@@ -107,9 +119,9 @@ def _print_trait_checklist(model: SubstanceReviewModel) -> None:
 
 
 def _print_current_traits(model: SubstanceReviewModel) -> None:
-    registered_by_namespace = grouped_trait_defs(model.trait_defs)
-    namespaces = list(NAMESPACE_ORDER) + sorted(
-        ns for ns in model.substance_slugs_by_namespace if ns not in NAMESPACE_ORDER
+    registered_by_namespace = grouped_policies(model.policies, model.namespace_order)
+    namespaces = list(model.namespace_order) + sorted(
+        ns for ns in model.substance_slugs_by_namespace if ns not in model.namespace_order
     )
 
     printed_any = False
@@ -119,10 +131,6 @@ def _print_current_traits(model: SubstanceReviewModel) -> None:
             continue
         printed_any = True
         print(f"\n{namespace}")
-        if namespace == "context":
-            _print_context_namespace(model, substance_slugs)
-            continue
-
         registered_traits = {trait.short_name: trait for trait in registered_by_namespace.get(namespace, [])}
         for slug in sorted(substance_slugs, key=str.casefold):
             trait = registered_traits.get(slug)
@@ -134,25 +142,6 @@ def _print_current_traits(model: SubstanceReviewModel) -> None:
 
     if not printed_any:
         print("  none")
-
-
-def _print_context_namespace(
-    model: SubstanceReviewModel,
-    substance_slugs: set[str],
-) -> None:
-    if not substance_slugs:
-        print("  (empty)")
-        return
-
-    for slug in sorted(substance_slugs, key=str.casefold):
-        details = model.context_dashboards.get(slug)
-        if details is None:
-            print(f"  [x] {slug}  (no dashboard yaml — run planner check)")
-            continue
-        name, description = details
-        print(f"  [x] {slug} - {name}")
-        if description:
-            print(f"      {description}")
 
 
 def _print_substance_concerns(model: SubstanceReviewModel) -> None:

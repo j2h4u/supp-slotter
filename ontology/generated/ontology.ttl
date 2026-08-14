@@ -1,0 +1,2961 @@
+# generated-by: scripts/generate_ontology.py
+# schema-version: 2
+# source-hash: a3b6c4e8b4ee59bde07c8215957535adc46247a96c15d9f1733c58d8293ceffc
+@prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/> a ss:Ontology ;
+  ss:schema_version "2" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Action> a ss:SchemaClass ;
+  ss:name "Action" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/CardConcern> a ss:SchemaClass ;
+  ss:name "CardConcern" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/CardKnowledge> a ss:SchemaClass ;
+  ss:name "CardKnowledge" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/CardSchedule> a ss:SchemaClass ;
+  ss:name "CardSchedule" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Catalog> a ss:SchemaClass ;
+  ss:name "Catalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Concern> a ss:SchemaClass ;
+  ss:name "Concern" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Condition> a ss:SchemaClass ;
+  ss:name "Condition" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Dashboard> a ss:SchemaClass ;
+  ss:name "Dashboard" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/DashboardSelector> a ss:SchemaClass ;
+  ss:name "DashboardSelector" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/EntitySelector> a ss:SchemaClass ;
+  ss:name "EntitySelector" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/IdentifiedNode> a ss:SchemaClass ;
+  ss:name "IdentifiedNode" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/KnowledgeAssertion> a ss:SchemaClass ;
+  ss:name "KnowledgeAssertion" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/OntoCleanCatalog> a ss:SchemaClass ;
+  ss:name "OntoCleanCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/OntoCleanProfile> a ss:SchemaClass ;
+  ss:name "OntoCleanProfile" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Ontology> a ss:SchemaClass ;
+  ss:name "Ontology" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/OntologyTerm> a ss:SchemaClass ;
+  ss:name "OntologyTerm" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/OperationalRelationType> a ss:SchemaClass ;
+  ss:name "OperationalRelationType" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Pillbox> a ss:SchemaClass ;
+  ss:name "Pillbox" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Product> a ss:SchemaClass ;
+  ss:name "Product" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ProductCard> a ss:SchemaClass ;
+  ss:name "ProductCard" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ProductComponent> a ss:SchemaClass ;
+  ss:name "ProductComponent" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RelationAssertionCatalog> a ss:SchemaClass ;
+  ss:name "RelationAssertionCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RelationAssertionEntitySelector> a ss:SchemaClass ;
+  ss:name "RelationAssertionEntitySelector" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RelationAssertionRecord> a ss:SchemaClass ;
+  ss:name "RelationAssertionRecord" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RelationAssertionSelector> a ss:SchemaClass ;
+  ss:name "RelationAssertionSelector" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RelationCatalog> a ss:SchemaClass ;
+  ss:name "RelationCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAssignmentAxisPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeAssignmentAxisPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConcernCatalogEntry> a ss:SchemaClass ;
+  ss:name "RuntimeConcernCatalogEntry" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintExecutionPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeConstraintExecutionPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDashboardProductTrackingStateDefinition> a ss:SchemaClass ;
+  ss:name "RuntimeDashboardProductTrackingStateDefinition" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDashboardProductTrackingTruthState> a ss:SchemaClass ;
+  ss:name "RuntimeDashboardProductTrackingTruthState" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDashboardStateCatalog> a ss:SchemaClass ;
+  ss:name "RuntimeDashboardStateCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDashboardUsageStateDefinition> a ss:SchemaClass ;
+  ss:name "RuntimeDashboardUsageStateDefinition" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDashboardUsageTruthState> a ss:SchemaClass ;
+  ss:name "RuntimeDashboardUsageTruthState" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectMatchDimensionPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeEffectMatchDimensionPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectScore> a ss:SchemaClass ;
+  ss:name "RuntimeEffectScore" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectScoringPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeEffectScoringPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGlueContract> a ss:SchemaClass ;
+  ss:name "RuntimeGlueContract" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog> a ss:SchemaClass ;
+  ss:name "RuntimePolicyCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePreferWithPolicy> a ss:SchemaClass ;
+  ss:name "RuntimePreferWithPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProjectionDescriptor> a ss:SchemaClass ;
+  ss:name "RuntimeProjectionDescriptor" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeRelationPresenceStatusPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceTruthState> a ss:SchemaClass ;
+  ss:name "RuntimeRelationPresenceTruthState" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationWarningRule> a ss:SchemaClass ;
+  ss:name "RuntimeRelationWarningRule" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSelectorFormCapability> a ss:SchemaClass ;
+  ss:name "RuntimeSelectorFormCapability" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSemanticEnrichmentGroomingPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeSemanticEnrichmentGroomingPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSourceKindValuePolicy> a ss:SchemaClass ;
+  ss:name "RuntimeSourceKindValuePolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningEmitterPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeWarningEmitterPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningTraitActionPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeWarningTraitActionPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningTypePolicy> a ss:SchemaClass ;
+  ss:name "RuntimeWarningTypePolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ScheduleAssertion> a ss:SchemaClass ;
+  ss:name "ScheduleAssertion" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationActiveFactIndex> a ss:SchemaClass ;
+  ss:name "SchedulePresentationActiveFactIndex" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationConcernAnnotations> a ss:SchemaClass ;
+  ss:name "SchedulePresentationConcernAnnotations" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationLabel> a ss:SchemaClass ;
+  ss:name "SchedulePresentationLabel" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationPolicy> a ss:SchemaClass ;
+  ss:name "SchedulePresentationPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationReviewTags> a ss:SchemaClass ;
+  ss:name "SchedulePresentationReviewTags" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationZeroEffect> a ss:SchemaClass ;
+  ss:name "SchedulePresentationZeroEffect" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingAssessment> a ss:SchemaClass ;
+  ss:name "SchedulingAssessment" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingAssessmentRecord> a ss:SchemaClass ;
+  ss:name "SchedulingAssessmentRecord" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraint> a ss:SchemaClass ;
+  ss:name "SchedulingConstraint" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintCatalog> a ss:SchemaClass ;
+  ss:name "SchedulingConstraintCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintEntitySelector> a ss:SchemaClass ;
+  ss:name "SchedulingConstraintEntitySelector" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintRecord> a ss:SchemaClass ;
+  ss:name "SchedulingConstraintRecord" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintSelector> a ss:SchemaClass ;
+  ss:name "SchedulingConstraintSelector" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicyCatalog> a ss:SchemaClass ;
+  ss:name "SchedulingPolicyCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicyEffectMatch> a ss:SchemaClass ;
+  ss:name "SchedulingPolicyEffectMatch" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicyEffectRecord> a ss:SchemaClass ;
+  ss:name "SchedulingPolicyEffectRecord" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicyRecord> a ss:SchemaClass ;
+  ss:name "SchedulingPolicyRecord" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Selector> a ss:SchemaClass ;
+  ss:name "Selector" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SemanticCategory> a ss:SchemaClass ;
+  ss:name "SemanticCategory" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Slot> a ss:SchemaClass ;
+  ss:name "Slot" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Stack> a ss:SchemaClass ;
+  ss:name "Stack" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/StackEntry> a ss:SchemaClass ;
+  ss:name "StackEntry" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/Substance> a ss:SchemaClass ;
+  ss:name "Substance" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/SubstanceCard> a ss:SchemaClass ;
+  ss:name "SubstanceCard" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/TermAssignment> a ss:SchemaClass ;
+  ss:name "TermAssignment" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/TermSelector> a ss:SchemaClass ;
+  ss:name "TermSelector" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/VocabularyCatalog> a ss:SchemaClass ;
+  ss:name "VocabularyCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/VocabularyCategoryRecord> a ss:SchemaClass ;
+  ss:name "VocabularyCategoryRecord" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/action> a ss:SchemaSlot ;
+  ss:name "action" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/action_text> a ss:SchemaSlot ;
+  ss:name "action_text" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/active_fact_index> a ss:SchemaSlot ;
+  ss:name "active_fact_index" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/active_side> a ss:SchemaSlot ;
+  ss:name "active_side" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/active_stack_membership> a ss:SchemaSlot ;
+  ss:name "active_stack_membership" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/activity> a ss:SchemaSlot ;
+  ss:name "activity" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/aggregation> a ss:SchemaSlot ;
+  ss:name "aggregation" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/aggregation_mode> a ss:SchemaSlot ;
+  ss:name "aggregation_mode" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/aliases> a ss:SchemaSlot ;
+  ss:name "aliases" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/allowed_predicates> a ss:SchemaSlot ;
+  ss:name "allowed_predicates" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/amount> a ss:SchemaSlot ;
+  ss:name "amount" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/applies_to> a ss:SchemaSlot ;
+  ss:name "applies_to" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/applies_when> a ss:SchemaSlot ;
+  ss:name "applies_when" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/assertion_kind> a ss:SchemaSlot ;
+  ss:name "assertion_kind" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/assignment_axes> a ss:SchemaSlot ;
+  ss:name "assignment_axes" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/assignment_field> a ss:SchemaSlot ;
+  ss:name "assignment_field" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/assignment_source> a ss:SchemaSlot ;
+  ss:name "assignment_source" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/axis> a ss:SchemaSlot ;
+  ss:name "axis" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/balance_penalty_expression> a ss:SchemaSlot ;
+  ss:name "balance_penalty_expression" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/balance_weight> a ss:SchemaSlot ;
+  ss:name "balance_weight" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/benefit_description> a ss:SchemaSlot ;
+  ss:name "benefit_description" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/blocks_slots> a ss:SchemaSlot ;
+  ss:name "blocks_slots" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/brand> a ss:SchemaSlot ;
+  ss:name "brand" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog_path> a ss:SchemaSlot ;
+  ss:name "catalog_path" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog_role> a ss:SchemaSlot ;
+  ss:name "catalog_role" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog_root_class> a ss:SchemaSlot ;
+  ss:name "catalog_root_class" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/category> a ss:SchemaSlot ;
+  ss:name "category" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/children> a ss:SchemaSlot ;
+  ss:name "children" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/components> a ss:SchemaSlot ;
+  ss:name "components" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/concern_annotations> a ss:SchemaSlot ;
+  ss:name "concern_annotations" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/concern_catalog> a ss:SchemaSlot ;
+  ss:name "concern_catalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/concern_kind> a ss:SchemaSlot ;
+  ss:name "concern_kind" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/concern_text> a ss:SchemaSlot ;
+  ss:name "concern_text" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/concerns> a ss:SchemaSlot ;
+  ss:name "concerns" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/conclusion> a ss:SchemaSlot ;
+  ss:name "conclusion" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/condition> a ss:SchemaSlot ;
+  ss:name "condition" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/conditions> a ss:SchemaSlot ;
+  ss:name "conditions" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint_execution_policies> a ss:SchemaSlot ;
+  ss:name "constraint_execution_policies" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraints> a ss:SchemaSlot ;
+  ss:name "constraints" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/context> a ss:SchemaSlot ;
+  ss:name "context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/dashboard_state_catalog> a ss:SchemaSlot ;
+  ss:name "dashboard_state_catalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/declares_context> a ss:SchemaSlot ;
+  ss:name "declares_context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/default_batch_size> a ss:SchemaSlot ;
+  ss:name "default_batch_size" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/default_message> a ss:SchemaSlot ;
+  ss:name "default_message" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/dependence> a ss:SchemaSlot ;
+  ss:name "dependence" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/description> a ss:SchemaSlot ;
+  ss:name "description" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/directional> a ss:SchemaSlot ;
+  ss:name "directional" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/effect> a ss:SchemaSlot ;
+  ss:name "effect" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/effect_match_dimensions> a ss:SchemaSlot ;
+  ss:name "effect_match_dimensions" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/effect_scoring> a ss:SchemaSlot ;
+  ss:name "effect_scoring" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/effects> a ss:SchemaSlot ;
+  ss:name "effects" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/eligibility> a ss:SchemaSlot ;
+  ss:name "eligibility" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/emitter> a ss:SchemaSlot ;
+  ss:name "emitter" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/endpoint_kind> a ss:SchemaSlot ;
+  ss:name "endpoint_kind" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/entity> a ss:SchemaSlot ;
+  ss:name "entity" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/entity_id> a ss:SchemaSlot ;
+  ss:name "entity_id" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/entries> a ss:SchemaSlot ;
+  ss:name "entries" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/exclude_policy_ids> a ss:SchemaSlot ;
+  ss:name "exclude_policy_ids" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/executable> a ss:SchemaSlot ;
+  ss:name "executable" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/expression> a ss:SchemaSlot ;
+  ss:name "expression" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/field> a ss:SchemaSlot ;
+  ss:name "field" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/filter_field> a ss:SchemaSlot ;
+  ss:name "filter_field" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/filter_value> a ss:SchemaSlot ;
+  ss:name "filter_value" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/food> a ss:SchemaSlot ;
+  ss:name "food" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/form> a ss:SchemaSlot ;
+  ss:name "form" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/glue_contract> a ss:SchemaSlot ;
+  ss:name "glue_contract" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/id> a ss:SchemaSlot ;
+  ss:name "id" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/inactive_stack_membership> a ss:SchemaSlot ;
+  ss:name "inactive_stack_membership" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/inactive_stack_name> a ss:SchemaSlot ;
+  ss:name "inactive_stack_name" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/include_kinds> a ss:SchemaSlot ;
+  ss:name "include_kinds" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/include_namespaces> a ss:SchemaSlot ;
+  ss:name "include_namespaces" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/intake> a ss:SchemaSlot ;
+  ss:name "intake" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/key> a ss:SchemaSlot ;
+  ss:name "key" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/kind> a ss:SchemaSlot ;
+  ss:name "kind" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/knowledge> a ss:SchemaSlot ;
+  ss:name "knowledge" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/knowledge_assertions> a ss:SchemaSlot ;
+  ss:name "knowledge_assertions" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/knowledge_category> a ss:SchemaSlot ;
+  ss:name "knowledge_category" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/knowledge_value> a ss:SchemaSlot ;
+  ss:name "knowledge_value" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/label> a ss:SchemaSlot ;
+  ss:name "label" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/labels> a ss:SchemaSlot ;
+  ss:name "labels" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/left> a ss:SchemaSlot ;
+  ss:name "left" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/level> a ss:SchemaSlot ;
+  ss:name "level" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/match> a ss:SchemaSlot ;
+  ss:name "match" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/match_direction> a ss:SchemaSlot ;
+  ss:name "match_direction" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/maximum_cardinality> a ss:SchemaSlot ;
+  ss:name "maximum_cardinality" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/minimum_cardinality> a ss:SchemaSlot ;
+  ss:name "minimum_cardinality" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/model> a ss:SchemaSlot ;
+  ss:name "model" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/multivalued> a ss:SchemaSlot ;
+  ss:name "multivalued" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/name> a ss:SchemaSlot ;
+  ss:name "name" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/near> a ss:SchemaSlot ;
+  ss:name "near" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/notes> a ss:SchemaSlot ;
+  ss:name "notes" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/objective_function> a ss:SchemaSlot ;
+  ss:name "objective_function" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean_profile> a ss:SchemaSlot ;
+  ss:name "ontoclean_profile" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean_profiles> a ss:SchemaSlot ;
+  ss:name "ontoclean_profiles" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/operation> a ss:SchemaSlot ;
+  ss:name "operation" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/operator> a ss:SchemaSlot ;
+  ss:name "operator" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/order> a ss:SchemaSlot ;
+  ss:name "order" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/pair_mode> a ss:SchemaSlot ;
+  ss:name "pair_mode" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/pathway> a ss:SchemaSlot ;
+  ss:name "pathway" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy> a ss:SchemaSlot ;
+  ss:name "policy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/precedence> a ss:SchemaSlot ;
+  ss:name "precedence" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/prefer_with> a ss:SchemaSlot ;
+  ss:name "prefer_with" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/prefer_with_bonus> a ss:SchemaSlot ;
+  ss:name "prefer_with_bonus" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/prefer_with_pair_modes> a ss:SchemaSlot ;
+  ss:name "prefer_with_pair_modes" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/prefer_with_policy> a ss:SchemaSlot ;
+  ss:name "prefer_with_policy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/prefer_with_source_fields> a ss:SchemaSlot ;
+  ss:name "prefer_with_source_fields" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/prefer_with_target_resolutions> a ss:SchemaSlot ;
+  ss:name "prefer_with_target_resolutions" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/product> a ss:SchemaSlot ;
+  ss:name "product" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/product_tracking_states> a ss:SchemaSlot ;
+  ss:name "product_tracking_states" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/product_tracking_truth_table> a ss:SchemaSlot ;
+  ss:name "product_tracking_truth_table" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/quality> a ss:SchemaSlot ;
+  ss:name "quality" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/rank> a ss:SchemaSlot ;
+  ss:name "rank" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/rationale> a ss:SchemaSlot ;
+  ss:name "rationale" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/reason> a ss:SchemaSlot ;
+  ss:name "reason" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_endpoint_selector_kinds> a ss:SchemaSlot ;
+  ss:name "relation_endpoint_selector_kinds" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_kind> a ss:SchemaSlot ;
+  ss:name "relation_kind" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_presence_active_sides> a ss:SchemaSlot ;
+  ss:name "relation_presence_active_sides" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_presence_statuses> a ss:SchemaSlot ;
+  ss:name "relation_presence_statuses" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_presence_truth_table> a ss:SchemaSlot ;
+  ss:name "relation_presence_truth_table" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_selector_forms> a ss:SchemaSlot ;
+  ss:name "relation_selector_forms" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_type> a ss:SchemaSlot ;
+  ss:name "relation_type" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_types> a ss:SchemaSlot ;
+  ss:name "relation_types" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_warning_active_sides> a ss:SchemaSlot ;
+  ss:name "relation_warning_active_sides" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_warning_filter_fields> a ss:SchemaSlot ;
+  ss:name "relation_warning_filter_fields" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_warning_rules> a ss:SchemaSlot ;
+  ss:name "relation_warning_rules" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relations> a ss:SchemaSlot ;
+  ss:name "relations" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/result> a ss:SchemaSlot ;
+  ss:name "result" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/reverse_output> a ss:SchemaSlot ;
+  ss:name "reverse_output" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/review_tags> a ss:SchemaSlot ;
+  ss:name "review_tags" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/right> a ss:SchemaSlot ;
+  ss:name "right" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/rigidity> a ss:SchemaSlot ;
+  ss:name "rigidity" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/risk> a ss:SchemaSlot ;
+  ss:name "risk" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/risk_description> a ss:SchemaSlot ;
+  ss:name "risk_description" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/roi_order_desc> a ss:SchemaSlot ;
+  ss:name "roi_order_desc" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/role> a ss:SchemaSlot ;
+  ss:name "role" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/runtime_projection> a ss:SchemaSlot ;
+  ss:name "runtime_projection" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/runtime_value> a ss:SchemaSlot ;
+  ss:name "runtime_value" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/schedule> a ss:SchemaSlot ;
+  ss:name "schedule" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_assertions> a ss:SchemaSlot ;
+  ss:name "schedule_assertions" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axis> a ss:SchemaSlot ;
+  ss:name "schedule_axis" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_presentation> a ss:SchemaSlot ;
+  ss:name "schedule_presentation" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_value> a ss:SchemaSlot ;
+  ss:name "schedule_value" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_assessment> a ss:SchemaSlot ;
+  ss:name "scheduling_assessment" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_constraints> a ss:SchemaSlot ;
+  ss:name "scheduling_constraints" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_policies> a ss:SchemaSlot ;
+  ss:name "scheduling_policies" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/schema_version> a ss:SchemaSlot ;
+  ss:name "schema_version" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/scope> a ss:SchemaSlot ;
+  ss:name "scope" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/score> a ss:SchemaSlot ;
+  ss:name "score" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/score_delta> a ss:SchemaSlot ;
+  ss:name "score_delta" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/scores> a ss:SchemaSlot ;
+  ss:name "scores" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/scores_advisory> a ss:SchemaSlot ;
+  ss:name "scores_advisory" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/selector> a ss:SchemaSlot ;
+  ss:name "selector" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/selector_form> a ss:SchemaSlot ;
+  ss:name "selector_form" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/selector_form_capabilities> a ss:SchemaSlot ;
+  ss:name "selector_form_capabilities" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/selector_id> a ss:SchemaSlot ;
+  ss:name "selector_id" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/selector_kind> a ss:SchemaSlot ;
+  ss:name "selector_kind" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/selector_resolution> a ss:SchemaSlot ;
+  ss:name "selector_resolution" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/selector_term> a ss:SchemaSlot ;
+  ss:name "selector_term" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/selectors> a ss:SchemaSlot ;
+  ss:name "selectors" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_categories> a ss:SchemaSlot ;
+  ss:name "semantic_categories" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_category> a ss:SchemaSlot ;
+  ss:name "semantic_category" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_enrichment_attempted_on> a ss:SchemaSlot ;
+  ss:name "semantic_enrichment_attempted_on" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_enrichment_grooming> a ss:SchemaSlot ;
+  ss:name "semantic_enrichment_grooming" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_family> a ss:SchemaSlot ;
+  ss:name "semantic_family" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/severity> a ss:SchemaSlot ;
+  ss:name "severity" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/show_match_details> a ss:SchemaSlot ;
+  ss:name "show_match_details" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/slot_field> a ss:SchemaSlot ;
+  ss:name "slot_field" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/slot_near_values> a ss:SchemaSlot ;
+  ss:name "slot_near_values" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/slots> a ss:SchemaSlot ;
+  ss:name "slots" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/slug> a ss:SchemaSlot ;
+  ss:name "slug" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source> a ss:SchemaSlot ;
+  ss:name "source" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source_active> a ss:SchemaSlot ;
+  ss:name "source_active" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source_field> a ss:SchemaSlot ;
+  ss:name "source_field" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source_kind> a ss:SchemaSlot ;
+  ss:name "source_kind" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source_kind_roles> a ss:SchemaSlot ;
+  ss:name "source_kind_roles" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source_kind_values> a ss:SchemaSlot ;
+  ss:name "source_kind_values" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source_kinds> a ss:SchemaSlot ;
+  ss:name "source_kinds" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source_selector> a ss:SchemaSlot ;
+  ss:name "source_selector" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source_selector_forms> a ss:SchemaSlot ;
+  ss:name "source_selector_forms" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/sources> a ss:SchemaSlot ;
+  ss:name "sources" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/stack> a ss:SchemaSlot ;
+  ss:name "stack" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/state> a ss:SchemaSlot ;
+  ss:name "state" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/status> a ss:SchemaSlot ;
+  ss:name "status" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/subject> a ss:SchemaSlot ;
+  ss:name "subject" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/substance> a ss:SchemaSlot ;
+  ss:name "substance" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/summary> a ss:SchemaSlot ;
+  ss:name "summary" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/supplies_identity> a ss:SchemaSlot ;
+  ss:name "supplies_identity" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/target> a ss:SchemaSlot ;
+  ss:name "target" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/target_active> a ss:SchemaSlot ;
+  ss:name "target_active" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/target_resolution> a ss:SchemaSlot ;
+  ss:name "target_resolution" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/target_selector> a ss:SchemaSlot ;
+  ss:name "target_selector" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/target_selector_forms> a ss:SchemaSlot ;
+  ss:name "target_selector_forms" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/template> a ss:SchemaSlot ;
+  ss:name "template" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term> a ss:SchemaSlot ;
+  ss:name "term" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/terms> a ss:SchemaSlot ;
+  ss:name "terms" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/text> a ss:SchemaSlot ;
+  ss:name "text" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/tie_break> a ss:SchemaSlot ;
+  ss:name "tie_break" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/timing> a ss:SchemaSlot ;
+  ss:name "timing" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/trace_key> a ss:SchemaSlot ;
+  ss:name "trace_key" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/tracked_product_presence> a ss:SchemaSlot ;
+  ss:name "tracked_product_presence" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/trait_id> a ss:SchemaSlot ;
+  ss:name "trait_id" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/urls> a ss:SchemaSlot ;
+  ss:name "urls" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/usage_states> a ss:SchemaSlot ;
+  ss:name "usage_states" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/usage_truth_table> a ss:SchemaSlot ;
+  ss:name "usage_truth_table" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/use_pattern> a ss:SchemaSlot ;
+  ss:name "use_pattern" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/value> a ss:SchemaSlot ;
+  ss:name "value" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/value_type> a ss:SchemaSlot ;
+  ss:name "value_type" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/values> a ss:SchemaSlot ;
+  ss:name "values" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/warning> a ss:SchemaSlot ;
+  ss:name "warning" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/warning_emitter_ids> a ss:SchemaSlot ;
+  ss:name "warning_emitter_ids" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/warning_emitters> a ss:SchemaSlot ;
+  ss:name "warning_emitters" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/warning_trait_actions> a ss:SchemaSlot ;
+  ss:name "warning_trait_actions" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/warning_type> a ss:SchemaSlot ;
+  ss:name "warning_type" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/warning_types> a ss:SchemaSlot ;
+  ss:name "warning_types" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/weight> a ss:SchemaSlot ;
+  ss:name "weight" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/zero_effect> a ss:SchemaSlot ;
+  ss:name "zero_effect" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/assertions> a ss:Catalog ;
+  ss:catalog_role "assertions" ;
+  ss:catalog_path "data/relations.yaml" ;
+  ss:catalog_root_class "RelationAssertionCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/constraints> a ss:Catalog ;
+  ss:catalog_role "constraints" ;
+  ss:catalog_path "ontology/scheduling-constraints.yaml" ;
+  ss:catalog_root_class "SchedulingConstraintCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/ontoclean> a ss:Catalog ;
+  ss:catalog_role "ontoclean" ;
+  ss:catalog_path "ontology/ontoclean.yaml" ;
+  ss:catalog_root_class "OntoCleanCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/policies> a ss:Catalog ;
+  ss:catalog_role "policies" ;
+  ss:catalog_path "ontology/policies.yaml" ;
+  ss:catalog_root_class "SchedulingPolicyCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/relation_types> a ss:Catalog ;
+  ss:catalog_role "relation_types" ;
+  ss:catalog_path "ontology/relations.yaml" ;
+  ss:catalog_root_class "RelationCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/runtime_policy> a ss:Catalog ;
+  ss:catalog_role "runtime_policy" ;
+  ss:catalog_path "ontology/runtime-policy.yaml" ;
+  ss:catalog_root_class "RuntimePolicyCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/semantic_vocabulary> a ss:Catalog ;
+  ss:catalog_role "vocabulary" ;
+  ss:catalog_path "ontology/vocabulary.yaml" ;
+  ss:catalog_root_class "VocabularyCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/shapes> a ss:Catalog ;
+  ss:catalog_role "custom_shapes" ;
+  ss:catalog_path "ontology/constraints/semantic.ttl" ;
+  ss:catalog_root_class "ShapesGraph" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> a ss:OntoCleanProfile ;
+  ss:id "anti_rigid_dependent" ;
+  ss:rigidity "anti_rigid" ;
+  ss:supplies_identity false ;
+  ss:dependence "dependent" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> a ss:OntoCleanProfile ;
+  ss:id "dependent_assertion" ;
+  ss:rigidity "rigid" ;
+  ss:supplies_identity false ;
+  ss:dependence "dependent" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> a ss:OntoCleanProfile ;
+  ss:id "rigid_identity" ;
+  ss:rigidity "rigid" ;
+  ss:supplies_identity true ;
+  ss:dependence "independent" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/activity> a ss:SemanticCategory ;
+  ss:id "activity" ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:allowed_predicates
+  "schedule.activity" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/context> a ss:SemanticCategory ;
+  ss:id "context" ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:allowed_predicates
+  "knowledge.context" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/effect> a ss:SemanticCategory ;
+  ss:id "effect" ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:allowed_predicates
+  "knowledge.effect" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/intake> a ss:SemanticCategory ;
+  ss:id "intake" ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:allowed_predicates
+  "schedule.intake" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/kind> a ss:SemanticCategory ;
+  ss:id "kind" ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:allowed_predicates
+  "knowledge.kind" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/pathway> a ss:SemanticCategory ;
+  ss:id "pathway" ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:allowed_predicates
+  "knowledge.pathway" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/quality> a ss:SemanticCategory ;
+  ss:id "quality" ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:allowed_predicates
+  "knowledge.quality" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/risk> a ss:SemanticCategory ;
+  ss:id "risk" ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:allowed_predicates
+  "knowledge.risk" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/role> a ss:SemanticCategory ;
+  ss:id "role" ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:allowed_predicates
+  "knowledge.role" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/timing> a ss:SemanticCategory ;
+  ss:id "timing" ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:allowed_predicates
+  "schedule.timing" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/balance> a ss:OperationalRelationType ;
+  ss:id "balance" ;
+  ss:label "Balance pairing" ;
+  ss:order 10 ;
+  ss:directional false .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/balance> ss:source_selector_forms "entity" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/balance> ss:target_selector_forms "entity" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/review_with> a ss:OperationalRelationType ;
+  ss:id "review_with" ;
+  ss:label "Review together" ;
+  ss:order 30 ;
+  ss:directional false .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/review_with> ss:source_selector_forms "term" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/review_with> ss:source_selector_forms "entity" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/review_with> ss:target_selector_forms "term" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/review_with> ss:target_selector_forms "entity" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/supports> a ss:OperationalRelationType ;
+  ss:id "supports" ;
+  ss:label "Support relationship" ;
+  ss:order 20 ;
+  ss:directional true .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/supports> ss:source_selector_forms "term" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/supports> ss:source_selector_forms "entity" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/supports> ss:target_selector_forms "term" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/supports> ss:target_selector_forms "entity" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/assignment-axis/assignment_axis_intake> ss:id "assignment_axis_intake" ;
+  ss:axis "intake" ;
+  ss:assignment_source "schedule" ;
+  ss:assignment_field "intake" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/assignment-axis/assignment_axis_timing> ss:id "assignment_axis_timing" ;
+  ss:axis "timing" ;
+  ss:assignment_source "schedule" ;
+  ss:assignment_field "timing" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/assignment-axis/assignment_axis_activity> ss:id "assignment_axis_activity" ;
+  ss:axis "activity" ;
+  ss:assignment_source "schedule" ;
+  ss:assignment_field "activity" .
+
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/activity/any_workout> a ss:OntologyTerm ;
+  ss:id "activity:any_workout" ;
+  ss:slug "any_workout" ;
+  ss:semantic_category ss:activity ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Any workout slot" ;
+  ss:description "Training-adjacent marker where pre/post timing is flexible." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/activity/post_workout> a ss:OntologyTerm ;
+  ss:id "activity:post_workout" ;
+  ss:slug "post_workout" ;
+  ss:semantic_category ss:activity ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Post-workout" ;
+  ss:description "Timing marker for substances intended after training." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/activity/pre_workout> a ss:OntologyTerm ;
+  ss:id "activity:pre_workout" ;
+  ss:slug "pre_workout" ;
+  ss:semantic_category ss:activity ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Pre-workout" ;
+  ss:description "Timing marker for substances intended before training." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/antioxidant_protection> a ss:OntologyTerm ;
+  ss:id "context:antioxidant_protection" ;
+  ss:slug "antioxidant_protection" ;
+  ss:semantic_category ss:context ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:label "Antioxidant Protection" ;
+  ss:description "Curated dashboard context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/connective_tissue_support> a ss:OntologyTerm ;
+  ss:id "context:connective_tissue_support" ;
+  ss:slug "connective_tissue_support" ;
+  ss:semantic_category ss:context ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:label "Connective Tissue Support" ;
+  ss:description "Curated dashboard context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/cortisol_reduction> a ss:OntologyTerm ;
+  ss:id "context:cortisol_reduction" ;
+  ss:slug "cortisol_reduction" ;
+  ss:semantic_category ss:context ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:label "Cortisol Reduction" ;
+  ss:description "Curated dashboard context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/incretin_drug_context> a ss:OntologyTerm ;
+  ss:id "context:incretin_drug_context" ;
+  ss:slug "incretin_drug_context" ;
+  ss:semantic_category ss:context ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:label "Incretin Drug Context" ;
+  ss:description "Prescription or investigational GLP-1, GIP, or related incretin-mimetic drug review context spanning satiety, gastric emptying, glucose, and weight-management pharmacology." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/mitochondrial_health> a ss:OntologyTerm ;
+  ss:id "context:mitochondrial_health" ;
+  ss:slug "mitochondrial_health" ;
+  ss:semantic_category ss:context ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:label "Mitochondrial Health" ;
+  ss:description "Curated dashboard context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/neurocognitive_support> a ss:OntologyTerm ;
+  ss:id "context:neurocognitive_support" ;
+  ss:slug "neurocognitive_support" ;
+  ss:semantic_category ss:context ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:label "Neurocognitive Support" ;
+  ss:description "Curated dashboard context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/skin_support> a ss:OntologyTerm ;
+  ss:id "context:skin_support" ;
+  ss:slug "skin_support" ;
+  ss:semantic_category ss:context ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:label "Skin Support" ;
+  ss:description "Curated dashboard context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/sleep_recovery> a ss:OntologyTerm ;
+  ss:id "context:sleep_recovery" ;
+  ss:slug "sleep_recovery" ;
+  ss:semantic_category ss:context ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:label "Sleep Recovery" ;
+  ss:description "Curated dashboard context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/vascular_health> a ss:OntologyTerm ;
+  ss:id "context:vascular_health" ;
+  ss:slug "vascular_health" ;
+  ss:semantic_category ss:context ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:label "Vascular Health" ;
+  ss:description "Curated dashboard context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/workout_performance> a ss:OntologyTerm ;
+  ss:id "context:workout_performance" ;
+  ss:slug "workout_performance" ;
+  ss:semantic_category ss:context ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:label "Workout Performance" ;
+  ss:description "Curated dashboard context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/alertness_context> a ss:OntologyTerm ;
+  ss:id "effect:alertness_context" ;
+  ss:slug "alertness_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Alertness Context" ;
+  ss:description "Alertness and wakefulness context for substances that increase arousal, vigilance, or short-term focus." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/amino_acid_metabolism_support> a ss:OntologyTerm ;
+  ss:id "effect:amino_acid_metabolism_support" ;
+  ss:slug "amino_acid_metabolism_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Amino Acid Metabolism Support" ;
+  ss:description "Amino-acid metabolism support context for vitamins or cofactors that participate in transamination, decarboxylation, or amino-acid turnover." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/androgen_context> a ss:OntologyTerm ;
+  ss:id "effect:androgen_context" ;
+  ss:slug "androgen_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Androgen Context" ;
+  ss:description "Androgen or androgen-adjacent endocrine review context, especially for prostate, hair, libido, or hormone-sensitive use cases." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/anti_catabolic_context> a ss:OntologyTerm ;
+  ss:id "effect:anti_catabolic_context" ;
+  ss:slug "anti_catabolic_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Anti Catabolic Context" ;
+  ss:description "Anti-catabolic context for substances positioned to reduce muscle protein breakdown or preserve lean tissue during training stress." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/anti_inflammatory_context> a ss:OntologyTerm ;
+  ss:id "effect:anti_inflammatory_context" ;
+  ss:slug "anti_inflammatory_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Anti Inflammatory Context" ;
+  ss:description "Inflammation-modulating review context, including botanicals or nutrients with anti-inflammatory signaling, pain, or tissue-irritation relevance." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/antioxidant_enzyme_cofactor> a ss:OntologyTerm ;
+  ss:id "effect:antioxidant_enzyme_cofactor" ;
+  ss:slug "antioxidant_enzyme_cofactor" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Antioxidant Enzyme Cofactor" ;
+  ss:description "Cofactor context for endogenous antioxidant enzymes such as superoxide dismutase, glutathione peroxidase, or related redox enzymes." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/bile_acid_conjugation_context> a ss:OntologyTerm ;
+  ss:id "effect:bile_acid_conjugation_context" ;
+  ss:slug "bile_acid_conjugation_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Bile Acid Conjugation Context" ;
+  ss:description "Bile-acid conjugation context for substances involved in bile acid handling or conjugation support." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/bone_mineral_metabolism_support> a ss:OntologyTerm ;
+  ss:id "effect:bone_mineral_metabolism_support" ;
+  ss:slug "bone_mineral_metabolism_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Bone Mineral Metabolism Support" ;
+  ss:description "Bone and mineral-metabolism support axis spanning calcium, magnesium, phosphorus, vitamin D/K, boron, strontium, and related cofactors." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/bowel_regularity_context> a ss:OntologyTerm ;
+  ss:id "effect:bowel_regularity_context" ;
+  ss:slug "bowel_regularity_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Bowel Regularity Context" ;
+  ss:description "Bowel-regularity context for fibers or gut supports selected for stool frequency, stool form, or transit regularity." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/calcium_absorption_support> a ss:OntologyTerm ;
+  ss:id "effect:calcium_absorption_support" ;
+  ss:slug "calcium_absorption_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Calcium Absorption Support" ;
+  ss:description "Calcium absorption support context for substances that improve intestinal calcium uptake or calcium handling." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/calming_context> a ss:OntologyTerm ;
+  ss:id "effect:calming_context" ;
+  ss:slug "calming_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Calming Context" ;
+  ss:description "Calming or anxiolytic-adjacent effect context for substances used to reduce arousal, stress reactivity, or nervous-system excitability." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/capillary_support_context> a ss:OntologyTerm ;
+  ss:id "effect:capillary_support_context" ;
+  ss:slug "capillary_support_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Capillary Support Context" ;
+  ss:description "Microvascular and capillary support context, usually from flavonoid or polyphenol effects on capillary fragility or vascular integrity." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/carbohydrate_digestion_support> a ss:OntologyTerm ;
+  ss:id "effect:carbohydrate_digestion_support" ;
+  ss:slug "carbohydrate_digestion_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Carbohydrate Digestion Support" ;
+  ss:description "Carbohydrate-digestion support context for enzymes or compounds acting on starches and other carbohydrates in the gut." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/carboxylase_cofactor> a ss:OntologyTerm ;
+  ss:id "effect:carboxylase_cofactor" ;
+  ss:slug "carboxylase_cofactor" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Carboxylase Cofactor" ;
+  ss:description "Carboxylase-enzyme cofactor context, most commonly biotin-related metabolism of fats, carbohydrates, and amino acids." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/carnosine_buffer_context> a ss:OntologyTerm ;
+  ss:id "effect:carnosine_buffer_context" ;
+  ss:slug "carnosine_buffer_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Carnosine Buffer Context" ;
+  ss:description "Carnosine-buffer context for beta-alanine or related supports that raise muscle carnosine and buffering capacity." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/cartilage_matrix_context> a ss:OntologyTerm ;
+  ss:id "effect:cartilage_matrix_context" ;
+  ss:slug "cartilage_matrix_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Cartilage Matrix Context" ;
+  ss:description "Cartilage matrix support context for structural joint compounds involved in cartilage composition, resilience, or turnover." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/catecholamine_precursor_context> a ss:OntologyTerm ;
+  ss:id "effect:catecholamine_precursor_context" ;
+  ss:slug "catecholamine_precursor_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Catecholamine Precursor Context" ;
+  ss:description "Catecholamine-precursor context for substances that supply or support dopamine, norepinephrine, or epinephrine synthesis." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/cellular_function_support> a ss:OntologyTerm ;
+  ss:id "effect:cellular_function_support" ;
+  ss:slug "cellular_function_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Cellular Function Support" ;
+  ss:description "Broad cellular-function support context for foundational vitamins or cofactors whose value is not captured by a narrower pathway." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/cholinergic_support> a ss:OntologyTerm ;
+  ss:id "effect:cholinergic_support" ;
+  ss:slug "cholinergic_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Cholinergic Support" ;
+  ss:description "Supports acetylcholine availability, signaling, or cholinergic cognitive context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/circulation_support> a ss:OntologyTerm ;
+  ss:id "effect:circulation_support" ;
+  ss:slug "circulation_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Circulation Support" ;
+  ss:description "General circulation-support context for substances selected for blood flow, peripheral circulation, or vascular perfusion." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/cognitive_performance_context> a ss:OntologyTerm ;
+  ss:id "effect:cognitive_performance_context" ;
+  ss:slug "cognitive_performance_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Cognitive Performance Context" ;
+  ss:description "Cognitive performance context covering focus, mental stamina, recall, or task-performance positioning." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/collagen_matrix_support> a ss:OntologyTerm ;
+  ss:id "effect:collagen_matrix_support" ;
+  ss:slug "collagen_matrix_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Collagen Matrix Support" ;
+  ss:description "Collagen matrix support context for amino acids, vitamin C-related cofactors, or nutrients involved in collagen structure and repair." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/connective_tissue_matrix_context> a ss:OntologyTerm ;
+  ss:id "effect:connective_tissue_matrix_context" ;
+  ss:slug "connective_tissue_matrix_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Connective Tissue Matrix Context" ;
+  ss:description "Connective-tissue matrix context spanning collagen, elastin, glycosaminoglycans, and structural mineral support." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/connective_tissue_synthesis_support> a ss:OntologyTerm ;
+  ss:id "effect:connective_tissue_synthesis_support" ;
+  ss:slug "connective_tissue_synthesis_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Connective Tissue Synthesis Support" ;
+  ss:description "Connective-tissue synthesis support context for cofactors involved in forming or maintaining collagen, elastin, or extracellular matrix." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/cyp_modulation_context> a ss:OntologyTerm ;
+  ss:id "effect:cyp_modulation_context" ;
+  ss:slug "cyp_modulation_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "CYP Modulation Context" ;
+  ss:description "Cytochrome P450 modulation context for substances that may alter medication or xenobiotic metabolism." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/digestive_comfort_context> a ss:OntologyTerm ;
+  ss:id "effect:digestive_comfort_context" ;
+  ss:slug "digestive_comfort_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Digestive Comfort Context" ;
+  ss:description "Digestive-comfort context for substances selected around nausea, bloating, motility discomfort, or meal tolerance." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/digestive_enzyme_context> a ss:OntologyTerm ;
+  ss:id "effect:digestive_enzyme_context" ;
+  ss:slug "digestive_enzyme_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Digestive Enzyme Context" ;
+  ss:description "Digestive enzyme activity context for enzymes intended to act on food substrates in the gut." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/diuretic_context> a ss:OntologyTerm ;
+  ss:id "effect:diuretic_context" ;
+  ss:slug "diuretic_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Diuretic Context" ;
+  ss:description "Diuretic or urinary-fluid context for substances that may increase urine output or alter fluid handling." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/dna_synthesis_support> a ss:OntologyTerm ;
+  ss:id "effect:dna_synthesis_support" ;
+  ss:slug "dna_synthesis_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "DNA Synthesis Support" ;
+  ss:description "Nucleotide synthesis and cell-replication support context, commonly tied to folate, B12, zinc, and methylation-related cofactors." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/electron_transport_support> a ss:OntologyTerm ;
+  ss:id "effect:electron_transport_support" ;
+  ss:slug "electron_transport_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Electron Transport Support" ;
+  ss:description "Mitochondrial electron-transport support context for cofactors involved in respiratory-chain electron transfer." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/endothelial_context> a ss:OntologyTerm ;
+  ss:id "effect:endothelial_context" ;
+  ss:slug "endothelial_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Endothelial Context" ;
+  ss:description "Endothelial-function context for vascular substances affecting nitric oxide signaling, vascular tone, or endothelial resilience." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/endurance_context> a ss:OntologyTerm ;
+  ss:id "effect:endurance_context" ;
+  ss:slug "endurance_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Endurance Context" ;
+  ss:description "Endurance context for substances selected for sustained aerobic output, time to fatigue, or exercise capacity." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/epithelial_immune_context> a ss:OntologyTerm ;
+  ss:id "effect:epithelial_immune_context" ;
+  ss:slug "epithelial_immune_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Epithelial Immune Context" ;
+  ss:description "Epithelial and mucosal immune-support context for nutrients that affect barrier tissues and immune-facing surfaces." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/exercise_performance_context> a ss:OntologyTerm ;
+  ss:id "effect:exercise_performance_context" ;
+  ss:slug "exercise_performance_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Exercise Performance Context" ;
+  ss:description "Exercise-performance context for substances selected for training output, power, endurance, or workout tolerance." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/exercise_pump_context> a ss:OntologyTerm ;
+  ss:id "effect:exercise_pump_context" ;
+  ss:slug "exercise_pump_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Exercise Pump Context" ;
+  ss:description "Exercise-pump context for substances that support workout blood flow, nitric-oxide-linked pump, or muscle fullness during training." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/exercise_recovery_support> a ss:OntologyTerm ;
+  ss:id "effect:exercise_recovery_support" ;
+  ss:slug "exercise_recovery_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Exercise Recovery Support" ;
+  ss:description "Exercise-recovery support context for substances selected to improve post-training recovery, soreness, or readiness." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/fat_digestion_support> a ss:OntologyTerm ;
+  ss:id "effect:fat_digestion_support" ;
+  ss:slug "fat_digestion_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Fat Digestion Support" ;
+  ss:description "Fat-digestion support context for enzymes or bile-adjacent factors involved in breaking down dietary fats." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/fatigue_resilience_context> a ss:OntologyTerm ;
+  ss:id "effect:fatigue_resilience_context" ;
+  ss:slug "fatigue_resilience_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Fatigue Resilience Context" ;
+  ss:description "Fatigue-resilience context for adaptogens or performance supports intended to delay perceived fatigue or improve stress tolerance." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/fatty_acid_metabolism_support> a ss:OntologyTerm ;
+  ss:id "effect:fatty_acid_metabolism_support" ;
+  ss:slug "fatty_acid_metabolism_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Fatty Acid Metabolism Support" ;
+  ss:description "Supports fatty-acid synthesis, transport, oxidation, or related cofactor-dependent lipid metabolism." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/fibrinolytic> a ss:OntologyTerm ;
+  ss:id "effect:fibrinolytic" ;
+  ss:slug "fibrinolytic" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Fibrinolytic" ;
+  ss:description "Promotes fibrin breakdown or fibrinolytic activity, creating bleeding-load review context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/fluid_balance_context> a ss:OntologyTerm ;
+  ss:id "effect:fluid_balance_context" ;
+  ss:slug "fluid_balance_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Fluid Balance Context" ;
+  ss:description "Fluid-balance context for substances that affect hydration, extracellular fluid, osmotic balance, or water retention." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/focus_relaxation_context> a ss:OntologyTerm ;
+  ss:id "effect:focus_relaxation_context" ;
+  ss:slug "focus_relaxation_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Focus Relaxation Context" ;
+  ss:description "Focus-with-relaxation context for substances positioned around calm attention rather than sedation or stimulation." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/gastric_acid_suppressing_drug_context> a ss:OntologyTerm ;
+  ss:id "effect:gastric_acid_suppressing_drug_context" ;
+  ss:slug "gastric_acid_suppressing_drug_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Gastric Acid Suppressing Drug Context" ;
+  ss:description "Proton-pump inhibitor or H2-receptor antagonist context where reduced stomach acid can affect food-bound nutrient absorption or GI medication review." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/glutathione_precursor_support> a ss:OntologyTerm ;
+  ss:id "effect:glutathione_precursor_support" ;
+  ss:slug "glutathione_precursor_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Glutathione Precursor Support" ;
+  ss:description "Glutathione-precursor support context for substances that supply cysteine or otherwise support glutathione synthesis capacity." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/glycosaminoglycan_context> a ss:OntologyTerm ;
+  ss:id "effect:glycosaminoglycan_context" ;
+  ss:slug "glycosaminoglycan_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Glycosaminoglycan Context" ;
+  ss:description "Glycosaminoglycan and joint-matrix context for structural compounds involved in cartilage, synovial fluid, or connective-tissue hydration." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/gut_barrier_context> a ss:OntologyTerm ;
+  ss:id "effect:gut_barrier_context" ;
+  ss:slug "gut_barrier_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Gut Barrier Context" ;
+  ss:description "Gut-barrier context for substances selected for intestinal lining, permeability, mucosal integrity, or gut repair support." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/gut_microbiome_context> a ss:OntologyTerm ;
+  ss:id "effect:gut_microbiome_context" ;
+  ss:slug "gut_microbiome_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Gut Microbiome Context" ;
+  ss:description "Gut microbiome context for probiotics, prebiotic fibers, or compounds selected for microbial ecology support." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/homocysteine_metabolism_support> a ss:OntologyTerm ;
+  ss:id "effect:homocysteine_metabolism_support" ;
+  ss:slug "homocysteine_metabolism_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Homocysteine Metabolism Support" ;
+  ss:description "Homocysteine and one-carbon metabolism support context, usually tied to folate, B12, B6, betaine, or related cofactors." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/hpa_axis_context> a ss:OntologyTerm ;
+  ss:id "effect:hpa_axis_context" ;
+  ss:slug "hpa_axis_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "HPA Axis Context" ;
+  ss:description "HPA-axis review context for substances positioned around cortisol, stress response, or neuroendocrine stress adaptation." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/immune_cell_context> a ss:OntologyTerm ;
+  ss:id "effect:immune_cell_context" ;
+  ss:slug "immune_cell_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Immune Cell Context" ;
+  ss:description "Immune-cell context for substances that support lymphocytes, macrophages, neutrophils, or other immune-cell activity." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/immune_function_support> a ss:OntologyTerm ;
+  ss:id "effect:immune_function_support" ;
+  ss:slug "immune_function_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Immune Function Support" ;
+  ss:description "Supports normal immune function through nutrient status, antioxidant protection, barrier function, or immune-cell function." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/immune_modulation_context> a ss:OntologyTerm ;
+  ss:id "effect:immune_modulation_context" ;
+  ss:slug "immune_modulation_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Immune Modulation Context" ;
+  ss:description "Immune-modulation context for botanicals, mushrooms, or nutrients that may alter immune tone rather than simply fill deficiency." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/insulin_signaling_context> a ss:OntologyTerm ;
+  ss:id "effect:insulin_signaling_context" ;
+  ss:slug "insulin_signaling_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Insulin Signaling Context" ;
+  ss:description "Insulin-signaling context for substances that affect insulin sensitivity, insulin receptor signaling, or glucose-disposal signaling." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/iron_metabolism_support> a ss:OntologyTerm ;
+  ss:id "effect:iron_metabolism_support" ;
+  ss:slug "iron_metabolism_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Iron Metabolism Support" ;
+  ss:description "Iron-metabolism support context for cofactors involved in iron transport, utilization, or incorporation into blood proteins." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/joint_comfort_context> a ss:OntologyTerm ;
+  ss:id "effect:joint_comfort_context" ;
+  ss:slug "joint_comfort_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Joint Comfort Context" ;
+  ss:description "Joint-comfort effect context covering pain, stiffness, inflammation, lubrication, or connective-tissue support relevant to joints." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/joint_lubrication_context> a ss:OntologyTerm ;
+  ss:id "effect:joint_lubrication_context" ;
+  ss:slug "joint_lubrication_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Joint Lubrication Context" ;
+  ss:description "Joint-lubrication context for substances related to synovial fluid, membrane lipids, or connective-tissue hydration." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/learning_context> a ss:OntologyTerm ;
+  ss:id "effect:learning_context" ;
+  ss:slug "learning_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Learning Context" ;
+  ss:description "Learning-support context for substances selected around learning, acquisition, or training-related cognitive adaptation." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/leucine_metabolite_context> a ss:OntologyTerm ;
+  ss:id "effect:leucine_metabolite_context" ;
+  ss:slug "leucine_metabolite_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Leucine Metabolite Context" ;
+  ss:description "Leucine-metabolite context for HICA or related compounds derived from leucine metabolism." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/lipid_antioxidant_support> a ss:OntologyTerm ;
+  ss:id "effect:lipid_antioxidant_support" ;
+  ss:slug "lipid_antioxidant_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Lipid Antioxidant Support" ;
+  ss:description "Lipid-phase antioxidant support context for protecting membranes, lipoproteins, or polyunsaturated fatty acids from oxidation." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/lipid_metabolism_support> a ss:OntologyTerm ;
+  ss:id "effect:lipid_metabolism_support" ;
+  ss:slug "lipid_metabolism_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Lipid Metabolism Support" ;
+  ss:description "Lipid-metabolism support context for substances that materially affect lipid synthesis, clearance, or cholesterol-related pathways." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/memory_recall_context> a ss:OntologyTerm ;
+  ss:id "effect:memory_recall_context" ;
+  ss:slug "memory_recall_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Memory Recall Context" ;
+  ss:description "Memory-recall context for substances selected around retrieval, retention, or memory performance." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/mild_stimulant_context> a ss:OntologyTerm ;
+  ss:id "effect:mild_stimulant_context" ;
+  ss:slug "mild_stimulant_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Mild Stimulant Context" ;
+  ss:description "Mild-stimulant context for substances with stimulant-like effects that are weaker or smoother than caffeine-like stimulant load." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/mitochondrial_biogenesis_context> a ss:OntologyTerm ;
+  ss:id "effect:mitochondrial_biogenesis_context" ;
+  ss:slug "mitochondrial_biogenesis_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Mitochondrial Biogenesis Context" ;
+  ss:description "Mitochondrial-biogenesis context for substances selected around mitochondrial renewal, density, or signaling that supports new mitochondria." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/mitochondrial_fatty_acid_transport> a ss:OntologyTerm ;
+  ss:id "effect:mitochondrial_fatty_acid_transport" ;
+  ss:slug "mitochondrial_fatty_acid_transport" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Mitochondrial Fatty Acid Transport" ;
+  ss:description "Mitochondrial fatty-acid transport context, especially carnitine shuttle support for moving long-chain fatty acids into mitochondria." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/mitochondrial_redox_cofactor> a ss:OntologyTerm ;
+  ss:id "effect:mitochondrial_redox_cofactor" ;
+  ss:slug "mitochondrial_redox_cofactor" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Mitochondrial Redox Cofactor" ;
+  ss:description "Mitochondrial redox cofactor context for compounds involved in mitochondrial oxidative metabolism and redox cycling." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/mucolytic_context> a ss:OntologyTerm ;
+  ss:id "effect:mucolytic_context" ;
+  ss:slug "mucolytic_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Mucolytic Context" ;
+  ss:description "Mucolytic context for substances selected to thin mucus, support airway clearance, or reduce mucus viscosity." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/muscle_protein_synthesis_context> a ss:OntologyTerm ;
+  ss:id "effect:muscle_protein_synthesis_context" ;
+  ss:slug "muscle_protein_synthesis_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Muscle Protein Synthesis Context" ;
+  ss:description "Muscle-protein-synthesis context for substances that specifically support anabolic muscle signaling or muscle tissue protein formation." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/muscle_recovery_context> a ss:OntologyTerm ;
+  ss:id "effect:muscle_recovery_context" ;
+  ss:slug "muscle_recovery_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Muscle Recovery Context" ;
+  ss:description "Muscle-recovery context for substances selected around soreness, repair, training adaptation, or recovery between workouts." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/nad_precursor_support> a ss:OntologyTerm ;
+  ss:id "effect:nad_precursor_support" ;
+  ss:slug "nad_precursor_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "NAD Precursor Support" ;
+  ss:description "NAD-precursor support context for substances that supply precursors used in NAD+ biosynthesis or NAD-related metabolism." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/nervous_system_support> a ss:OntologyTerm ;
+  ss:id "effect:nervous_system_support" ;
+  ss:slug "nervous_system_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Nervous System Support" ;
+  ss:description "Nervous-system support context for nutrients required for nerve maintenance, myelin, neurotransmission, or neurologic deficiency correction." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/neurotransmitter_synthesis_support> a ss:OntologyTerm ;
+  ss:id "effect:neurotransmitter_synthesis_support" ;
+  ss:slug "neurotransmitter_synthesis_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Neurotransmitter Synthesis Support" ;
+  ss:description "Neurotransmitter synthesis support context for cofactors involved in producing monoamines, GABA, acetylcholine, or related transmitters." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/neurotrophic_support> a ss:OntologyTerm ;
+  ss:id "effect:neurotrophic_support" ;
+  ss:slug "neurotrophic_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Neurotrophic Support" ;
+  ss:description "Neurotrophic-support context for substances positioned around nerve growth factor, neuronal maintenance, or neuroplasticity support." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/nitrate_context> a ss:OntologyTerm ;
+  ss:id "effect:nitrate_context" ;
+  ss:slug "nitrate_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Nitrate Context" ;
+  ss:description "Nitrate context for substances whose vascular or exercise role depends on nitrate/nitrite/nitric-oxide biology." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/nitric_oxide_support> a ss:OntologyTerm ;
+  ss:id "effect:nitric_oxide_support" ;
+  ss:slug "nitric_oxide_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Nitric Oxide Support" ;
+  ss:description "Nitric-oxide support context for direct substrates or nitrate donors that increase practical NO availability or NO-linked vascular signaling." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/nutrient_metabolism_support> a ss:OntologyTerm ;
+  ss:id "effect:nutrient_metabolism_support" ;
+  ss:slug "nutrient_metabolism_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Nutrient Metabolism Support" ;
+  ss:description "General nutrient-metabolism support context for cofactors that help convert, activate, or use nutrients." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/ocular_retina_context> a ss:OntologyTerm ;
+  ss:id "effect:ocular_retina_context" ;
+  ss:slug "ocular_retina_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Ocular Retina Context" ;
+  ss:description "Ocular and retinal support context, especially macular carotenoids and berry/polyphenol support for eye-health review." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/oxygen_transport_support> a ss:OntologyTerm ;
+  ss:id "effect:oxygen_transport_support" ;
+  ss:slug "oxygen_transport_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Oxygen Transport Support" ;
+  ss:description "Oxygen-transport support context for iron and red-cell related nutrients affecting hemoglobin or oxygen-carrying capacity." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/pde5_inhibition> a ss:OntologyTerm ;
+  ss:id "effect:pde5_inhibition" ;
+  ss:slug "pde5_inhibition" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "PDE5 Inhibition" ;
+  ss:description "Inhibits phosphodiesterase type 5, increasing cGMP-mediated smooth-muscle relaxation and vasodilatory context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/phosphocreatine_support> a ss:OntologyTerm ;
+  ss:id "effect:phosphocreatine_support" ;
+  ss:slug "phosphocreatine_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Phosphocreatine Support" ;
+  ss:description "Phosphocreatine-system support context for substances that improve rapid ATP buffering and high-intensity energy availability." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/phospholipid_membrane_context> a ss:OntologyTerm ;
+  ss:id "effect:phospholipid_membrane_context" ;
+  ss:slug "phospholipid_membrane_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Phospholipid Membrane Context" ;
+  ss:description "Neurocognitive phospholipid-membrane context for choline donors, uridine, phosphatidylserine, or similar membrane-precursor candidates." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/platelet_aggregation_modulation> a ss:OntologyTerm ;
+  ss:id "effect:platelet_aggregation_modulation" ;
+  ss:slug "platelet_aggregation_modulation" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Platelet Aggregation Modulation" ;
+  ss:description "Modulates platelet aggregation or platelet-related bleeding-load context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/prostate_urinary_context> a ss:OntologyTerm ;
+  ss:id "effect:prostate_urinary_context" ;
+  ss:slug "prostate_urinary_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Prostate Urinary Context" ;
+  ss:description "Prostate and lower-urinary-tract context for substances selected for urinary flow, frequency, or benign-prostate-support positioning." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/protein_digestion_support> a ss:OntologyTerm ;
+  ss:id "effect:protein_digestion_support" ;
+  ss:slug "protein_digestion_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Protein Digestion Support" ;
+  ss:description "Protein-digestion support context for proteolytic enzymes intended to break down dietary protein in the gut." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/protein_synthesis_support> a ss:OntologyTerm ;
+  ss:id "effect:protein_synthesis_support" ;
+  ss:slug "protein_synthesis_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Protein Synthesis Support" ;
+  ss:description "Protein-synthesis support context for amino acids, cofactors, or nutrients that contribute to tissue protein formation across tissues." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/red_blood_cell_support> a ss:OntologyTerm ;
+  ss:id "effect:red_blood_cell_support" ;
+  ss:slug "red_blood_cell_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Red Blood Cell Support" ;
+  ss:description "Red blood cell and hematologic support context, including iron, folate, B12, and related erythropoiesis cofactors." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/redox_metabolism_support> a ss:OntologyTerm ;
+  ss:id "effect:redox_metabolism_support" ;
+  ss:slug "redox_metabolism_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Redox Metabolism Support" ;
+  ss:description "Redox metabolism support context for substances involved in cellular electron transfer, antioxidant recycling, NAD/NADH, or glutathione-adjacent balance." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/reproductive_hormone_context> a ss:OntologyTerm ;
+  ss:id "effect:reproductive_hormone_context" ;
+  ss:slug "reproductive_hormone_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Reproductive Hormone Context" ;
+  ss:description "Reproductive and hormone-adjacent review context for menopause, menstrual-cycle, PMS, fertility, libido, or hormone-sensitive use cases." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/skin_barrier_context> a ss:OntologyTerm ;
+  ss:id "effect:skin_barrier_context" ;
+  ss:slug "skin_barrier_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Skin Barrier Context" ;
+  ss:description "Skin-barrier and epithelial-support context for nutrients that affect epidermal integrity, wound resilience, or skin structure." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/skin_matrix_context> a ss:OntologyTerm ;
+  ss:id "effect:skin_matrix_context" ;
+  ss:slug "skin_matrix_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Skin Matrix Context" ;
+  ss:description "Skin-matrix context for substances selected around dermal structure, collagen, sulfur matrix, or connective-tissue support in skin." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/sleep_context> a ss:OntologyTerm ;
+  ss:id "effect:sleep_context" ;
+  ss:slug "sleep_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Sleep Context" ;
+  ss:description "Sleep-support context for substances that affect sleep quality, sleep continuity, calming at bedtime, or circadian timing." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/sleep_onset_support> a ss:OntologyTerm ;
+  ss:id "effect:sleep_onset_support" ;
+  ss:slug "sleep_onset_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Sleep Onset Support" ;
+  ss:description "Supports sleep onset or circadian sleep timing without implying a generic sedative effect." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/stimulant_context> a ss:OntologyTerm ;
+  ss:id "effect:stimulant_context" ;
+  ss:slug "stimulant_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Stimulant Context" ;
+  ss:description "Stimulant-load context for substances that increase arousal, sympathetic tone, or stimulant-like activation." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/stress_performance_context> a ss:OntologyTerm ;
+  ss:id "effect:stress_performance_context" ;
+  ss:slug "stress_performance_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Stress Performance Context" ;
+  ss:description "Stress-performance context for substances selected to maintain focus, drive, or output during acute stress." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/stress_reactivity_context> a ss:OntologyTerm ;
+  ss:id "effect:stress_reactivity_context" ;
+  ss:slug "stress_reactivity_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Stress Reactivity Context" ;
+  ss:description "Stress-reactivity context for substances that may change emotional, physiologic, or cognitive response to stressors." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/stress_resilience_context> a ss:OntologyTerm ;
+  ss:id "effect:stress_resilience_context" ;
+  ss:slug "stress_resilience_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Stress Resilience Context" ;
+  ss:description "Stress-resilience and adaptogen context for substances used to modulate perceived stress, HPA-axis tone, fatigue resilience, or stress performance." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/sulfur_amino_acid_metabolism> a ss:OntologyTerm ;
+  ss:id "effect:sulfur_amino_acid_metabolism" ;
+  ss:slug "sulfur_amino_acid_metabolism" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Sulfur Amino Acid Metabolism" ;
+  ss:description "Sulfur amino-acid metabolism context for cysteine, methionine, taurine, molybdenum-linked sulfur handling, or glutathione-adjacent flow." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/sulfur_connective_tissue_context> a ss:OntologyTerm ;
+  ss:id "effect:sulfur_connective_tissue_context" ;
+  ss:slug "sulfur_connective_tissue_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Sulfur Connective Tissue Context" ;
+  ss:description "Sulfur connective-tissue context for sulfur donors or sulfur-rich compounds used for connective tissue, cartilage, or skin matrix support." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/urinary_adhesion_context> a ss:OntologyTerm ;
+  ss:id "effect:urinary_adhesion_context" ;
+  ss:slug "urinary_adhesion_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Urinary Adhesion Context" ;
+  ss:description "Urinary-adhesion context for substances selected to reduce bacterial adhesion to urinary tract surfaces." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/urinary_tract_context> a ss:OntologyTerm ;
+  ss:id "effect:urinary_tract_context" ;
+  ss:slug "urinary_tract_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Urinary Tract Context" ;
+  ss:description "Urinary-tract support context for substances selected around bladder, urethral, or urinary-system health." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/vascular_calcification_context> a ss:OntologyTerm ;
+  ss:id "effect:vascular_calcification_context" ;
+  ss:slug "vascular_calcification_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Vascular Calcification Context" ;
+  ss:description "Vascular calcification review context for calcium trafficking, vitamin K-dependent carboxylation, and mineral deposition concerns." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/vascular_polyphenol_context> a ss:OntologyTerm ;
+  ss:id "effect:vascular_polyphenol_context" ;
+  ss:slug "vascular_polyphenol_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Vascular Polyphenol Context" ;
+  ss:description "Polyphenol-linked vascular support context covering endothelial tone, vascular resilience, and circulation-related antioxidant effects." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/vascular_tone_context> a ss:OntologyTerm ;
+  ss:id "effect:vascular_tone_context" ;
+  ss:slug "vascular_tone_context" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Vascular Tone Context" ;
+  ss:description "Vascular-tone context for substances that may alter vessel relaxation, constriction, or smooth-muscle signaling." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/vasodilator> a ss:OntologyTerm ;
+  ss:id "effect:vasodilator" ;
+  ss:slug "vasodilator" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Vasodilator" ;
+  ss:description "Promotes vascular smooth-muscle relaxation or vasodilatory signaling." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/vision_retinoid_support> a ss:OntologyTerm ;
+  ss:id "effect:vision_retinoid_support" ;
+  ss:slug "vision_retinoid_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Vision Retinoid Support" ;
+  ss:description "Vision and retinoid-cycle support context for vitamin A forms or provitamin A compounds involved in visual pigment function." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/effect/wound_healing_support> a ss:OntologyTerm ;
+  ss:id "effect:wound_healing_support" ;
+  ss:slug "wound_healing_support" ;
+  ss:semantic_category ss:effect ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Wound Healing Support" ;
+  ss:description "Supports wound-healing biology such as collagen formation, epithelial repair, immune function, or zinc-dependent repair processes." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/empty_preferred> a ss:OntologyTerm ;
+  ss:id "intake:empty_preferred" ;
+  ss:slug "empty_preferred" ;
+  ss:semantic_category ss:intake ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Prefers empty stomach" ;
+  ss:description "Works or absorbs better away from food, without a hard food block." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/fat_meal_required> a ss:OntologyTerm ;
+  ss:id "intake:fat_meal_required" ;
+  ss:slug "fat_meal_required" ;
+  ss:semantic_category ss:intake ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Requires fat-containing meal" ;
+  ss:description "Fat-containing food is the real intake target; current slot model approximates this as food=true." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/food_neutral> a ss:OntologyTerm ;
+  ss:id "intake:food_neutral" ;
+  ss:slug "food_neutral" ;
+  ss:semantic_category ss:intake ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Food neutral" ;
+  ss:description "Food state is not a meaningful scheduling driver." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/food_preferred> a ss:OntologyTerm ;
+  ss:id "intake:food_preferred" ;
+  ss:slug "food_preferred" ;
+  ss:semantic_category ss:intake ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Prefers food" ;
+  ss:description "Food improves tolerance or practical use, but empty-stomach intake remains acceptable." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/food_required> a ss:OntologyTerm ;
+  ss:id "intake:food_required" ;
+  ss:slug "food_required" ;
+  ss:semantic_category ss:intake ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Requires food" ;
+  ss:description "Active substance requires food for absorption, stomach tolerance, or reliable effect." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/alkaloid> a ss:OntologyTerm ;
+  ss:id "kind:alkaloid" ;
+  ss:slug "alkaloid" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Alkaloid" ;
+  ss:description "Nitrogen-containing plant alkaloid or alkaloid-derived supplement compound." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/amino> a ss:OntologyTerm ;
+  ss:id "kind:amino" ;
+  ss:slug "amino" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Amino acid" ;
+  ss:description "Amino acid or close structural analogue (including non-proteinogenic and conditionally essential forms)." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/bile_acid> a ss:OntologyTerm ;
+  ss:id "kind:bile_acid" ;
+  ss:slug "bile_acid" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Bile acid" ;
+  ss:description "Bile acid or bile-acid conjugate used as a liver, gallbladder, or fat-digestion review item." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/botanical> a ss:OntologyTerm ;
+  ss:id "kind:botanical" ;
+  ss:slug "botanical" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Botanical" ;
+  ss:description "Whole plant, herb, or botanical extract without a more specific classifier (not adaptogen, not flavonoid, not carotenoid)." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/carbohydrate> a ss:OntologyTerm ;
+  ss:id "kind:carbohydrate" ;
+  ss:slug "carbohydrate" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Carbohydrate" ;
+  ss:description "Carbohydrate, sugar alcohol, cyclic polyol, or closely related carbohydrate-class compound not better represented as dietary fiber." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/carotenoid> a ss:OntologyTerm ;
+  ss:id "kind:carotenoid" ;
+  ss:slug "carotenoid" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Carotenoid" ;
+  ss:description "Carotenoid pigment — fat-soluble antioxidant from the tetraterpene family, including xanthophylls and carotenes." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/enzyme> a ss:OntologyTerm ;
+  ss:id "kind:enzyme" ;
+  ss:slug "enzyme" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Enzyme" ;
+  ss:description "Proteolytic, lipolytic, or other digestive/systemic enzyme." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/fatty_acid_derivative> a ss:OntologyTerm ;
+  ss:id "kind:fatty_acid_derivative" ;
+  ss:slug "fatty_acid_derivative" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Fatty acid derivative" ;
+  ss:description "Fatty acid, fatty acid ester, or closely related lipid derivative not covered by a more specific class such as omega3." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/fiber> a ss:OntologyTerm ;
+  ss:id "kind:fiber" ;
+  ss:slug "fiber" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Dietary fiber" ;
+  ss:description "Dietary fiber or polysaccharide-based fiber supplement." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/flavonoid> a ss:OntologyTerm ;
+  ss:id "kind:flavonoid" ;
+  ss:slug "flavonoid" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Flavonoid" ;
+  ss:description "Polyphenol from the flavonoid family (flavonols, flavones, flavanols, anthocyanins, flavanones, isoflavones)." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/glycosaminoglycan> a ss:OntologyTerm ;
+  ss:id "kind:glycosaminoglycan" ;
+  ss:slug "glycosaminoglycan" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Glycosaminoglycan" ;
+  ss:description "Glycosaminoglycan or direct glycosaminoglycan salt used as a connective-tissue, cartilage, or synovial-fluid matrix component." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/hormone> a ss:OntologyTerm ;
+  ss:id "kind:hormone" ;
+  ss:slug "hormone" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Hormone" ;
+  ss:description "Endogenous hormone or hormone-identical supplement used as a signaling molecule rather than as a vitamin, mineral, botanical, or amino acid." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/mineral> a ss:OntologyTerm ;
+  ss:id "kind:mineral" ;
+  ss:slug "mineral" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Mineral" ;
+  ss:description "Mineral marker; concrete scheduling comes from intake and competition traits." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/nucleotide> a ss:OntologyTerm ;
+  ss:id "kind:nucleotide" ;
+  ss:slug "nucleotide" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Nucleotide" ;
+  ss:description "Nucleotide or nucleotide-like phosphorylated metabolite used as a supplement or reference compound." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/omega3> a ss:OntologyTerm ;
+  ss:id "kind:omega3" ;
+  ss:slug "omega3" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Omega-3" ;
+  ss:description "Long-chain omega-3 fatty acid (EPA or DHA) or a direct whole-source that delivers EPA/DHA." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/phytosterol> a ss:OntologyTerm ;
+  ss:id "kind:phytosterol" ;
+  ss:slug "phytosterol" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Phytosterol" ;
+  ss:description "Plant sterol or plant stanol compound/class used for cholesterol-absorption review." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/probiotic> a ss:OntologyTerm ;
+  ss:id "kind:probiotic" ;
+  ss:slug "probiotic" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Probiotic" ;
+  ss:description "Live microorganism blend or strain marker used for gut-microbiome context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/protein> a ss:OntologyTerm ;
+  ss:id "kind:protein" ;
+  ss:slug "protein" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Protein" ;
+  ss:description "Protein or peptide-based supplement material." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/vitamin> a ss:OntologyTerm ;
+  ss:id "kind:vitamin" ;
+  ss:slug "vitamin" ;
+  ss:semantic_category ss:kind ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/rigid_identity> ;
+  ss:label "Vitamin" ;
+  ss:description "Vitamin — essential organic micronutrient required in trace amounts that the body cannot synthesize in sufficient quantity." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/bcaa_metabolism> a ss:OntologyTerm ;
+  ss:id "pathway:bcaa_metabolism" ;
+  ss:slug "bcaa_metabolism" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "BCAA metabolism" ;
+  ss:description "Branched-chain essential amino-acid context for leucine, isoleucine, and valine." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/carnitine_shuttle> a ss:OntologyTerm ;
+  ss:id "pathway:carnitine_shuttle" ;
+  ss:slug "carnitine_shuttle" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Carnitine shuttle" ;
+  ss:description "Fatty-acid transport into mitochondria via carnitine-dependent transport; reviewer-only pathway context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/coa_metabolism> a ss:OntologyTerm ;
+  ss:id "pathway:coa_metabolism" ;
+  ss:slug "coa_metabolism" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "CoA metabolism" ;
+  ss:description "Coenzyme A synthesis and acyl-group transfer context; reviewer-only pathway grouping for pantothenic-acid/B5-dependent energy and fatty-acid metabolism." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/collagen_matrix> a ss:OntologyTerm ;
+  ss:id "pathway:collagen_matrix" ;
+  ss:slug "collagen_matrix" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Collagen matrix" ;
+  ss:description "Collagen synthesis, hydroxylation, cross-linking, or connective-tissue matrix context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/electron_transport_chain> a ss:OntologyTerm ;
+  ss:id "pathway:electron_transport_chain" ;
+  ss:slug "electron_transport_chain" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Electron transport chain" ;
+  ss:description "Mitochondrial electron transport and ATP-production cofactor context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/fibrinolysis_coagulation> a ss:OntologyTerm ;
+  ss:id "pathway:fibrinolysis_coagulation" ;
+  ss:slug "fibrinolysis_coagulation" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Fibrinolysis / coagulation" ;
+  ss:description "Fibrin breakdown, platelet aggregation, clotting, or anticoagulant context; reviewer-only pathway grouping for bleeding-load review." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/flavin_redox> a ss:OntologyTerm ;
+  ss:id "pathway:flavin_redox" ;
+  ss:slug "flavin_redox" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Flavin redox" ;
+  ss:description "Riboflavin-derived FMN/FAD redox cofactor context; reviewer-only pathway grouping for mitochondrial and cellular energy metabolism." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/gabaergic_signaling> a ss:OntologyTerm ;
+  ss:id "pathway:gabaergic_signaling" ;
+  ss:slug "gabaergic_signaling" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "GABAergic signaling" ;
+  ss:description "Gamma-aminobutyric-acid or GABA-modulating sleep/calm context; reviewer-only pathway grouping for sedative-load and sleep-stack review." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/glutathione_metabolism> a ss:OntologyTerm ;
+  ss:id "pathway:glutathione_metabolism" ;
+  ss:slug "glutathione_metabolism" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Glutathione metabolism" ;
+  ss:description "Glutathione precursor, recycling, antioxidant-defense, or sulfur-redox context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/methylation_cycle> a ss:OntologyTerm ;
+  ss:id "pathway:methylation_cycle" ;
+  ss:slug "methylation_cycle" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Methylation cycle" ;
+  ss:description "Substance participates in the one-carbon / methylation pathway as cofactor or substrate; Reviewer surfaces methylation pathway membership; not used by Planner." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/nad_metabolism> a ss:OntologyTerm ;
+  ss:id "pathway:nad_metabolism" ;
+  ss:slug "nad_metabolism" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "NAD metabolism" ;
+  ss:description "Niacin-derived NAD/NADP cofactor context for cellular redox and ATP-producing metabolism; reviewer-only pathway grouping." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/nitric_oxide_cgmp> a ss:OntologyTerm ;
+  ss:id "pathway:nitric_oxide_cgmp" ;
+  ss:slug "nitric_oxide_cgmp" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Nitric oxide / cGMP" ;
+  ss:description "Nitric-oxide production, PDE5 inhibition, or cGMP-mediated vascular tone context; reviewer-only pathway grouping." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/omega3_eicosanoid> a ss:OntologyTerm ;
+  ss:id "pathway:omega3_eicosanoid" ;
+  ss:slug "omega3_eicosanoid" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Omega-3 / eicosanoid" ;
+  ss:description "Long-chain omega-3 fatty acid context affecting eicosanoid balance, inflammation signaling, and platelet aggregation; reviewer-only pathway grouping." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/phosphocreatine_system> a ss:OntologyTerm ;
+  ss:id "pathway:phosphocreatine_system" ;
+  ss:slug "phosphocreatine_system" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Phosphocreatine system" ;
+  ss:description "Creatine/phosphocreatine energy-buffer context for rapid ATP regeneration; reviewer-only pathway grouping for workout and mitochondrial energy review." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/thiamine_energy_metabolism> a ss:OntologyTerm ;
+  ss:id "pathway:thiamine_energy_metabolism" ;
+  ss:slug "thiamine_energy_metabolism" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Thiamine energy metabolism" ;
+  ss:description "Thiamine/TPP-dependent carbohydrate oxidation and mitochondrial energy-enzyme context; reviewer-only pathway grouping." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/thyroid_hormone_axis> a ss:OntologyTerm ;
+  ss:id "pathway:thyroid_hormone_axis" ;
+  ss:slug "thyroid_hormone_axis" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Thyroid hormone axis" ;
+  ss:description "Thyroid hormone synthesis, deiodinase conversion, or thyroid medication context; reviewer-only pathway grouping." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/tmao_precursor> a ss:OntologyTerm ;
+  ss:id "pathway:tmao_precursor" ;
+  ss:slug "tmao_precursor" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "TMAO precursor" ;
+  ss:description "Gut-microbiome conversion context where trimethylamine and TMAO production may be relevant to cardiometabolic review." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/pathway/vitamin_d_calcium_axis> a ss:OntologyTerm ;
+  ss:id "pathway:vitamin_d_calcium_axis" ;
+  ss:slug "vitamin_d_calcium_axis" ;
+  ss:semantic_category ss:pathway ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Vitamin D / calcium axis" ;
+  ss:description "Vitamin-D-mediated calcium/phosphorus absorption, bone-mineral, PTH, and hypercalcemia review context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/quality/electrolyte> a ss:OntologyTerm ;
+  ss:id "quality:electrolyte" ;
+  ss:slug "electrolyte" ;
+  ss:semantic_category ss:quality ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Electrolyte" ;
+  ss:description "Electrolyte marker for physiological electrolyte ions and supplement forms that supply sodium, potassium, magnesium, calcium, chloride, or similar electrolyte context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/quality/fat_soluble> a ss:OntologyTerm ;
+  ss:id "quality:fat_soluble" ;
+  ss:slug "fat_soluble" ;
+  ss:semantic_category ss:quality ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Fat-soluble" ;
+  ss:description "Fat-soluble nutrient or carotenoid." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/b6_neuropathy_long_term> a ss:OntologyTerm ;
+  ss:id "risk:b6_neuropathy_long_term" ;
+  ss:slug "b6_neuropathy_long_term" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "B6 neuropathy long-term" ;
+  ss:description "Long-term supplemental pyridoxine exposure can cause sensory peripheral neuropathy; review cumulative B6 intake across products." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/biotin_lab_interference> a ss:OntologyTerm ;
+  ss:id "risk:biotin_lab_interference" ;
+  ss:slug "biotin_lab_interference" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Biotin lab-test interference" ;
+  ss:description "Supplemental biotin can interfere with biotin-streptavidin immunoassays, including thyroid, cardiac troponin, and other lab tests depending on assay design." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/bleeding_med_interaction> a ss:OntologyTerm ;
+  ss:id "risk:bleeding_med_interaction" ;
+  ss:slug "bleeding_med_interaction" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Bleeding medication interaction" ;
+  ss:description "Fibrinolytic, antiplatelet, anticoagulant, or omega-3 context where medication, surgery, or stacked bleeding-load review matters." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/cyp450_med_interaction> a ss:OntologyTerm ;
+  ss:id "risk:cyp450_med_interaction" ;
+  ss:slug "cyp450_med_interaction" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "CYP450 medication interaction" ;
+  ss:description "Botanical or supplement context where CYP induction/inhibition could change medication exposure." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/glucose_med_interaction> a ss:OntologyTerm ;
+  ss:id "risk:glucose_med_interaction" ;
+  ss:slug "glucose_med_interaction" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Glucose medication interaction" ;
+  ss:description "Insulin-sensitizing or glucose-lowering supplement context where insulin, metformin, or other antidiabetes medication should be reviewed for additive hypoglycemia risk." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/hyperkalemia_med_interaction> a ss:OntologyTerm ;
+  ss:id "risk:hyperkalemia_med_interaction" ;
+  ss:slug "hyperkalemia_med_interaction" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Hyperkalemia medication interaction" ;
+  ss:description "Potassium-related medication interaction risk." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/hypotension_med_interaction> a ss:OntologyTerm ;
+  ss:id "risk:hypotension_med_interaction" ;
+  ss:slug "hypotension_med_interaction" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Hypotension medication interaction" ;
+  ss:description "Vasodilator or blood-pressure-lowering context where nitrates, alpha-blockers, antihypertensives, PDE5 inhibitors, or symptomatic hypotension should be reviewed." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/incretin_drug_medical_review> a ss:OntologyTerm ;
+  ss:id "risk:incretin_drug_medical_review" ;
+  ss:slug "incretin_drug_medical_review" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Incretin drug medical review" ;
+  ss:description "Prescription or investigational GLP-1/GIP/incretin-drug context where indication, contraindications, product quality, adverse effects, and drug-supplement interactions require medical review." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/iron_overdose_review> a ss:OntologyTerm ;
+  ss:id "risk:iron_overdose_review" ;
+  ss:slug "iron_overdose_review" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Iron overdose review" ;
+  ss:description "Supplemental iron has clinically important overdose and iron-overload review context, especially around children or hemochromatosis." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/liver_injury_review> a ss:OntologyTerm ;
+  ss:id "risk:liver_injury_review" ;
+  ss:slug "liver_injury_review" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Liver-injury review" ;
+  ss:description "Supplement context where rare liver injury has been reported and liver disease, symptoms, dose, extract potency, or empty-stomach use should be reviewed." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/manual_review> a ss:OntologyTerm ;
+  ss:id "risk:manual_review" ;
+  ss:slug "manual_review" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Requires manual review" ;
+  ss:description "Generic safety or interaction marker for items needing operator attention." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/narrow_therapeutic_window> a ss:OntologyTerm ;
+  ss:id "risk:narrow_therapeutic_window" ;
+  ss:slug "narrow_therapeutic_window" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Narrow therapeutic window" ;
+  ss:description "Nutrient or mineral where useful and excessive doses are close enough to require caution." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/retinol_accumulation_review> a ss:OntologyTerm ;
+  ss:id "risk:retinol_accumulation_review" ;
+  ss:slug "retinol_accumulation_review" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Retinol accumulation review" ;
+  ss:description "Preformed vitamin A/retinol accumulates and has dose-dependent toxicity and pregnancy/teratogenicity review context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/seizure_threshold_review> a ss:OntologyTerm ;
+  ss:id "risk:seizure_threshold_review" ;
+  ss:slug "seizure_threshold_review" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Seizure-threshold review" ;
+  ss:description "Substance or botanical context where seizure history or medications that lower seizure threshold should be reviewed." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/serotonergic_med_interaction> a ss:OntologyTerm ;
+  ss:id "risk:serotonergic_med_interaction" ;
+  ss:slug "serotonergic_med_interaction" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Serotonergic medication interaction" ;
+  ss:description "Serotonin-precursor, serotonergic-modulating, SSRI/SNRI/MAOI, or stacked 5-HT context where medication or cumulative serotonergic-load review matters." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/statin_like_monacolin_review> a ss:OntologyTerm ;
+  ss:id "risk:statin_like_monacolin_review" ;
+  ss:slug "statin_like_monacolin_review" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Statin-like / monacolin review" ;
+  ss:description "Red yeast rice context where monacolin K/lovastatin-like exposure, product variability, muscle/liver adverse effects, and statin-like drug interactions should be reviewed." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/tmao_cardiometabolic_review> a ss:OntologyTerm ;
+  ss:id "risk:tmao_cardiometabolic_review" ;
+  ss:slug "tmao_cardiometabolic_review" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "TMAO cardiometabolic review" ;
+  ss:description "Carnitine/choline-class gut-microbiome conversion context where TMAO production and cardiovascular risk profile should be reviewed without assuming direct harm from the substance alone." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/vitamin_k_anticoagulant_review> a ss:OntologyTerm ;
+  ss:id "risk:vitamin_k_anticoagulant_review" ;
+  ss:slug "vitamin_k_anticoagulant_review" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Vitamin K anticoagulant review" ;
+  ss:description "Vitamin K intake affects vitamin-K-antagonist anticoagulant management; consistency matters more than avoidance." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/zinc_copper_balance_review> a ss:OntologyTerm ;
+  ss:id "risk:zinc_copper_balance_review" ;
+  ss:slug "zinc_copper_balance_review" ;
+  ss:semantic_category ss:risk ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Zinc-copper balance review" ;
+  ss:description "Supplemental zinc can reduce copper status at higher or sustained intakes; review zinc and copper together." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/role/adaptogen> a ss:OntologyTerm ;
+  ss:id "role:adaptogen" ;
+  ss:slug "adaptogen" ;
+  ss:semantic_category ss:role ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:label "Adaptogen" ;
+  ss:description "Botanical or natural-product class conventionally categorized as an adaptogen." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/role/antioxidant> a ss:OntologyTerm ;
+  ss:id "role:antioxidant" ;
+  ss:slug "antioxidant" ;
+  ss:semantic_category ss:role ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:label "Antioxidant" ;
+  ss:description "Antioxidant-class substance or nutrient category marker." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/role/ergogenic> a ss:OntologyTerm ;
+  ss:id "role:ergogenic" ;
+  ss:slug "ergogenic" ;
+  ss:semantic_category ss:role ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:label "Ergogenic" ;
+  ss:description "Sports-performance supplement class marker." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/role/nootropic> a ss:OntologyTerm ;
+  ss:id "role:nootropic" ;
+  ss:slug "nootropic" ;
+  ss:semantic_category ss:role ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:label "Nootropic" ;
+  ss:description "Cognitive-support supplement class marker." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/role/pharmaceutical> a ss:OntologyTerm ;
+  ss:id "role:pharmaceutical" ;
+  ss:slug "pharmaceutical" ;
+  ss:semantic_category ss:role ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
+  ss:label "Pharmaceutical" ;
+  ss:description "Prescription or OTC pharmaceutical drug (not a supplement)." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/timing/energy_like> a ss:OntologyTerm ;
+  ss:id "timing:energy_like" ;
+  ss:slug "energy_like" ;
+  ss:semantic_category ss:timing ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Energy-like" ;
+  ss:description "Direct wake-promoting or activating effect." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/timing/sleep_disruptive> a ss:OntologyTerm ;
+  ss:id "timing:sleep_disruptive" ;
+  ss:slug "sleep_disruptive" ;
+  ss:semantic_category ss:timing ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Sleep disruptive" ;
+  ss:description "Likely to disrupt sleep and should not be placed near bedtime." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/term/timing/sleep_support> a ss:OntologyTerm ;
+  ss:id "timing:sleep_support" ;
+  ss:slug "sleep_support" ;
+  ss:semantic_category ss:timing ;
+  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
+  ss:label "Sleep support" ;
+  ss:description "Directly supports sleep onset or sleep quality." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout> a ss:SchedulingPolicyRecord ;
+  ss:id "activity:any_workout" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/activity/any_workout> ;
+  ss:applies_when "Prefer either observable workout slot." ;
+  ss:warning false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/0> a ss:SchedulingPolicyEffectRecord .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/0> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/0> ss:level "prefer" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/0/match> a ss:SchedulingPolicyEffectMatch .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/0/match> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/0/match> ss:near "workout_before" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/1> a ss:SchedulingPolicyEffectRecord .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/1> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/1> ss:level "prefer" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/1/match> a ss:SchedulingPolicyEffectMatch .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/1> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/1/match> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/1/match> ss:near "workout_after" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout> a ss:SchedulingPolicyRecord ;
+  ss:id "activity:post_workout" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/activity/post_workout> ;
+  ss:applies_when "Prefer the observable post-workout slot." ;
+  ss:warning false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout/effect/0> a ss:SchedulingPolicyEffectRecord .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout/effect/0> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout/effect/0> ss:level "prefer" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout/effect/0/match> a ss:SchedulingPolicyEffectMatch .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout/effect/0/match> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout/effect/0/match> ss:near "workout_after" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout> a ss:SchedulingPolicyRecord ;
+  ss:id "activity:pre_workout" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/activity/pre_workout> ;
+  ss:applies_when "Prefer the observable pre-workout slot." ;
+  ss:warning false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout/effect/0> a ss:SchedulingPolicyEffectRecord .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout/effect/0> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout/effect/0> ss:level "prefer" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout/effect/0/match> a ss:SchedulingPolicyEffectMatch .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout/effect/0/match> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout/effect/0/match> ss:near "workout_before" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred> a ss:SchedulingPolicyRecord ;
+  ss:id "intake:empty_preferred" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/empty_preferred> ;
+  ss:applies_when "Prefer a slot without food when feasible." ;
+  ss:warning false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/0> a ss:SchedulingPolicyEffectRecord .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/0> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/0> ss:level "prefer" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/0/match> a ss:SchedulingPolicyEffectMatch .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/0/match> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/0/match> ss:food false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/1> a ss:SchedulingPolicyEffectRecord .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/1> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/1> ss:level "avoid" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/1/match> a ss:SchedulingPolicyEffectMatch .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/1> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/1/match> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/1/match> ss:food true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required> a ss:SchedulingPolicyRecord ;
+  ss:id "intake:fat_meal_required" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/fat_meal_required> ;
+  ss:applies_when "Prefer a slot with food as the current approximation of a fat-containing meal." ;
+  ss:warning false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/0> a ss:SchedulingPolicyEffectRecord .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/0> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/0> ss:level "prefer_strong" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/0/match> a ss:SchedulingPolicyEffectMatch .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/0/match> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/0/match> ss:food true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/1> a ss:SchedulingPolicyEffectRecord .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/1> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/1> ss:level "avoid" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/1/match> a ss:SchedulingPolicyEffectMatch .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/1> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/1/match> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/1/match> ss:food false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_neutral> a ss:SchedulingPolicyRecord ;
+  ss:id "intake:food_neutral" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/food_neutral> ;
+  ss:applies_when "Food state does not drive slot assignment." ;
+  ss:warning false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred> a ss:SchedulingPolicyRecord ;
+  ss:id "intake:food_preferred" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/food_preferred> ;
+  ss:applies_when "Prefer a slot with food when feasible." ;
+  ss:warning false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred/effect/0> a ss:SchedulingPolicyEffectRecord .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred/effect/0> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred/effect/0> ss:level "prefer" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred/effect/0/match> a ss:SchedulingPolicyEffectMatch .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred/effect/0/match> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred/effect/0/match> ss:food true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required> a ss:SchedulingPolicyRecord ;
+  ss:id "intake:food_required" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/food_required> ;
+  ss:applies_when "Prefer a slot with food; retain the soft preference when food is unavailable." ;
+  ss:warning false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/0> a ss:SchedulingPolicyEffectRecord .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/0> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/0> ss:level "prefer_strong" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/0/match> a ss:SchedulingPolicyEffectMatch .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/0/match> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/0/match> ss:food true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/1> a ss:SchedulingPolicyEffectRecord .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/1> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/1> ss:level "avoid" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/1/match> a ss:SchedulingPolicyEffectMatch .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/1> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/1/match> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/1/match> ss:food false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Ab6_neuropathy_long_term> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:b6_neuropathy_long_term" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/b6_neuropathy_long_term> ;
+  ss:applies_when "Use for pyridoxine HCl/pyridoxine supplement forms when chronic intake should be reviewed separately from active P5P forms." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Ab6_neuropathy_long_term> ss:action "Review cumulative daily pyridoxine HCl/B6 intake across active products." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Abiotin_lab_interference> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:biotin_lab_interference" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/biotin_lab_interference> ;
+  ss:applies_when "Use for supplemental biotin/B7 forms where lab-test interpretation should include a biotin-interference check." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Abiotin_lab_interference> ss:action "Ask about biotin before interpreting thyroid, troponin, or other immunoassay results; pause timing should follow the lab or clinician's guidance." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Ableeding_med_interaction> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:bleeding_med_interaction" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/bleeding_med_interaction> ;
+  ss:applies_when "Use for nattokinase, high-signal omega-3 sources, antiplatelet botanicals, and other substances where anticoagulant/antiplatelet context should be reviewed." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Acyp450_med_interaction> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:cyp450_med_interaction" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/cyp450_med_interaction> ;
+  ss:applies_when "Use when a substance has credible CYP interaction context, especially when product review should look for narrow-therapeutic-index or CNS medications." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Acyp450_med_interaction> ss:action "Review medication list for CYP-sensitive drugs before treating this as routine background support." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aglucose_med_interaction> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:glucose_med_interaction" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/glucose_med_interaction> ;
+  ss:applies_when "Use for substances or supplement contexts where glucose-lowering, insulin-sensitizing, or insulin-mimetic effects make antidiabetes-medication review practical." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aglucose_med_interaction> ss:action "Review antidiabetes medication context and hypoglycemia risk before treating this as routine background support." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Ahyperkalemia_med_interaction> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:hyperkalemia_med_interaction" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/hyperkalemia_med_interaction> ;
+  ss:applies_when "Use for potassium-containing substances or formulas where ACEi, ARB, NSAID, or K-sparing diuretic context matters." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Ahypotension_med_interaction> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:hypotension_med_interaction" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/hypotension_med_interaction> ;
+  ss:applies_when "Use for PDE5 inhibitors, nitric-oxide precursors, and direct vasodilator substances where additive hypotension is the practical concern." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aincretin_drug_medical_review> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:incretin_drug_medical_review" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/incretin_drug_medical_review> ;
+  ss:applies_when "Use for semaglutide, tirzepatide, liraglutide, dulaglutide, exenatide, retatrutide, and similar incretin-mimetic drugs; do not use for ordinary glucose-support supplements." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aincretin_drug_medical_review> ss:action "Review prescribing context, glycemic medications, GI tolerance, pancreatitis/gallbladder history, kidney dehydration risk, pregnancy planning, and product quality before any practical use discussion." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Airon_overdose_review> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:iron_overdose_review" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/iron_overdose_review> ;
+  ss:applies_when "Use for iron supplement forms, regardless of source salt or chelate." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Airon_overdose_review> ss:action "Review iron indication, ferritin/iron status, hemochromatosis context, and child-safety storage before treating iron as routine background support." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aliver_injury_review> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:liver_injury_review" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/liver_injury_review> ;
+  ss:applies_when "Use for concentrated botanical extracts with credible liver-injury reports, such as green tea extract, especially when extract potency is unknown." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aliver_injury_review> ss:action "Review liver disease, symptoms, extract potency, dose, and food timing before treating this as routine background antioxidant support." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Amanual_review> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:manual_review" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/manual_review> ;
+  ss:applies_when "Use when no more specific practical risk trait exists yet." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Anarrow_therapeutic_window> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:narrow_therapeutic_window" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/narrow_therapeutic_window> ;
+  ss:applies_when "Use for selenium, copper, and similar narrow-window minerals." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aretinol_accumulation_review> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:retinol_accumulation_review" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/retinol_accumulation_review> ;
+  ss:applies_when "Use for preformed vitamin A/retinol forms, not demand-regulated provitamin-A carotenoids." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aretinol_accumulation_review> ss:action "Review cumulative preformed vitamin A intake, liver context, and pregnancy relevance before treating retinol as routine background support." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aseizure_threshold_review> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:seizure_threshold_review" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/seizure_threshold_review> ;
+  ss:applies_when "Use for substances where credible clinical references advise caution in people with seizure history or interacting seizure-threshold-lowering drugs." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aserotonergic_med_interaction> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:serotonergic_med_interaction" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/serotonergic_med_interaction> ;
+  ss:applies_when "Use for 5-HTP and botanicals/adaptogens with documented or review-relevant serotonergic modulation where antidepressant or serotonin-syndrome-like context should be reviewed." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Astatin_like_monacolin_review> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:statin_like_monacolin_review" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/statin_like_monacolin_review> ;
+  ss:applies_when "Use for red yeast rice products when monacolin content is unknown or when statin-like lipid-lowering activity is part of the intended rationale." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Astatin_like_monacolin_review> ss:action "Review monacolin/statin-like exposure, liver and muscle symptoms, and medication interaction context." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Atmao_cardiometabolic_review> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:tmao_cardiometabolic_review" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/tmao_cardiometabolic_review> ;
+  ss:applies_when "Use for supplemental L-carnitine forms and related precursors when the reviewer should surface TMAO/cardiometabolic context." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Avitamin_k_anticoagulant_review> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:vitamin_k_anticoagulant_review" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/vitamin_k_anticoagulant_review> ;
+  ss:applies_when "Use for K1 and K2 forms where warfarin or related anticoagulant context should be reviewed." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Avitamin_k_anticoagulant_review> ss:action "Review warfarin/vitamin-K-antagonist therapy and intake consistency before changing vitamin K exposure." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Azinc_copper_balance_review> a ss:SchedulingPolicyRecord ;
+  ss:id "risk:zinc_copper_balance_review" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/zinc_copper_balance_review> ;
+  ss:applies_when "Use for zinc supplement forms when cumulative zinc and copper balance should be surfaced." ;
+  ss:warning true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Azinc_copper_balance_review> ss:action "Review cumulative zinc intake and copper status/context for long-term use." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like> a ss:SchedulingPolicyRecord ;
+  ss:id "timing:energy_like" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/timing/energy_like> ;
+  ss:applies_when "Prefer wake/day slots and avoid sleep when feasible." ;
+  ss:warning false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/0> a ss:SchedulingPolicyEffectRecord .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/0> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/0> ss:level "prefer" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/0/match> a ss:SchedulingPolicyEffectMatch .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/0/match> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/0/match> ss:near "wake" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/1> a ss:SchedulingPolicyEffectRecord .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/1> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/1> ss:level "prefer" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/1/match> a ss:SchedulingPolicyEffectMatch .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/1> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/1/match> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/1/match> ss:near "day_meal" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/2> a ss:SchedulingPolicyEffectRecord .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/2> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/2> ss:level "avoid" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/2/match> a ss:SchedulingPolicyEffectMatch .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/2> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/2/match> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/2/match> ss:near "sleep" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive> a ss:SchedulingPolicyRecord ;
+  ss:id "timing:sleep_disruptive" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/timing/sleep_disruptive> ;
+  ss:applies_when "Avoid the observable sleep slot when feasible." ;
+  ss:warning false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive/effect/0> a ss:SchedulingPolicyEffectRecord .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive/effect/0> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive/effect/0> ss:level "avoid" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive/effect/0/match> a ss:SchedulingPolicyEffectMatch .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive/effect/0/match> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive/effect/0/match> ss:near "sleep" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support> a ss:SchedulingPolicyRecord ;
+  ss:id "timing:sleep_support" ;
+  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/timing/sleep_support> ;
+  ss:applies_when "Prefer the observable sleep slot." ;
+  ss:warning false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support/effect/0> a ss:SchedulingPolicyEffectRecord .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support/effect/0> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support/effect/0> ss:level "prefer" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support/effect/0/match> a ss:SchedulingPolicyEffectMatch .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support/effect/0/match> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support/effect/0/match> ss:near "sleep" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots> a ss:SchedulingConstraintRecord ;
+  ss:id "sc_calcium_iron_separate_slots" ;
+  ss:operation "separate_products_same_slot" ;
+  ss:rationale "Calcium and iron evidence is dose- and context-dependent; dose is unknown, so no hard rule or computable 2-4 hour promise is justified." ;
+  ss:action "Prefer different slots for calcium and iron when feasible; no calculated separation interval." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots> ss:blocks_slots false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots> ss:scores_advisory true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots> ss:score_delta -1 .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/source_selector> a ss:SchedulingConstraintSelector .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots> ss:source_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/source_selector> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/source_selector/entity> a ss:SchedulingConstraintEntitySelector .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/source_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/source_selector/entity> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/source_selector/entity> ss:name "Calcium" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/target_selector> a ss:SchedulingConstraintSelector .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots> ss:target_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/target_selector> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/target_selector/entity> a ss:SchedulingConstraintEntitySelector .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/target_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/target_selector/entity> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/target_selector/entity> ss:name "Iron" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots> a ss:SchedulingConstraintRecord ;
+  ss:id "sc_calcium_zinc_separate_slots" ;
+  ss:operation "separate_products_same_slot" ;
+  ss:rationale "Calcium can compete with zinc for absorption when co-administered." ;
+  ss:action "Keep calcium and zinc away from the same slot when they are in separate products." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/source_selector> a ss:SchedulingConstraintSelector .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots> ss:source_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/source_selector> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/source_selector/entity> a ss:SchedulingConstraintEntitySelector .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/source_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/source_selector/entity> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/source_selector/entity> ss:name "Calcium" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/target_selector> a ss:SchedulingConstraintSelector .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots> ss:target_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/target_selector> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/target_selector/entity> a ss:SchedulingConstraintEntitySelector .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/target_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/target_selector/entity> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/target_selector/entity> ss:name "Zinc" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots> a ss:SchedulingConstraintRecord ;
+  ss:id "sc_tocopherol_tocotrienol_separate_slots" ;
+  ss:operation "separate_products_same_slot" ;
+  ss:rationale "Vitamin E tocopherols and tocotrienols can compete for absorption and tissue uptake when co-administered." ;
+  ss:action "Keep tocopherol and tocotrienol products away from the same slot." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/source_selector> a ss:SchedulingConstraintSelector .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots> ss:source_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/source_selector> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/source_selector/entity> a ss:SchedulingConstraintEntitySelector .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/source_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/source_selector/entity> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/source_selector/entity> ss:entity_id <https://j2h4u.github.io/supp-slotter/ontology/v1/substance/sub_844a87d72b> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/source_selector> ss:scope "exact_form" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/target_selector> a ss:SchedulingConstraintSelector .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots> ss:target_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/target_selector> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/target_selector/entity> a ss:SchedulingConstraintEntitySelector .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/target_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/target_selector/entity> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/target_selector/entity> ss:entity_id <https://j2h4u.github.io/supp-slotter/ontology/v1/substance/sub_5723eafac4> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/target_selector> ss:scope "exact_form" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots> a ss:SchedulingConstraintRecord ;
+  ss:id "sc_zinc_copper_separate_slots" ;
+  ss:operation "separate_products_same_slot" ;
+  ss:rationale "Zinc and copper can compete for absorption when co-administered." ;
+  ss:action "Keep zinc and copper away from the same slot when they are in separate products." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/source_selector> a ss:SchedulingConstraintSelector .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots> ss:source_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/source_selector> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/source_selector/entity> a ss:SchedulingConstraintEntitySelector .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/source_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/source_selector/entity> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/source_selector/entity> ss:name "Zinc" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/target_selector> a ss:SchedulingConstraintSelector .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots> ss:target_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/target_selector> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/target_selector/entity> a ss:SchedulingConstraintEntitySelector .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/target_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/target_selector/entity> .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/target_selector/entity> ss:name "Copper" .

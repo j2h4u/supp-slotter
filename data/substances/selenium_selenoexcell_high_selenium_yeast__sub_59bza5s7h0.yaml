@@ -1,19 +1,18 @@
 id: sub_59bza5s7h0
 name: Selenium
 form: SelenoExcell High Selenium Yeast
-notes: Selenium-enriched yeast source listed on Doctor's Best NAC Detox Regulators.
-  NIH ODS lists selenium-enriched yeast as a common supplemental selenium form,
-  predominantly selenomethionine.
+notes: Selenium-enriched yeast source listed on Doctor's Best NAC Detox Regulators. NIH ODS lists selenium-enriched yeast
+  as a common supplemental selenium form, predominantly selenomethionine.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - mineral
   effect:
   - antioxidant_enzyme_cofactor
-  risk:
-  - narrow_therapeutic_window
+  kind:
+  - mineral
   pathway:
   - glutathione_metabolism
   - thyroid_hormone_axis
+  risk:
+  - narrow_therapeutic_window

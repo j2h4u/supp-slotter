@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Literal, TypedDict
+from typing import NotRequired, TypedDict
 
-ProductTrackingState = Literal["tracked_product", "no_tracked_product"]
-UsageState = Literal["current", "on_shelf", "unassigned", "not_current"]
+ProductTrackingState = str
+UsageState = str
 
 
 class DashboardMatchedTrait(TypedDict):
@@ -41,7 +41,10 @@ class DashboardMember(TypedDict):
 
 
 class DashboardReviewEntry(TypedDict):
+    id: str
     name: str
+    declares_context: list[str]
+    declares_context_labels: list[str]
 
 
 class DashboardReviewEntryWithMembers(DashboardReviewEntry, total=False):
@@ -97,20 +100,82 @@ class SchedulePlacementNote(TypedDict):
 
 class ScheduleSummary(TypedDict):
     take: dict[str, list[str]]
+    usage_groups: dict[str, list[str]]
 
 
-class ScheduleExplanation(TypedDict):
+class ScheduleAssignmentExplanation(TypedDict):
+    assignment_id: str
+    policy_id: str
+    source_kind: str
+    source_card_id: str
+    component_id: str | None
+
+
+class SchedulePolicyContribution(TypedDict):
+    policy_id: str
+    vote_count: int
+    substance_ids: list[str]
+    substances: list[str]
+    score_contribution: int
+    assessment_states: dict[str, str]
+
+
+class ScheduleNeutralComponent(TypedDict):
+    substance_id: str
+    substance: str
+    status: str
+    reason: str
+    assessment_states: NotRequired[dict[str, str]]
+
+
+class _ScheduleExplanationRequired(TypedDict):
     components: list[str]
     pillbox: str
     slot: str
     why_here: list[str]
     review_tags: list[str]
+    schedule_assignments: list[ScheduleAssignmentExplanation]
+    policy_contributions: list[SchedulePolicyContribution]
+    neutral_components: list[ScheduleNeutralComponent]
 
 
-class ScheduleKeptTogether(TypedDict):
-    pair: list[str]
-    together: bool
-    slot: str | None
+class ScheduleExplanation(_ScheduleExplanationRequired, total=False):
+    advisory_penalty: int
+    advisory_constraint_ids: list[str]
+
+
+class ActiveFactIndexEntry(TypedDict):
+    namespace: str
+    fact: str
+    label: str
+    product_count: int
+    products: list[str]
+
+
+class SchedulePairwiseEndpoint(TypedDict):
+    """One resolved product/component endpoint in the pairwise journal."""
+
+    product: str
+    component: str
+    substance_id: str
+
+
+class SchedulePairwiseJournalEntry(TypedDict, total=False):
+    """One ontology-derived pairwise scheduling decision."""
+
+    kind: str
+    products: list[str]
+    endpoints: list[SchedulePairwiseEndpoint]
+    slots: list[str | None]
+    state: str
+    satisfied: bool
+    rule_id: str
+    source_field: str
+    bonus_contribution: int
+    constraint_id: str
+    disposition: str
+    rationale: str
+    action: str
 
 
 class ScheduleData(TypedDict):
@@ -120,8 +185,8 @@ class ScheduleData(TypedDict):
     benefits: list[DashboardReviewEntryWithMembers]
     risks: list[DashboardReviewEntryWithMembers]
     warnings: list[ScheduleWarning]
-    active_fact_index: list[dict[str, object]]
-    kept_together: list[ScheduleKeptTogether]
+    active_fact_index: list[ActiveFactIndexEntry]
+    pairwise_journal: list[SchedulePairwiseJournalEntry]
     explanations: dict[str, ScheduleExplanation]
 
 

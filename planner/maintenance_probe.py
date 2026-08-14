@@ -12,23 +12,35 @@ from planner.cards.product import canonical_product_filename
 from planner.cards.substance import canonical_substance_filename
 from planner.contracts import CardLoadError
 from planner.maintenance_mapping import product_from_mapping, substance_from_mapping
-from planner.maintenance_substance_resolution import product_has_draft_component_ref
+from planner.maintenance_substance_resolution import (
+    MaintenanceContract,
+    has_draft_reference,
+)
 from planner.paths import Paths, strip_root_prefix
 
 
-def auto_maintenance_needed(paths: Paths) -> bool | None:
+def auto_maintenance_needed(
+    paths: Paths,
+    *,
+    contract: MaintenanceContract | None = None,
+) -> bool | None:
+    if contract is None:
+        print("auto-maintenance: verified ontology maintenance contract is required", file=sys.stderr)
+        return None
+    substance_dir = paths.root / contract.substance_path
+    product_dir = paths.root / contract.product_path
     substance_result = _cards_need_maintenance(
-        paths.substances,
-        lambda path, data: path != paths.substances / canonical_substance_filename(substance_from_mapping(data)),
+        substance_dir,
+        lambda path, data: path != substance_dir / canonical_substance_filename(substance_from_mapping(data)),
     )
     if substance_result is not False:
         return substance_result
 
     return _cards_need_maintenance(
-        paths.products,
+        product_dir,
         lambda path, data: (
-            path != paths.products / canonical_product_filename(product_from_mapping(data))
-            or product_has_draft_component_ref(data)
+            path != product_dir / canonical_product_filename(product_from_mapping(data))
+            or has_draft_reference(data, contract.product_substance)
         ),
     )
 

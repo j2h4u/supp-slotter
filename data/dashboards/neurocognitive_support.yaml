@@ -1,24 +1,34 @@
 name: Neurocognitive Support
-description: Nootropic, cognitive-performance, alertness, learning, recall, and
-  nervous-system support review cluster. This is a candidate-comparison surface,
-  not a medical classification.
+description: Nootropic, cognitive-performance, alertness, learning, recall, and nervous-system support review cluster. This
+  is a candidate-comparison surface, not a medical classification.
 benefit:
-  description: Cognitive and nervous-system support coverage across nootropics,
-    alertness/focus positioning, learning/recall context, and curated
-    neurocognitive candidates.
-from_traits:
-  is:
-  - nootropic
-  context:
-  - neurocognitive_support
-  effect:
-  - alertness_context
-  - catecholamine_precursor_context
-  - cognitive_performance_context
-  - focus_relaxation_context
-  - learning_context
-  - memory_recall_context
-  - mild_stimulant_context
-  - phospholipid_membrane_context
-  - stimulant_context
-  - stress_performance_context
+  description: Cognitive and nervous-system support coverage across nootropics, alertness/focus positioning, learning/recall
+    context, and curated neurocognitive candidates.
+id: neurocognitive_support
+selectors:
+- category: context
+  term: neurocognitive_support
+- category: effect
+  term: alertness_context
+- category: effect
+  term: catecholamine_precursor_context
+- category: effect
+  term: cognitive_performance_context
+- category: effect
+  term: focus_relaxation_context
+- category: effect
+  term: learning_context
+- category: effect
+  term: memory_recall_context
+- category: effect
+  term: mild_stimulant_context
+- category: effect
+  term: phospholipid_membrane_context
+- category: effect
+  term: stimulant_context
+- category: effect
+  term: stress_performance_context
+- category: role
+  term: nootropic
+declares_context:
+- neurocognitive_support

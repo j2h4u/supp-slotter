@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths-ignore:
+      - "docs/**"
       - ".planning/**"
       - "**/*.md"
   pull_request:
@@ -23,11 +24,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality:
+  release:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Fetch pinned provenance history
+        run: git fetch --no-tags origin refs/tags/provenance/slot-policy-pre-v1:refs/tags/provenance/slot-policy-pre-v1
 
       - uses: actions/setup-python@v7.0.0
         with:
@@ -44,88 +50,13 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked
 
-      - name: Static quality gate
-        run: just check
-
-  unit:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7.0.1
-
-      - uses: actions/setup-python@v7.0.0
-        with:
-          python-version: "3.14"
-
-      - uses: astral-sh/setup-uv@v9.0.0
-        with:
-          enable-cache: true
-          save-cache: false
-
-      - uses: taiki-e/install-action@v2
-        with:
-          tool: just
-
-      - name: Install dependencies
-        run: uv sync --locked
-
-      - name: Unit tests
-        run: just unit
-
-  crap:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7.0.1
-
-      - uses: actions/setup-python@v7.0.0
-        with:
-          python-version: "3.14"
-
-      - uses: astral-sh/setup-uv@v9.0.0
-        with:
-          enable-cache: true
-          save-cache: false
-
-      - uses: taiki-e/install-action@v2
-        with:
-          tool: just
-
-      - name: Install dependencies
-        run: uv sync --locked
-
-      - name: CRAP gate
-        run: just crap-check
-
-  coverage:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7.0.1
-
-      - uses: actions/setup-python@v7.0.0
-        with:
-          python-version: "3.14"
-
-      - uses: astral-sh/setup-uv@v9.0.0
-        with:
-          enable-cache: true
-          save-cache: false
-
-      - uses: taiki-e/install-action@v2
-        with:
-          tool: just
-
-      - name: Install dependencies
-        run: uv sync --locked
-
-      - name: Coverage gate
-        run: just coverage-check
+      - name: Release gate
+        run: just release
 
   ci:
     if: always()
     runs-on: ubuntu-latest
-    needs: [quality, unit, crap, coverage]
+    needs: [release]
     steps:
       - name: Check required jobs
         run: |

@@ -4,18 +4,26 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from planner.contracts import Product, Slot, SlotNear, Substance, TraitDef, TraitEffect
+from planner.contracts import (
+    KnowledgeAssertion,
+    Product,
+    ScheduleAssertion,
+    SchedulingPolicy,
+    Slot,
+    SlotObservation,
+    Substance,
+    TraitEffect,
+)
 
 NO_TRAIT_SOURCES: dict[str, list[str]] = {}
 
 
-def make_slot(near: SlotNear = "breakfast", food: bool = True) -> Slot:
+def make_slot(near: str = "breakfast", food: bool = True) -> Slot:
     return Slot(
         slot_id="test_slot",
         label="Test Slot",
         order=1,
-        near=near,
-        food=food,
+        observations=(SlotObservation("near", near), SlotObservation("food", food)),
         pillbox="daily",
         pillbox_label="Daily",
         stack="daily",
@@ -26,8 +34,8 @@ def make_trait_def(
     trait_id: str,
     *,
     effects: tuple[TraitEffect, ...] = (),
-) -> TraitDef:
-    return TraitDef(
+) -> SchedulingPolicy:
+    return SchedulingPolicy(
         id=trait_id,
         namespace="intake",
         short_name=trait_id,
@@ -43,7 +51,7 @@ class SubstanceTraitOverrides:
     intake: tuple[str, ...] = ()
     timing: tuple[str, ...] = ()
     activity: tuple[str, ...] = ()
-    is_: tuple[str, ...] = ()
+    kind: tuple[str, ...] = ()
     effect: tuple[str, ...] = ()
     risk: tuple[str, ...] = ()
     pathway: tuple[str, ...] = ()
@@ -58,16 +66,30 @@ def make_substance(
     *,
     traits: SubstanceTraitOverrides = NO_SUBSTANCE_TRAIT_OVERRIDES,
 ) -> Substance:
+    schedule_assertions = tuple(
+        ScheduleAssertion(axis, value)
+        for axis, values in (
+            ("intake", traits.intake),
+            ("timing", traits.timing),
+            ("activity", traits.activity),
+        )
+        for value in values
+    )
+    knowledge_assertions = tuple(
+        KnowledgeAssertion(category, value)
+        for category, values in (
+            ("kind", traits.kind),
+            ("effect", traits.effect),
+            ("risk", traits.risk),
+            ("pathway", traits.pathway),
+        )
+        for value in values
+    )
     return Substance(
         id=sub_id,
         name=name,
-        intake=traits.intake,
-        timing=traits.timing,
-        activity=traits.activity,
-        is_=traits.is_,
-        effect=traits.effect,
-        risk=traits.risk,
-        pathway=traits.pathway,
+        knowledge_assertions=knowledge_assertions,
+        schedule_assertions=schedule_assertions,
     )
 
 

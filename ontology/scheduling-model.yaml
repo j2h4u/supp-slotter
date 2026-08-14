@@ -1,0 +1,233 @@
+id: https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling-model
+name: supp_slotter_scheduling
+title: Generic scheduling ontology
+description: >-
+  Open scheduling structures. Values such as intake, timing, activity, slot
+  names, and effects are authored instances, never schema enums.
+prefixes:
+  ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
+  linkml: https://w3id.org/linkml/
+default_prefix: ss
+default_range: string
+imports:
+  - linkml:types
+  - model
+  - runtime-protocol
+  - vocabulary-model
+
+enums:
+  SchedulingConstraintScope:
+    permissible_values:
+      exact_form:
+
+classes:
+  SchedulingConstraint:
+    slots: [id, key, effect, condition, action, rationale]
+    slot_usage:
+      key: {required: true}
+      effect: {required: true}
+      action: {range: Action, inlined: true}
+
+  # Source-facing catalog contract for real scheduling constraints.
+  SchedulingPolicyCatalog:
+    description: Authored planner policy catalog for slot preferences, warnings, and presentation.
+    slots: [scheduling_policies, schedule_presentation]
+    slot_usage:
+      scheduling_policies: {required: true, inlined: true, inlined_as_list: false}
+      schedule_presentation: {required: true, inlined: true}
+
+  SchedulingPolicyRecord:
+    slots: [id, term, applies_when, effects, warning, action]
+    slot_usage:
+      id: {required: true}
+      term: {required: true}
+      applies_when: {required: true}
+      effects: {required: true, range: SchedulingPolicyEffectRecord, inlined: true, inlined_as_list: true}
+      warning: {required: true}
+      action: {range: string, inlined: false}
+
+  SchedulingPolicyEffectRecord:
+    slots: [match, level]
+    slot_usage:
+      match: {required: true, inlined: true}
+      level: {required: true}
+
+  SchedulingPolicyEffectMatch:
+    slots: [near, food]
+
+  SchedulePresentationPolicy:
+    slots: [concern_annotations, review_tags, active_fact_index, zero_effect]
+    slot_usage:
+      concern_annotations: {required: true, inlined: true}
+      review_tags: {required: true, inlined: true}
+      active_fact_index: {required: true, inlined: true}
+      zero_effect: {required: true, inlined: true}
+
+  SchedulePresentationZeroEffect:
+    description: Authored explanation for a placement with no non-zero scheduling effect.
+    slots: [condition, template]
+    slot_usage:
+      condition: {required: true, range: string}
+      template: {required: true, range: string}
+
+  SchedulePresentationConcernAnnotations:
+    slots: [include_kinds, labels]
+    slot_usage:
+      include_kinds: {required: true, multivalued: true}
+      labels: {required: true, multivalued: true, inlined: true, inlined_as_list: true}
+
+  SchedulePresentationLabel:
+    slots: [key, label]
+    slot_usage:
+      key: {required: true}
+      label: {required: true}
+
+  SchedulePresentationReviewTags:
+    slots: [include_namespaces, exclude_policy_ids]
+
+  SchedulePresentationActiveFactIndex:
+    slots: [include_namespaces, labels]
+    slot_usage:
+      labels: {required: true, multivalued: true, inlined: true, inlined_as_list: true}
+
+  SchedulingConstraintCatalog:
+    slots: [scheduling_constraints]
+
+  SchedulingConstraintRecord:
+    slots:
+      - id
+      - operation
+      - source_selector
+      - target_selector
+      - rationale
+      - action
+      - blocks_slots
+      - scores_advisory
+      - score_delta
+    slot_usage:
+      operation: {required: true}
+      source_selector:
+        required: true
+        range: SchedulingConstraintSelector
+        multivalued: false
+        inlined: true
+      target_selector:
+        required: true
+        range: SchedulingConstraintSelector
+        multivalued: false
+        inlined: true
+      rationale: {required: true}
+      action:
+        required: true
+        range: string
+        multivalued: false
+        inlined: false
+      blocks_slots: {range: boolean, required: false}
+      scores_advisory: {range: boolean, required: false}
+      score_delta: {range: integer, required: false}
+
+  SchedulingConstraintSelector:
+    slots: [entity, category, term, scope]
+    exactly_one_of:
+      - slot_conditions:
+          entity: {required: true}
+          category: {maximum_cardinality: 0}
+          term: {maximum_cardinality: 0}
+      - slot_conditions:
+          entity: {maximum_cardinality: 0}
+          category: {required: true}
+          term: {required: true}
+          scope: {maximum_cardinality: 0}
+    slot_usage:
+      entity:
+        range: SchedulingConstraintEntitySelector
+        multivalued: false
+        inlined: true
+      category: {range: string, required: false}
+      term: {range: string, required: false}
+      scope: {range: SchedulingConstraintScope, required: false}
+
+  SchedulingConstraintEntitySelector:
+    description: Stable identity selector used by executable scheduling constraints.
+    slots: [entity_id, name]
+    exactly_one_of:
+      - slot_conditions:
+          entity_id: {required: true}
+          name: {maximum_cardinality: 0}
+      - slot_conditions:
+          entity_id: {maximum_cardinality: 0}
+          name: {required: true}
+    slot_usage:
+      entity_id: {required: false, range: Substance, pattern: '\S'}
+      name: {required: false, pattern: '\S'}
+
+slots:
+  id: {identifier: true, required: true}
+  key:
+  effect:
+  label:
+  description:
+  value:
+  axis:
+  effects: {multivalued: true}
+  subject: {range: Selector, inlined: false}
+  constraints: {multivalued: true, range: SchedulingConstraint, inlined: false}
+  condition: {range: Condition, inlined: true}
+  action:
+  operation: {range: ConstraintExecutionOperation}
+  entity:
+    range: SchedulingConstraintEntitySelector
+    inlined: true
+  category:
+    range: string
+  term:
+  scope:
+  name:
+  expression:
+  weight: {range: decimal}
+  rationale:
+  precedence: {range: integer}
+  scheduling_constraints:
+    multivalued: true
+    range: SchedulingConstraintRecord
+    inlined: true
+    inlined_as_list: false
+  scheduling_policies:
+    multivalued: true
+    range: SchedulingPolicyRecord
+    inlined: true
+    inlined_as_list: false
+  schedule_presentation:
+    range: SchedulePresentationPolicy
+    inlined: true
+  applies_when:
+    range: string
+  warning:
+    range: boolean
+  match:
+    range: SchedulingPolicyEffectMatch
+    inlined: true
+  review_tags:
+    range: SchedulePresentationReviewTags
+
+  concern_annotations:
+    range: SchedulePresentationConcernAnnotations
+    inlined: true
+  active_fact_index:
+    range: SchedulePresentationActiveFactIndex
+    inlined: true
+  zero_effect:
+    range: SchedulePresentationZeroEffect
+    inlined: true
+  template:
+  include_namespaces:
+    multivalued: true
+  include_kinds:
+    multivalued: true
+  labels:
+    multivalued: true
+    range: SchedulePresentationLabel
+    inlined: true
+    inlined_as_list: true
+  exclude_policy_ids:
+    multivalued: true

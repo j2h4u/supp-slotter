@@ -6,11 +6,20 @@ import contextlib
 import io as _io
 import sys
 from dataclasses import dataclass
+from functools import cache
 from pathlib import Path
 
-__all__ = ["RunResult", "run_planner"]
+from planner.ontology.artifacts import OntologyBundle, load_ontology
+
+__all__ = ["RunResult", "ontology_bundle", "run_planner"]
 
 _HELP_ONLY_ROOT = Path("/__supp_slotter_help_only_no_data_root__")
+_ROOT = Path(__file__).resolve().parents[1]
+
+
+@cache
+def ontology_bundle() -> OntologyBundle:
+    return load_ontology(_ROOT / "ontology")
 
 
 @dataclass

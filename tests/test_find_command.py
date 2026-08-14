@@ -19,17 +19,17 @@ def _write_find_fixture(tmp_path: Path) -> None:
                 "prd_glycine000": {"stack": "inactive"},
             },
             products={
-                "prd_magnesium1": [("sub_magnesium1", ["timing:wake"])],
-                "prd_citrulline": [("sub_citrulline", ["activity:workout"])],
-                "prd_glycine000": [("sub_glycine000", ["timing:wake"])],
+                "prd_magnesium1": [("sub_magnesium1", ["timing:energy_like"])],
+                "prd_citrulline": [("sub_citrulline", ["schedule.activity:any_workout"])],
+                "prd_glycine000": [("sub_glycine000", ["timing:energy_like"])],
             },
             traits={
-                "timing:wake": {
-                    "label": "Wake",
-                    "description": "Fixture wake timing.",
+                "timing:energy_like": {
+                    "label": "Energy-like",
+                    "description": "Fixture energy-like timing.",
                     "applies_when": "Fixture only.",
                 },
-                "activity:workout": {
+                "schedule.activity:any_workout": {
                     "label": "Workout",
                     "description": "Fixture workout activity.",
                     "applies_when": "Fixture only.",
@@ -49,10 +49,15 @@ def _write_find_fixture(tmp_path: Path) -> None:
     magnesium_product = cast(dict[str, object], yaml.safe_load(magnesium_product_path.read_text()))
     magnesium_product["name"] = "Magnesium Bisglycinate"
     magnesium_product["brand"] = "Fixture Brand"
+    magnesium_components = cast(list[dict[str, object]], magnesium_product["components"])
+    magnesium_components[0]["label"] = "Magnesium bisglycinate, 200 mg elemental magnesium"
+    magnesium_components[0]["amount"] = "2 capsules"
     magnesium_product_path.write_text(yaml.safe_dump(magnesium_product, sort_keys=False))
 
     citrulline_path = find_card_path_by_id(data_dir / "substances", "sub_citrulline")
     citrulline = cast(dict[str, object], yaml.safe_load(citrulline_path.read_text()))
+    assert citrulline["schedule"] == {"activity": ["any_workout"]}
+    assert "schedule.activity" not in cast(dict[str, object], citrulline.get("knowledge", {}))
     citrulline["name"] = "L-Citrulline"
     citrulline["form"] = "malate"
     citrulline_path.write_text(yaml.safe_dump(citrulline, sort_keys=False))
@@ -77,6 +82,7 @@ def test_find_searches_multiple_fuzzy_words(tmp_path: Path) -> None:
     product_names = [label for _score, _card_id, label, _path in result.products]
     assert "Magnesium (bisglycinate)" in substance_names
     assert "Fixture Brand - Magnesium Bisglycinate" in product_names
+    assert all("200 mg" not in label and "2 capsules" not in label for label in product_names)
     magnesium_idx = substance_names.index("Magnesium (bisglycinate)")
     assert "Magnesium Glycine" in substance_names
     glycine_idx = substance_names.index("Magnesium Glycine")

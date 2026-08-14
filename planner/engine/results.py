@@ -50,6 +50,26 @@ class ReviewResult:
 
 
 @dataclass(frozen=True)
+class GroomingCandidate:
+    id: str
+    name: str
+    path: Path
+    total_product_count: int
+    active_product_count: int
+
+
+@dataclass(frozen=True)
+class GroomingResult:
+    exit_code: int
+    candidates: list[GroomingCandidate]
+    limit: int
+    total_remaining: int
+    shown: int
+    output: str = ""
+    stderr: str = ""
+
+
+@dataclass(frozen=True)
 class ShowResult:
     exit_code: int
     output: str = ""
