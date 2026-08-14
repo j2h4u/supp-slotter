@@ -106,6 +106,7 @@ ONTOLOGY_CONTRACT_GROUPS: tuple[tuple[str, tuple[SuiteTarget, ...]], ...] = (
             Path("tests/test_ontology_assertion_runtime.py"),
             Path("tests/test_ontology_repository_projection.py"),
             Path("tests/test_ontology_runtime_loader.py"),
+            Path("tests/test_ontology_presentation_cache.py"),
             Path("tests/test_ontology_shacl_fixtures.py"),
             Path("tests/test_yaml_duplicate_keys.py"),
         ),
