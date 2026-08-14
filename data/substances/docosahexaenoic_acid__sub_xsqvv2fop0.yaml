@@ -1,36 +1,23 @@
 id: sub_xsqvv2fop0
 name: Docosahexaenoic acid
-semantic_enrichment_attempted_on: '2026-08-13'
 aliases:
 - DHA
-notes: 'Omega-3 fatty acid component listed as DHA on Nature''s Truth Antarctic Krill Oil. Meal effects are formulation- and dose-dependent; no product-independent meal rule is established for the active low-dose krill reference. Source: Nature''s Truth/iHerb product label.'
-scheduling_assessment:
+notes: 'Omega-3 fatty acid component listed as DHA on Nature''s Truth Antarctic Krill
+  Oil. Source: Nature''s Truth/iHerb product label.'
+schedule:
   intake:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/30799231/
-    - https://pubmed.ncbi.nlm.nih.gov/26328782/
-    summary: Food effects vary by omega-3 chemical form, carrier, and product; bidirectional/formulation-sensitive evidence is insufficient for a universal meal preference for this low-dose krill reference.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/30799231/
-    - https://pubmed.ncbi.nlm.nih.gov/26328782/
-    summary: No comparative clock-time rule was demonstrated for DHA, and the form/carrier and dose do not support transferring a clock preference.
+  - fat_meal_required
 knowledge:
-  context:
-  - skin_support
-  - vascular_health
+  is:
+  - fat_soluble
+  - omega3
   effect:
   - platelet_aggregation_modulation
-  kind:
-  - omega3
-  pathway:
-  - omega3_eicosanoid
-  quality:
-  - fat_soluble
   risk:
   - manual_review
   - bleeding_med_interaction
+  context:
+  - skin_support
+  - vascular_health
+  pathway:
+  - omega3_eicosanoid

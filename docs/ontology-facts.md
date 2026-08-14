@@ -14,7 +14,7 @@ Preferred modeling order:
 
 1. Use existing substance cards when possible.
 2. Use `data/relations.yaml` when a fact is substance-to-substance.
-3. Use reviewer facts (`knowledge.kind`, `knowledge.effect`, `knowledge.risk`,
+3. Use reviewer facts (`knowledge.is`, `knowledge.effect`, `knowledge.risk`,
    `knowledge.pathway`) when the fact is reusable across cards or dashboard
    projections.
 4. Use scheduling traits only when the planner needs a reusable slot-placement
@@ -26,14 +26,14 @@ Preferred modeling order:
 
 | Fact | Current fit | Next useful action |
 |---|---|---|
-| Calcium and magnesium separation is dose-dependent. | A slot-blocking scheduling constraint would overstate the rule without a dose model; notes or `review_with` are safer unless typical-dose co-slotting should be blocked. | Keep thresholds in relation `reason` or notes. Add dose modeling only if scheduler decisions need reliable product amounts. |
+| Calcium and magnesium separation is dose-dependent. | `competes` would overstate the rule without a dose model; notes or `review_with` are safer unless typical-dose co-slotting should be blocked. | Keep thresholds in relation `reason` or notes. Add dose modeling only if scheduler decisions need reliable product amounts. |
 | Metformin may matter for lactate/exercise-tolerance review. | The B12-status relation is already modeled; broader medication-performance context is not first-class. | Keep broader context in private user notes or `concerns` until repeated cases need structure. |
 
 ## Current Boundaries
 
 - Dose thresholds may be documented in `reason`, `action`, notes, or
   `concerns`; the planner does not calculate dose, ratio, or adequacy.
-- Use slot-blocking scheduling constraints only when co-slotting should be avoided at typical doses.
+- Use `competes` only when co-slotting should be avoided at typical doses.
 - Use `supports` when absence of the supporter should produce a useful review
   warning.
 - Use `review_with` for pairings that should produce a schedule warning when
@@ -46,7 +46,7 @@ Preferred modeling order:
   generic supplement-knowledge bucket.
 - Treat goal dashboards as candidate-comparison surfaces, not as proof of
   coverage, adequacy, safety, or recommendation.
-- Prefer dashboard membership from reusable semantic facts (`kind:`, `effect:`,
+- Prefer dashboard membership from reusable semantic facts (`is:`, `effect:`,
   `risk:`, `pathway:`). Use `knowledge.context: <slug>` only for explicit
   curated membership.
 - Keep proprietary blends, excipients, and non-specific label lines in product

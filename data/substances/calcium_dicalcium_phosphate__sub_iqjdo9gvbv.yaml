@@ -1,40 +1,20 @@
 id: sub_iqjdo9gvbv
 name: Calcium
 form: dicalcium phosphate
-semantic_enrichment_attempted_on: '2026-08-13'
-notes: Dicalcium phosphate component from the TiM Electrolyte Caps label; TiM's 24 mg total calcium is split across dicalcium phosphate and calcium lactate, with per-source contribution unresolved. Calcium supports bone/tooth mineral structure and
-  mediates muscle function, blood clotting, nerve transmission, vascular contraction/dilation, and hormone secretion; vitamin
-  D supports active calcium absorption.
+notes: Dicalcium phosphate component from the TiM Electrolyte Caps label. Calcium
+  supports bone/tooth mineral structure and mediates muscle function, blood clotting,
+  nerve transmission, vascular contraction/dilation, and hormone secretion; vitamin D
+  supports active calcium absorption.
 schedule:
   intake:
   - food_preferred
-scheduling_assessment:
-  intake:
-    conclusion: supports_preference
-    policy: food_preferred
-    sources:
-    - https://ods.od.nih.gov/factsheets/calcium-HealthProfessional/
-    - https://ods.od.nih.gov/factsheets/Calcium-Consumer/
-    summary: 'Low-confidence soft food heuristic: general calcium guidance plus the relative insolubility/gastric-dissolution rationale makes food a coherent practical preference for dicalcium phosphate, but no direct controlled comparison exists for this exact low-dose component and TiM''s 24 mg calcium pool is split across dicalcium phosphate and lactate with source contributions unresolved.'
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/calcium-HealthProfessional/
-    - https://ods.od.nih.gov/factsheets/Calcium-Consumer/
-    summary: No comparative morning or evening rule was demonstrated for calcium.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/calcium-HealthProfessional/
-    summary: The active electrolyte product is in training, but evidence does not establish pre-, during-, or post-workout calcium placement.
 knowledge:
-  context:
-  - workout_performance
+  is:
+  - electrolyte
+  - mineral
   effect:
   - bone_mineral_metabolism_support
-  kind:
-  - mineral
+  context:
+  - workout_performance
   pathway:
   - vitamin_d_calcium_axis
-  quality:
-  - electrolyte

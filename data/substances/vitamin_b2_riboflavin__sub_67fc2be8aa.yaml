@@ -1,37 +1,20 @@
 id: sub_67fc2be8aa
 name: Vitamin B2
 form: riboflavin
-semantic_enrichment_attempted_on: '2026-08-13'
-notes: "Coenzyme B-Complex component: riboflavin-5-phosphate active B2 form. Human oral-absorption evidence supports a soft food preference for free riboflavin and FMN/riboflavin-5'-phosphate. Direct sources: https://doi.org/10.1002/jps.2600550305, https://doi.org/10.1002/jps.2600560112, https://www.ncbi.nlm.nih.gov/books/NBK114322/, https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/"
+notes: 'Coenzyme B-Complex component: riboflavin-5-phosphate active B2 form. Review
+  context: riboflavin-derived FMN/FAD support energy production, cellular function,
+  and metabolism of fats, drugs, and steroids.'
 schedule:
   intake:
   - food_preferred
-scheduling_assessment:
-  intake:
-    conclusion: supports_preference
-    policy: food_preferred
-    sources:
-    - https://doi.org/10.1002/jps.2600550305
-    - https://doi.org/10.1002/jps.2600560112
-    - https://www.ncbi.nlm.nih.gov/books/NBK114322/
-    - https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/
-    summary: Human fed and meal-absorption evidence supports a soft food preference for free riboflavin and FMN/riboflavin-5'-phosphate.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://doi.org/10.1002/jps.2600550305
-    - https://doi.org/10.1002/jps.2600560112
-    - https://www.ncbi.nlm.nih.gov/books/NBK114322/
-    - https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/
-    summary: No general clock-time rule was demonstrated for riboflavin supplementation.
 knowledge:
-  context:
-  - mitochondrial_health
+  is:
+  - vitamin
   effect:
   - cellular_function_support
   - nutrient_metabolism_support
-  kind:
-  - vitamin
+  context:
+  - mitochondrial_health
   pathway:
   - flavin_redox
   - methylation_cycle

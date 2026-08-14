@@ -1,1 +1,0 @@
-"""Canonical executable ontology support."""

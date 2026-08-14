@@ -1,317 +1,237 @@
-"""Canonical typed-selector relation loading and validation."""
+"""Substance-to-substance relations: YAML loader, raw-data validator, and dataclass-side helpers.
+
+Query/matching logic lives behind `planner.query_model`, which loads these
+Relation dataclasses into an in-memory SurrealDB read model once per command.
+The functions here stay Python because they operate on raw YAML before the read
+model is constructed.
+"""
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+import sys
+from collections.abc import Collection
 from pathlib import Path
 from typing import Literal, NamedTuple, cast
 
-from planner.contracts import CardLoadError, Relation, RelationSelector, RelationType, Severity, Substance
-from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.selector import (
-    RelationTypeContract,
-    hydrate_selector,
-    load_relation_type_contracts,
-    resolve_selector,
-    selector_identity_key,
-    validate_relation_selector_form,
-)
+from planner.cards.substance import substance_names
+from planner.contracts import Relation, RelationType, Severity, Substance, TraitDef
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue, load_yaml
 
-
-class _ValidationContext(NamedTuple):
-    substances: Mapping[str, Substance]
-    relation_types: Mapping[str, RelationTypeContract]
+RelationSide = Literal["source", "target"]
 
 
-class _SelectorContext(NamedTuple):
-    substances: Mapping[str, Substance]
-    bundle: OntologyBundle
+class _RelationValidationContext(NamedTuple):
+    relations_file: Path
+    names: set[str]
+    substances: dict[str, Substance]
+    trait_defs: dict[str, TraitDef]
+    registered_classes: set[str]
 
 
-def load_global_relations(
-    paths: Paths,
-    bundle: OntologyBundle,
-    substances: Mapping[str, Substance],
-) -> list[Relation]:
-    """Load authored ontology relations without endpoint aliases or fallback decoding."""
-    # Relation endpoint identity is checked against the complete card registry,
-    # not the active stack.  Every caller must supply that registry explicitly.
-    data = load_yaml(paths.relations_file)
+def load_global_relations(paths: Paths) -> list[Relation]:
+    """Read data/relations.yaml and return the flat list of Relation dataclasses.
+
+    Silently returns [] when the file is absent or has a non-mapping top level
+    (with a stderr warning in the latter case); schema-level validation belongs
+    in `check_global_relations`, which runs before any caller relies on this.
+    """
+    relations_file = paths.relations_file
+    if not relations_file.exists():
+        return []
+    data = load_yaml(relations_file)
     if not isinstance(data, dict):
-        raise CardLoadError(paths.relations_file, f"{paths.relations_file}: relations top-level must be a mapping")
-    result: list[Relation] = []
-    if "relations" not in data:
-        raise CardLoadError(paths.relations_file, f"{paths.relations_file}: missing required field 'relations'")
-    entries = data["relations"]
-    if not isinstance(entries, list):
-        raise CardLoadError(paths.relations_file, f"{paths.relations_file}: relations must be a list")
-    relation_types = load_relation_type_contracts(bundle)
-    selector_context = _SelectorContext(substances, bundle)
-    seen_directionless: dict[tuple[str, frozenset[str]], int] = {}
-    for index, raw_entry in enumerate(entries):
-        path = f"{paths.relations_file}: relations[{index}]"
-        entry = _validated_relation_entry(raw_entry, paths.relations_file, path)
-        relation_type = entry.get("relation_type")
-        if not isinstance(relation_type, str) or relation_type not in relation_types:
-            raise CardLoadError(
-                paths.relations_file,
-                f"{path}.relation_type {relation_type!r} is not in ontology relation_types",
-            )
-        typed_relation = _relation_from_mapping(
-            cast(RelationType, relation_type),
-            entry,
-            paths.relations_file,
-            index,
-            selector_context,
-            relation_types[relation_type],
+        print(
+            f"warning: {relations_file}: expected mapping, got {type(data).__name__}; ignoring relation-based warnings",
+            file=sys.stderr,
         )
-        _validate_direction_usage(
-            typed_relation,
-            relation_types[relation_type],
-            substances,
-            bundle,
-            seen_directionless,
-            index,
-            paths.relations_file,
-        )
-        result.append(typed_relation)
-    errors = schema_errors(data, "relations", paths.relations_file, bundle)
-    if errors:
-        raise CardLoadError(paths.relations_file, errors[0])
-    return result
-
-
-def _validated_relation_entry(raw: object, path: Path, label: str) -> dict[str, object]:
-    if not isinstance(raw, dict):
-        raise CardLoadError(path, f"{label} must be a mapping")
-    entry = cast(dict[str, object], raw)
-    required = ("id", "relation_type", "source_selector", "target_selector", "reason")
-    missing = tuple(field for field in required if field not in entry)
-    if missing:
-        raise CardLoadError(path, f"{label} missing required field(s): {', '.join(missing)}")
-    for field in ("id", "reason"):
-        value = entry[field]
-        if not isinstance(value, str) or not value.strip():
-            raise CardLoadError(path, f"{label}.{field} must be a non-empty string")
-    for field in ("action", "severity", "assertion_kind", "semantic_family"):
-        value = entry.get(field)
-        if value is not None and (not isinstance(value, str) or not value.strip()):
-            raise CardLoadError(path, f"{label}.{field} must be a non-empty string when present")
-    return entry
-
-
-def _relation_from_mapping(  # noqa: PLR0913, PLR0917
-    relation_type: RelationType,
-    relation: dict[str, object],
-    path: Path,
-    index: int,
-    selector_context: _SelectorContext,
-    contract: RelationTypeContract,
-) -> Relation:
-    source = _selector_from_mapping(
-        relation.get("source_selector"),
-        path,
-        f"relations[{index}].source_selector",
-        selector_context.substances,
-        selector_context.bundle,
-    )
-    target = _selector_from_mapping(
-        relation.get("target_selector"),
-        path,
-        f"relations[{index}].target_selector",
-        selector_context.substances,
-        selector_context.bundle,
-    )
-    validate_relation_selector_form(
-        source,
-        contract=contract,
-        side="source",
-        path=path,
-        label=f"relations[{index}].source_selector",
-    )
-    validate_relation_selector_form(
-        target,
-        contract=contract,
-        side="target",
-        path=path,
-        label=f"relations[{index}].target_selector",
-    )
-    return Relation(
-        id=cast(str, relation.get("id", "")),
-        type=relation_type,
-        reason=cast(str, relation.get("reason", "")),
-        source_selector=source,
-        target_selector=target,
-        action=_optional_str(relation.get("action")),
-        severity=cast(Severity | None, relation.get("severity")),
-        assertion_kind=_optional_str(relation.get("assertion_kind")),
-        semantic_family=_optional_str(relation.get("semantic_family")),
-    )
-
-
-def _selector_from_mapping(
-    raw: object,
-    path: Path,
-    label: str,
-    substances: Mapping[str, Substance],
-    bundle: OntologyBundle,
-) -> RelationSelector:
-    selector = hydrate_selector(
-        raw,
-        path=path,
-        label=label,
-        allow_entity_name=True,
-    )
-    resolution = resolve_selector(selector, substances, bundle)
-    if resolution.outcome not in {"resolved", "empty"}:
-        raise CardLoadError(path, _selector_resolution_error(selector, label, resolution.outcome))
-    return selector
-
-
-def _selector_resolution_error(selector: RelationSelector, label: str, outcome: str) -> str:
-    if selector.entity_id is not None:
-        return f"{label}.entity.entity_id '{selector.entity_id}' has no matching substance card"
-    if selector.entity_name is not None:
-        return f"{label}.entity.name '{selector.entity_name}' has no matching substance name"
-    if selector.category is not None and selector.term is not None:
-        return f"{label} term '{selector.category}:{selector.term}' is not in canonical ontology vocabulary"
-    return f"{label} cannot resolve selector ({outcome})"
+        return []
+    data_dict = cast(dict[str, object], data)
+    relations: list[Relation] = []
+    for relation_type in ("balance", "supports", "competes", "review_with"):
+        relation_items = data_dict.get(relation_type)
+        if not isinstance(relation_items, list):
+            continue
+        relation_items_list = cast(list[object], relation_items)
+        for relation_raw in relation_items_list:
+            if not isinstance(relation_raw, dict):
+                continue
+            relation = cast(dict[str, object], relation_raw)
+            relations.append(_relation_from_mapping(relation_type, relation))
+    return relations
 
 
 def _optional_str(value: object) -> str | None:
     return value if isinstance(value, str) else None
 
 
-def check_global_relations(  # noqa: C901
-    relations_data: YamlValue, substances: dict[str, Substance], paths: Paths, bundle: OntologyBundle
+def _relation_from_mapping(relation_type: RelationType, relation: dict[str, object]) -> Relation:
+    reason = relation.get("reason")
+    return Relation(
+        type=relation_type,
+        reason=reason if isinstance(reason, str) else "",
+        source_substance=_optional_str(relation.get("source_substance")),
+        target_substance=_optional_str(relation.get("target_substance")),
+        source_name=_optional_str(relation.get("source_name")),
+        target_name=_optional_str(relation.get("target_name")),
+        source_trait=_optional_str(relation.get("source_trait")),
+        target_trait=_optional_str(relation.get("target_trait")),
+        source_class=_optional_str(relation.get("source_class")),
+        target_class=_optional_str(relation.get("target_class")),
+        action=_optional_str(relation.get("action")),
+        severity=cast(Severity | None, relation.get("severity")),
+    )
+
+
+def check_global_relations(
+    relations_data: YamlValue,
+    substances: dict[str, Substance],
+    trait_defs: dict[str, TraitDef],
+    paths: Paths,
 ) -> list[str]:
-    """Validate selector shape and every entity/term reference against canonical vocabulary."""
-    errors = schema_errors(relations_data, "relations", paths.relations_file, bundle)
+    """Validate relations.yaml against schema and reference integrity.
+
+    Runs before read-model construction — operates on raw YAML data so that
+    schema-broken files can be reported before any downstream loader fires.
+
+    Class endpoints (`source_class` / `target_class`) are checked against the
+    registered `is:` namespace in the trait registry. A misspelled class slug would
+    otherwise pass JSON Schema (it's any lowercase identifier) but never match
+    in `slot_is_blocked` — silent failure.
+    """
+    relations_file = paths.relations_file
+    errors: list[str] = []
+    errors.extend(schema_errors(relations_data, "relations", relations_file))
     if errors or not isinstance(relations_data, dict):
         return errors
-    relation_types = load_relation_type_contracts(bundle)
-    context = _ValidationContext(substances, relation_types)
-    entries = relations_data.get("relations")
-    if "relations" not in relations_data:
-        errors.append(f"{paths.relations_file}: missing required field 'relations'")
-        return errors
-    if not isinstance(entries, list):
-        errors.append(f"{paths.relations_file}: relations must be a list")
-        return errors
-    seen_directionless: dict[tuple[str, frozenset[str]], int] = {}
-    for index, raw in enumerate(entries):
-        if not isinstance(raw, dict):
-            errors.append(f"{paths.relations_file}: relations[{index}] must be a mapping")
+
+    relations_dict = cast(dict[str, object], relations_data)
+    context = _RelationValidationContext(
+        relations_file=relations_file,
+        names=substance_names(substances),
+        substances=substances,
+        trait_defs=trait_defs,
+        registered_classes={td.short_name for td in trait_defs.values() if td.namespace == "is"},
+    )
+    return [*errors, *_relation_reference_errors(relations_dict, context)]
+
+
+def _relation_reference_errors(
+    relations_dict: dict[str, object],
+    context: _RelationValidationContext,
+) -> list[str]:
+    errors: list[str] = []
+    for relation_type in ("balance", "supports", "competes", "review_with"):
+        relation_items = relations_dict.get(relation_type) or []
+        if not isinstance(relation_items, list):
             continue
-        relation = cast(dict[str, object], raw)
-        path = f"{paths.relations_file}: relations[{index}]"
-        relation_type = relation.get("relation_type")
-        contract = relation_types.get(relation_type) if isinstance(relation_type, str) else None
-        if contract is None:
-            errors.append(f"{path}.relation_type {relation_type!r} is not in ontology relation_types")
-        for side in ("source", "target"):
-            errors.extend(
-                _selector_errors(
-                    relation.get(f"{side}_selector"),
-                    side,
-                    path,
-                    context,
-                    bundle,
-                    contract,
-                )
-            )
-        if contract is not None and not contract.directional:
-            try:
-                source = _selector_from_mapping(
-                    relation.get("source_selector"),
-                    Path(path),
-                    f"{path}.source_selector",
-                    context.substances,
-                    bundle,
-                )
-                target = _selector_from_mapping(
-                    relation.get("target_selector"),
-                    Path(path),
-                    f"{path}.target_selector",
-                    context.substances,
-                    bundle,
-                )
-            except CardLoadError:
+        relation_items_list = cast(list[object], relation_items)
+        for index, relation_raw in enumerate(relation_items_list):
+            if not isinstance(relation_raw, dict):
                 continue
-            key = (
-                contract.id,
-                frozenset((
-                    _selector_identity_key(source, context.substances, bundle),
-                    _selector_identity_key(target, context.substances, bundle),
-                )),
-            )
-            previous = seen_directionless.get(key)
-            if previous is not None:
-                errors.append(
-                    f"{path} uses direction for non-directional relation type {contract.id!r}; "
-                    f"its endpoints duplicate the unordered relation at relations[{previous}]"
-                )
-            else:
-                seen_directionless[key] = index
+            errors.extend(_relation_item_errors(cast(dict[str, object], relation_raw), relation_type, index, context))
     return errors
 
 
-def _selector_errors(  # noqa: PLR0913, PLR0917
-    raw: object,
-    side: str,
-    path: str,
-    context: _ValidationContext,
-    bundle: OntologyBundle,
-    contract: RelationTypeContract | None,
-) -> list[str]:
-    label = f"{path}.{side}_selector"
-    try:
-        selector = _selector_from_mapping(raw, Path(path), label, context.substances, bundle)
-        if contract is not None:
-            validate_relation_selector_form(
-                selector,
-                contract=contract,
-                side=cast("Literal['source', 'target']", side),
-                path=Path(path),
-                label=label,
-            )
-    except CardLoadError as error:
-        return [error.message]
-    return []
-
-
-def _validate_direction_usage(  # noqa: PLR0913, PLR0917
-    relation: Relation,
-    contract: RelationTypeContract,
-    substances: Mapping[str, Substance],
-    bundle: OntologyBundle,
-    seen_directionless: dict[tuple[str, frozenset[str]], int],
+def _relation_item_errors(
+    relation: dict[str, object],
+    relation_type: str,
     index: int,
-    path: Path,
+    context: _RelationValidationContext,
+) -> list[str]:
+    path = f"{context.relations_file}: {relation_type}[{index}]"
+    errors = _endpoint_reference_errors(relation, path, context)
+    has_class_endpoint = relation.get("source_class") is not None or relation.get("target_class") is not None
+    if has_class_endpoint and relation_type != "competes":
+        errors.append(f"{path}: source_class/target_class endpoints are only supported for competes relations")
+
+    source_key = _endpoint_key(relation, "source")
+    target_key = _endpoint_key(relation, "target")
+    if source_key is not None and source_key == target_key:
+        errors.append(f"{path} references the same source and target")
+    return errors
+
+
+def _endpoint_reference_errors(
+    relation: dict[str, object],
+    path: str,
+    context: _RelationValidationContext,
+) -> list[str]:
+    errors: list[str] = []
+    _append_missing_reference_error(
+        errors,
+        relation.get("source_name"),
+        context.names,
+        f"{path}.source_name",
+        "has no matching substance name",
+    )
+    _append_missing_reference_error(
+        errors,
+        relation.get("target_name"),
+        context.names,
+        f"{path}.target_name",
+        "has no matching substance name",
+    )
+    _append_missing_reference_error(
+        errors,
+        relation.get("source_substance"),
+        context.substances,
+        f"{path}.source_substance",
+        "has no matching substance card",
+    )
+    _append_missing_reference_error(
+        errors,
+        relation.get("target_substance"),
+        context.substances,
+        f"{path}.target_substance",
+        "has no matching substance card",
+    )
+    _append_missing_reference_error(
+        errors,
+        relation.get("source_trait"),
+        context.trait_defs,
+        f"{path}.source_trait",
+        "is not a registered trait in data/traits/",
+    )
+    _append_missing_reference_error(
+        errors,
+        relation.get("target_trait"),
+        context.trait_defs,
+        f"{path}.target_trait",
+        "is not a registered trait in data/traits/",
+    )
+    _append_missing_reference_error(
+        errors,
+        relation.get("source_class"),
+        context.registered_classes,
+        f"{path}.source_class",
+        "is not a registered is: trait in data/traits/",
+    )
+    _append_missing_reference_error(
+        errors,
+        relation.get("target_class"),
+        context.registered_classes,
+        f"{path}.target_class",
+        "is not a registered is: trait in data/traits/",
+    )
+    return errors
+
+
+def _append_missing_reference_error(
+    errors: list[str],
+    value: object,
+    known_values: Collection[str],
+    label: str,
+    missing_text: str,
 ) -> None:
-    """Reject reversed duplicates where the authored type is directionless."""
-
-    if contract.directional:
-        return
-    source_key = _selector_identity_key(relation.source_selector, substances, bundle)
-    target_key = _selector_identity_key(relation.target_selector, substances, bundle)
-    key = (contract.id, frozenset((source_key, target_key)))
-    previous = seen_directionless.get(key)
-    if previous is not None:
-        raise CardLoadError(
-            path,
-            f"relations[{index}] uses direction for non-directional relation type {contract.id!r}; "
-            f"its endpoints duplicate the unordered relation at relations[{previous}]",
-        )
-    seen_directionless[key] = index
+    if isinstance(value, str) and value not in known_values:
+        errors.append(f"{label} '{value}' {missing_text}")
 
 
-def _selector_identity_key(
-    selector: RelationSelector,
-    substances: Mapping[str, Substance],
-    bundle: OntologyBundle,
-) -> str:
-    return selector_identity_key(selector, substances, bundle)
+def _endpoint_key(relation: dict[str, object], side: RelationSide) -> str | None:
+    for suffix in ("substance", "name", "trait", "class"):
+        value = relation.get(f"{side}_{suffix}")
+        if isinstance(value, str):
+            return value
+    return None

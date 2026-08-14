@@ -4,25 +4,23 @@ form: d-alpha tocopheryl succinate
 aliases:
 - alpha-tocopheryl succinate
 - vitamin E succinate
-notes: Esterified fat-soluble vitamin E form used in multivitamin and joint formulations including Animal Flex and Source
-  Naturals Male Response. Review context - vitamin E antioxidant/lipid-peroxidation context; ester form is preserved from
-  the label.
+notes: Esterified fat-soluble vitamin E form used in multivitamin and joint formulations
+  including Animal Flex and Source Naturals Male Response. Review context - vitamin
+  E antioxidant/lipid-peroxidation context; ester form is preserved from the label.
 concerns:
 - kind: safety
-  text: Review cumulative vitamin E dose, anticoagulant/antiplatelet medication context, vitamin K context, and product form
-    before treating this form as routine background antioxidant coverage.
+  text: Review cumulative vitamin E dose, anticoagulant/antiplatelet medication context, vitamin K context, and product form before treating this form as routine background antioxidant coverage.
 schedule:
   intake:
-  - food_preferred
+  - food_required
 knowledge:
-  context:
-  - antioxidant_protection
+  is:
+  - fat_soluble
+  - vitamin
   effect:
   - lipid_antioxidant_support
   - immune_function_support
-  kind:
-  - vitamin
-  quality:
-  - fat_soluble
+  context:
+  - antioxidant_protection
   risk:
   - manual_review

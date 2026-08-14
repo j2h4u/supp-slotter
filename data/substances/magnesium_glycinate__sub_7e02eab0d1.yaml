@@ -1,32 +1,29 @@
 id: sub_7e02eab0d1
 name: Magnesium
 form: glycinate
-semantic_enrichment_attempted_on: '2026-08-13'
 aliases:
 - Magnesium bisglycinate
 - Albion magnesium bisglycinate
-notes: 'Magnesium glycinate component. Formulation and tolerability are product- and dose-dependent; the bounded evidence does not establish categorical high bioavailability, low-laxative, glycine-synergy, or evening-timing claims. Sleep-recovery context is bounded to the cited trial and is not a general timing rule. NIH ODS describes magnesium as a cofactor for energy production, glucose and blood-pressure regulation, muscle/nerve function, calcium/potassium ion transport, normal heart rhythm, and bone structure.'
-scheduling_assessment:
+notes: 'Glycinate форма: высокая биодоступность, низкое слабительное действие. Глицин
+  в составе сам по себе sleep-supportive (synergy с Mg). Типичная доза элементарного
+  Mg 200-400 mg вечером, за 30-60 мин до сна. Severe Mg deficiency can disrupt calcium
+  homeostasis. NIH ODS describes magnesium as a cofactor for energy production,
+  glucose and blood-pressure regulation, muscle/nerve function, calcium/potassium
+  ion transport, normal heart rhythm, and bone structure. Sources: examine.com
+  (Magnesium glycinate); LPI Magnesium; NIH ODS Magnesium.'
+schedule:
   intake:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/40918053/
-    summary: No direct controlled evidence establishes a fed-versus-fasted preference for magnesium glycinate; tolerability and practical meal choice are dose- and product-dependent, with no universal requirement.
+  - food_preferred
   timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/40918053/
-    summary: No comparative evening or clock-time rule was demonstrated; a bounded sleep-recovery trial does not establish a general timing rule.
+  - sleep_support
 knowledge:
-  context:
-  - sleep_recovery
+  is:
+  - electrolyte
+  - mineral
   effect:
   - bone_mineral_metabolism_support
-  kind:
-  - mineral
+  context:
+  - cortisol_reduction
+  - sleep_recovery
   pathway:
   - vitamin_d_calcium_axis
-  quality:
-  - electrolyte

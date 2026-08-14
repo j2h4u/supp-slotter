@@ -6,14 +6,13 @@ from collections.abc import Mapping
 from pathlib import Path
 
 from planner.contracts import CardLoadError, StackEntry
-from planner.ontology.artifacts import OntologyBundle
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import load_yaml
 
 
 def check_stack_alignment(
-    stacks_data: Mapping[str, object], product_ids: dict[str, Path], stacks_file: Path, inactive_stack_name: str
+    stacks_data: Mapping[str, object], product_ids: dict[str, Path], stacks_file: Path
 ) -> tuple[list[str], list[str]]:
     """Verify every stack entry references an existing product card, and warn for product cards not yet added to any stack.
 
@@ -23,12 +22,7 @@ def check_stack_alignment(
     info: list[str] = []
     referenced_products: set[str] = set()
 
-    try:
-        normalized_entries = normalize_stack_entries(stacks_data)
-    except ValueError as e:
-        return [f"{stacks_file}: {e}"], info
-
-    for entry in normalized_entries.values():
+    for entry in normalize_stack_entries(stacks_data).values():
         product_ref = entry.get("product")
         if not isinstance(product_ref, str):
             continue
@@ -44,7 +38,7 @@ def check_stack_alignment(
         if pid not in referenced_products:
             msg = (
                 f"{stacks_file}: product '{pid}' has no stack "
-                f"entry (card at {pf}). Add it to `{inactive_stack_name}` if it is still on "
+                f"entry (card at {pf}). Add it to `inactive` if it is still on "
                 "the shelf; if it is depleted/not owned/reference-only, keep it "
                 "outside stacks intentionally."
             )
@@ -54,13 +48,29 @@ def check_stack_alignment(
     return errors, info
 
 
-def normalize_stack_entries(stacks_data: Mapping[str, object]) -> dict[str, StackEntry]:
-    """Return stack entries, rejecting product IDs assigned to multiple stacks.
+def check_stack_duplicate_items(stacks_data: Mapping[str, object], stacks_file: Path) -> list[str]:
+    errors: list[str] = []
+    seen: dict[str, str] = {}
 
-    The previous mapping projection let later YAML keys overwrite earlier
-    assignments.  That made downstream dashboard and scheduling state depend
-    on source order, so normalization is deliberately fail-closed.
-    """
+    for stack, items in stacks_data.items():
+        if not isinstance(items, list):
+            continue
+        items_list = items
+        for item_id in items_list:
+            if not isinstance(item_id, str):
+                continue
+            previous_stack = seen.get(item_id)
+            if previous_stack is not None:
+                errors.append(
+                    f"{stacks_file}: stack item '{item_id}' appears in multiple stacks: {previous_stack}, {stack}"
+                )
+            else:
+                seen[item_id] = stack
+    return errors
+
+
+def normalize_stack_entries(stacks_data: Mapping[str, object]) -> dict[str, StackEntry]:
+    """Return a flat dict mapping item_id → {product, stack} for all stack items regardless of active/inactive status."""
     normalized: dict[str, StackEntry] = {}
 
     for stack, items in stacks_data.items():
@@ -71,12 +81,6 @@ def normalize_stack_entries(stacks_data: Mapping[str, object]) -> dict[str, Stac
             if not isinstance(entry, str):
                 continue
             product_id = entry
-            previous = normalized.get(product_id)
-            if previous is not None:
-                previous_stack = previous["stack"]
-                if previous_stack != stack:
-                    raise ValueError(f"stack item '{product_id}' appears in multiple stacks: {previous_stack}, {stack}")
-                raise ValueError(f"stack item '{product_id}' appears more than once in stack '{stack}'")
             normalized[product_id] = {"product": product_id, "stack": stack}
     return normalized
 
@@ -84,7 +88,6 @@ def normalize_stack_entries(stacks_data: Mapping[str, object]) -> dict[str, Stac
 def validate_stacks(
     paths: Paths,
     product_ids: dict[str, Path],
-    bundle: OntologyBundle,
 ) -> tuple[list[str], list[str]]:
     """Validate the stacks file.  Returns (errors, info)."""
     stacks_path = paths.stacks_file
@@ -96,12 +99,8 @@ def validate_stacks(
         return [e.message], []
     if not isinstance(stacks_data, dict):
         return [f"{stacks_path}: top-level must be a mapping"], []
-    errors = schema_errors(stacks_data, "stacks", stacks_path, bundle)
-    alignment_errors, alignment_info = check_stack_alignment(
-        stacks_data,
-        product_ids,
-        stacks_path,
-        bundle.runtime_program.glue_contract.inactive_stack_name,
-    )
+    errors = schema_errors(stacks_data, "stacks", stacks_path)
+    errors.extend(check_stack_duplicate_items(stacks_data, stacks_path))
+    alignment_errors, alignment_info = check_stack_alignment(stacks_data, product_ids, stacks_path)
     errors.extend(alignment_errors)
     return errors, alignment_info

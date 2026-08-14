@@ -6,12 +6,11 @@ schedule:
   intake:
   - food_preferred
 knowledge:
-  context:
-  - antioxidant_protection
+  is:
+  - antioxidant
+  - flavonoid
   effect:
   - vascular_polyphenol_context
   - capillary_support_context
-  kind:
-  - flavonoid
-  role:
-  - antioxidant
+  context:
+  - antioxidant_protection

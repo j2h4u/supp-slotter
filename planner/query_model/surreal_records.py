@@ -1,146 +1,82 @@
-"""Canonical ontology projections for the in-memory SurrealDB read model."""
+"""Record builders for the in-memory SurrealDB read model."""
 
 from __future__ import annotations
 
+from typing import cast
+
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
-from planner.contracts import (
-    Dashboard,
-    OntologyAssertion,
-    Product,
-    Relation,
-    RelationSelector,
-    SchedulingConstraint,
-    Substance,
-)
-from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
-from planner.ontology.runtime_program import RuntimeProgram
-from planner.ontology.selector import resolve_selector, selector_capability_form
-from planner.ontology.warning_policy import authored_term_label
-from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
+from planner.contracts import Dashboard, Product, Relation, Substance, TraitDef
 
 
-def substance_record(substance_id: str, substance: Substance, ontology_bundle: OntologyBundle) -> dict[str, object]:
-    return {
+def substance_record(substance_id: str, substance: Substance) -> dict[str, object]:
+    record: dict[str, object] = {
         "id": substance_id,
         "name": substance.name,
-        "knowledge_assertions": [
-            {"knowledge_category": row.category, "knowledge_value": row.value} for row in substance.knowledge_assertions
-        ],
-        "schedule_assertions": [
-            {"schedule_axis": row.axis, "schedule_value": row.value} for row in substance.schedule_assertions
-        ],
-        "term_refs": _substance_term_refs(substance, ontology_bundle),
+        "intake": list(substance.intake),
+        "timing": list(substance.timing),
+        "activity": list(substance.activity),
+        "is_": list(substance.is_),
+        "effect": list(substance.effect),
+        "risk": list(substance.risk),
+        "context": list(substance.context),
+        "pathway": list(substance.pathway),
         "prefer_with": list(substance.prefer_with),
-        **({"form": substance.form} if substance.form is not None else {}),
+        "trait_refs": _substance_trait_refs(substance),
     }
+    if substance.form is not None:
+        record["form"] = substance.form
+    return record
 
 
 def relation_record(
     relation: Relation,
     substances: dict[str, Substance],
-    ontology_bundle: OntologyBundle,
+    trait_defs: dict[str, TraitDef] | None = None,
 ) -> dict[str, object]:
-    runtime_program = ontology_bundle.runtime_program
-    src_ids = list(resolve_selector(relation.source_selector, substances, ontology_bundle).substance_ids)
-    tgt_ids = list(resolve_selector(relation.target_selector, substances, ontology_bundle).substance_ids)
-    return {
-        "id": relation.id,
+    src_ids = _resolve_endpoint_ids(relation, "source", substances)
+    tgt_ids = _resolve_endpoint_ids(relation, "target", substances)
+    src_key, src_display = _endpoint_key_and_display(
+        relation,
+        "source",
+        substances,
+        trait_defs,
+    )
+    tgt_key, tgt_display = _endpoint_key_and_display(
+        relation,
+        "target",
+        substances,
+        trait_defs,
+    )
+    record: dict[str, object] = {
         "type": relation.type,
         "src_substances": src_ids,
         "tgt_substances": tgt_ids,
         "src_member_names": _endpoint_member_names(src_ids, substances),
         "tgt_member_names": _endpoint_member_names(tgt_ids, substances),
-        "src_selector": _selector_record(relation.source_selector, runtime_program),
-        "tgt_selector": _selector_record(relation.target_selector, runtime_program),
-        "src_key": _selector_key(relation.source_selector),
-        "tgt_key": _selector_key(relation.target_selector),
-        "src_display": _selector_display(relation.source_selector, substances, ontology_bundle),
-        "tgt_display": _selector_display(relation.target_selector, substances, ontology_bundle),
+        "src_endpoint_kind": _endpoint_kind(relation, "source"),
+        "tgt_endpoint_kind": _endpoint_kind(relation, "target"),
+        "src_key": src_key,
+        "tgt_key": tgt_key,
+        "src_display": src_display,
+        "tgt_display": tgt_display,
+        "src_substance_raw": relation.source_substance,
+        "src_name_raw": relation.source_name,
+        "src_trait_raw": relation.source_trait,
+        "src_class_raw": relation.source_class,
+        "tgt_substance_raw": relation.target_substance,
+        "tgt_name_raw": relation.target_name,
+        "tgt_trait_raw": relation.target_trait,
+        "tgt_class_raw": relation.target_class,
         "reason": relation.reason,
-        **({"action": relation.action} if relation.action is not None else {}),
-        **({"severity": relation.severity} if relation.severity is not None else {}),
+        "action": relation.action or "",
     }
+    if relation.severity is not None:
+        record["severity"] = relation.severity
+    return record
 
 
-def ontology_assertion_record(
-    assertion: OntologyAssertion,
-    substances: dict[str, Substance],
-    ontology_bundle: OntologyBundle,
-) -> dict[str, object]:
-    runtime_program = ontology_bundle.runtime_program
-    source_resolution = resolve_selector(assertion.source_selector, substances, ontology_bundle)
-    target_resolution = resolve_selector(assertion.target_selector, substances, ontology_bundle)
-    src_ids = list(source_resolution.substance_ids)
-    tgt_ids = list(target_resolution.substance_ids)
-    return {
-        "id": assertion.id,
-        "type": assertion.relation_type,
-        "assertion_kind": assertion.assertion_kind,
-        "semantic_family": assertion.semantic_family,
-        "src_substances": src_ids,
-        "tgt_substances": tgt_ids,
-        "src_selector_resolution": source_resolution.outcome,
-        "tgt_selector_resolution": target_resolution.outcome,
-        "src_member_names": _endpoint_member_names(src_ids, substances),
-        "tgt_member_names": _endpoint_member_names(tgt_ids, substances),
-        "src_selector": _selector_record(assertion.source_selector, runtime_program),
-        "tgt_selector": _selector_record(assertion.target_selector, runtime_program),
-        "src_key": _selector_key(assertion.source_selector),
-        "tgt_key": _selector_key(assertion.target_selector),
-        "src_display": _selector_display(assertion.source_selector, substances, ontology_bundle),
-        "tgt_display": _selector_display(assertion.target_selector, substances, ontology_bundle),
-        "reason": assertion.reason,
-        **({"action": assertion.action} if assertion.action is not None else {}),
-        **({"severity": assertion.severity} if assertion.severity is not None else {}),
-    }
-
-
-def scheduling_constraint_record(
-    constraint: SchedulingConstraint,
-    substances: dict[str, Substance],
-    ontology_bundle: OntologyBundle,
-) -> dict[str, object]:
-    # Keep endpoint resolution deterministic while retaining authored selectors.
-    runtime_program = ontology_bundle.runtime_program
-    src_ids = sorted(resolve_selector(constraint.source_selector, substances, ontology_bundle).substance_ids)
-    tgt_ids = sorted(resolve_selector(constraint.target_selector, substances, ontology_bundle).substance_ids)
-    return {
-        "id": constraint.id,
-        "operation": constraint.operation,
-        "src_substances": src_ids,
-        "tgt_substances": tgt_ids,
-        "src_selector": _selector_record(constraint.source_selector, runtime_program),
-        "tgt_selector": _selector_record(constraint.target_selector, runtime_program),
-        "action": constraint.action or "",
-        "rationale": constraint.rationale or "",
-    }
-
-
-def scheduling_constraint_execution_plan_record(
-    plan: SchedulingConstraintExecutionPlan,
-) -> dict[str, object]:
-    """Serialize the compiled behavioral instruction."""
-    return {
-        "id": plan.id,
-        "source_substances": list(plan.source_substance_ids),
-        "target_substances": list(plan.target_substance_ids),
-        "operation": plan.operation,
-        "executable": plan.executable,
-        "blocks_slots": plan.blocks_slots,
-        "scores_advisory": plan.scores_advisory,
-        "score_delta": plan.score_delta,
-        "match_direction": plan.match_direction,
-        "aggregation": plan.aggregation,
-        "selector_resolution": plan.selector_resolution,
-        "selector_resolution_outcome": plan.selector_resolution_outcome,
-        "action": plan.action or "",
-        "rationale": plan.rationale or "",
-    }
-
-
-def product_record(product_id: str, product: Product, ontology_bundle: OntologyBundle) -> dict[str, object]:
+def product_record(product_id: str, product: Product) -> dict[str, object]:
     return {
         "id": product_id,
         "name": product.name,
@@ -149,100 +85,144 @@ def product_record(product_id: str, product: Product, ontology_bundle: OntologyB
     }
 
 
-def dashboard_record(
-    dashboard: Dashboard,
-    ontology_bundle: OntologyBundle | None = None,
-) -> dict[str, object]:
-    context_labels = (
-        [authored_term_label(f"context:{term}", ontology_bundle) for term in dashboard.declares_context]
-        if ontology_bundle is not None
-        else []
-    )
-    record: dict[str, object] = {
-        "id": dashboard.id,
-        "name": dashboard.name,
-        "from_terms": [
-            f"{selector.category}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{selector.term}"
-            for selector in dashboard.selectors
-            if selector.category is not None and selector.term is not None
-        ],
-        "declares_context": list(dashboard.declares_context),
-        "declares_context_labels": context_labels,
-    }
-    if dashboard.source_path is not None:
-        # Diagnostic provenance only; never use this value as a key or
-        # selector.  In particular, renaming the file must not change id.
-        record["source_path"] = str(dashboard.source_path)
-    return record
-
-
-def _selector_record(selector: RelationSelector, runtime_program: RuntimeProgram) -> dict[str, object]:
-    form = selector_capability_form(selector)
-    try:
-        capability = runtime_program.selector_form_capabilities_by_form[form]
-    except KeyError as error:
-        raise ValueError(f"ontology selector_form_capabilities does not declare {form!r}") from error
-    if form == "term":
-        return {
-            "form": form,
-            "kind": capability.endpoint_kind,
-            "category": selector.category,
-            "term": selector.term,
-        }
+def trait_record(trait_id: str, trait: TraitDef) -> dict[str, object]:
     return {
-        "form": form,
-        "kind": capability.endpoint_kind,
-        "id": selector.entity_id,
-        "name": selector.entity_name,
+        "id": trait_id,
+        "namespace": trait.namespace,
+        "short_name": trait.short_name,
+        "label": trait.label,
     }
 
 
-def _selector_key(selector: RelationSelector) -> str:
-    return (
-        selector.entity_id
-        or selector.entity_name
-        or f"{selector.category}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{selector.term}"
-    )
+def dashboard_record(slug: str, dashboard: Dashboard) -> dict[str, object]:
+    from_traits_pairs = [
+        f"{namespace}:{short_name}"
+        for namespace, short_names in dashboard.from_traits.items()
+        for short_name in short_names
+    ]
+    return {
+        "slug": slug,
+        "name": dashboard.name,
+        "from_traits_pairs": from_traits_pairs,
+    }
 
 
-def _selector_display(
-    selector: RelationSelector,
+def _endpoint_fields(relation: Relation, side: str) -> tuple[str | None, str | None]:
+    if side == "source":
+        return relation.source_substance, relation.source_name
+    return relation.target_substance, relation.target_name
+
+
+def _endpoint_trait(relation: Relation, side: str) -> str | None:
+    if side == "source":
+        return relation.source_trait
+    return relation.target_trait
+
+
+def _endpoint_kind(relation: Relation, side: str) -> str:
+    exact_id, name = _endpoint_fields(relation, side)
+    if exact_id is not None:
+        return "substance"
+    if name is not None:
+        return "name"
+    if _endpoint_trait(relation, side) is not None:
+        return "trait"
+    if _endpoint_class(relation, side) is not None:
+        return "class"
+    return "unknown"
+
+
+def _endpoint_class(relation: Relation, side: str) -> str | None:
+    if side == "source":
+        return relation.source_class
+    return relation.target_class
+
+
+def _resolve_endpoint_ids(
+    relation: Relation,
+    side: str,
     substances: dict[str, Substance],
-    ontology_bundle: OntologyBundle,
+) -> list[str]:
+    """Resolve one relation endpoint to the substance IDs it matches."""
+    exact_id, name = _endpoint_fields(relation, side)
+    if exact_id is not None:
+        return [exact_id] if exact_id in substances else []
+    if name is not None:
+        return [sid for sid, s in substances.items() if s.name == name]
+    trait = _endpoint_trait(relation, side)
+    if trait is not None:
+        return [
+            sid
+            for sid, substance in substances.items()
+            if trait in cast("list[str]", substance_record(sid, substance)["trait_refs"])
+        ]
+    class_slug = _endpoint_class(relation, side)
+    if class_slug is not None:
+        return [sid for sid, substance in substances.items() if class_slug in substance.is_]
+    return []
+
+
+def _endpoint_member_names(
+    substance_ids: list[str],
+    substances: dict[str, Substance],
+) -> list[str]:
+    return [
+        format_substance_name(substances[substance_id]) for substance_id in substance_ids if substance_id in substances
+    ]
+
+
+def _endpoint_key_and_display(
+    relation: Relation,
+    side: str,
+    substances: dict[str, Substance],
+    trait_defs: dict[str, TraitDef] | None = None,
+) -> tuple[str, str]:
+    """Identity and display text for warning deduplication."""
+    exact_id, name = _endpoint_fields(relation, side)
+    if exact_id is not None:
+        substance = substances.get(exact_id)
+        if substance is not None:
+            return exact_id, format_substance_name(substance)
+        return exact_id, exact_id
+    if name is not None:
+        return name, name
+    trait = _endpoint_trait(relation, side)
+    if trait is not None:
+        return trait, _trait_endpoint_display(trait, trait_defs)
+    class_slug = _endpoint_class(relation, side)
+    if class_slug is not None:
+        key = f"is:{class_slug}"
+        return key, _trait_endpoint_display(key, trait_defs)
+    return "<unknown>", "<unknown>"
+
+
+def _trait_endpoint_display(
+    trait_id: str,
+    trait_defs: dict[str, TraitDef] | None = None,
 ) -> str:
-    if selector.entity_name is not None:
-        return selector.entity_name
-    if selector.entity_id is not None:
-        substance = substances.get(selector.entity_id)
-        return format_substance_name(substance) if substance is not None else selector.entity_id
-    if selector.category is None or selector.term is None:
-        raise ValueError("relation selector has no displayable authored endpoint")
-    return authored_term_label(
-        f"{selector.category}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{selector.term}",
-        ontology_bundle,
-    )
+    trait = trait_defs.get(trait_id) if trait_defs is not None else None
+    if trait is None:
+        return trait_id
+    label = trait.label or trait.short_name.replace("_", " ")
+    return f"{label} ({trait.id})"
 
 
-def _endpoint_member_names(ids: list[str], substances: dict[str, Substance]) -> list[str]:
-    return [format_substance_name(substances[sid]) for sid in ids if sid in substances]
+_SUBSTANCE_NAMESPACES: tuple[tuple[str, str], ...] = (
+    ("intake", "intake"),
+    ("timing", "timing"),
+    ("activity", "activity"),
+    ("is", "is_"),
+    ("effect", "effect"),
+    ("risk", "risk"),
+    ("context", "context"),
+    ("pathway", "pathway"),
+)
 
 
-def _substance_term_refs(substance: Substance, ontology_bundle: OntologyBundle) -> list[str]:
+def _substance_trait_refs(substance: Substance) -> list[str]:
+    """Pre-compute all namespace:slug pairs the substance carries."""
     refs: list[str] = []
-    for category, values in _term_ref_values(substance, ontology_bundle):
-        refs.extend(f"{category}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{term}" for term in values)
+    for namespace, field_name in _SUBSTANCE_NAMESPACES:
+        slugs: tuple[str, ...] = getattr(substance, field_name, ())
+        refs.extend(f"{namespace}:{slug}" for slug in slugs)
     return refs
-
-
-def _term_ref_values(substance: Substance, ontology_bundle: OntologyBundle) -> tuple[tuple[str, tuple[str, ...]], ...]:
-    del ontology_bundle
-    values: list[tuple[str, tuple[str, ...]]] = []
-    by_axis: dict[str, list[str]] = {}
-    for assertion in substance.schedule_assertions:
-        by_axis.setdefault(assertion.axis, []).append(assertion.value)
-    values.extend((axis, tuple(items)) for axis, items in by_axis.items())
-    by_category: dict[str, list[str]] = {}
-    for assertion in substance.knowledge_assertions:
-        by_category.setdefault(assertion.category, []).append(assertion.value)
-    values.extend((category, tuple(items)) for category, items in by_category.items())
-    return tuple((key, tuple(items)) for key, items in values)

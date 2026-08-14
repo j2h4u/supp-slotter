@@ -1,32 +1,22 @@
 id: sub_799419116d
 name: Vitamin B6
 form: pyridoxal 5 phosphate
-semantic_enrichment_attempted_on: '2026-08-13'
-notes: 'Active/coenzymated B6 form used by the Coenzyme B-Complex product. ODS does not establish a categorical P5P absorption or neuropathy-safety advantage over other supplemental forms. Review context: B6 coenzyme forms participate in amino-acid/protein metabolism, neurotransmitter biosynthesis, and homocysteine handling.'
-concerns:
-- kind: safety
-  text: Active B-complex provides 50 mg P5P per two-capsule serving; total use and duration are unresolved. P5P lacks a proven categorical neuropathy-safety advantage; review total B6 exposure and duration using NIH ODS B6 (https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/) and EFSA 2023 guidance (https://doi.org/10.2903/j.efsa.2023.8006).
-scheduling_assessment:
+notes: 'Active/coenzymated B6 form used by the Coenzyme B-Complex product. Preferred
+  for long-term use — P5P does not accumulate as a pseudo-antagonist and carries significantly
+  lower neuropathy risk than pyridoxine HCl at comparable doses. Review context:
+  B6 coenzyme forms participate in amino-acid/protein metabolism, neurotransmitter
+  biosynthesis, and homocysteine handling.'
+schedule:
   intake:
-    conclusion: insufficient
-    sources:
-    - https://www.ncbi.nlm.nih.gov/books/NBK114313/
-    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
-    summary: Research on B6 forms does not directly establish a general fed or fasted preference for P5P specifically.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://www.ncbi.nlm.nih.gov/books/NBK114313/
-    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
-    summary: No general clock-time rule was demonstrated for P5P supplementation.
+  - food_preferred
 knowledge:
-  context:
-  - neurocognitive_support
+  is:
+  - vitamin
   effect:
   - amino_acid_metabolism_support
   - homocysteine_metabolism_support
   - neurotransmitter_synthesis_support
-  kind:
-  - vitamin
+  context:
+  - neurocognitive_support
   pathway:
   - methylation_cycle

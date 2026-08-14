@@ -12,12 +12,11 @@ from planner.engine import (
     cmd_audit,
     cmd_check,
     cmd_find,
-    cmd_grooming_next,
     cmd_review,
     cmd_review_substance,
     cmd_show,
 )
-from planner.engine.results import GroomingResult, ReviewResult, ShowResult
+from planner.engine.results import ReviewResult, ShowResult
 
 CommandHandler = Callable[[argparse.Namespace, Path | None], int]
 
@@ -29,10 +28,9 @@ def main(data_root: Path | None = None) -> None:
             "Usage:\n"
             "  python -m planner                        — show schedule (default)\n"
             "  python -m planner check                  — validate data files only\n"
-            "  python -m planner review                 — concerns, relations, fact memberships\n"
+            "  python -m planner review                 — concerns, relations, risk flags, pathways\n"
             "  python -m planner audit                  — diagnostics and card-quality checks\n"
             "  python -m planner find <words>           — search cards\n"
-            "  python -m planner grooming next          — show the next enrichment batch\n"
             "  python -m planner review-substance <path> — single-card trait checklist\n\n"
             "Notes:\n"
             "  check and the default command automatically generate missing\n"
@@ -48,7 +46,10 @@ def main(data_root: Path | None = None) -> None:
     audit_parser.add_argument(
         "--full",
         action="store_true",
-        help="also include the generic full-audit diagnostics",
+        help=(
+            "also run deep card quality checks: no-form variants, missing fields, "
+            "intake review, active product source gaps"
+        ),
     )
 
     find_parser = sub.add_parser(
@@ -64,17 +65,7 @@ def main(data_root: Path | None = None) -> None:
     )
     sub.add_parser(
         "review",
-        help="knowledge-section review of active stack (concerns, relations, fact memberships)",
-    )
-
-    grooming = sub.add_parser("grooming", help="read-only enrichment queue")
-    grooming_sub = grooming.add_subparsers(dest="grooming_cmd", required=True)
-    grooming_next = grooming_sub.add_parser("next", help="show active cards never attempted")
-    grooming_next.add_argument(
-        "--limit",
-        type=int,
-        default=None,
-        help="positive maximum number of cards (default from ontology policy)",
+        help="knowledge-section review of active stack (concerns, relations, risk flags, pathways)",
     )
 
     review_substance = sub.add_parser(
@@ -97,7 +88,6 @@ def main(data_root: Path | None = None) -> None:
         "audit": _run_audit,
         "check": _run_check,
         "find": _run_find,
-        "grooming": _run_grooming,
         "review": _run_review,
         "review-substance": _run_review_substance,
     }
@@ -121,12 +111,6 @@ def _run_find(args: argparse.Namespace, data_root: Path | None) -> int:
     return cmd_find(cast(list[str], args.query), cast(int, args.limit), data_root=data_root).exit_code
 
 
-def _run_grooming(args: argparse.Namespace, data_root: Path | None) -> int:
-    if cast(str, args.grooming_cmd) != "next":
-        return 2
-    return _print_result(cmd_grooming_next(cast(int, args.limit), data_root=data_root))
-
-
 def _run_review(_args: argparse.Namespace, data_root: Path | None) -> int:
     return _print_result(cmd_review(data_root=data_root))
 
@@ -145,10 +129,10 @@ def _exit_with_result(result: ReviewResult | ShowResult) -> None:
     sys.exit(_print_result(result))
 
 
-def _print_result(result: ReviewResult | ShowResult | GroomingResult) -> int:
+def _print_result(result: ReviewResult | ShowResult) -> int:
     if result.output:
         print(result.output, end="")
-    if isinstance(result, (ReviewResult, GroomingResult)) and result.stderr:
+    if isinstance(result, ReviewResult) and result.stderr:
         print(result.stderr, end="", file=sys.stderr)
     return result.exit_code
 

@@ -1,8 +1,0 @@
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
-
-ss:empty a ss:RelationAssertionEntitySelector ;
-  ss:name "   " .
-ss:known a ss:Substance ; ss:label "Known" .
-ss:unknown a ss:RelationAssertionEntitySelector ;
-  ss:entity_id ss:not_a_substance .

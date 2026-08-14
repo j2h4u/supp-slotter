@@ -1,35 +1,25 @@
 id: sub_844a0cc551
 name: Copper
 form: bisglycinate
-semantic_enrichment_attempted_on: '2026-08-13'
 aliases:
 - copper glycinate chelate
-notes: Chelated copper form used where labels call out bisglycinate/glycinate chelate. Copper has a narrow review window;
-  NIH ODS notes high zinc intake can impair copper absorption and the adult UL is 10 mg/day. Copper is a cuproenzyme cofactor
-  for energy production, iron metabolism, connective tissue synthesis, neurotransmitter synthesis, and copper-containing superoxide
-  dismutases.
+notes: Chelated copper form used where labels call out bisglycinate/glycinate chelate.
+  Copper has a narrow review window; NIH ODS notes high zinc intake can impair
+  copper absorption and the adult UL is 10 mg/day. Copper is a cuproenzyme cofactor
+  for energy production, iron metabolism, connective tissue synthesis, neurotransmitter
+  synthesis, and copper-containing superoxide dismutases.
+schedule:
+  intake:
+  - food_preferred
 knowledge:
-  context:
-  - connective_tissue_support
+  is:
+  - mineral
   effect:
   - antioxidant_enzyme_cofactor
   - connective_tissue_synthesis_support
   - iron_metabolism_support
-  kind:
-  - mineral
   risk:
   - manual_review
   - narrow_therapeutic_window
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
-    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2008.718
-    summary: The cited evidence does not establish an intake preference for copper bisglycinate; it addresses copper generally and lacks a validated bisglycinate-specific comparator rule.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
-    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2008.718
-    summary: No general clock-time scheduling rule was demonstrated.
+  context:
+  - connective_tissue_support

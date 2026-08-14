@@ -1,8 +1,0 @@
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
-
-ss:substance-a a ss:Substance ; ss:label "Canonical A" .
-ss:by_id a ss:RelationAssertionEntitySelector ;
-  ss:entity_id ss:substance-a .
-ss:by_name a ss:RelationAssertionEntitySelector ;
-  ss:name "Canonical A" .

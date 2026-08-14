@@ -4,23 +4,22 @@ aliases:
 - Magnesium threonate
 - Magnesium L-threonate
 - Magtein
-notes: 'Knowledge-only popular brain-marketed magnesium form. Added because the repository has several magnesium forms but
-  not the commonly marketed L-threonate/Magtein form. Keep cognition claims as review context rather than stronger evidence.
-  Sources checked: EFSA magnesium L-threonate novel-food safety opinion; NIH ODS magnesium fact sheet.'
+notes: 'Knowledge-only popular brain-marketed magnesium form. Added because the repository
+  has several magnesium forms but not the commonly marketed L-threonate/Magtein form.
+  Keep cognition claims as review context rather than stronger evidence. Sources checked:
+  EFSA magnesium L-threonate novel-food safety opinion; NIH ODS magnesium fact sheet.'
 schedule:
   intake:
   - food_preferred
 knowledge:
-  context:
-  - sleep_recovery
+  is:
+  - electrolyte
+  - mineral
+  - nootropic
   effect:
   - nervous_system_support
-  kind:
-  - mineral
+  context:
+  - sleep_recovery
   pathway:
   - vitamin_d_calcium_axis
-  quality:
-  - electrolyte
-  role:
-  - nootropic
 id: sub_7aem4hgdmv

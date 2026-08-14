@@ -1,31 +1,27 @@
 id: sub_a3ec9f9c52
 name: Tadalafil
-semantic_enrichment_attempted_on: '2026-08-13'
-notes: 'PDE5 inhibitor. The exact active Tadalista source/formulation is absent; the product is retained as an informational interaction/review placeholder. DailyMed tadalafil tablets may be taken with or without food, but that label is not prescribing guidance for this product or its user-reported 1.25 mg amount. Preserve PDE5/NO-cGMP context without off-label endothelial, typical-morning, or synergy claims. Source: DailyMed tadalafil label.'
+notes: 'PDE5 inhibitor. Off-label low-dose use (~1.25–2.5 mg/day) for vascular tone
+  and endothelial function. Half-life ~17h; food does not significantly affect absorption
+  at low dose. Typically taken in the morning. Synergistic vasodilation alongside
+  L-Citrulline and Nattokinase. Source: FDA label; Kloner et al. 2013 (J Cardiovasc
+  Pharmacol Ther).'
 concerns:
 - kind: safety
-  text: PDE5 inhibitor context should be reviewed with nitrates, alpha-blockers, antihypertensives, alcohol, and other vasodilators
-    because symptomatic hypotension can become the limiting stack risk.
+  text: PDE5 inhibitor context should be reviewed with nitrates, alpha-blockers,
+    antihypertensives, alcohol, and other vasodilators because symptomatic hypotension
+    can become the limiting stack risk.
+schedule:
+  intake:
+  - food_neutral
 knowledge:
-  context:
-  - vascular_health
+  is:
+  - pharmaceutical
   effect:
   - pde5_inhibition
   - vasodilator
-  pathway:
-  - nitric_oxide_cgmp
   risk:
   - hypotension_med_interaction
-  role:
-  - pharmaceutical
-scheduling_assessment:
-  intake:
-    conclusion: supports_no_rule
-    sources:
-    - https://dailymed.nlm.nih.gov/dailymed/fdaDrugXsl.cfm?setid=78509a43-a907-4359-9022-f38c4f765880&type=display
-    summary: DailyMed tadalafil tablets may be taken with or without food; the exact Tadalista source/formulation is absent, so this informational label conclusion does not prescribe use or create a food preference.
-  timing:
-    conclusion: supports_no_rule
-    sources:
-    - https://dailymed.nlm.nih.gov/dailymed/fdaDrugXsl.cfm?setid=78509a43-a907-4359-9022-f38c4f765880&type=display
-    summary: No comparative AM-versus-PM evidence establishes a preferred clock time; half-life and label administration are not morning-superiority evidence.
+  context:
+  - vascular_health
+  pathway:
+  - nitric_oxide_cgmp
