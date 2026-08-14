@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping
+import threading
+import weakref
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
+from types import MappingProxyType
 from typing import cast
 
 from planner.contracts import CardLoadError
@@ -12,6 +15,7 @@ from planner.ontology.bundle_view import OntologyBundleView
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
 from planner.ontology.schema_enums import schema_enum_values
+from planner.ontology.verification import is_registered_bundle
 
 _CANONICAL_NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
 _TERM_FIELDS = frozenset({
@@ -29,6 +33,41 @@ _ONTOCLEAN_RIGIDITY_VALUES = frozenset({"rigid", "anti_rigid"})
 _ONTOCLEAN_DEPENDENCE_VALUES = frozenset({"independent", "dependent"})
 
 
+class _VerifiedBundleCache[T]:
+    """Reuse one immutable decoder result for one live verified bundle."""
+
+    def __init__(self) -> None:
+        self._entries: dict[int, tuple[weakref.ReferenceType[OntologyBundleView], T]] = {}
+        self._lock: threading.Lock = threading.Lock()
+
+    def get(self, bundle: OntologyBundleView, decoder: Callable[[OntologyBundleView], T]) -> T:
+        if not is_registered_bundle(bundle):
+            return decoder(bundle)
+        identity = id(bundle)
+        with self._lock:
+            entry = self._entries.get(identity)
+            if entry is not None and entry[0]() is bundle:
+                return entry[1]
+            if entry is not None:
+                del self._entries[identity]
+
+        value = decoder(bundle)
+
+        def discard(reference: weakref.ReferenceType[OntologyBundleView]) -> None:
+            with self._lock:
+                current = self._entries.get(identity)
+                if current is not None and current[0] is reference:
+                    del self._entries[identity]
+
+        reference = weakref.ref(bundle, discard)
+        with self._lock:
+            current = self._entries.get(identity)
+            if current is not None and current[0]() is bundle:
+                return current[1]
+            self._entries[identity] = (reference, value)
+        return value
+
+
 @dataclass(frozen=True, slots=True)
 class OntoCleanProfile:
     """One canonical, executable OntoClean profile from the verified catalog."""
@@ -39,8 +78,14 @@ class OntoCleanProfile:
     dependence: str
 
 
-def load_ontoclean_profiles(bundle: OntologyBundleView) -> Mapping[str, OntoCleanProfile]:  # noqa: C901
+def load_ontoclean_profiles(bundle: OntologyBundleView) -> Mapping[str, OntoCleanProfile]:
     """Strictly decode the complete profile catalog without fallback records."""
+
+    return _PROFILE_CACHE.get(bundle, _decode_ontoclean_profiles)
+
+
+def _decode_ontoclean_profiles(bundle: OntologyBundleView) -> Mapping[str, OntoCleanProfile]:  # noqa: C901
+    """Decode the complete profile catalog without consulting the cache."""
 
     source = bundle.root / "generated" / "runtime-vocabulary.yaml"
     raw_profiles = bundle.runtime_vocabulary.get("ontoclean_profiles")
@@ -86,7 +131,7 @@ def load_ontoclean_profiles(bundle: OntologyBundleView) -> Mapping[str, OntoClea
             supplies_identity=supplies_identity,
             dependence=dependence,
         )
-    return dict(sorted(profiles.items()))
+    return MappingProxyType(dict(sorted(profiles.items())))
 
 
 @dataclass(frozen=True, slots=True)
@@ -125,6 +170,14 @@ class ReviewPresentation:
             ) from error
 
 
+_PROFILE_CACHE = _VerifiedBundleCache[Mapping[str, OntoCleanProfile]]()
+_CATEGORY_CACHE = _VerifiedBundleCache[Mapping[str, tuple[str, ...]]]()
+_TERM_CACHE = _VerifiedBundleCache[tuple[Mapping[str, object], ...]]()
+_TERM_LABEL_CACHE = _VerifiedBundleCache[Mapping[tuple[str, str], str]]()
+_REVIEW_PRESENTATION_CACHE = _VerifiedBundleCache[ReviewPresentation]()
+_RELATION_TYPE_ORDER_CACHE = _VerifiedBundleCache[tuple[str, ...]]()
+
+
 def load_term_labels(bundle: OntologyBundleView) -> Mapping[tuple[str, str], str]:
     """Return the complete authored term-label catalog after strict decoding.
 
@@ -134,15 +187,27 @@ def load_term_labels(bundle: OntologyBundleView) -> Mapping[tuple[str, str], str
     hide a broken ontology artifact as valid data.
     """
 
-    return {
+    return _TERM_LABEL_CACHE.get(bundle, _decode_term_labels)
+
+
+def _decode_term_labels(bundle: OntologyBundleView) -> Mapping[tuple[str, str], str]:
+    return MappingProxyType({
         (str(term["semantic_category"]), str(term["slug"])): str(term["label"]) for term in load_term_catalog(bundle)
-    }
+    })
 
 
-def load_term_catalog(  # noqa: C901, PLR0912
+def load_term_catalog(
     bundle: OntologyBundleView,
 ) -> tuple[Mapping[str, object], ...]:
     """Return the canonical generated term registry after strict decoding."""
+
+    return _TERM_CACHE.get(bundle, _decode_term_catalog)
+
+
+def _decode_term_catalog(  # noqa: C901, PLR0912
+    bundle: OntologyBundleView,
+) -> tuple[Mapping[str, object], ...]:
+    """Decode the canonical generated term registry without consulting the cache."""
 
     source = bundle.root / "generated" / "runtime-vocabulary.yaml"
     raw_terms = bundle.runtime_vocabulary.get("terms")
@@ -203,14 +268,22 @@ def load_term_catalog(  # noqa: C901, PLR0912
         if key in seen:
             raise _error(f"terms contains duplicate key {key[0]}:{key[1]}", source)
         seen.add(key)
-        terms.append(term)
+        terms.append(MappingProxyType(dict(term)))
     return tuple(terms)
 
 
-def load_category_predicates(  # noqa: C901, PLR0912
+def load_category_predicates(
     bundle: OntologyBundleView,
 ) -> Mapping[str, tuple[str, ...]]:
     """Return category predicates after strict structural identity validation."""
+
+    return _CATEGORY_CACHE.get(bundle, _decode_category_predicates)
+
+
+def _decode_category_predicates(  # noqa: C901, PLR0912
+    bundle: OntologyBundleView,
+) -> Mapping[str, tuple[str, ...]]:
+    """Decode category predicates without consulting the cache."""
 
     source = bundle.root / "generated" / "runtime-vocabulary.yaml"
     raw_categories = bundle.runtime_vocabulary.get("categories")
@@ -250,7 +323,7 @@ def load_category_predicates(  # noqa: C901, PLR0912
         if len({value.split(".", maxsplit=1)[0] for value in values}) != 1:
             raise _error(f"categories.{category}.allowed_predicates must be homogeneous", source)
         result[category] = tuple(values)
-    return result
+    return MappingProxyType(result)
 
 
 def validate_runtime_catalog(bundle: OntologyBundleView) -> None:
@@ -262,13 +335,19 @@ def validate_runtime_catalog(bundle: OntologyBundleView) -> None:
     load_term_catalog(bundle)
 
 
-def load_review_presentation(bundle: OntologyBundleView) -> ReviewPresentation:  # noqa: PLR0914
+def load_review_presentation(bundle: OntologyBundleView) -> ReviewPresentation:
     """Decode complete review presentation metadata against formal registries.
 
     The compiler validates authored source, but runtime callers must also fail
     closed when a verified artifact is mutated or a non-canonical bundle is
     supplied.  This accessor intentionally has no fallback vocabulary.
     """
+
+    return _REVIEW_PRESENTATION_CACHE.get(bundle, _decode_review_presentation)
+
+
+def _decode_review_presentation(bundle: OntologyBundleView) -> ReviewPresentation:  # noqa: PLR0914
+    """Decode review presentation metadata without consulting the cache."""
 
     source = bundle.root / "generated" / "runtime-vocabulary.yaml"
     vocabulary = bundle.runtime_vocabulary
@@ -359,11 +438,11 @@ def load_review_presentation(bundle: OntologyBundleView) -> ReviewPresentation: 
     namespace_order = tuple(dict.fromkeys(review_namespaces + axes + category_names))
     return ReviewPresentation(
         concern_kinds=concern_kinds,
-        concern_labels=concern_labels,
+        concern_labels=MappingProxyType(dict(concern_labels)),
         review_tag_namespaces=review_namespaces,
         excluded_policy_ids=excluded_policy_ids,
         active_fact_namespaces=active_namespaces,
-        active_fact_labels=active_labels,
+        active_fact_labels=MappingProxyType(dict(active_labels)),
         namespace_order=namespace_order,
         zero_effect_condition=cast(str, zero_effect_condition),
         zero_effect_template=zero_effect_template,
@@ -377,6 +456,12 @@ def load_relation_type_order(bundle: OntologyBundleView) -> tuple[str, ...]:
     authored relation registry.  Relation IDs are the deterministic tie-break
     when authors assign the same presentation order.
     """
+
+    return _RELATION_TYPE_ORDER_CACHE.get(bundle, _decode_relation_type_order)
+
+
+def _decode_relation_type_order(bundle: OntologyBundleView) -> tuple[str, ...]:
+    """Decode relation order without consulting the cache."""
 
     source = bundle.root / "generated" / "runtime-vocabulary.yaml"
     raw_relation_types = bundle.runtime_vocabulary.get("relation_types")

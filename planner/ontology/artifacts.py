@@ -17,8 +17,6 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-import threading
-import weakref
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
@@ -34,6 +32,7 @@ from planner.ontology.errors import (
     UNSUPPORTED,
     OntologyInfrastructureError,
 )
+from planner.ontology.verification import is_registered_bundle, register_bundle
 from planner.yaml_io import safe_load_yaml
 
 if TYPE_CHECKING:
@@ -192,22 +191,8 @@ class OntologyBundle:
         return self.projection_map
 
 
-_VERIFIED_BUNDLES: dict[int, weakref.ReferenceType[OntologyBundle]] = {}
-_VERIFIED_BUNDLES_LOCK = threading.Lock()
-
-
 def _register_verified_bundle(bundle: OntologyBundle) -> OntologyBundle:
-    identity = id(bundle)
-
-    def discard(reference: weakref.ReferenceType[OntologyBundle]) -> None:
-        with _VERIFIED_BUNDLES_LOCK:
-            if _VERIFIED_BUNDLES.get(identity) is reference:
-                del _VERIFIED_BUNDLES[identity]
-
-    reference = weakref.ref(bundle, discard)
-    with _VERIFIED_BUNDLES_LOCK:
-        _VERIFIED_BUNDLES[identity] = reference
-    return bundle
+    return cast(OntologyBundle, register_bundle(bundle))
 
 
 def load_ontology(root: Path) -> OntologyBundle:  # noqa: PLR0914
@@ -328,11 +313,7 @@ def load_ontology(root: Path) -> OntologyBundle:  # noqa: PLR0914
 
 
 def _is_verified_bundle(value: object) -> bool:
-    if type(value) is not OntologyBundle:
-        return False
-    with _VERIFIED_BUNDLES_LOCK:
-        reference = _VERIFIED_BUNDLES.get(id(value))
-        return reference is not None and reference() is value
+    return type(value) is OntologyBundle and is_registered_bundle(value)
 
 
 def load_runtime_vocabulary(ontology_root: Path) -> Mapping[str, object]:

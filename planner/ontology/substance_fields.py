@@ -3,18 +3,28 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from types import MappingProxyType
 from typing import cast
 
 from planner.contracts import Substance
 from planner.ontology.bundle_view import OntologyBundleView
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import IMPLEMENTED_PREDICATE_NAMESPACES
-from planner.ontology.presentation import load_category_predicates, load_term_catalog
+from planner.ontology.presentation import _VerifiedBundleCache, load_category_predicates, load_term_catalog
+
+_SCHEDULE_FIELDS_CACHE = _VerifiedBundleCache[tuple[str, ...]]()
+_KNOWLEDGE_FIELDS_CACHE = _VerifiedBundleCache[tuple[str, ...]]()
+_CANONICAL_TERMS_CACHE = _VerifiedBundleCache[Mapping[str, frozenset[str]]]()
+_SUBSTANCE_TRAIT_FIELDS_CACHE = _VerifiedBundleCache[tuple[tuple[str, str], ...]]()
 
 
 def schedule_assignment_fields(bundle: OntologyBundleView) -> tuple[str, ...]:
     """Return substance ``schedule`` fields controlled by assignment axes."""
 
+    return _SCHEDULE_FIELDS_CACHE.get(bundle, _decode_schedule_assignment_fields)
+
+
+def _decode_schedule_assignment_fields(bundle: OntologyBundleView) -> tuple[str, ...]:
     return tuple(
         row.assignment_field
         for row in sorted(bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
@@ -24,6 +34,10 @@ def schedule_assignment_fields(bundle: OntologyBundleView) -> tuple[str, ...]:
 def knowledge_category_fields(bundle: OntologyBundleView) -> tuple[str, ...]:
     """Return substance ``knowledge`` fields declared by ontology categories."""
 
+    return _KNOWLEDGE_FIELDS_CACHE.get(bundle, _decode_knowledge_category_fields)
+
+
+def _decode_knowledge_category_fields(bundle: OntologyBundleView) -> tuple[str, ...]:
     fields: list[str] = []
     for predicates in load_category_predicates(bundle).values():
         fields.extend(
@@ -42,6 +56,10 @@ def canonical_terms_by_predicate(bundle: OntologyBundleView) -> Mapping[str, fro
     malformed records are ignored, which makes the resolver fail closed.
     """
 
+    return _CANONICAL_TERMS_CACHE.get(bundle, _decode_canonical_terms_by_predicate)
+
+
+def _decode_canonical_terms_by_predicate(bundle: OntologyBundleView) -> Mapping[str, frozenset[str]]:
     terms_by_predicate: dict[str, set[str]] = {}
     for term in load_term_catalog(bundle):
         slug = term.get("slug")
@@ -53,7 +71,7 @@ def canonical_terms_by_predicate(bundle: OntologyBundleView) -> Mapping[str, fro
             continue
         for predicate in cast(list[str], raw_predicates):
             terms_by_predicate.setdefault(predicate, set()).add(slug)
-    return {predicate: frozenset(slugs) for predicate, slugs in terms_by_predicate.items()}
+    return MappingProxyType({predicate: frozenset(slugs) for predicate, slugs in terms_by_predicate.items()})
 
 
 def substance_trait_fields(bundle: OntologyBundleView) -> tuple[tuple[str, str], ...]:
@@ -64,6 +82,10 @@ def substance_trait_fields(bundle: OntologyBundleView) -> tuple[tuple[str, str],
     treating an ontology category as a Python attribute.
     """
 
+    return _SUBSTANCE_TRAIT_FIELDS_CACHE.get(bundle, _decode_substance_trait_fields)
+
+
+def _decode_substance_trait_fields(bundle: OntologyBundleView) -> tuple[tuple[str, str], ...]:
     categories = knowledge_category_fields(bundle)
     axes = tuple(
         row.axis for row in sorted(bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
