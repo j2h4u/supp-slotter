@@ -159,20 +159,6 @@ relations:
   target_selector:
     category: context
     term: incretin_drug_context
-- severity: low
-  reason: Creatine supports phosphocreatine availability, training output, and lean-mass retention context during calorie
-    deficit; it is an adjunctive support signal, not a GLP requirement.
-  action: Review resistance training, creatine tolerance, kidney-context assumptions, and total lean-mass preservation strategy.
-  id: rel_supports_011
-  relation_type: supports
-  assertion_kind: ontology_assertion
-  semantic_family: nutritional_adequacy_advisory
-  source_selector:
-    entity:
-      entity_id: sub_9c0908e7f7
-  target_selector:
-    category: context
-    term: incretin_drug_context
 - severity: medium
   reason: Convergence is mechanistic; no isolated controlled citrulline-PDE5 hemodynamic study establishes a clinical interaction,
     and this is not organic-nitrate equivalence.

@@ -1,7 +1,7 @@
 id: sub_9c0908e7f7
 name: Creatine
 form: monohydrate
-notes: 'Creatine monohydrate is the exact active Do4a form, labeled 5 g per serving. Chronic consistent intake and muscle saturation dominate over acute clock timing; carbohydrate co-ingestion may modestly affect retention but is not required. The registered prefer_with link to L-Citrulline is a co-use fact, not a proven synergy. Sources: PMID 8899067; ISSN PMC5469049; https://www.lsgeotar.ru/supplements/do4a-lab-creatine-monohydrate-AFMC.'
+notes: 'Creatine monohydrate is the exact active form for this card, labeled 5 g per serving. Chronic consistent intake and muscle saturation dominate over acute clock timing. The prefer_with link to L-Citrulline records co-use only and does not establish synergy (PMID 40010353).'
 schedule:
   intake:
   - food_preferred
@@ -15,9 +15,8 @@ scheduling_assessment:
     policy: food_preferred
     sources:
     - https://pubmed.ncbi.nlm.nih.gov/8899067/
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC5469049/
-    - https://www.lsgeotar.ru/supplements/do4a-lab-creatine-monohydrate-AFMC
-    summary: 'Low-confidence soft co-ingestion heuristic: human retention evidence and the exact 5 g monohydrate label support taking with a meal/carbohydrate when convenient, but this is not required and does not create dose or post-workout priority.'
+    - https://pubmed.ncbi.nlm.nih.gov/20035494/
+    summary: 'Optional loading and co-ingestion evidence supports taking with food when convenient, but food is not required and no post-workout priority is established.'
   timing:
     conclusion: insufficient
     sources:
@@ -28,17 +27,41 @@ scheduling_assessment:
     conclusion: supports_preference
     policy: any_workout
     sources:
+    - https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-HealthProfessional/
     - https://pmc.ncbi.nlm.nih.gov/articles/PMC5469049/
     - https://pmc.ncbi.nlm.nih.gov/articles/PMC9163789/
-    - https://www.lsgeotar.ru/supplements/do4a-lab-creatine-monohydrate-AFMC
-    summary: 'Soft activity-context preference: the exact Do4a label supports use before or after exercise and corroborates the weak any_workout heuristic, while independent evidence does not establish acute timing superiority or necessity; chronic saturation and consistent intake dominate.'
+    summary: 'Exercise evidence is strongest for high-intensity work, supporting an any_workout context, but does not establish an acute timing requirement.'
 knowledge:
   context:
-  - mitochondrial_health
-  - workout_performance
+  - value: mitochondrial_health
+    research_state: mechanistic_only
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/11356982/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC5469049/
+  - value: workout_performance
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-HealthProfessional/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC5469049/
+    - https://pubmed.ncbi.nlm.nih.gov/11356982/
   effect:
-  - phosphocreatine_support
+  - value: phosphocreatine_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-HealthProfessional/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC5469049/
+    - https://pubmed.ncbi.nlm.nih.gov/11356982/
   pathway:
-  - phosphocreatine_system
+  - value: phosphocreatine_system
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-HealthProfessional/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC5469049/
+    - https://pubmed.ncbi.nlm.nih.gov/11356982/
   role:
-  - ergogenic
+  - value: ergogenic
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-HealthProfessional/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC5469049/
+    - https://pubmed.ncbi.nlm.nih.gov/11356982/
