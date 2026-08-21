@@ -111,8 +111,13 @@ def validate_stacks(
             for value in pillboxes.values()
             if isinstance(value, dict) and isinstance(value.get("stack"), str)
         }
+        inactive_stack_name = bundle.runtime_program.glue_contract.inactive_stack_name
         for stack_name in stacks_data:
-            if isinstance(stack_name, str) and stack_name not in pillbox_stacks:
+            if (
+                isinstance(stack_name, str)
+                and stack_name != inactive_stack_name
+                and stack_name not in pillbox_stacks
+            ):
                 alignment_info.append(
                     f"{stacks_path}: stack '{stack_name}' has no pillbox; add a pillbox or remove the stack"
                 )
