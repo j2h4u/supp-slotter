@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: c6e0e7da6982fbae7812c5560d6e8c72fd3b4933894637b24290d44fd605ca38
+source_hash: 9ba4a5e4f31860c13c1f9388e5b26dcd647529fad69b2ceb75421a567286fb44
 categories:
   kind:
     allowed_predicates: &id005
@@ -2367,6 +2367,10 @@ ontology_assertions:
       and copper status should be reviewed together in long-term stacks.
     action: Review zinc/copper balance in long-term active stacks.
     severity: medium
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/zinc-healthprofessional/
+    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
   rel_balance_002:
     id: rel_balance_002
     relation_type: balance
@@ -2629,6 +2633,12 @@ ontology_assertions:
     action: Review calcium and iron context together; prefer separate slots when feasible
       without treating co-presence as proof of harm or promising a fixed interval.
     severity: medium
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Iron%20%20-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/1984334/
+    - https://pubmed.ncbi.nlm.nih.gov/16155272/
+    - https://pubmed.ncbi.nlm.nih.gov/24290597/
   rel_review_with_017:
     id: rel_review_with_017
     relation_type: review_with
@@ -2646,6 +2656,11 @@ ontology_assertions:
     action: Review calcium and zinc context together; prefer separate slots when feasible
       without imposing a universal separation interval.
     severity: medium
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/8194505/
+    - https://pubmed.ncbi.nlm.nih.gov/9174476/
+    - https://ods.od.nih.gov/factsheets/calcium-HealthProfessional/
   rel_review_with_018:
     id: rel_review_with_018
     relation_type: review_with
@@ -2663,6 +2678,11 @@ ontology_assertions:
     action: Review unusually high-dose lysine/arginine use; no automatic slot separation
       is justified by the current dose-blind planner.
     severity: low
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/32187681/
+    - https://pubmed.ncbi.nlm.nih.gov/14603368/
+    - https://pubmed.ncbi.nlm.nih.gov/7690540/
   rel_review_with_019:
     id: rel_review_with_019
     relation_type: review_with
@@ -2680,6 +2700,11 @@ ontology_assertions:
     action: Treat glycine/beta-alanine transport or receptor competition as low-confidence
       review knowledge; do not separate slots automatically.
     severity: low
+    research_state: mechanistic_only
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/7563025/
+    - https://pubmed.ncbi.nlm.nih.gov/1915594/
+    - https://pubmed.ncbi.nlm.nih.gov/7542038/
   rel_review_with_020:
     id: rel_review_with_020
     relation_type: review_with
@@ -2696,6 +2721,12 @@ ontology_assertions:
     action: Treat glycine/taurine transport or receptor competition as low-confidence
       review knowledge; do not separate slots automatically.
     severity: low
+    research_state: mechanistic_only
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/7563025/
+    - https://pubmed.ncbi.nlm.nih.gov/19074966/
+    - https://pubmed.ncbi.nlm.nih.gov/2845721/
+    - https://pubmed.ncbi.nlm.nih.gov/7542038/
   rel_review_with_021:
     id: rel_review_with_021
     relation_type: review_with
@@ -2713,6 +2744,12 @@ ontology_assertions:
     action: Review cumulative vitamin E dose and formulation when exact tocopherol
       and tocotrienol forms are both active; do not automatically separate slots.
     severity: low
+    research_state: mechanistic_only
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminE-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/22252050/
+    - https://pubmed.ncbi.nlm.nih.gov/22528033/
+    - https://pubmed.ncbi.nlm.nih.gov/27278668/
   rel_supports_001:
     id: rel_supports_001
     relation_type: supports

@@ -7,6 +7,10 @@ relations:
   relation_type: balance
   assertion_kind: clinical_review_signal
   semantic_family: nutrient_balance_review_signal
+  research_state: supported
+  sources:
+  - https://ods.od.nih.gov/factsheets/zinc-healthprofessional/
+  - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
   source_selector:
     entity:
       name: Zinc
@@ -366,6 +370,12 @@ relations:
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: supported
+  sources:
+  - https://ods.od.nih.gov/factsheets/Iron%20%20-HealthProfessional/
+  - https://pubmed.ncbi.nlm.nih.gov/1984334/
+  - https://pubmed.ncbi.nlm.nih.gov/16155272/
+  - https://pubmed.ncbi.nlm.nih.gov/24290597/
   source_selector:
     entity:
       name: Calcium
@@ -379,6 +389,11 @@ relations:
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: supported
+  sources:
+  - https://pubmed.ncbi.nlm.nih.gov/8194505/
+  - https://pubmed.ncbi.nlm.nih.gov/9174476/
+  - https://ods.od.nih.gov/factsheets/calcium-HealthProfessional/
   source_selector:
     entity:
       name: Calcium
@@ -392,6 +407,11 @@ relations:
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: supported
+  sources:
+  - https://pubmed.ncbi.nlm.nih.gov/32187681/
+  - https://pubmed.ncbi.nlm.nih.gov/14603368/
+  - https://pubmed.ncbi.nlm.nih.gov/7690540/
   source_selector:
     entity:
       name: L-Lysine
@@ -405,6 +425,11 @@ relations:
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: mechanistic_only
+  sources:
+  - https://pubmed.ncbi.nlm.nih.gov/7563025/
+  - https://pubmed.ncbi.nlm.nih.gov/1915594/
+  - https://pubmed.ncbi.nlm.nih.gov/7542038/
   source_selector:
     entity:
       name: Glycine
@@ -418,6 +443,12 @@ relations:
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: mechanistic_only
+  sources:
+  - https://pubmed.ncbi.nlm.nih.gov/7563025/
+  - https://pubmed.ncbi.nlm.nih.gov/19074966/
+  - https://pubmed.ncbi.nlm.nih.gov/2845721/
+  - https://pubmed.ncbi.nlm.nih.gov/7542038/
   source_selector:
     entity:
       name: Glycine
@@ -431,6 +462,12 @@ relations:
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: mechanistic_only
+  sources:
+  - https://ods.od.nih.gov/factsheets/VitaminE-HealthProfessional/
+  - https://pubmed.ncbi.nlm.nih.gov/22252050/
+  - https://pubmed.ncbi.nlm.nih.gov/22528033/
+  - https://pubmed.ncbi.nlm.nih.gov/27278668/
   source_selector:
     entity:
       entity_id: sub_844a87d72b
