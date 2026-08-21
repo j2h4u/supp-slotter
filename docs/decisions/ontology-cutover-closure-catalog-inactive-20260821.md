@@ -2,22 +2,22 @@
 
 ## Decision
 
-**Catalog/data-preservation criterion: BLOCK pending one bounded B5 portability decision.**
+**Catalog/data-preservation criterion: PASS.**
 
 The three former daily products are accepted as intentional shelf-state changes, and
 all three product cards and component facts remain present. The inactive/unassigned
 schedule tail contains no new migration-loss class and is nonblocking under cutover
-Criterion 2. The sole blocker in this closure is stricter than factual catalog
-preservation: the feature intentionally removes the standalone calcium
-D-pantothenate substance ID, so a future form-specific query/import cannot address
-that stable form as its own substance identity. Product labels and notes preserve
-the disclosed chemistry, but that is not yet a stable form mapping.
+Criterion 2. The feature's B5 change is an intentional canonical correction: the
+stable family identity remains addressable, while product labels retain the exact
+chemistry where disclosed. The former standalone D-form card was over-specific for
+the BioGrace label, which explicitly does not establish D stereochemistry.
 
 This is not a medical adjudication and does not authorize mass restoration of
 historical schedule heuristics. No ontology, data, or Python repair was made:
-the B5 change is an explicit canonical-consolidation design (repository commit
-`923c862`), not a proven accidental edit; the blocker requires a portability
-contract decision (family-plus-product form mapping versus a durable form identity).
+repository commit `923c862` records the grounded B5 identity correction and
+preserves product-level label chemistry. The formal Substance `form` field,
+stable ProductComponent substance reference, and generated projection contract
+therefore remain portable without restoring the superseded D-form identity.
 
 ## Evidence scope and source anchors
 
@@ -28,7 +28,7 @@ contract decision (family-plus-product form mapping versus a durable form identi
 | Shared schedule diff | `docs/decisions/ontology-schedule-semantic-diff-20260821.md` |
 | Active/episodic/training adjudication | `docs/decisions/active-reachable-scheduling-adjudication-20260821.md` |
 | Supported unassigned state | `data/stacks.yaml:23-25,31-32`; history `35dc1e7` is titled “Update active supplement shelf” |
-| B5 consolidation | `923c862`: creates family card, remaps two product links, and preserves exact chemistry in Product labels/notes |
+| B5 consolidation | `923c862`: grounds BioGrace as calcium pantothenate with unspecified stereochemistry, uses the family card for shared identity, and preserves exact chemistry in Product labels/notes |
 | Cutover acceptance | `docs/decisions/ontology-cutover-decision-20260821.md`, Criteria 2–3 |
 
 ## Three daily → tracked-unassigned products
@@ -57,21 +57,21 @@ be scheduled now.
 
 | Check | Baseline | Feature | Verdict |
 | --- | --- | --- | --- |
-| Main-only form card | `sub_yd7dqo36dn`, Vitamin B5, form `calcium D-pantothenate`, aliases retained | absent as standalone card | stable form identity is not portable as its own substance ID |
-| Canonical family card | `sub_7628e4f478`, form `pantothenic acid` | same stable ID, now explicitly a Vitamin B5 family card | intentional canonical consolidation |
+| Main-only form card | `sub_yd7dqo36dn`, Vitamin B5, form `calcium D-pantothenate` | absent as standalone card | intentional supersession; BioGrace does not establish the D form, so this over-specific identity is not required for current product data |
+| Canonical family card | `sub_7628e4f478`, form `pantothenic acid` | same stable ID, now explicitly a Vitamin B5 family card | stable reusable identity preserved and portable |
 | BioGrace `prd_8eff2491b7` | same family ID; label “кальция пантотенат 15 мг” | same family ID plus label/notes | factual product chemistry preserved |
-| Opti-Men `prd_io1peb9syp` | component `sub_yd7dqo36dn`, label calcium D-pantothenate | component `sub_7628e4f478`, label unchanged | form fact preserved at Product level; stable form reference changed |
-| BioCoenzymated B Complex `prd_qmgu4q8ipo` | component `sub_yd7dqo36dn`, label calcium D-pantothenate | component `sub_7628e4f478`, label plus explicit preservation note | form fact preserved at Product level; stable form reference changed |
+| Opti-Men `prd_io1peb9syp` | component `sub_yd7dqo36dn`, label calcium D-pantothenate | component `sub_7628e4f478`, label unchanged | exact label fact preserved; family identity is the intentional canonical reference |
+| BioCoenzymated B Complex `prd_qmgu4q8ipo` | component `sub_yd7dqo36dn`, label calcium D-pantothenate | component `sub_7628e4f478`, label plus preservation note | exact label fact preserved; family identity is the intentional canonical reference |
 
-The feature card itself states that calcium pantothenate, calcium
-D-pantothenate, and pantethine are chemically distinct and that exact chemistry
-is Product-level. Thus **factual data preservation is PASS**, but **strict
-stable-form portability is BLOCK**: neither the family card nor a canonical
-relation maps `sub_yd7dqo36dn` to a durable exact-form identity. This is a
-known intentional consolidation, not a new inactive schedule-loss class. A
-future cutover may clear the blocker by documenting a deterministic form
-mapping accepted by the importer/query contract; this artifact does not choose
-that design.
+The feature card states that calcium pantothenate, calcium D-pantothenate, and
+pantethine are chemically distinct and that exact chemistry is Product-level.
+The product labels preserve those distinctions where disclosed; BioGrace's label
+does not establish D stereochemistry and is correctly routed to the family card.
+The formal projection keeps the stable family ID in `ProductComponent.substance`,
+the label-specific chemistry in `ProductComponent.label`, and the amount in
+`ProductComponent.amount`. Therefore **identity, component data, and projection
+portability are PASS**. Restoring `sub_yd7dqo36dn` would reintroduce an
+unsupported form claim rather than repair a migration loss.
 
 ## Inactive/unassigned-only schedule changes: finite groups
 
@@ -213,6 +213,6 @@ sub_zu1zthqo97	Beta-glucans	intake	empty_preferred	-	inactive	-	-	likely migrati
 - Product catalog: all 59 baseline product IDs remain; four feature-only product
   additions are recorded by the catalog inventory; three former daily products
   are intentionally tracked-unassigned.
-- Overall catalog/data-preservation status remains **BLOCK** only because the
-  mandatory stable-form portability requirement is unresolved for B5. There is
-  no separate product-card deletion or inactive-tail blocker.
+- Overall catalog/data-preservation status is **PASS**. The B5 family identity,
+  product component links, label chemistry, and generated projection contract are
+  preserved; there is no separate product-card deletion or inactive-tail blocker.
