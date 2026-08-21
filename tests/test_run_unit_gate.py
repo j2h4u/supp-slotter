@@ -219,7 +219,6 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
         "tests/test_read_model_relations.py",
         "tests/test_relation_conflicts.py",
         "tests/test_review_command.py",
-        "tests/test_review_substance_command.py",
         "tests/test_run_unit_gate.py",
         "tests/test_scheduling_constraint_audit.py",
         "tests/test_scheduling_constraint_runtime.py",

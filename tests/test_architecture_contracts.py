@@ -9,7 +9,6 @@ COMMANDS_REQUIRING_SYNTHETIC_ROOT = frozenset({
     "cmd_find",
     "cmd_plan",
     "cmd_review",
-    "cmd_review_substance",
 })
 
 

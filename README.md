@@ -172,7 +172,6 @@ That flow keeps the system from turning into a giant undifferentiated supplement
 | `uv run python -m planner audit` | Inspect structural diagnostics such as duplicates, unused traits, and empty clusters |
 | `uv run python -m planner audit --full` | Include the generic full-audit diagnostics |
 | `uv run python -m planner find "<words>"` | Search products and substances by name, alias, form, ID, URL, or card text |
-| `uv run python -m planner review-substance <path>` | Show the trait checklist and relation context for one substance card |
 
 ## Data Model
 

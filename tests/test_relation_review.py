@@ -375,7 +375,7 @@ def test_support_relation_accepts_active_supporter_from_another_product(
 
     assert review_result.exit_code == 0, review_result.output
     relations_output = review_result.output.split("Relations", maxsplit=1)[1].split(
-        "Context memberships",
+        "Dashboard coverage",
         maxsplit=1,
     )[0]
     selenium_nac_line = "[Support relationship] Selenium -> N-Acetyl Cysteine"

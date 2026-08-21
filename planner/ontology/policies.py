@@ -415,7 +415,7 @@ def grouped_policies(
 
     Order is supplied by the ontology runtime vocabulary.
     Only namespaces that have at least one registered trait are included;
-    the review-substance command is responsible for showing empty-namespace
+    the review tooling is responsible for showing empty-namespace
     headings for namespaces the substance references but that have no traits.
     """
     groups: dict[str, list[SchedulingPolicy]] = {}
@@ -457,11 +457,11 @@ def readable_policies(
 ) -> list[str]:
     """Return display labels for scheduling-narrative use (schedule.yaml review_tags field).
 
-    For full grouped display (all namespaces, used by review-substance), use
+    For full grouped display (all namespaces), use
     grouped_policies() + print_policy_details() instead. The two paths are
     intentionally distinct:
       readable_policies()       = schedule narrative (scheduling drivers only)
-      review-substance output = full audit (all namespaces visible)
+      review output = concise active-stack summary
     """
     visibility = _review_tag_visibility(bundle)
     labels: list[str] = []

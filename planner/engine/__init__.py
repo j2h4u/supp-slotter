@@ -16,7 +16,7 @@ from planner.engine.results import (
     ReviewResult,
     ShowResult,
 )
-from planner.engine.review import cmd_review, cmd_review_substance
+from planner.engine.review import cmd_review
 from planner.engine.show import cmd_show
 
 __all__ = [
@@ -36,6 +36,5 @@ __all__ = [
     "cmd_grooming_research",
     "cmd_plan",
     "cmd_review",
-    "cmd_review_substance",
     "cmd_show",
 ]

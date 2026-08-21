@@ -14,7 +14,6 @@ from planner.engine import (
     cmd_find,
     cmd_grooming_next,
     cmd_review,
-    cmd_review_substance,
     cmd_show,
 )
 from planner.engine.results import ResearchStateResult, ReviewResult, ShowResult
@@ -33,7 +32,7 @@ def main(data_root: Path | None = None) -> None:
             "  python -m planner audit                  — diagnostics and card-quality checks\n"
             "  python -m planner find <words>           — search cards\n"
             "  python -m planner groom                  — show the next grooming card\n"
-            "  python -m planner review-substance <path> — single-card trait checklist\n\n"
+            "\n"
             "Notes:\n"
             "  check and the default command automatically generate missing\n"
             "  product/substance ids and rename files when the fix is deterministic."
@@ -69,16 +68,6 @@ def main(data_root: Path | None = None) -> None:
 
     sub.add_parser("groom", help="show the next priority grooming card")
 
-    review_substance = sub.add_parser(
-        "review-substance",
-        help="show a grouped trait checklist for one substance card",
-    )
-    review_substance.add_argument("path", help="path to data/substances/*.yaml")
-    review_substance.add_argument(
-        "--compact",
-        action="store_true",
-        help="show only current traits, relation matches, and concerns",
-    )
 
     if len(sys.argv) == 1:
         _exit_with_result(cmd_show(data_root=data_root))
@@ -91,7 +80,6 @@ def main(data_root: Path | None = None) -> None:
         "find": _run_find,
         "groom": _run_grooming,
         "review": _run_review,
-        "review-substance": _run_review_substance,
     }
     if command is None:
         parser.print_help()
@@ -120,16 +108,6 @@ def _run_grooming(args: argparse.Namespace, data_root: Path | None) -> int:
 
 def _run_review(_args: argparse.Namespace, data_root: Path | None) -> int:
     return _print_result(cmd_review(data_root=data_root))
-
-
-def _run_review_substance(args: argparse.Namespace, data_root: Path | None) -> int:
-    return _print_result(
-        cmd_review_substance(
-            cast(str, args.path),
-            data_root=data_root,
-            compact=cast(bool, args.compact),
-        )
-    )
 
 
 def _exit_with_result(result: ReviewResult | ShowResult) -> None:

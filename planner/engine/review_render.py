@@ -17,7 +17,6 @@ def render_review(model: ReviewModel) -> None:
     _print_review_brief(model)
     _print_concerns(model)
     _print_relations(model)
-    _print_knowledge_index(model)
     _print_dashboard_summary(model)
 
 
@@ -71,7 +70,9 @@ def _print_concerns(model: ReviewModel) -> None:
             print()
         print(f"{header} ({len(entries)})")
         print(SEPARATOR)
-        for entry in sorted(entries, key=_concern_sort_key):
+        ordered = sorted(entries, key=_concern_sort_key)
+        shown = ordered[:12]
+        for entry in shown:
             print(f"  {entry.name} ({entry.record.subject_kind}:{entry.record.subject_id})")
             wrapped = textwrap.fill(
                 entry.text,
@@ -80,6 +81,8 @@ def _print_concerns(model: ReviewModel) -> None:
                 subsequent_indent=_INDENT,
             )
             print(wrapped)
+        if len(ordered) > len(shown):
+            print(f"  … {len(ordered) - len(shown)} more concerns; inspect source cards or audit for the full catalog.")
         any_output = True
 
     if not any_output:
@@ -94,36 +97,26 @@ def _concern_label(model: ReviewModel, kind: str) -> str:
 
 
 def _print_relations(model: ReviewModel) -> None:
-    total_relations = sum(len(v) for v in model.relations_by_status.values())
+    warning_entries = [
+        entry for entries in model.relations_by_status.values() for entry in entries if entry["warning_type"]
+    ]
     print()
-    print(f"Relations ({total_relations})")
+    print(f"Actionable relation warnings ({len(warning_entries)})")
     print(SEPARATOR)
-    if total_relations == 0:
-        print("  No relations defined.")
+    if not warning_entries:
+        print("  No active relation warnings.")
         return
 
-    for status in model.relation_status_order:
-        entries = model.relations_by_status[status]
-        if not entries:
-            continue
-        print(f"\n  {status} ({len(entries)})")
-        for entry in sorted(entries, key=lambda item: _relation_sort_key(item, model.relation_type_order)):
-            relation_type = _relation_type_label(model, entry["type"])
-            source = entry["source"]
-            target = entry["target"]
-            reason = entry["reason"]
-            presence = entry["presence"]
-            line = f"[{relation_type}] {source} -> {target}"
-            if presence:
-                line += f" [{presence}]"
-            if entry["warning_type"]:
-                line += f" [warning: {entry['warning_type']}]"
-            if reason:
-                line += f": {reason}"
-            print(f"    {line}")
-            _print_relation_metadata(entry)
-            if entry["show_matches"]:
-                _print_relation_match_details(entry)
+    for entry in sorted(warning_entries, key=lambda item: _relation_sort_key(item, model.relation_type_order)):
+        relation_type = _relation_type_label(model, entry["type"])
+        line = f"  [{relation_type}] {entry['source']} -> {entry['target']}"
+        print(f"{line} [warning: {entry['warning_type']}]")
+        if entry["reason"]:
+            print(f"      {entry['reason']}")
+        _print_relation_metadata(entry)
+        action = entry.get("action")
+        if action:
+            print(f"      action: {action}")
 
 
 def _relation_sort_key(entry: RelationReviewRow, relation_type_order: tuple[str, ...]) -> tuple[int, str]:
@@ -215,34 +208,19 @@ def _concern_sort_key(entry: ConcernEntry) -> tuple[str, str]:
 
 def _print_dashboard_summary(model: ReviewModel) -> None:
     print()
-    print(f"Dashboard summary ({len(model.dashboard_summary)})")
+    print(f"Dashboard coverage ({len(model.dashboard_summary)})")
     print(SEPARATOR)
     if not model.dashboard_summary:
         print("  No dashboards with benefit or risk blocks found.")
         print("  (Dashboards lacking both benefit: and risk: blocks are excluded from this summary.)")
         return
 
-    for entry in sorted(model.dashboard_summary.values(), key=lambda item: (item["name"].casefold(), item["id"])):
-        name = entry["name"]
-        members = _dashboard_members(entry)
-        total = len(members)
-        usage_counts = {
-            state.state: _count_members_by_usage(members, state.state)
-            for state in model.dashboard_state_catalog.usage_states
-        }
-        tracking_counts = {
-            state.state: _count_members_by_tracking(members, state.state)
-            for state in model.dashboard_state_catalog.product_tracking_states
-        }
-        usage_summary = ", ".join(
-            f"{state.label}: {usage_counts[state.state]}"
-            for state in sorted(model.dashboard_state_catalog.usage_states, key=lambda state: state.order)
-        )
-        tracking_summary = ", ".join(
-            f"{state.label}: {tracking_counts[state.state]}"
-            for state in sorted(model.dashboard_state_catalog.product_tracking_states, key=lambda state: state.order)
-        )
-        print(f"  {name}: {total} relevant substances (usage: {usage_summary}; tracking: {tracking_summary})")
+    primary_usage_state = min(model.dashboard_state_catalog.usage_states, key=lambda state: state.order)
+    with_current = sum(
+        1 for entry in model.dashboard_summary.values()
+        if any(_member_usage_state(member) == primary_usage_state.state for member in _dashboard_members(entry))
+    )
+    print(f"  {with_current} with {primary_usage_state.label} members; {len(model.dashboard_summary) - with_current} without.")
 
 
 def _dashboard_members(entry: DashboardReviewEntryWithMembers) -> list[DashboardMember]:

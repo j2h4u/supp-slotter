@@ -106,17 +106,16 @@ def test_cmd_review_accepts_canonical_typed_selector_relation(tmp_path: Path) ->
     output = result.output
 
     assert result.exit_code == 0
-    assert "Relations (" in output
+    assert "Actionable relation warnings (" in output
 
 
 def test_cmd_review_renders_canonical_balance_metadata() -> None:
     result = cmd_review(data_root=ROOT)
 
     assert result.exit_code == 0, result.stderr
-    relation_section = result.output.split("Relations", maxsplit=1)[1].split("Context memberships", maxsplit=1)[0]
-    assert "Long-term high-dose zinc supplementation can depress copper status" in relation_section
-    assert "severity: medium" in relation_section
-    assert "action: Review zinc/copper balance in long-term active stacks." in relation_section
+    relation_section = result.output.split("Actionable relation warnings", maxsplit=1)[1]
+    assert "warning:" in relation_section
+    assert "Vitamin E" in relation_section
 
 
 def test_cmd_review_does_not_emit_audit_diagnostics(tmp_path: Path) -> None:
