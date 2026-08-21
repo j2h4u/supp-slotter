@@ -85,12 +85,16 @@ grooming; this skill is only the quick operator surface.
 
 Quick rules:
 
-- Grooming is card-level work: take the queue's normal batch of 10 Substance
-  cards and research/adjudicate all meaningful unresolved knowledge assertions
-  and relation leads for each card in one holistic pass. `research_state` and
-  `sources` on individual assertions are provenance, not separate queue jobs.
-  Report progress in cards, never as the count of underlying assertion rows;
-  active-product reach/count is the ROI priority signal.
+- Grooming is card-level work: the CLI supplies one priority Substance card by
+  default, and that complete card is the work/acceptance unit. An orchestrator
+  may assign one additional card only when current output shows a concrete
+  shared relation, exact repeated claim, or clearly shared narrow evidence
+  context; predicate/category equality alone is insufficient. Complete every
+  assigned card holistically. Relations have one owner. `research_state` and
+  `sources` on assertions are provenance, not separate queue jobs. `--limit N`
+  is manual viewing/explicit orchestration control, not a standard batch size.
+  Report progress in cards; active-product reach/count is workflow ROI, not
+  medical confidence or ontology semantics.
 
 - Search first with `uv run python -m planner find "<product substance form alias>"`;
   reuse matching Product/Substance/form identities and do not use grep/glob as

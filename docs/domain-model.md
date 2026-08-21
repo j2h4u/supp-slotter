@@ -23,13 +23,20 @@ could improve the greatest number of active Products; this is operational
 triage, not medical importance, quality, or recommendation scoring.
 
 The queue's work unit is the Substance card, not an individual knowledge
-assertion or relation row. A normal agent batch is 10 cards; each card receives
-one holistic pass over meaningful unresolved knowledge assertions, relation
-leads, and applicable scheduling questions. `research_state` and `sources` on
-assertions remain provenance. Progress is therefore counted in cards. The
+assertion or relation row. The CLI supplies one priority card by default. An
+orchestrator may add one card only for a concrete shared relation, exact
+repeated claim, or clearly shared narrow evidence context; predicate/category
+equality alone is insufficient. Both assigned cards receive one holistic pass
+over meaningful unresolved knowledge assertions, relation leads, and applicable
+scheduling questions. Relations have one owner. `research_state` and `sources`
+on assertions remain provenance. `--limit N` is manual viewing/explicit
+orchestration control, not a standard batch size. The
 current `main` planning baseline is 37 active-reachable cards, 36 needing work
 (25 wholly unassessed and 11 partially assessed); 170 underlying rows must not
-be presented as 170 jobs.
+be presented as 170 jobs. Priority is transparent workflow ROI: active Product
+count descending, then unresolved knowledge/relation item count descending,
+then stable card name/ID. These are not weighted scores, medical confidence,
+or ontology semantics.
 
 **Product** (`data/products/*.yaml`) is a physical label-backed item. It owns `brand`, formula components, component labels/amounts when known, product description URLs, product notes, and label ambiguity. A product may contain one or many substances. Product components are canonical as `sub_*` IDs; during drafting, `uv run python -m planner check` may rewrite exact substance name/form, alias, or filename-stem refs to IDs when the match is unique. Product `id` is a stable opaque key such as `prd_83dffd67bf`; it does not change when `brand` or `name` changes. Product filenames use readable parts plus the id, for example `minami_healthy_foods__nattokinase__prd_83dffd67bf.yaml`; if the brand is genuinely unknown, use `unknown`. Product cards are user-specific stack state by default. An optional `use_pattern: not_every_day` is a presentation marker only: omission means the `daily_base` presentation, and the marker never changes stack routing, slot scoring, constraints, relations, or the physical schedule.
 

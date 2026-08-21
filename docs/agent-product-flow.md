@@ -32,11 +32,13 @@ applicable questions; they do not skip the common stages.
    stack matches. Prefer existing terms and choose deliberately among
    `schedule`, `knowledge`, concerns, relations, and dashboards.
 4. **Research cards holistically, then adjudicate.** The substance card is the
-   unit of grooming work. A normal batch is 10 cards, selected by the
-   read-only queue's active-product reach/ROI ordering. For each card, perform
-   one bounded pass over all meaningful unresolved knowledge assertions and
-   relation leads, as well as applicable scheduling questions; do not turn
-   assertion rows into separate jobs. A Luna/evidence worker collects sources
+   unit of grooming work. The CLI supplies one priority card by default. An
+   orchestrator may assign one additional card only when current output shows
+   a concrete shared relation, exact repeated claim, or clearly shared narrow
+   evidence context; predicate/category equality alone is insufficient. Both
+   assigned cards receive a complete holistic pass over meaningful unresolved
+   knowledge assertions and relation leads, as well as applicable scheduling
+   questions; do not turn assertion rows into separate jobs. A Luna/evidence worker collects sources
    and candidate claims, and Sol/the expert adjudicates what is admitted
    against the repository's conservative threshold. Luna may implement only
    admitted facts. Manufacturer instructions establish
@@ -232,29 +234,35 @@ planner score.
 
 ### Minimal enrichment queue
 
-The read-only command `python -m planner grooming next --limit N` (default
-`N=10`) returns a bounded batch of active Substance cards whose
-`semantic_enrichment_attempted_on` field is absent. It prints
-`Grooming queue: {total} remaining, showing {shown}` and each candidate's
-unique total/active Product counts. Results are sorted by active Product count
-descending, total Product count descending, then case-folded card name and
-stable Substance ID. The optional ISO
-`YYYY-MM-DD` field records that a bounded semantic/evidence enrichment attempt
-was made; it does not assert completeness, freshness, safety, approval, or any
-scheduling fact. Any present date permanently excludes the card from this
-minimal queue. The queue has no owners, tasks, scores, expiry, auto-write, or
-product-level marker, and it never affects scheduling.
+The read-only command `uv run python -m planner grooming research --state
+unassessed --limit N` (default `N=1`) supplies one priority active-reachable
+Substance card by default whose matching research-state provenance is visible.
+It prints
+the card-level research-state summary and each card's active-product and
+unresolved-item counts. Candidates are ordered by active Product count
+descending, unresolved knowledge/relation item count descending, then
+case-folded stable card name and ID. Both counts explain workflow ROI; they
+are not weighted scores, medical confidence, or ontology semantics. The
+optional ISO `YYYY-MM-DD` field records that a bounded semantic/evidence
+enrichment attempt was made; it does not assert completeness, freshness,
+safety, approval, or any scheduling fact. Any present date permanently
+excludes the card. `--limit N` is manual viewing/explicit orchestration
+control, not a standard batch size. The queue has no owners, tasks, scores,
+expiry, auto-write, or product-level marker, and it never affects scheduling.
 The authoritative ownership and ROI boundary is [Domain Model](domain-model.md#core-objects).
 
-The queue returns cards, not knowledge assertions or relation rows. A worker
-normally takes 10 cards and, for each card, researches/adjudicates every
-meaningful unresolved knowledge assertion and relation lead in one holistic
-pass. Assertion-level `research_state` and `sources` are retained as
-provenance and do not become separate jobs. Progress is reported in cards: the
+The queue returns cards, not knowledge assertions or relation rows. The default
+assignment is one card. An orchestrator may add one card only for a concrete
+shared relation, exact repeated claim, or clearly shared narrow evidence
+context; predicate/category equality alone is insufficient. Both cards must be
+completed holistically, and each relation has one owner. Assertion-level
+`research_state` and `sources` are retained as provenance and do not become
+separate jobs. Progress is reported in cards: the
 current `main` baseline is 37 active-reachable substance cards, 36 needing
 work (25 wholly unassessed and 11 partially assessed). The 170 underlying
 assertion/relation rows are evidence inventory, not 170 jobs. Active-product
-reach/count is the operational priority signal.
+reach/count and unresolved-item count are transparent workflow-priority
+signals, not weighted scores, medical confidence, or ontology semantics.
 
 ### Research-state glossary
 
