@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import sys
 from collections.abc import Callable, Iterator, Mapping
+from dataclasses import dataclass
 from pathlib import Path
 from typing import cast
 
@@ -175,19 +176,60 @@ def _string_mapping(value: object) -> Mapping[str, object] | None:
     return cast(Mapping[str, object], mapping)
 
 
-def _validate_generated_rule(  # noqa: PLR0914
+@dataclass(frozen=True)
+class _RuleContext:
+    file_path: Path
+    rule_name: str
+    rule: Mapping[str, object]
+    uniqueness: object
+    scope: object
+    target_class: object
+    source_field: object
+    semantics: object
+    matches: list[_SourceMatch]
+    reference_values: Mapping[str, set[str]] | None
+
+
+def _validate_generated_rule(
     file_path: Path,
     rule_name: str,
     rule: Mapping[str, object],
     matches: list[_SourceMatch],
     reference_values: Mapping[str, set[str]] | None,
 ) -> list[str]:
-    errors: list[str] = []
     uniqueness = rule.get("uniqueness")
     scope = rule.get("scope")
     target_class = rule.get("target_class")
     source_field = rule.get("source_field")
     semantics = rule.get("semantics")
+    context = _RuleContext(
+        file_path,
+        rule_name,
+        rule,
+        uniqueness,
+        scope,
+        target_class,
+        source_field,
+        semantics,
+        matches,
+        reference_values,
+    )
+    errors = _validate_rule_contract(context)
+    field = rule.get("field")
+    if field is not None and not isinstance(field, str):
+        errors.append(f"{file_path}: generated validation rule {rule_name!r} has invalid field")
+    values = _rule_values(context, field)
+    errors.extend(_minimum_rule_errors(context, values))
+    errors.extend(_uniqueness_errors(context, values))
+    errors.extend(_reference_rule_errors(context))
+    return errors
+
+
+def _validate_rule_contract(context: _RuleContext) -> list[str]:
+    file_path, rule_name, rule = context.file_path, context.rule_name, context.rule
+    uniqueness, target_class = context.uniqueness, context.target_class
+    source_field, semantics, scope = context.source_field, context.semantics, context.scope
+    errors: list[str] = []
     if uniqueness is not None and uniqueness != "required":
         errors.append(f"{file_path}: generated validation rule {rule_name!r} has unsupported uniqueness")
     if scope is not None and not isinstance(scope, str):
@@ -199,59 +241,84 @@ def _validate_generated_rule(  # noqa: PLR0914
         errors.append(f"{file_path}: generated validation rule {rule_name!r} has unsupported reference semantics")
     if all(value is None for value in (rule.get("minimum"), uniqueness, target_class, source_field, semantics)):
         errors.append(f"{file_path}: generated validation rule {rule_name!r} has no executable operation")
-    field = rule.get("field")
-    if field is not None and not isinstance(field, str):
-        errors.append(f"{file_path}: generated validation rule {rule_name!r} has invalid field")
+    return errors
+
+
+def _rule_values(context: _RuleContext, field: object) -> list[tuple[tuple[str, ...], object, dict[str, str]]]:
     values: list[tuple[tuple[str, ...], object, dict[str, str]]] = []
-    for path, record, bindings in matches:
-        value = record.get(field) if isinstance(field, str) else bindings.get(_last_placeholder(rule["source"]))
+    for path, record, bindings in context.matches:
+        value = record.get(field) if isinstance(field, str) else bindings.get(_last_placeholder(context.rule["source"]))
         value_path = (*path, field) if isinstance(field, str) else path
         values.append((value_path, value, bindings))
+    return values
 
-    minimum = rule.get("minimum")
-    if minimum is not None:
-        if isinstance(minimum, bool) or not isinstance(minimum, int):
-            errors.append(f"{file_path}: generated validation rule {rule_name!r} has invalid minimum")
+
+def _minimum_rule_errors(
+    context: _RuleContext,
+    values: list[tuple[tuple[str, ...], object, dict[str, str]]],
+) -> list[str]:
+    file_path, rule_name, minimum = context.file_path, context.rule_name, context.rule.get("minimum")
+    errors: list[str] = []
+    if minimum is None:
+        return errors
+    if isinstance(minimum, bool) or not isinstance(minimum, int):
+        return [f"{file_path}: generated validation rule {rule_name!r} has invalid minimum"]
+    for path, value, _bindings in values:
+        if isinstance(value, int) and not isinstance(value, bool) and value < minimum:
+            errors.append(
+                f"{file_path}: generated validation rule {rule_name!r} rejected {'.'.join(path)}="
+                f"{value!r}; minimum={minimum!r}"
+            )
+    return errors
+
+
+def _uniqueness_errors(
+    context: _RuleContext,
+    values: list[tuple[tuple[str, ...], object, dict[str, str]]],
+) -> list[str]:
+    file_path, rule_name, uniqueness, scope = context.file_path, context.rule_name, context.uniqueness, context.scope
+    if uniqueness != "required":
+        return []
+    errors: list[str] = []
+    seen: dict[tuple[object, tuple[tuple[str, str], ...]], tuple[str, ...]] = {}
+    for path, value, bindings in values:
+        if value is None:
+            continue
+        scope_key = () if scope == "global" else _parent_scope_bindings(context.rule.get("source"), bindings)
+        key = (value, scope_key)
+        previous = seen.get(key)
+        if previous is not None:
+            errors.append(
+                f"{file_path}: generated validation rule {rule_name!r} rejected duplicate value {value!r} "
+                f"at {'.'.join(path)} (previously at {'.'.join(previous)}); scope={scope!r}"
+            )
         else:
-            for path, value, _bindings in values:
-                if isinstance(value, int) and not isinstance(value, bool) and value < minimum:
-                    errors.append(
-                        f"{file_path}: generated validation rule {rule_name!r} rejected {'.'.join(path)}="
-                        f"{value!r}; minimum={minimum!r}"
-                    )
-    if uniqueness == "required":
-        seen: dict[tuple[object, tuple[tuple[str, str], ...]], tuple[str, ...]] = {}
-        for path, value, bindings in values:
-            if value is None:
-                continue
-            scope_key = () if scope == "global" else _parent_scope_bindings(rule.get("source"), bindings)
-            key = (value, scope_key)
-            previous = seen.get(key)
-            if previous is not None:
-                errors.append(
-                    f"{file_path}: generated validation rule {rule_name!r} rejected duplicate value {value!r} "
-                    f"at {'.'.join(path)} (previously at {'.'.join(previous)}); scope={scope!r}"
-                )
-            else:
-                seen[key] = path
+            seen[key] = path
+    return errors
 
-    if (
+
+def _reference_rule_errors(context: _RuleContext) -> list[str]:
+    file_path, rule_name = context.file_path, context.rule_name
+    target_class, source_field, semantics = context.target_class, context.source_field, context.semantics
+    matches, reference_values = context.matches, context.reference_values
+    if not (
         isinstance(target_class, str)
         and isinstance(source_field, str)
         and semantics == "required_reference"
         and reference_values is not None
     ):
-        allowed = reference_values.get(target_class)
-        if allowed is None:
-            errors.append(f"{file_path}: generated validation rule {rule_name!r} has no {target_class!r} references")
-        else:
-            for path, record, _bindings in matches:
-                value = record.get(source_field)
-                if isinstance(value, str) and value not in allowed:
-                    errors.append(
-                        f"{file_path}: generated validation rule {rule_name!r} rejected unknown reference "
-                        f"{value!r} at {'.'.join((*path, source_field))}"
-                    )
+        return []
+    allowed = reference_values.get(target_class)
+    if allowed is None:
+        return [f"{file_path}: generated validation rule {rule_name!r} has no {target_class!r} references"]
+    errors: list[str] = []
+    for path, record, _bindings in matches:
+        value = record.get(source_field)
+        if isinstance(value, str) and value not in allowed:
+            errors.append(
+                f"{file_path}: generated validation rule {rule_name!r} rejected unknown reference "
+                f"{value!r} at {'.'.join((*path, source_field))}"
+            )
     return errors
 
 

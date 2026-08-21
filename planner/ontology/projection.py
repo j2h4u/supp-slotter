@@ -55,6 +55,28 @@ class ProjectionResult:
         return self.provenance
 
 
+@dataclass
+class _ProjectionContext:
+    graph: Graph
+    emitted: dict[tuple[object, object, object], ProvenanceRecord]
+    repository_root: Path
+    document: RepositoryDocument
+    value: object
+    key: str | None
+    instructions: list[dict[str, object]]
+    base_iri: str
+    subject: URIRef | None = None
+
+
+@dataclass(frozen=True)
+class _InlineNode:
+    subject: URIRef
+    predicate: URIRef
+    path: tuple[str, ...]
+    leaf: object
+    instruction: Mapping[str, object]
+
+
 def project_repository(repository_root: Path, ontology: OntologyBundle) -> ProjectionResult:
     """Project all declared repository sources using compiled instructions."""
 
@@ -85,25 +107,22 @@ def _project_repository_with_projection(
             for key in sorted(document.document, key=str):
                 value = document.document[key]
                 _project_document(
+                    _ProjectionContext(
+                        graph, emitted, repository_root, document, value, str(key), normalized_instructions, base_iri
+                    )
+                )
+        else:
+            _project_document(
+                _ProjectionContext(
                     graph,
                     emitted,
                     repository_root,
                     document,
-                    value,
-                    str(key),
+                    document.document,
+                    None,
                     normalized_instructions,
                     base_iri,
                 )
-        else:
-            _project_document(
-                graph,
-                emitted,
-                repository_root,
-                document,
-                document.document,
-                None,
-                normalized_instructions,
-                base_iri,
             )
     triples = tuple(sorted((_term_text(s), _term_text(p), _term_text(o)) for s, p, o in emitted))
     provenance = tuple(
@@ -115,170 +134,209 @@ def _project_repository_with_projection(
     return ProjectionResult(graph, triples, provenance)
 
 
-def _project_document(  # noqa: C901, PLR0912, PLR0913, PLR0917
-    graph: Graph,
-    emitted: dict[tuple[object, object, object], ProvenanceRecord],
-    repository_root: Path,
-    document: RepositoryDocument,
-    value: object,
-    key: str | None,
-    instructions: list[dict[str, object]],
-    base_iri: str,
-) -> None:
+def _project_document(context: _ProjectionContext) -> None:
+    context.subject = _document_subject(context.base_iri, context.document, context.value, context.key)
+    subject = context.subject
+    _emit(
+        context.graph,
+        context.emitted,
+        subject,
+        RDF.type,
+        URIRef(context.base_iri + context.document.root_class),
+        context.document,
+        "<root>",
+        context.repository_root,
+    )
+    for path, leaf, node_kind in _walk(context.value, (context.key,) if context.key is not None else ()):
+        compatible = _compatible_instructions(path, node_kind, context.instructions)
+        for instruction in compatible:
+            _project_instruction(context, path, leaf, instruction)
+
+
+def _document_subject(base_iri: str, document: RepositoryDocument, value: object, key: str | None) -> URIRef:
     identity = document.documents.get("identity")
     if identity is None and key is None:
-        identity_value = document.source_id
+        identity_value: object = document.source_id
     elif not isinstance(identity, Mapping):
         raise OntologyInfrastructureError(f"Source {document.source_id!r} has no identity instruction")
     else:
         identity_source = identity.get("source")
-        if identity_source == "<key>":
-            if key is None:
-                raise OntologyInfrastructureError(f"Keyed source {document.source_id!r} has no key")
-            identity_value = key
-        else:
-            identity_value = _lookup(value, str(identity_source))
+        if identity_source == "<key>" and key is None:
+            raise OntologyInfrastructureError(f"Keyed source {document.source_id!r} has no key")
+        identity_value = key if identity_source == "<key>" else _lookup(value, str(identity_source))
     if identity_value is _MISSING or isinstance(identity_value, (Mapping, list)):
         raise OntologyInfrastructureError(f"Source {document.source_id!r} identity is missing or non-scalar")
-    subject = URIRef(_entity_iri(base_iri, document.root_class, identity_value))
-    _emit(
-        graph, emitted, subject, RDF.type, URIRef(base_iri + document.root_class), document, "<root>", repository_root
-    )
-    for path, leaf, node_kind in _walk(value, (key,) if key is not None else ()):
-        matching = _matching_instructions(path, instructions)
-        if not matching:
-            continue
-        compatible = [instruction for instruction in matching if _shape_compatible(instruction, node_kind)]
-        if not compatible:
-            if node_kind in {"list-item", "mapping-item"}:
-                continue
-            raise OntologyInfrastructureError(f"Projection instructions are incompatible with {node_kind} at {path}")
-        for instruction in compatible:
-            kind = instruction["kind"]
-            if kind not in {
-                "slot",
-                "alias",
-                "sequence",
-                "keyed-map",
-                "opaque-value",
-                "reference",
-                "inlined-node",
-                "path-token",
-            }:
-                raise OntologyInfrastructureError(f"Unsupported projection instruction kind: {kind!r}")
-            predicate_value = instruction.get("predicate")
-            if not isinstance(predicate_value, str) or not predicate_value:
-                raise OntologyInfrastructureError(f"Instruction for {document.source_id!r} has no predicate")
-            predicate = URIRef(predicate_value)
-            if leaf is _CONTAINER:
-                continue
-            if kind == "inlined-node":
-                target_class = instruction.get("target")
-                if not isinstance(target_class, str) or not target_class:
-                    raise OntologyInfrastructureError(f"Inlined-node instruction has invalid target at {path}")
-                triple_subject = subject
-                subject_ref = instruction.get("subject")
-                if subject_ref is not None:
-                    if not isinstance(subject_ref, str):
-                        raise OntologyInfrastructureError(f"Instruction subject is invalid at {path}")
-                    triple_subject = _inlined_subject_iri(
-                        base_iri=base_iri,
-                        root_subject=subject,
-                        subject_pattern=subject_ref,
-                        actual_path=path,
-                        document_value=value,
-                        key=key,
-                        instructions=instructions,
-                    )
-                obj = URIRef(_child_entity_iri(base_iri, target_class, triple_subject, path, leaf))
-                _emit(graph, emitted, triple_subject, predicate, obj, document, _display_path(path), repository_root)
-                _emit(
-                    graph,
-                    emitted,
-                    obj,
-                    RDF.type,
-                    URIRef(base_iri + target_class),
-                    document,
-                    _display_path(path),
-                    repository_root,
-                )
-                continue
-            triple_subject = subject
-            subject_ref = instruction.get("subject")
-            if subject_ref is not None:
-                if not isinstance(subject_ref, str):
-                    raise OntologyInfrastructureError(f"Instruction subject is invalid at {path}")
-                triple_subject = _inlined_subject_iri(
-                    base_iri=base_iri,
-                    root_subject=subject,
-                    subject_pattern=subject_ref,
-                    actual_path=path,
-                    document_value=value,
-                    key=key,
-                    instructions=instructions,
-                )
-            target = instruction.get("target")
-            if target is not None:
-                if not isinstance(target, str) or not target or isinstance(leaf, (Mapping, list)):
-                    raise OntologyInfrastructureError(f"Reference target has invalid value at {path}")
-                obj = URIRef(_entity_iri(base_iri, target, leaf))
-            elif kind == "reference":
-                target = instruction.get("target")
-                if not isinstance(target, str) or isinstance(leaf, (Mapping, list)):
-                    raise OntologyInfrastructureError(f"Reference instruction has invalid target/value at {path}")
-                obj = URIRef(_entity_iri(base_iri, target, leaf))
-            elif kind == "path-token":
-                token = instruction.get("token")
-                token_index = instruction.get("token_index", 0)
-                source = instruction.get("source")
-                if (
-                    not isinstance(token, str)
-                    or not isinstance(source, str)
-                    or isinstance(token_index, bool)
-                    or not isinstance(token_index, int)
-                ):
-                    raise OntologyInfrastructureError(f"Path-token instruction is invalid at {path}")
-                obj = _literal(_path_token_value(source, path, token, token_index))
-            else:
-                datatype = instruction.get("datatype")
-                obj = _literal(leaf, datatype if isinstance(datatype, str) else None)
-            _emit(graph, emitted, triple_subject, predicate, obj, document, _display_path(path), repository_root)
+    return URIRef(_entity_iri(base_iri, document.root_class, identity_value))
 
 
-def _validate_structure(  # noqa: C901
-    document: RepositoryDocument, instructions: list[dict[str, object]]
+def _compatible_instructions(
+    path: tuple[str, ...], node_kind: str, instructions: list[dict[str, object]]
+) -> list[dict[str, object]]:
+    matching = _matching_instructions(path, instructions)
+    if not matching:
+        return []
+    compatible = [instruction for instruction in matching if _shape_compatible(instruction, node_kind)]
+    if not compatible and node_kind not in {"list-item", "mapping-item"}:
+        raise OntologyInfrastructureError(f"Projection instructions are incompatible with {node_kind} at {path}")
+    return compatible
+
+
+def _project_instruction(
+    context: _ProjectionContext, path: tuple[str, ...], leaf: object, instruction: Mapping[str, object]
 ) -> None:
+    document = context.document
+    kind = instruction["kind"]
+    if kind not in {
+        "slot",
+        "alias",
+        "sequence",
+        "keyed-map",
+        "opaque-value",
+        "reference",
+        "inlined-node",
+        "path-token",
+    }:
+        raise OntologyInfrastructureError(f"Unsupported projection instruction kind: {kind!r}")
+    predicate_value = instruction.get("predicate")
+    if not isinstance(predicate_value, str) or not predicate_value:
+        raise OntologyInfrastructureError(f"Instruction for {document.source_id!r} has no predicate")
+    if leaf is _CONTAINER:
+        return
+    predicate = URIRef(predicate_value)
+    triple_subject = _instruction_subject(context, instruction, path)
+    if kind == "inlined-node":
+        _emit_inlined_node(context, _InlineNode(triple_subject, predicate, path, leaf, instruction))
+        return
+    obj = _instruction_object(instruction, kind, context.base_iri, path, leaf)
+    _emit(
+        context.graph,
+        context.emitted,
+        triple_subject,
+        predicate,
+        obj,
+        document,
+        _display_path(path),
+        context.repository_root,
+    )
+
+
+def _instruction_subject(
+    context: _ProjectionContext, instruction: Mapping[str, object], path: tuple[str, ...]
+) -> URIRef:
+    subject_ref = instruction.get("subject")
+    if subject_ref is None:
+        assert context.subject is not None
+        return context.subject
+    if not isinstance(subject_ref, str):
+        raise OntologyInfrastructureError(f"Instruction subject is invalid at {path}")
+    return _inlined_subject_iri(
+        base_iri=context.base_iri,
+        root_subject=context.subject,
+        subject_pattern=subject_ref,
+        actual_path=path,
+        document_value=context.value,
+        key=context.key,
+        instructions=context.instructions,
+    )
+
+
+def _emit_inlined_node(context: _ProjectionContext, node: _InlineNode) -> None:
+    triple_subject, predicate, path, leaf, instruction = (
+        node.subject,
+        node.predicate,
+        node.path,
+        node.leaf,
+        node.instruction,
+    )
+    target_class = instruction.get("target")
+    if not isinstance(target_class, str) or not target_class:
+        raise OntologyInfrastructureError(f"Inlined-node instruction has invalid target at {path}")
+    obj = URIRef(_child_entity_iri(context.base_iri, target_class, triple_subject, path, leaf))
+    display_path = _display_path(path)
+    _emit(
+        context.graph,
+        context.emitted,
+        triple_subject,
+        predicate,
+        obj,
+        context.document,
+        display_path,
+        context.repository_root,
+    )
+    _emit(
+        context.graph,
+        context.emitted,
+        obj,
+        RDF.type,
+        URIRef(context.base_iri + target_class),
+        context.document,
+        display_path,
+        context.repository_root,
+    )
+
+
+def _instruction_object(
+    instruction: Mapping[str, object], kind: object, base_iri: str, path: tuple[str, ...], leaf: object
+) -> URIRef | Literal:
+    target = instruction.get("target")
+    if target is not None:
+        if not isinstance(target, str) or not target or isinstance(leaf, (Mapping, list)):
+            raise OntologyInfrastructureError(f"Reference target has invalid value at {path}")
+        return URIRef(_entity_iri(base_iri, target, leaf))
+    if kind == "reference":
+        if not isinstance(target, str) or isinstance(leaf, (Mapping, list)):
+            raise OntologyInfrastructureError(f"Reference instruction has invalid target/value at {path}")
+        return URIRef(_entity_iri(base_iri, target, leaf))
+    if kind == "path-token":
+        token = instruction.get("token")
+        token_index = instruction.get("token_index", 0)
+        source = instruction.get("source")
+        if (
+            not isinstance(token, str)
+            or not isinstance(source, str)
+            or isinstance(token_index, bool)
+            or not isinstance(token_index, int)
+        ):
+            raise OntologyInfrastructureError(f"Path-token instruction is invalid at {path}")
+        return _literal(_path_token_value(source, path, token, token_index))
+    datatype = instruction.get("datatype")
+    return _literal(leaf, datatype if isinstance(datatype, str) else None)
+
+
+def _validate_structure(document: RepositoryDocument, instructions: list[dict[str, object]]) -> None:
     allowed = [str(item["source"]) for item in instructions]
     root = document.document
     if document.documents.get("document_shape") == "keyed-map":
         if not isinstance(root, Mapping):
             raise OntologyInfrastructureError(f"Source {document.source_id!r} must be a mapping")
         for key, value in root.items():
-            for path, leaf, node_kind in _walk(value, (str(key),)):
-                matching = _matching_instructions(path, instructions)
-                if leaf is _CONTAINER and not matching:
-                    raise _unknown(document, path)
-                if not matching and not _has_instruction_prefix(path, allowed, node_kind):
-                    raise _unknown(document, path)
-                if (
-                    matching
-                    and not any(_shape_compatible(instruction, node_kind) for instruction in matching)
-                    and node_kind not in {"list-item", "mapping-item"}
-                ):
-                    raise _unknown(document, path)
+            _validate_paths(document, instructions, allowed, _walk(value, (str(key),)))
     else:
-        for path, leaf, node_kind in _walk(root, ()):
-            matching = _matching_instructions(path, instructions)
-            if leaf is _CONTAINER and not matching:
-                raise _unknown(document, path)
-            if not matching and not _has_instruction_prefix(path, allowed, node_kind):
-                raise _unknown(document, path)
-            if (
-                matching
-                and not any(_shape_compatible(instruction, node_kind) for instruction in matching)
-                and node_kind not in {"list-item", "mapping-item"}
-            ):
-                raise _unknown(document, path)
+        _validate_paths(document, instructions, allowed, _walk(root, ()))
+
+
+def _validate_paths(
+    document: RepositoryDocument,
+    instructions: list[dict[str, object]],
+    allowed: list[str],
+    walked: list[tuple[tuple[str, ...], object, str]],
+) -> None:
+    for path, leaf, node_kind in walked:
+        matching = _matching_instructions(path, instructions)
+        if leaf is _CONTAINER and not matching:
+            raise _unknown(document, path)
+        if not matching and not _has_instruction_prefix(path, allowed, node_kind):
+            raise _unknown(document, path)
+        if _has_incompatible_instruction(matching, node_kind):
+            raise _unknown(document, path)
+
+
+def _has_incompatible_instruction(matching: list[dict[str, object]], node_kind: str) -> bool:
+    return bool(
+        matching
+        and not any(_shape_compatible(instruction, node_kind) for instruction in matching)
+        and node_kind not in {"list-item", "mapping-item"}
+    )
 
 
 def _walk(value: object, path: tuple[str, ...]) -> list[tuple[tuple[str, ...], object, str]]:

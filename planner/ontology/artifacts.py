@@ -195,7 +195,7 @@ def _register_verified_bundle(bundle: OntologyBundle) -> OntologyBundle:
     return cast(OntologyBundle, register_bundle(bundle))
 
 
-def load_ontology(root: Path) -> OntologyBundle:  # noqa: PLR0914
+def load_ontology(root: Path) -> OntologyBundle:
     """Verify and decode a committed ontology artifact set.
 
     Every manifest, lock, source, and output file is read at most once.  The
@@ -204,91 +204,17 @@ def load_ontology(root: Path) -> OntologyBundle:  # noqa: PLR0914
     """
 
     ontology_root = root if isinstance(root, Path) else Path(root)
-    manifest_path = ontology_root / "manifest.yaml"
-    lock_path = ontology_root / "generated" / "artifact-lock.json"
-    manifest, manifest_bytes = _read_mapping(manifest_path, yaml_format=True)
-    lock, _lock_bytes = _read_mapping(lock_path, yaml_format=False)
+    manifest, manifest_bytes, lock = _read_manifest_and_lock(ontology_root)
     _validate_contract(manifest, lock)
 
     repository_root = ontology_root.parent.resolve()
     generated_root = ontology_root / "generated"
     sources = _lock_records(lock, "sources")
     outputs = _lock_records(lock, "outputs")
-
-    # Verify source declarations and hashes before consuming any generated
-    # projection.  The manifest itself is included in the source set.
-    source_bytes: dict[str, bytes] = {}
-    for record in sources:
-        relative = _safe_relative(record["path"], "source")
-        source_path = _contained_path(repository_root, relative, source_kind="source")
-        source_bytes[relative] = (
-            manifest_bytes if relative == "ontology/manifest.yaml" else _read_once(source_path, code=MISSING)
-        )
-        _check_hash(source_bytes[relative], record["sha256"], relative, source=True)
-
-    expected_outputs = _manifest_outputs(manifest)
-    locked_outputs = {record["path"] for record in outputs}
-    if locked_outputs != expected_outputs:
-        raise _error(
-            UNSUPPORTED,
-            "Artifact lock output set does not equal manifest artifact declaration",
-        )
-
-    artifact_bytes: dict[str, bytes] = {}
-    decoded: dict[str, object] = {}
-    for record in outputs:
-        relative = _safe_relative(record["path"], "output")
-        path = _contained_path(generated_root, relative, source_kind="output")
-        content = _read_once(path, code=MISSING)
-        _check_hash(content, record["sha256"], relative, source=False)
-        artifact_bytes[relative] = content
-        decoded[relative] = _decode_artifact(relative, content, path=path)
-        _validate_declared_format(relative, decoded[relative])
-
-    runtime = decoded.get("runtime-vocabulary.yaml")
-    if not isinstance(runtime, dict):
-        raise _error(UNSUPPORTED, "runtime-vocabulary.yaml is not a mapping")
-    runtime_map = cast(dict[str, object], runtime)
-    if runtime_map.get("format") != manifest.get("runtime_vocabulary_format", RUNTIME_VOCABULARY_FORMAT):
-        raise _error(UNSUPPORTED, "Unsupported runtime vocabulary format")
-    if runtime_map.get("schema_version") != str(manifest.get("schema_version")):
-        raise _error(UNSUPPORTED, "Runtime vocabulary schema version does not match manifest")
-    program = decoded.get("runtime-program.json")
-    if not isinstance(program, dict):
-        raise _error(UNSUPPORTED, "runtime-program.json is not a mapping")
-    program_map = cast(dict[str, object], program)
-    if program_map.get("schema_version") != str(manifest.get("schema_version")):
-        raise _error(UNSUPPORTED, "Runtime program schema version does not match manifest")
-    if program_map.get("source_hash") != runtime_map.get("source_hash"):
-        raise _error(STALE, "Runtime program source hash does not match runtime vocabulary")
-    provenance = program_map.get("provenance")
-    if not isinstance(provenance, dict) or set(provenance) != {
-        "source",
-        "source_sha256",
-        "manifest_schema_version",
-        "compiler_sha256",
-    }:
-        raise _error(MALFORMED, "Runtime program provenance is not a mapping")
-    policy_paths = [record["path"] for record in sources if record["path"].endswith("runtime-policy.yaml")]
-    if len(policy_paths) != 1 or provenance.get("source") != policy_paths[0]:
-        raise _error(STALE, "Runtime program provenance source does not match locked runtime policy")
-    policy_bytes = source_bytes[policy_paths[0]]
-    if provenance.get("source_sha256") != hashlib.sha256(policy_bytes).hexdigest():
-        raise _error(STALE, "Runtime program provenance source hash does not match locked source")
-    if provenance.get("manifest_schema_version") != str(manifest.get("schema_version")):
-        raise _error(STALE, "Runtime program provenance schema version does not match manifest")
-    compiler_path = repository_root / "scripts" / "ontology_compiler.py"
-    compiler_bytes = _read_once(compiler_path, code=MISSING)
-    if provenance.get("compiler_sha256") != hashlib.sha256(compiler_bytes).hexdigest():
-        raise _error(STALE, "Runtime program compiler digest does not match the active compiler")
-    digest = hashlib.sha256()
-    for relative in _manifest_sources(manifest):
-        digest.update(relative.encode("utf-8"))
-        digest.update(b"\0")
-        digest.update(source_bytes[relative])
-        digest.update(b"\0")
-    if program_map.get("source_hash") != digest.hexdigest():
-        raise _error(STALE, "Runtime program source-set hash does not match locked sources")
+    source_bytes = _verify_sources(repository_root, sources, manifest_bytes)
+    _check_locked_outputs(manifest, outputs)
+    artifact_bytes, decoded = _load_outputs(generated_root, outputs)
+    _validate_runtime_program(manifest, repository_root, sources, source_bytes, decoded)
     frozen_artifacts = _FrozenDict(artifact_bytes)
     frozen_decoded = _FrozenDict({key: _freeze(value) for key, value in decoded.items()})
     bundle = OntologyBundle(
@@ -310,6 +236,105 @@ def load_ontology(root: Path) -> OntologyBundle:  # noqa: PLR0914
 
     validate_substance_schema_conformance(bundle)
     return _register_verified_bundle(bundle)
+
+
+def _read_manifest_and_lock(ontology_root: Path) -> tuple[dict[str, object], bytes, dict[str, object]]:
+    manifest, manifest_bytes = _read_mapping(ontology_root / "manifest.yaml", yaml_format=True)
+    lock, _lock_bytes = _read_mapping(ontology_root / "generated" / "artifact-lock.json", yaml_format=False)
+    return manifest, manifest_bytes, lock
+
+
+def _verify_sources(repository_root: Path, sources: list[dict[str, str]], manifest_bytes: bytes) -> dict[str, bytes]:
+    source_bytes: dict[str, bytes] = {}
+    for record in sources:
+        relative = _safe_relative(record["path"], "source")
+        path = _contained_path(repository_root, relative, source_kind="source")
+        content = manifest_bytes if relative == "ontology/manifest.yaml" else _read_once(path, code=MISSING)
+        _check_hash(content, record["sha256"], relative, source=True)
+        source_bytes[relative] = content
+    return source_bytes
+
+
+def _check_locked_outputs(manifest: Mapping[str, object], outputs: list[dict[str, str]]) -> None:
+    if {record["path"] for record in outputs} != _manifest_outputs(manifest):
+        raise _error(UNSUPPORTED, "Artifact lock output set does not equal manifest artifact declaration")
+
+
+def _load_outputs(generated_root: Path, outputs: list[dict[str, str]]) -> tuple[dict[str, bytes], dict[str, object]]:
+    artifact_bytes: dict[str, bytes] = {}
+    decoded: dict[str, object] = {}
+    for record in outputs:
+        relative = _safe_relative(record["path"], "output")
+        path = _contained_path(generated_root, relative, source_kind="output")
+        content = _read_once(path, code=MISSING)
+        _check_hash(content, record["sha256"], relative, source=False)
+        artifact_bytes[relative] = content
+        decoded[relative] = _decode_artifact(relative, content, path=path)
+        _validate_declared_format(relative, decoded[relative])
+    return artifact_bytes, decoded
+
+
+def _validate_runtime_program(
+    manifest: Mapping[str, object],
+    repository_root: Path,
+    sources: list[dict[str, str]],
+    source_bytes: Mapping[str, bytes],
+    decoded: Mapping[str, object],
+) -> None:
+    runtime = decoded.get("runtime-vocabulary.yaml")
+    if not isinstance(runtime, dict):
+        raise _error(UNSUPPORTED, "runtime-vocabulary.yaml is not a mapping")
+    runtime_map = cast(Mapping[str, object], runtime)
+    schema_version = str(manifest.get("schema_version"))
+    if runtime_map.get("format") != manifest.get("runtime_vocabulary_format", RUNTIME_VOCABULARY_FORMAT):
+        raise _error(UNSUPPORTED, "Unsupported runtime vocabulary format")
+    if runtime_map.get("schema_version") != schema_version:
+        raise _error(UNSUPPORTED, "Runtime vocabulary schema version does not match manifest")
+    program = decoded.get("runtime-program.json")
+    if not isinstance(program, dict):
+        raise _error(UNSUPPORTED, "runtime-program.json is not a mapping")
+    program_map = cast(Mapping[str, object], program)
+    if program_map.get("schema_version") != schema_version:
+        raise _error(UNSUPPORTED, "Runtime program schema version does not match manifest")
+    if program_map.get("source_hash") != runtime_map.get("source_hash"):
+        raise _error(STALE, "Runtime program source hash does not match runtime vocabulary")
+    _validate_program_provenance(manifest, repository_root, sources, source_bytes, program_map)
+    if program_map.get("source_hash") != _source_set_hash(manifest, source_bytes):
+        raise _error(STALE, "Runtime program source-set hash does not match locked sources")
+
+
+def _validate_program_provenance(
+    manifest: Mapping[str, object],
+    repository_root: Path,
+    sources: list[dict[str, str]],
+    source_bytes: Mapping[str, bytes],
+    program: Mapping[str, object],
+) -> None:
+    provenance = program.get("provenance")
+    expected_fields = {"source", "source_sha256", "manifest_schema_version", "compiler_sha256"}
+    if not isinstance(provenance, dict) or set(provenance) != expected_fields:
+        raise _error(MALFORMED, "Runtime program provenance is not a mapping")
+    policy_paths = [record["path"] for record in sources if record["path"].endswith("runtime-policy.yaml")]
+    if len(policy_paths) != 1 or provenance.get("source") != policy_paths[0]:
+        raise _error(STALE, "Runtime program provenance source does not match locked runtime policy")
+    policy_path = policy_paths[0]
+    if provenance.get("source_sha256") != hashlib.sha256(source_bytes[policy_path]).hexdigest():
+        raise _error(STALE, "Runtime program provenance source hash does not match locked source")
+    if provenance.get("manifest_schema_version") != str(manifest.get("schema_version")):
+        raise _error(STALE, "Runtime program provenance schema version does not match manifest")
+    compiler = _read_once(repository_root / "scripts" / "ontology_compiler.py", code=MISSING)
+    if provenance.get("compiler_sha256") != hashlib.sha256(compiler).hexdigest():
+        raise _error(STALE, "Runtime program compiler digest does not match the active compiler")
+
+
+def _source_set_hash(manifest: Mapping[str, object], source_bytes: Mapping[str, bytes]) -> str:
+    digest = hashlib.sha256()
+    for relative in _manifest_sources(manifest):
+        digest.update(relative.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(source_bytes[relative])
+        digest.update(b"\0")
+    return digest.hexdigest()
 
 
 def _is_verified_bundle(value: object) -> bool:

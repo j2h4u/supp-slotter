@@ -27,6 +27,16 @@ class ValidationRegistry:
     relation_type_class: URIRef
 
 
+@dataclass(frozen=True)
+class _RegistrySelection:
+    canonical: Graph
+    terms: set[Node]
+    categories: set[Node]
+    profiles: set[Node]
+    axes: set[Node]
+    base: str
+
+
 def _phase_start(phase_timings: MutableMapping[str, float] | None) -> float | None:
     return time.monotonic() if phase_timings is not None else None
 
@@ -40,7 +50,7 @@ def _record_phase(
         phase_timings[name] = time.monotonic() - started
 
 
-def build_validation_registry(ontology_root: Path) -> ValidationRegistry:  # noqa: C901, PLR0912, PLR0914, PLR0915
+def build_validation_registry(ontology_root: Path) -> ValidationRegistry:
     """Load generated term/category/profile and placement metadata.
 
     The generated ontology also contains catalog and schema metadata.  Those
@@ -50,12 +60,46 @@ def build_validation_registry(ontology_root: Path) -> ValidationRegistry:  # noq
     of placement during validation.
     """
 
+    canonical = _load_canonical_ontology(ontology_root)
+    base = _canonical_base(canonical)
+    ontology_term = URIRef(f"{base}OntologyTerm")
+    terms, category_nodes, profile_nodes, axis_nodes = _registry_nodes(canonical, base)
+    metadata = category_nodes | profile_nodes | axis_nodes
+    if not terms:
+        raise OntologyInfrastructureError("Generated ontology has no canonical OntologyTerm registry")
+    if not metadata:
+        raise OntologyInfrastructureError("Generated ontology has no canonical placement metadata")
+
+    registry = Graph()
+    _copy_registry_nodes(
+        registry, _RegistrySelection(canonical, terms, category_nodes, profile_nodes, axis_nodes, base)
+    )
+
+    # Entity selectors use the same authored substance identity registry as
+    # the compiler/runtime.  Keep this registry in the composed SHACL graph so
+    # an assertion cannot make an unknown ID/name valid merely by omitting its
+    # corresponding Substance card from a focused fixture.
+    _append_substance_registry(registry, ontology_root, base)
+
+    # Relation assertions use literal relation_type values while directionality
+    # and per-side selector forms are authored in the generated relation-type
+    # catalog.  Project that catalog into the validation graph so SHACL never
+    # needs a Python/domain list and a fixture cannot redefine relation policy.
+    relation_type_class = URIRef(f"{base}OperationalRelationType")
+    _append_relation_registry(registry, canonical, relation_type_class)
+    triples = tuple(sorted(registry, key=lambda triple: tuple(str(value) for value in triple)))
+    return ValidationRegistry(triples, ontology_term, relation_type_class)
+
+
+def _load_canonical_ontology(ontology_root: Path) -> Graph:
     ontology_path = ontology_root / "generated" / "ontology.ttl"
     try:
-        canonical = Graph().parse(ontology_path, format="turtle")
+        return Graph().parse(ontology_path, format="turtle")
     except Exception as error:  # RDF parsing is part of the validation boundary.
         raise OntologyInfrastructureError(f"Cannot load generated ontology registry: {error}") from error
 
+
+def _canonical_base(canonical: Graph) -> str:
     base = next(
         (
             str(subject)
@@ -66,95 +110,86 @@ def build_validation_registry(ontology_root: Path) -> ValidationRegistry:  # noq
     )
     if base is None:
         raise OntologyInfrastructureError("Generated ontology has no canonical ontology base")
+    return base
+
+
+def _registry_nodes(canonical: Graph, base: str) -> tuple[set[Node], set[Node], set[Node], set[Node]]:
     ontology_term = URIRef(f"{base}OntologyTerm")
     semantic_category = URIRef(f"{base}semantic_category")
     ontoclean_profile = URIRef(f"{base}ontoclean_profile")
-    semantic_category_class = URIRef(f"{base}SemanticCategory")
-    ontoclean_profile_class = URIRef(f"{base}OntoCleanProfile")
+    category_class = URIRef(f"{base}SemanticCategory")
+    profile_class = URIRef(f"{base}OntoCleanProfile")
     assignment_source = URIRef(f"{base}assignment_source")
     axis_predicate = URIRef(f"{base}axis")
     terms = set(canonical.subjects(RDF.type, ontology_term))
-    category_nodes = set(canonical.subjects(RDF.type, semantic_category_class))
-    category_nodes.update(obj for term in terms for obj in canonical.objects(term, semantic_category))
-    axis_nodes = {
+    categories = set(canonical.subjects(RDF.type, category_class))
+    categories.update(obj for term in terms for obj in canonical.objects(term, semantic_category))
+    axes = {
         subject
         for subject in canonical.subjects(assignment_source, None)
         if (subject, axis_predicate, None) in canonical
     }
-    profile_nodes = set(canonical.subjects(RDF.type, ontoclean_profile_class))
-    profile_nodes.update(obj for category in category_nodes for obj in canonical.objects(category, ontoclean_profile))
-    metadata = category_nodes | profile_nodes | axis_nodes
-    if not terms:
-        raise OntologyInfrastructureError("Generated ontology has no canonical OntologyTerm registry")
-    if not metadata:
-        raise OntologyInfrastructureError("Generated ontology has no canonical placement metadata")
+    profiles = set(canonical.subjects(RDF.type, profile_class))
+    profiles.update(obj for category in categories for obj in canonical.objects(category, ontoclean_profile))
+    return terms, categories, profiles, axes
 
-    registry = Graph()
-    for term in terms:
-        for triple in canonical.triples((term, None, None)):
+
+def _copy_registry_nodes(registry: Graph, selection: _RegistrySelection) -> None:
+    for node in selection.terms | selection.categories | selection.profiles:
+        for triple in selection.canonical.triples((node, None, None)):
             registry.add(triple)
-    for category in category_nodes:
-        for triple in canonical.triples((category, None, None)):
-            registry.add(triple)
-    for profile in profile_nodes:
-        for triple in canonical.triples((profile, None, None)):
-            registry.add(triple)
-    for axis in axis_nodes:
-        for predicate in (axis_predicate, assignment_source, URIRef(f"{base}assignment_field")):
-            for value in canonical.objects(axis, predicate):
+    axis_predicate = URIRef(f"{selection.base}axis")
+    assignment_source = URIRef(f"{selection.base}assignment_source")
+    assignment_field = URIRef(f"{selection.base}assignment_field")
+    for axis in selection.axes:
+        for predicate in (axis_predicate, assignment_source, assignment_field):
+            for value in selection.canonical.objects(axis, predicate):
                 registry.add((axis, predicate, value))
 
-    # Entity selectors use the same authored substance identity registry as
-    # the compiler/runtime.  Keep this registry in the composed SHACL graph so
-    # an assertion cannot make an unknown ID/name valid merely by omitting its
-    # corresponding Substance card from a focused fixture.
-    substance_class = URIRef(f"{base}Substance")
-    substance_id_predicate = URIRef(f"{base}id")
-    label_predicate = URIRef(f"{base}label")
-    substances_dir = ontology_root.parent / "data" / "substances"
-    if substances_dir.is_dir():
-        seen_ids: set[str] = set()
-        substance_records: list[tuple[str, str]] = []
-        for path in sorted(substances_dir.glob("*.yaml")):
-            try:
-                raw = safe_load_yaml(path.read_text(encoding="utf-8"), path=path)
-            except (OSError, UnicodeError, yaml.YAMLError) as error:
-                raise OntologyInfrastructureError(f"Cannot load substance registry card {path}: {error}") from error
-            if not isinstance(raw, Mapping):
-                raise OntologyInfrastructureError(f"Substance registry card {path} must be a mapping")
-            raw = cast(Mapping[str, object], raw)
-            substance_id = raw.get("id")
-            name = raw.get("name")
-            if not isinstance(substance_id, str) or not substance_id.strip():
-                raise OntologyInfrastructureError(f"Substance registry card {path} has no non-empty id")
-            if not isinstance(name, str) or not name.strip():
-                raise OntologyInfrastructureError(f"Substance registry card {path} has no non-empty name")
-            if substance_id in seen_ids:
-                raise OntologyInfrastructureError(f"Duplicate substance registry id {substance_id!r}")
-            seen_ids.add(substance_id)
-            substance_records.append((substance_id, name))
-        # GROUP_CONCAT in the relation identity SHACL rule consumes graph
-        # order.  Insert canonical IDs lexically so the aggregate key is
-        # deterministic and matches compiler/runtime sorted resolution.
-        for substance_id, name in sorted(substance_records):
-            subject = URIRef(f"{base}substance/{substance_id}")
-            registry.add((subject, RDF.type, substance_class))
-            registry.add((subject, substance_id_predicate, Literal(substance_id)))
-            registry.add((subject, label_predicate, Literal(name)))
 
-    # Relation assertions use literal relation_type values while directionality
-    # and per-side selector forms are authored in the generated relation-type
-    # catalog.  Project that catalog into the validation graph so SHACL never
-    # needs a Python/domain list and a fixture cannot redefine relation policy.
-    relation_type_class = URIRef(f"{base}OperationalRelationType")
+def _append_substance_registry(registry: Graph, ontology_root: Path, base: str) -> None:
+    substances_dir = ontology_root.parent / "data" / "substances"
+    if not substances_dir.is_dir():
+        return
+    records = _read_substance_records(substances_dir)
+    substance_class = URIRef(f"{base}Substance")
+    for substance_id, name in sorted(records):
+        subject = URIRef(f"{base}substance/{substance_id}")
+        registry.add((subject, RDF.type, substance_class))
+        registry.add((subject, URIRef(f"{base}id"), Literal(substance_id)))
+        registry.add((subject, URIRef(f"{base}label"), Literal(name)))
+
+
+def _read_substance_records(substances_dir: Path) -> list[tuple[str, str]]:
+    seen_ids: set[str] = set()
+    records: list[tuple[str, str]] = []
+    for path in sorted(substances_dir.glob("*.yaml")):
+        try:
+            raw = safe_load_yaml(path.read_text(encoding="utf-8"), path=path)
+        except (OSError, UnicodeError, yaml.YAMLError) as error:
+            raise OntologyInfrastructureError(f"Cannot load substance registry card {path}: {error}") from error
+        if not isinstance(raw, Mapping):
+            raise OntologyInfrastructureError(f"Substance registry card {path} must be a mapping")
+        mapping = cast(Mapping[str, object], raw)
+        substance_id, name = mapping.get("id"), mapping.get("name")
+        if not isinstance(substance_id, str) or not substance_id.strip():
+            raise OntologyInfrastructureError(f"Substance registry card {path} has no non-empty id")
+        if not isinstance(name, str) or not name.strip():
+            raise OntologyInfrastructureError(f"Substance registry card {path} has no non-empty name")
+        if substance_id in seen_ids:
+            raise OntologyInfrastructureError(f"Duplicate substance registry id {substance_id!r}")
+        seen_ids.add(substance_id)
+        records.append((substance_id, name))
+    return records
+
+
+def _append_relation_registry(registry: Graph, canonical: Graph, relation_type_class: URIRef) -> None:
     relation_nodes = set(canonical.subjects(RDF.type, relation_type_class))
     if not relation_nodes:
         raise OntologyInfrastructureError("Generated ontology has no canonical relation-type registry")
     for relation_node in relation_nodes:
         for triple in canonical.triples((relation_node, None, None)):
             registry.add(triple)
-    triples = tuple(sorted(registry, key=lambda triple: tuple(str(value) for value in triple)))
-    return ValidationRegistry(triples, ontology_term, relation_type_class)
 
 
 def _validation_shapes(shapes: Graph) -> Graph:
@@ -175,6 +210,10 @@ def _validation_shapes(shapes: Graph) -> Graph:
     if len(ontology_terms) != 1:
         raise OntologyInfrastructureError("Generated SHACL shapes have no unique OntologyTerm class")
     ontology_term = next(iter(ontology_terms))
+    return _remove_catalog_shapes(shapes, ontology_term)
+
+
+def _remove_catalog_shapes(shapes: Graph, ontology_term: URIRef) -> Graph:
     result = Graph()
     registry_classes = {
         ontology_term,

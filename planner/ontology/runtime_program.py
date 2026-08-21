@@ -855,39 +855,52 @@ def _validate_relation_presence_statuses(
 
 
 def _validate_dashboard_state_catalog(catalog: RuntimeDashboardStateCatalog) -> None:
-    for label, definitions in (
-        ("usage_states", catalog.usage_states),
-        ("product_tracking_states", catalog.product_tracking_states),
-    ):
-        if not definitions:
-            raise _error(f"dashboard_state_catalog.{label}", "must be non-empty")
-        if len({row.state for row in definitions}) != len(definitions):
-            raise _error(f"dashboard_state_catalog.{label}", "must not duplicate state enums")
-        if len({row.label for row in definitions}) != len(definitions):
-            raise _error(f"dashboard_state_catalog.{label}", "must not duplicate state labels")
-        orders = [row.order for row in definitions]
-        if len(set(orders)) != len(orders) or set(orders) != set(range(len(orders))):
-            raise _error(f"dashboard_state_catalog.{label}", "must have unique contiguous order values")
+    _validate_dashboard_state_definitions("usage_states", catalog.usage_states)
+    _validate_dashboard_state_definitions("product_tracking_states", catalog.product_tracking_states)
+    _validate_usage_truth_table(catalog)
+    _validate_tracking_truth_table(catalog)
+
+
+def _validate_dashboard_state_definitions(
+    label: str,
+    definitions: Sequence[RuntimeDashboardUsageStateDefinition | RuntimeDashboardProductTrackingStateDefinition],
+) -> None:
+    if not definitions:
+        raise _error(f"dashboard_state_catalog.{label}", "must be non-empty")
+    if len({row.state for row in definitions}) != len(definitions):
+        raise _error(f"dashboard_state_catalog.{label}", "must not duplicate state enums")
+    if len({row.label for row in definitions}) != len(definitions):
+        raise _error(f"dashboard_state_catalog.{label}", "must not duplicate state labels")
+    orders = [row.order for row in definitions]
+    if len(set(orders)) != len(orders) or set(orders) != set(range(len(orders))):
+        raise _error(f"dashboard_state_catalog.{label}", "must have unique contiguous order values")
+
+
+def _validate_usage_truth_table(catalog: RuntimeDashboardStateCatalog) -> None:
     usage_states = set(catalog.usage_states_by_state)
     usage_keys = {
         (row.active_stack_membership, row.inactive_stack_membership, row.tracked_product_presence)
         for row in catalog.usage_truth_table
     }
-    expected_usage_keys = {
+    expected_keys = {
         (active, inactive, tracked)
         for active in (False, True)
         for inactive in (False, True)
         for tracked in (False, True)
     }
-    if usage_keys != expected_usage_keys or len(catalog.usage_truth_table) != len(expected_usage_keys):
+    if usage_keys != expected_keys or len(catalog.usage_truth_table) != len(expected_keys):
         raise _error(
             "dashboard_state_catalog.usage_truth_table",
             "must have exact unique coverage of active, inactive, and tracked booleans",
         )
-    if any(row.state not in usage_states for row in catalog.usage_truth_table):
+    states = {row.state for row in catalog.usage_truth_table}
+    if any(state not in usage_states for state in states):
         raise _error("dashboard_state_catalog.usage_truth_table", "references an unknown usage state")
-    if {row.state for row in catalog.usage_truth_table} != usage_states:
+    if states != usage_states:
         raise _error("dashboard_state_catalog.usage_truth_table", "must cover every usage state")
+
+
+def _validate_tracking_truth_table(catalog: RuntimeDashboardStateCatalog) -> None:
     tracking_states = set(catalog.product_tracking_states_by_state)
     tracking_keys = {row.tracked_product_presence for row in catalog.product_tracking_truth_table}
     if tracking_keys != {False, True} or len(catalog.product_tracking_truth_table) != 2:
@@ -895,12 +908,13 @@ def _validate_dashboard_state_catalog(catalog: RuntimeDashboardStateCatalog) -> 
             "dashboard_state_catalog.product_tracking_truth_table",
             "must have exact unique false/true coverage",
         )
-    if any(row.state not in tracking_states for row in catalog.product_tracking_truth_table):
+    states = {row.state for row in catalog.product_tracking_truth_table}
+    if any(state not in tracking_states for state in states):
         raise _error(
             "dashboard_state_catalog.product_tracking_truth_table",
             "references an unknown product-tracking state",
         )
-    if {row.state for row in catalog.product_tracking_truth_table} != tracking_states:
+    if states != tracking_states:
         raise _error(
             "dashboard_state_catalog.product_tracking_truth_table",
             "must cover every product-tracking state",
