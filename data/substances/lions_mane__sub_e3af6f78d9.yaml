@@ -3,9 +3,9 @@ name: Lion's Mane
 aliases:
 - Hericium erinaceus
 - Lion's Mane mushroom
-notes: Medicinal mushroom extract. Active compounds include hericenones (fruiting body) and erinacines (mycelium). MSKCC describes
-  supplemental Lion's Mane as promoted for cognitive health, mood, and immunity; clinical evidence is limited, while preclinical
-  work covers neuroprotective, cognition-enhancing, immunomodulatory, and wound-healing effects.
+notes: GLS discloses 500 mg of Lion's Mane extract, but not the source tissue, extraction method, or marker identity. Human
+  evidence is heterogeneous and preparation-specific, so findings from powders, blends, and marker-enriched extracts do not
+  transfer directly to this product.
 scheduling_assessment:
   intake:
     conclusion: insufficient
@@ -19,11 +19,38 @@ scheduling_assessment:
     - https://doi.org/10.3389/fnut.2025.1641246
     - https://doi.org/10.3389/fnut.2025.1405796
     summary: Protocols use varying administration times, including an after-breakfast acute study, but no clock-time comparison. Product-specific sleep outcomes do not establish evening dosing for the unidentified GLS extract.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://doi.org/10.3389/fnut.2025.1641246
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC9762243/
+    summary: Human studies do not establish a workout-linked intake or performance rule, and the heterogeneous preparations and unidentified GLS extract prevent transferring an activity-specific protocol.
 knowledge:
   context:
-  - neurocognitive_support
+  - value: neurocognitive_support
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/18844328/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC10675414/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC12018234/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC9762243/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC12434001/
   effect:
-  - neurotrophic_support
-  - immune_modulation_context
+  - value: neurotrophic_support
+    research_state: mechanistic_only
+    sources:
+    - https://doi.org/10.3389/fnagi.2020.00155
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC12434001/
+  - value: immune_modulation_context
+    research_state: mechanistic_only
+    sources:
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC12434001/
   role:
-  - nootropic
+  - value: nootropic
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/18844328/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC10675414/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC12018234/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC9762243/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC12434001/
