@@ -23,7 +23,10 @@ knowledge:
   context:
   - sleep_recovery
   effect:
-  - bone_mineral_metabolism_support
+  - value: bone_mineral_metabolism_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
   kind:
   - mineral
   pathway:

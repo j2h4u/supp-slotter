@@ -26,7 +26,10 @@ knowledge:
   context:
   - workout_performance
   effect:
-  - bone_mineral_metabolism_support
+  - value: bone_mineral_metabolism_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/
   kind:
   - mineral
   pathway:
