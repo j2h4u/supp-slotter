@@ -10,20 +10,19 @@ from planner.ontology.artifacts import load_ontology
 from planner.paths import ROOT, Paths
 
 
-def test_groom_selects_one_complete_deterministic_dossier() -> None:
+def test_groom_reports_empty_production_queue_deterministically() -> None:
     first = cmd_groom()
     second = cmd_groom()
 
     assert first.exit_code == 0, first.stderr
     assert second.exit_code == 0, second.stderr
-    assert first.work_item is not None
-    assert first.work_item == second.work_item
-    assert first.eligible_count >= 1
-    assert first.output.count("card ") == 1
-    assert first.work_item.active_unique_product_count == len(first.work_item.active_products)
-    assert "use_pattern:" in first.output and "notes:" in first.output
-    assert all(relation.owner_id in relation.active_endpoint_ids for relation in first.work_item.open_relations)
-    assert all(first.output.count(relation.id) == 1 for relation in first.work_item.open_relations)
+    assert first.work_item is None
+    assert second.work_item is None
+    assert first.eligible_count == 0
+    assert second.eligible_count == 0
+    assert first.output == second.output
+    assert "Grooming queue: 0 eligible, showing 0" in first.output
+    assert "card " not in first.output
 
 
 def test_groom_policy_is_closed_and_formal() -> None:
