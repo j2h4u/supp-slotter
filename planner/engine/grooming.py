@@ -41,15 +41,16 @@ def cmd_groom(data_root: Path | None = None) -> GroomResult:
             schema_result = validate_schemas(paths, bundle)
             if schema_result != 0:
                 return GroomResult(schema_result, None, 0, stderr=stderr_buf.getvalue())
-            work_item, eligible_count = _select_work_item(paths, bundle)
-            _render(work_item, eligible_count, bundle.runtime_program.grooming_policy.selection_count)
+            selected, eligible_count = _select_work_items(paths, bundle)
+            work_item = selected[0] if selected else None
+            _render(selected, eligible_count, bundle.runtime_program.grooming_policy.selection_count)
             return GroomResult(0, work_item, eligible_count, stdout_buf.getvalue(), stderr_buf.getvalue())
         except (CardLoadError, OntologyInfrastructureError) as error:
             message = error.message if isinstance(error, CardLoadError) else str(error)
             return GroomResult(1, None, 0, stderr=message + "\n")
 
 
-def _select_work_item(paths: Paths, bundle: OntologyBundle) -> tuple[GroomWorkItem | None, int]:
+def _select_work_items(paths: Paths, bundle: OntologyBundle) -> tuple[tuple[GroomWorkItem, ...], int]:
     loaded = _load_inputs(paths, bundle)
     if loaded is None:
         raise CardLoadError(paths.relations_file, "relation validation failed")
@@ -93,12 +94,10 @@ def _select_work_item(paths: Paths, bundle: OntologyBundle) -> tuple[GroomWorkIt
     }
     ordered = sorted(candidates, key=lambda row: _rank_key(metrics[row[0].id], policy.rank_fields))
     selected = ordered[: policy.selection_count]
-    work_item = (
-        _build_work_item(selected[0][0], selected[0][1], selected[0][2], paths, bundle)
-        if selected
-        else None
+    return (
+        tuple(_build_work_item(row[0], row[1], row[2], paths, bundle) for row in selected),
+        len(ordered),
     )
-    return work_item, len(ordered)
 
 
 def _load_inputs(
@@ -265,11 +264,13 @@ def _substance_path(paths: Paths, substance: Substance) -> Path:
     return matches[0] if matches else paths.substances
 
 
-def _render(item: GroomWorkItem | None, eligible_count: int, selection_count: int) -> None:
-    print(f"Grooming queue: {eligible_count} eligible, showing {1 if item else 0} (selection_count={selection_count})")
-    if item is None:
-        print("  none")
-        return
+def _render(items: tuple[GroomWorkItem, ...], eligible_count: int, selection_count: int) -> None:
+    print(f"Grooming queue: {eligible_count} eligible, showing {len(items)} (selection_count={selection_count})")
+    for item in items:
+        _render_item(item)
+
+
+def _render_item(item: GroomWorkItem) -> None:
     print(f"  card {item.substance_id} — {item.name}")
     print(f"    path: {item.path}")
     print(f"    form: {item.form or '—'}")
@@ -292,7 +293,8 @@ def _render(item: GroomWorkItem | None, eligible_count: int, selection_count: in
     for row in item.open_relations:
         print(
             f"      - OPEN {row.id} {row.relation_type}: {row.source} -> {row.target} "
-            f"({row.reason}); endpoints={','.join(row.active_endpoint_ids)}; owner={row.owner_id}"
+            f"({row.reason}); sources={','.join(row.sources) or '—'}; "
+            f"endpoints={','.join(row.active_endpoint_ids) or '—'}; owner={row.owner_id or '—'}"
         )
     if not item.open_relations:
         print("      - none")
