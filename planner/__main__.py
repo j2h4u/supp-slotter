@@ -13,12 +13,11 @@ from planner.engine import (
     cmd_check,
     cmd_find,
     cmd_grooming_next,
-    cmd_grooming_research,
     cmd_review,
     cmd_review_substance,
     cmd_show,
 )
-from planner.engine.results import GroomingResult, ResearchStateResult, ReviewResult, ShowResult
+from planner.engine.results import ResearchStateResult, ReviewResult, ShowResult
 
 CommandHandler = Callable[[argparse.Namespace, Path | None], int]
 
@@ -33,7 +32,7 @@ def main(data_root: Path | None = None) -> None:
             "  python -m planner review                 — concerns, relations, fact memberships\n"
             "  python -m planner audit                  — diagnostics and card-quality checks\n"
             "  python -m planner find <words>           — search cards\n"
-            "  python -m planner grooming next          — show the next enrichment batch\n"
+            "  python -m planner groom                  — show the next grooming card\n"
             "  python -m planner review-substance <path> — single-card trait checklist\n\n"
             "Notes:\n"
             "  check and the default command automatically generate missing\n"
@@ -68,20 +67,7 @@ def main(data_root: Path | None = None) -> None:
         help="knowledge-section review of active stack (concerns, relations, fact memberships)",
     )
 
-    grooming = sub.add_parser("grooming", help="read-only enrichment queue")
-    grooming_sub = grooming.add_subparsers(dest="grooming_cmd", required=True)
-    grooming_next = grooming_sub.add_parser("next", help="show active cards never attempted")
-    grooming_next.add_argument(
-        "--limit",
-        type=int,
-        default=None,
-        help="positive maximum number of cards (default: 1)",
-    )
-    grooming_research = grooming_sub.add_parser("research", help="list active substance cards by research state")
-    grooming_research.add_argument("--state", required=True, help="research state enum value")
-    grooming_research.add_argument(
-        "--limit", type=int, default=None, help="positive maximum number of cards (default: 1)"
-    )
+    sub.add_parser("groom", help="show the next priority grooming card")
 
     review_substance = sub.add_parser(
         "review-substance",
@@ -103,7 +89,7 @@ def main(data_root: Path | None = None) -> None:
         "audit": _run_audit,
         "check": _run_check,
         "find": _run_find,
-        "grooming": _run_grooming,
+        "groom": _run_grooming,
         "review": _run_review,
         "review-substance": _run_review_substance,
     }
@@ -128,13 +114,8 @@ def _run_find(args: argparse.Namespace, data_root: Path | None) -> int:
 
 
 def _run_grooming(args: argparse.Namespace, data_root: Path | None) -> int:
-    if cast(str, args.grooming_cmd) == "next":
-        return _print_result(cmd_grooming_next(cast(int, args.limit), data_root=data_root))
-    if cast(str, args.grooming_cmd) == "research":
-        return _print_result(
-            cmd_grooming_research(cast(str, args.state), cast(int | None, args.limit), data_root=data_root)
-        )
-    return 2
+    del args
+    return _print_result(cmd_grooming_next(data_root=data_root))
 
 
 def _run_review(_args: argparse.Namespace, data_root: Path | None) -> int:
@@ -155,10 +136,10 @@ def _exit_with_result(result: ReviewResult | ShowResult) -> None:
     sys.exit(_print_result(result))
 
 
-def _print_result(result: ReviewResult | ShowResult | GroomingResult | ResearchStateResult) -> int:
+def _print_result(result: ReviewResult | ShowResult | ResearchStateResult) -> int:
     if result.output:
         print(result.output, end="")
-    if isinstance(result, (ReviewResult, GroomingResult, ResearchStateResult)) and result.stderr:
+    if isinstance(result, (ReviewResult, ResearchStateResult)) and result.stderr:
         print(result.stderr, end="", file=sys.stderr)
     return result.exit_code
 
