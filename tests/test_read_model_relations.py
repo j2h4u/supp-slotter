@@ -12,7 +12,7 @@ from tests.helpers import ontology_bundle
 from tests.scheduling_fixtures import make_substance
 
 
-def test_canonical_balance_assertion_retains_authored_review_metadata() -> None:
+def test_canonical_balance_assertion_retains_current_authored_review_metadata() -> None:
     bundle = ontology_bundle()
     assertion = next(item for item in load_ontology_assertions(bundle) if item.id == "rel_balance_001")
 
@@ -22,18 +22,20 @@ def test_canonical_balance_assertion_retains_authored_review_metadata() -> None:
 
     assert row["reason"] == assertion.reason
     assert row["severity"] == "medium"
-    assert row["action"] == "Review zinc/copper balance in long-term active stacks."
+    assert row["action"] == (
+        "Review zinc/copper balance for sustained high-zinc exposure; do not split the same product or apply a "
+        "universal zinc-copper interval."
+    )
 
 
-def test_canonical_vitamin_e_support_assertion_retains_bounded_review_metadata() -> None:
+def test_canonical_vitamin_c_iron_support_assertion_retains_authored_review_metadata() -> None:
     bundle = ontology_bundle()
-    assertion = next(item for item in load_ontology_assertions(bundle) if item.id == "rel_supports_006")
+    assertion = next(item for item in load_ontology_assertions(bundle) if item.id == "rel_supports_009")
 
     assert assertion.severity == "low"
     assert assertion.action == (
-        "Do not add supplemental vitamin E by default. Review dietary vitamin E/status only if total EPA/DHA "
-        "exposure is high or low intake, deficiency, or malabsorption is plausible; if supplementation is "
-        "considered, review dose and bleeding risk, especially with nattokinase, anticoagulants, or antiplatelets."
+        "Review only when nonheme iron supplementation or other relevant iron context is active; no required "
+        "vitamin C supplement, co-dose, separation interval, or guaranteed outcome is established."
     )
 
 

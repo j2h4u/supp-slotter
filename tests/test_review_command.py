@@ -112,13 +112,19 @@ def test_cmd_review_accepts_canonical_typed_selector_relation(tmp_path: Path) ->
     assert "Actionable relation warnings (" in output
 
 
-def test_cmd_review_renders_canonical_balance_metadata() -> None:
+def test_cmd_review_renders_current_active_relation_metadata() -> None:
     result = cmd_review(data_root=ROOT)
 
     assert result.exit_code == 0, result.stderr
     relation_section = result.output.split("Actionable relation warnings", maxsplit=1)[1]
-    assert "warning:" in relation_section
-    assert "Vitamin E" in relation_section
+    assert (
+        "Calcium -> Zinc [warning: review_with_substance_present]\n"
+        "      Calcium reduced zinc absorption in some high-calcium/co-ingestion studies while ordinary-food studies did not; "
+        "the signal is dose-, meal-, phytate-, salt-, and endpoint-dependent, and long-term relevance remains unresolved.\n"
+        "      severity: medium\n"
+        "      action: Review calcium and zinc context together; prefer separate slots only when feasible for independently "
+        "schedulable products, never split a combination or impose a universal interval."
+    ) in relation_section
 
 
 def test_cmd_review_bounds_actionable_sections_and_does_not_duplicate_action(tmp_path: Path) -> None:
