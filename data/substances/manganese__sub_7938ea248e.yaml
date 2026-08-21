@@ -1,12 +1,23 @@
 id: sub_7938ea248e
 name: Manganese
-notes: Generic elemental manganese contribution. Product cards keep the concrete source form in component labels and notes.
-  NIH ODS describes manganese as a cofactor for enzymes including manganese superoxide dismutase, arginase, and pyruvate carboxylase,
-  with roles in reactive oxygen species scavenging, bone formation, amino-acid/cholesterol/glucose/carbohydrate metabolism,
-  and immune response.
+notes: Generic elemental manganese contribution. The active Life Extension Only Trace Minerals product supplies 2 mg elemental manganese
+  as manganese sulfate; product cards keep that concrete source form in component labels and notes. NIH ODS describes manganese as a cofactor
+  for manganese superoxide dismutase (MnSOD), arginase, and pyruvate carboxylase, but these intrinsic enzyme roles do not establish a
+  supplementation benefit in manganese-replete people. Absorption varies with dose, dietary matrix, and iron status; an old small fasting
+  tracer study and a matrix-specific human meal study do not establish a universal food rule. Excess exposure can cause central-nervous-system
+  toxicity, with greater susceptibility in iron deficiency or chronic liver disease; this bounded context does not assert harm at the product's
+  2 mg serving.
 knowledge:
   effect:
   - value: antioxidant_enzyme_cofactor
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/
+  - value: amino_acid_metabolism_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/
+  - value: carboxylase_cofactor
     research_state: supported
     sources:
     - https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/
@@ -15,17 +26,31 @@ knowledge:
     sources:
     - https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/
   kind:
-  - mineral
+  - value: mineral
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/
+  risk:
+  - value: narrow_therapeutic_window
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/
 scheduling_assessment:
   intake:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/2856562/
     - https://pubmed.ncbi.nlm.nih.gov/1957822/
-    summary: The cited evidence does not establish an intake preference for generic manganese across registered forms; it does not validate a form-specific comparator rule.
+    - https://www.lifeextension.com/vitamins-supplements/item01328/only-trace-minerals
+    summary: A 12-person study of a mixed supplement containing 2.5 mg manganese sulfate estimated higher manganese absorption fasting (9 +/- 3%) than with a light meal (2 +/- 1%), while a later paired human meal study found no significant effect from most tested components except calcium added to human milk. These old, small, matrix-specific findings, together with ODS-described dependence on dietary iron status, do not establish a universal food rule for generic manganese; Life Extension's current with-food instruction is product guidance.
   timing:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/1957822/
-    summary: No general clock-time scheduling rule was demonstrated.
+    summary: ODS describes manganese absorption and food, dose, form, and iron-status factors but provides no evidence for a general clock-time preference.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/
+    summary: ODS provides no exercise or workout-placement evidence for manganese; no pre-, during-, or post-workout rule is established.
