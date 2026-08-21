@@ -254,6 +254,17 @@ def _failed_search_plan_result(
     errors: list[str],
     feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]],
 ) -> PlanResult:
+    _report_tight_feasible_items(errors, feasible_slots_by_item)
+    no_assign_msg = "plan: no valid global assignment under slot conflict constraints."
+    print(no_assign_msg, file=sys.stderr)
+    errors.append(no_assign_msg)
+    return _failed_plan_result(1, errors)
+
+
+def _report_tight_feasible_items(
+    errors: list[str],
+    feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]],
+) -> None:
     tight_items = [
         (item_id, [name for name, _score, _reasons in candidates])
         for item_id, candidates in sorted(feasible_slots_by_item.items())
@@ -268,7 +279,3 @@ def _failed_search_plan_result(
             line = f"  - {item_id}: {slot_list}"
             print(line, file=sys.stderr)
             errors.append(line)
-    no_assign_msg = "plan: no valid global assignment under slot conflict constraints."
-    print(no_assign_msg, file=sys.stderr)
-    errors.append(no_assign_msg)
-    return _failed_plan_result(1, errors)

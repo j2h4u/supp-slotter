@@ -5,7 +5,7 @@ from __future__ import annotations
 import contextlib
 import io as _io
 import sys
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import cast
 
@@ -70,37 +70,62 @@ def _show_inner(schedule_path: Path) -> int:
 
 def _print_daily_usage_groups(schedule: ScheduleData) -> None:
     """Print active daily products by presentation marker, retaining slot detail."""
+    groups = _usage_groups(schedule)
+    pillboxes = schedule["pillboxes"]
+    daily_products = _daily_products(pillboxes)
+    for group_key, label in (("daily_base", "Daily base"), ("not_every_day", "Not every day")):
+        names = _active_group_names(groups.get(group_key, []), daily_products)
+        if not names:
+            continue
+        _print_usage_group(label, names, pillboxes)
+
+
+def _usage_groups(schedule: ScheduleData) -> dict[str, list[str]]:
     summary = schedule.get("summary", {})
     raw_groups = summary.get("usage_groups", {}) if isinstance(summary, dict) else {}
-    groups = raw_groups if isinstance(raw_groups, dict) else {}
-    pillboxes = schedule["pillboxes"]
-    daily_products = {
+    return raw_groups if isinstance(raw_groups, dict) else {}
+
+
+def _daily_products(pillboxes: dict[str, SchedulePillbox]) -> set[str]:
+    return {
         product
         for key, pillbox in pillboxes.items()
         if key != "training"
         for _slot_key, slot in _non_empty_slots(pillbox)
         for product in slot["products"]
     }
-    for group_key, label in (("daily_base", "Daily base"), ("not_every_day", "Not every day")):
-        raw_names = groups.get(group_key, [])
-        names = [name for name in raw_names if isinstance(name, str) and name in daily_products]
-        if not names:
+
+
+def _active_group_names(raw_names: Iterable[object], daily_products: set[str]) -> list[str]:
+    return [name for name in raw_names if isinstance(name, str) and name in daily_products]
+
+
+def _print_usage_group(
+    label: str,
+    names: list[str],
+    pillboxes: dict[str, SchedulePillbox],
+) -> None:
+    print(label)
+    print(SEPARATOR)
+    wanted = set(names)
+    for pillbox_key, pillbox in pillboxes.items():
+        if pillbox_key == "training":
             continue
-        print(label)
-        print(SEPARATOR)
-        wanted = set(names)
-        for pillbox_key, pillbox in pillboxes.items():
-            if pillbox_key == "training":
-                continue
-            filtered = [
-                (slot_key, slot)
-                for slot_key, slot in _non_empty_slots(pillbox)
-                if any(product in wanted for product in slot["products"])
-            ]
-            if not filtered:
-                continue
+        filtered = _group_slots(pillbox, wanted)
+        if filtered:
             _print_pillbox_slots(pillbox, filtered, wanted)
-        print()
+    print()
+
+
+def _group_slots(
+    pillbox: SchedulePillbox,
+    wanted: set[str],
+) -> list[tuple[str, ScheduleSlotEntry]]:
+    return [
+        (slot_key, slot)
+        for slot_key, slot in _non_empty_slots(pillbox)
+        if any(product in wanted for product in slot["products"])
+    ]
 
 
 def _load_schedule(schedule_path: Path) -> ScheduleData | None:
@@ -153,14 +178,17 @@ def _print_pillbox_slots(
     """Render filtered slots for one daily presentation group."""
     del pillbox
     for slot_key, slot in non_empty:
-        slot_label = _str_field(slot, "label", slot_key)
-        products = [product for product in slot["products"] if product in wanted]
-        if not products:
-            continue
-        print()
-        print(slot_label)
-        for product in products:
-            print(f"  • {product}")
+        _print_filtered_slot(slot_key, slot, wanted)
+
+
+def _print_filtered_slot(slot_key: str, slot: ScheduleSlotEntry, wanted: set[str]) -> None:
+    products = [product for product in slot["products"] if product in wanted]
+    if not products:
+        return
+    print()
+    print(_str_field(slot, "label", slot_key))
+    for product in products:
+        print(f"  • {product}")
 
 
 def _print_footer(schedule: ScheduleData) -> None:

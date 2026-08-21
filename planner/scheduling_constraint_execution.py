@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
+from typing import cast
 
 from planner.contracts import RelationSelector, SchedulingConstraint, Substance
 from planner.ontology.artifacts import OntologyBundle
@@ -156,6 +157,16 @@ def _validate_selector_scope(
     family-wide rule when sibling substance cards share its name.
     """
 
+    _validate_selector_scope_shape(constraint_id, selector)
+    if selector.entity_id is None or selector.entity_id not in substances:
+        return
+    substance = substances[selector.entity_id]
+    sibling_ids = _same_name_siblings(selector.entity_id, substance.name, substances)
+    if sibling_ids:
+        _reject_ambiguous_selector(constraint_id, selector, sibling_ids)
+
+
+def _validate_selector_scope_shape(constraint_id: str, selector: RelationSelector) -> None:
     if selector.scope not in {None, "exact_form"}:
         raise OntologyInfrastructureError(
             f"scheduling constraint {constraint_id}: unsupported selector scope {selector.scope!r}",
@@ -166,23 +177,35 @@ def _validate_selector_scope(
             f"scheduling constraint {constraint_id}: exact_form scope requires entity_id",
             code=MALFORMED,
         )
-    if selector.entity_id is None or selector.entity_id not in substances:
-        return
-    substance = substances[selector.entity_id]
-    sibling_ids = tuple(
+
+
+def _same_name_siblings(
+    entity_id: str,
+    name: str,
+    substances: Mapping[str, Substance],
+) -> tuple[str, ...]:
+    return tuple(
         sorted(
             substance_id
             for substance_id, candidate in substances.items()
-            if candidate.name == substance.name and substance_id != selector.entity_id
+            if candidate.name == name and substance_id != entity_id
         )
     )
-    if sibling_ids and selector.scope != "exact_form":
-        siblings = ", ".join(sibling_ids)
-        raise OntologyInfrastructureError(
-            f"scheduling constraint {constraint_id}: entity_id selector {selector.entity_id!r} "
-            f"has same-name sibling substance cards [{siblings}]; declare scope: exact_form",
-            code=MALFORMED,
-        )
+
+
+def _reject_ambiguous_selector(
+    constraint_id: str,
+    selector: RelationSelector,
+    sibling_ids: tuple[str, ...],
+) -> None:
+    if selector.scope == "exact_form":
+        return
+    siblings = ", ".join(sibling_ids)
+    raise OntologyInfrastructureError(
+        f"scheduling constraint {constraint_id}: entity_id selector {selector.entity_id!r} "
+        f"has same-name sibling substance cards [{siblings}]; declare scope: exact_form",
+        code=MALFORMED,
+    )
 
 
 def executable_blocking_plans(
@@ -283,37 +306,9 @@ def interpret_execution_component_pair(
     runtime_program: RuntimeProgram,
 ) -> bool:
     """Interpret a resolved execution row against the compiled runtime policy."""
-
-    constraint_id = execution.get("id")
-    operation = execution.get("operation")
-    match_direction = execution.get("match_direction")
-    aggregation = execution.get("aggregation")
-    source_substances = execution.get("source_substances")
-    target_substances = execution.get("target_substances")
-    if not isinstance(constraint_id, str) or not constraint_id.strip():
-        raise OntologyInfrastructureError("scheduling constraint execution row has invalid id", code=MALFORMED)
-    if not isinstance(operation, str) or not operation.strip():
-        raise OntologyInfrastructureError(f"scheduling constraint {constraint_id}: invalid operation", code=MALFORMED)
-    if not isinstance(match_direction, str) or not match_direction.strip():
-        raise OntologyInfrastructureError(
-            f"scheduling constraint {constraint_id}: invalid match direction", code=MALFORMED
-        )
-    if not isinstance(aggregation, str) or not aggregation.strip():
-        raise OntologyInfrastructureError(f"scheduling constraint {constraint_id}: invalid aggregation", code=MALFORMED)
-    if not isinstance(source_substances, Sequence) or isinstance(source_substances, (str, bytes)):
-        raise OntologyInfrastructureError(
-            f"scheduling constraint {constraint_id}: malformed source substances", code=MALFORMED
-        )
-    if not isinstance(target_substances, Sequence) or isinstance(target_substances, (str, bytes)):
-        raise OntologyInfrastructureError(
-            f"scheduling constraint {constraint_id}: malformed target substances", code=MALFORMED
-        )
-    if not all(isinstance(item, str) for item in source_substances) or not all(
-        isinstance(item, str) for item in target_substances
-    ):
-        raise OntologyInfrastructureError(
-            f"scheduling constraint {constraint_id}: malformed source or target substances", code=MALFORMED
-        )
+    constraint_id, operation, match_direction, aggregation, source_substances, target_substances = (
+        _execution_row_fields(execution)
+    )
     execution_policy = _execution_policy_for_operation(runtime_program, constraint_id, operation)
     _validate_policy_fields(
         constraint_id,
@@ -330,6 +325,46 @@ def interpret_execution_component_pair(
         source_substances,
         target_substances,
     )
+
+
+def _execution_row_fields(
+    execution: Mapping[str, object],
+) -> tuple[str, str, str, str, Sequence[str], Sequence[str]]:
+    constraint_id = _execution_text(execution, "id", "scheduling constraint execution row has invalid id")
+    operation = _execution_text(execution, "operation", f"scheduling constraint {constraint_id}: invalid operation")
+    direction = _execution_text(
+        execution, "match_direction", f"scheduling constraint {constraint_id}: invalid match direction"
+    )
+    aggregation = _execution_text(
+        execution, "aggregation", f"scheduling constraint {constraint_id}: invalid aggregation"
+    )
+    source = _execution_substances(execution, "source_substances", constraint_id)
+    target = _execution_substances(execution, "target_substances", constraint_id)
+    return constraint_id, operation, direction, aggregation, source, target
+
+
+def _execution_text(execution: Mapping[str, object], field: str, error_message: str) -> str:
+    value = execution.get(field)
+    if not isinstance(value, str) or not value.strip():
+        raise OntologyInfrastructureError(error_message, code=MALFORMED)
+    return value
+
+
+def _execution_substances(
+    execution: Mapping[str, object],
+    field: str,
+    constraint_id: str,
+) -> Sequence[str]:
+    value = execution.get(field)
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: malformed {field.replace('_', ' ')}", code=MALFORMED
+        )
+    if not all(isinstance(item, str) for item in value):
+        raise OntologyInfrastructureError(
+            f"scheduling constraint {constraint_id}: malformed source or target substances", code=MALFORMED
+        )
+    return cast(Sequence[str], value)
 
 
 def interpret_constraint_component_pair(

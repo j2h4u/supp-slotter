@@ -270,48 +270,87 @@ def load_ontology_assertions(bundle: OntologyBundle) -> tuple[OntologyAssertion,
         raise _policy_error(bundle, "canonical runtime vocabulary has no relation_types")
     relation_types = set(raw_relation_types)
     severity_values = frozenset(schema_enum_values(bundle, "Severity"))
-    assertions: list[OntologyAssertion] = []
     assertions_mapping = cast(dict[str, object], raw_assertions)
-    for assertion_id, raw_value in assertions_mapping.items():
-        raw = _object_mapping(raw_value)
-        if not isinstance(assertion_id, str) or not assertion_id.strip() or raw is None:
-            raise _policy_error(bundle, f"malformed ontology assertion {assertion_id!r}")
-        try:
-            source = _assertion_selector(raw.get("source_selector"))
-            target = _assertion_selector(raw.get("target_selector"))
-        except CardLoadError as error:
-            raise _policy_error(bundle, f"assertion {assertion_id!r}: {error}") from error
-        relation_type = raw.get("relation_type")
-        assertion_kind = raw.get("assertion_kind")
-        semantic_family = raw.get("semantic_family")
-        reason = raw.get("reason")
-        if source is None or target is None:
-            raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid selector")
-        if relation_type not in relation_types:
-            raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid relation_type")
-        if not isinstance(assertion_kind, str) or not isinstance(semantic_family, str) or not isinstance(reason, str):
-            raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid semantics")
-        action, severity = raw.get("action"), raw.get("severity")
-        if action is not None and (not isinstance(action, str) or not action.strip()):
-            raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid action")
-        if severity is not None and severity not in severity_values:
-            raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid severity")
-        assertions.append(
-            OntologyAssertion(
-                id=assertion_id,
-                relation_type=cast(RelationType, relation_type),
-                assertion_kind=assertion_kind,
-                semantic_family=semantic_family,
-                reason=reason,
-                source_selector=source,
-                target_selector=target,
-                action=action if isinstance(action, str) else None,
-                severity=cast(Severity | None, severity),
-                research_state=cast(str, raw.get("research_state", "unassessed")),
-                sources=tuple(item for item in cast(list[object], raw.get("sources", [])) if isinstance(item, str)),
-            )
-        )
-    return tuple(assertions)
+    return tuple(
+        _load_ontology_assertion(bundle, assertion_id, raw_value, relation_types, severity_values)
+        for assertion_id, raw_value in assertions_mapping.items()
+    )
+
+
+def _load_ontology_assertion(
+    bundle: OntologyBundle,
+    assertion_id: str,
+    raw_value: object,
+    relation_types: set[object],
+    severity_values: frozenset[str],
+) -> OntologyAssertion:
+    raw = _object_mapping(raw_value)
+    if not isinstance(assertion_id, str) or not assertion_id.strip() or raw is None:
+        raise _policy_error(bundle, f"malformed ontology assertion {assertion_id!r}")
+    source, target = _load_assertion_selectors(bundle, assertion_id, raw)
+    relation_type, assertion_kind, semantic_family, reason = _assertion_semantics(
+        bundle, assertion_id, raw, relation_types
+    )
+    action, severity = _assertion_metadata(bundle, assertion_id, raw, severity_values)
+    return OntologyAssertion(
+        id=assertion_id,
+        relation_type=cast(RelationType, relation_type),
+        assertion_kind=assertion_kind,
+        semantic_family=semantic_family,
+        reason=reason,
+        source_selector=source,
+        target_selector=target,
+        action=action,
+        severity=cast(Severity | None, severity),
+        research_state=cast(str, raw.get("research_state", "unassessed")),
+        sources=tuple(item for item in cast(list[object], raw.get("sources", [])) if isinstance(item, str)),
+    )
+
+
+def _load_assertion_selectors(
+    bundle: OntologyBundle,
+    assertion_id: str,
+    raw: dict[str, object],
+) -> tuple[RelationSelector, RelationSelector]:
+    try:
+        source = _assertion_selector(raw.get("source_selector"))
+        target = _assertion_selector(raw.get("target_selector"))
+    except CardLoadError as error:
+        raise _policy_error(bundle, f"assertion {assertion_id!r}: {error}") from error
+    if source is None or target is None:
+        raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid selector")
+    return source, target
+
+
+def _assertion_semantics(
+    bundle: OntologyBundle,
+    assertion_id: str,
+    raw: dict[str, object],
+    relation_types: set[object],
+) -> tuple[object, str, str, str]:
+    relation_type = raw.get("relation_type")
+    assertion_kind = raw.get("assertion_kind")
+    semantic_family = raw.get("semantic_family")
+    reason = raw.get("reason")
+    if relation_type not in relation_types:
+        raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid relation_type")
+    if not isinstance(assertion_kind, str) or not isinstance(semantic_family, str) or not isinstance(reason, str):
+        raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid semantics")
+    return relation_type, assertion_kind, semantic_family, reason
+
+
+def _assertion_metadata(
+    bundle: OntologyBundle,
+    assertion_id: str,
+    raw: dict[str, object],
+    severity_values: frozenset[str],
+) -> tuple[str | None, object]:
+    action, severity = raw.get("action"), raw.get("severity")
+    if action is not None and (not isinstance(action, str) or not action.strip()):
+        raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid action")
+    if severity is not None and severity not in severity_values:
+        raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid severity")
+    return (action if isinstance(action, str) else None), severity
 
 
 def project_ontology_assertions(
@@ -418,13 +457,25 @@ def grouped_policies(
     the review tooling is responsible for showing empty-namespace
     headings for namespaces the substance references but that have no traits.
     """
+    groups = _policies_by_namespace(policies)
+    return {namespace: groups[namespace] for namespace in _ordered_namespaces(groups, namespace_order)}
+
+
+def _policies_by_namespace(policies: dict[str, SchedulingPolicy]) -> dict[str, list[SchedulingPolicy]]:
     groups: dict[str, list[SchedulingPolicy]] = {}
     for trait in sorted(policies.values(), key=lambda t: t.id):
         groups.setdefault(trait.namespace, []).append(trait)
+    return groups
+
+
+def _ordered_namespaces(
+    groups: dict[str, list[SchedulingPolicy]],
+    namespace_order: tuple[str, ...],
+) -> list[str]:
     # Emit in canonical order; fall back to sorted for any unrecognised namespaces.
-    known = [ns for ns in namespace_order if ns in groups]
-    extra = sorted(ns for ns in groups if ns not in namespace_order)
-    return {ns: groups[ns] for ns in known + extra}
+    known = [namespace for namespace in namespace_order if namespace in groups]
+    extra = sorted(namespace for namespace in groups if namespace not in namespace_order)
+    return known + extra
 
 
 def format_trait_effect(effect: TraitEffect) -> str:
@@ -438,12 +489,20 @@ def format_trait_effect(effect: TraitEffect) -> str:
 
 
 def print_policy_details(trait: SchedulingPolicy) -> None:
+    _print_policy_description(trait)
+    _print_policy_effects(trait)
+
+
+def _print_policy_description(trait: SchedulingPolicy) -> None:
     if trait.description:
         print(f"      {trait.description}")
     if trait.applies_when:
         print(f"      Applies when: {trait.applies_when}")
     if trait.warning:
         print("      Output: schedule warning")
+
+
+def _print_policy_effects(trait: SchedulingPolicy) -> None:
     rendered = [format_trait_effect(effect) for effect in trait.effects]
     rendered = [text for text in rendered if text]
     if rendered:
