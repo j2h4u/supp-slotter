@@ -39,7 +39,11 @@ For the practical threshold for admitting a transparent soft heuristic when
 ideal comparative evidence is absent, follow [Agent Product Flow's practical
 evidence calibration](agent-product-flow.md#practical-evidence-calibration).
 
-## Why the broader proposal is deferred
+The remainder of this file is retained as historical design context only. It is
+not an active workflow, command contract, queue, filter, score, or implementation
+plan; Git history is the record for superseded proposals.
+
+## Historical design context
 
 The broader proposal is separate from the implemented MVP subset and would take
 multiple days of design, pilot annotation, and reader validation. The current

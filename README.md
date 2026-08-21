@@ -104,6 +104,7 @@ Run the current stack:
 uv run python -m planner --help
 uv run python -m planner
 uv run python -m planner review
+uv run python -m planner groom
 ```
 
 Validate source data:
@@ -170,6 +171,7 @@ That flow keeps the system from turning into a giant undifferentiated supplement
 | `uv run python -m planner check` | Validate cards, references, stacks, canonical ontology terms, and deterministic maintenance |
 | `uv run python -m planner review` | Review authored concerns, relations, fact memberships, and dashboard coverage |
 | `uv run python -m planner find "<words>"` | Search products and substances by name, alias, form, ID, URL, or card text |
+| `uv run python -m planner groom` | Return one complete active-reachable substance card for evidence grooming |
 
 ## Data Model
 

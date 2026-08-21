@@ -34,7 +34,7 @@ Progressive disclosure: use [README.md](README.md) for project orientation, [doc
 
 ## Mode Selector
 
-- Read-only orientation: `uv run python -m planner --help`, `uv run python -m planner review`, `uv run python -m planner audit`, `uv run python -m planner find "<query>"`, and `uv run python -m planner review-substance --help`.
+- Read-only orientation: `uv run python -m planner find "<query>"`, `uv run python -m planner review`, and `uv run python -m planner groom`.
 - Generated-output refresh: `uv run python -m planner` rewrites `schedule.yaml`; this is expected and does not change source data.
 - Source validation and deterministic maintenance: `uv run python -m planner check` may fill missing stable IDs or normalize product/substance filenames.
 - Source-data edits: changes under `data/`, `schema/`, `planner/`, `tests/`, or tracked docs require the validation path below.
@@ -73,7 +73,7 @@ Use [docs/agent-product-flow.md#onboard-a-new-stack](docs/agent-product-flow.md#
 
 ## Common Workflows
 
-`find`, `review`, `review-substance`, and `audit` are read-only. The default command regenerates `schedule.yaml`; that is expected disposable output, not a source-data edit. `check` and the default command may also write deterministic source maintenance changes such as missing stable IDs or normalized filenames. Inspect `git status --short` and `git diff` when you need to distinguish generated output from source-data changes.
+`find`, `review`, and `groom` are read-only. The bare planner command regenerates `schedule.yaml`; `check` performs deterministic normalization/maintenance and then validates the source data. Inspect `git status --short` and `git diff` after either command.
 
 ### Add, change, or groom cards
 
@@ -100,9 +100,8 @@ Quick rules:
   `Product.name` concise and bottle-facing, preserve exact label forms and
   amounts in their component fields, and let `planner check` assign stable IDs
   and normalize `sub_*` references.
-- Before changing Substance traits, run
-  `uv run python -m planner review-substance data/substances/<card>.yaml`; use
-  the generated vocabulary checklist and [docs/domain-model.md#trait-ontology](docs/domain-model.md#trait-ontology).
+- Before changing Substance traits, use the generated vocabulary checklist and
+  [docs/domain-model.md#trait-ontology](docs/domain-model.md#trait-ontology).
 - Keep `schedule.*` for admitted executable meal/time/activity facts;
   `knowledge.*` for reusable reviewer knowledge; relations in
   [data/relations.yaml](data/relations.yaml); dashboards for review surfaces;
@@ -111,7 +110,7 @@ Quick rules:
   [mandatory completion handoff](docs/agent-product-flow.md#mandatory-completion-handoff);
   retain `unassessed`/`insufficient` states because unavailable evidence does
   not block card creation. Validate with `uv run python -m planner check`, then
-  run only the relevant bounded planner/review/audit commands for the changed
+  run only the relevant bounded planner/review commands for the changed
   surface.
 
 ### Update Stacks
@@ -120,7 +119,7 @@ Edit only stack membership in [data/stacks.yaml](data/stacks.yaml). Allowed stac
 
 Use `daily` for ordinary recurring products. Use `training` for workout-adjacent products. Products with `activity:*` substances usually belong in `training`, where those traits prefer the workout slots.
 
-Run `uv run python -m planner`, then `uv run python -m planner review` and `uv run python -m planner audit`.
+Run `uv run python -m planner`, then `uv run python -m planner review`.
 
 ### Add Or Update A Dashboard
 
@@ -134,7 +133,8 @@ Recommended sequence:
 5. Write the description to name the dashboard scope: candidate-comparison surface, cumulative load surface, or interaction-review surface.
 6. Run `uv run python -m planner check` to validate reference integrity (hard FK errors).
 7. Run `uv run python -m planner` to regenerate `schedule.yaml`.
-8. Run `uv run python -m planner review` for concerns, typed relation outcomes, active fact memberships, and dashboard coverage (advisory, exit 0). Authored `risk` and `pathway` facts are not rendered as active planner-review sections. Run `uv run python -m planner audit` for diagnostics.
+8. Run `uv run python -m planner review` for concise active-stack health,
+   concerns, relations, active fact memberships, and dashboard coverage.
 9. Run `just verify` (or the relevant bounded `just unit-target <path>` recipe) to confirm tests still pass.
 
 Semantic projection rules live in [docs/domain-model.md#core-objects](docs/domain-model.md#core-objects). A single cluster may have both `benefit` and `risk` sections; do not split one member set into two files.
@@ -149,9 +149,8 @@ Use the validation path that matches the edit:
 
 - Narrow data-only edits: run `uv run python -m planner check`, then inspect `git status --short` and `git diff`.
 - Review-surface edits (concerns, relations, risks, pathways, dashboards, active stack membership): run `uv run python -m planner check`, `uv run python -m planner review`, and usually `uv run python -m planner`.
-- Structural diagnostics: run `uv run python -m planner audit` when traits, dashboards, duplicate risk, empty stacks, or stack/pillbox alignment may be affected.
-- Full-audit diagnostics: run `uv run python -m planner audit --full` when its generic diagnostics are relevant to the current task.
-- Planner, ontology, or tests changed: `uv run python -m planner`, `uv run python -m planner review`, `uv run python -m planner audit --full`, `just check`, then `git status --short` and `git diff`.
+- Planner, ontology, or tests changed: run the bare planner command, `review`,
+  `just check`, then inspect `git status --short` and `git diff`.
 
 Run `uv run python -m planner --help` to see the command list and workflow hints.
 
@@ -162,18 +161,15 @@ Reference-integrity errors (hard — from `planner check`, exit non-zero):
 
 Advisory output is split between two commands:
 - `planner review` — starts with a short `Review brief`, then concerns grouped by annotation kind (safety / data_quality / model_gap); typed relation outcomes grouped by endpoint presence (`both_active`, `missing_source`, `missing_target`, and `neither_active`) with optional warning tags; active knowledge facts across `context`, `effect`, `kind`, `role`, and `quality`; and a dashboard summary.
-- `planner audit` — diagnostics (valid knowledge-only substance cards, products outside stacks, unused traits, potential duplicate cards, empty clusters); `--full` adds generic diagnostics from the same read model.
-
-Advisory cleanup warnings (soft — from `planner audit`, exit 0):
-- `dashboard.empty_cluster` — dashboard `selectors` resolve to zero member substances.
-
-Hard errors (`check`) block all downstream commands. Advisory output (`review` and `audit`) reports state for operator attention but does not block.
+Hard errors (`check`) block downstream commands. `review` is advisory and
+informational; it does not block commits.
 
 ## Membership Flow
 
 The full dashboard membership contract lives in [docs/domain-model.md#core-objects](docs/domain-model.md#core-objects) and [docs/domain-model.md#scheduling-semantics](docs/domain-model.md#scheduling-semantics). Operational shortcut:
 
-- Use `uv run python -m planner review-substance data/substances/<card>.yaml` to inspect computed membership for one substance.
+- Use `uv run python -m planner review` for active-stack membership and dashboard
+  surfaces.
 - Add the reusable fact a dashboard projects from (`kind:`, `effect:`, `risk:`, or `pathway:`); use `context:` only for explicit curated membership with no cleaner axis.
 - Read `schedule.yaml` `benefits[].members` / `risks[].members` as neutral membership state, not as expert gap or adequacy judgment.
 
@@ -188,33 +184,13 @@ Concerns are rendered by annotation kind only (`safety`, `model_gap`, and `data_
 
 Note: `review` produces advisory output (soft — exit 0). It does NOT block commits.
 
-## Audit Warning Playbook
-
-WHEN to run `uv run python -m planner audit`:
-- After substance edits that change traits, `context:` tags, or `kind:` tags
-- After any dashboard yaml edit (`selectors` changes, new cluster created)
-- After any ontology vocabulary change (trait-backed namespace entry, renamed slug)
-- Once at end of session before commit when structural review surfaces changed
-
-Use `uv run python -m planner audit --full` when the generic full-audit diagnostics are relevant to the task.
-
-Note: `audit` produces diagnostic output (soft — exit 0). Concerns, relations, active fact memberships, and dashboards are in `planner review`; authored `risk` and `pathway` facts are not active planner-review output. For HARD reference-integrity errors that block commits, use `planner check`.
-
-Per-warning-class resolution:
-
-**`dashboard.empty_cluster`**
-Message format: `Empty cluster: data/dashboards/{slug}.yaml selectors resolve to zero member substances (using union resolution: OR across all listed (category, term) pairs). Resolution: add the underlying authored fact, or remove the dashboard yaml if abandoned. (If this is an intentional placeholder, add a notes: field explaining the intent.)`
-Causes: all matching facts were removed; or `selectors` terms do not match any substance's namespace fields under the canonical OR-across-namespaces resolution rule.
-Resolution: first check whether the dashboard should project from a semantic axis (`kind:`, `effect:`, `risk:`, `pathway:`) and add/fix that underlying fact on substance cards. Use `context: <slug>` tagging only for explicit operator-curated clusters. Remove the dashboard yaml if the cluster is abandoned. If the cluster is an intentional placeholder for future use, add a `notes:` field explaining the intent.
-
 ## Command Behavior
 
 - `check` validates the whole repository and may auto-fix deterministic maintenance, such as missing stable IDs or product/substance filenames.
 - `find` is read-only lookup. If schema validation fails, fix with `check` or direct edits before searching again.
 - Schemas are the source of truth for allowed fields. Do not infer support for old substance-card `relations` from stale examples or code comments; all current substance-to-substance links belong in [data/relations.yaml](data/relations.yaml).
-- The default command runs the scheduler after validation, rewrites [schedule.yaml](schedule.yaml) as expected generated output, and prints a compact pillbox view.
+- The bare planner command runs the scheduler after validation, rewrites [schedule.yaml](schedule.yaml), and prints a compact pillbox view.
 - Do not edit [schedule.yaml](schedule.yaml) directly; regenerate it with `uv run python -m planner`. Its structure is documented in [docs/domain-model.md#scheduling-semantics](docs/domain-model.md#scheduling-semantics).
-- `audit` reports diagnostics — valid knowledge-only substance cards, products outside stacks, unused traits, potential duplicate cards, empty stacks, stack/pillbox mismatches. It is a review surface, not a validator or automatic todo list.
 - Read `substances.similar_names` as a potential-duplicate review surface, not a duplicate list. A cluster means "check whether this new/edited substance should reuse an existing form, add an alias, or remain a distinct concrete form."
 - `check` and the default command may auto-fix deterministic source maintenance. After running them, inspect `git status --short` and `git diff` when source-data changes need review separately from generated `schedule.yaml`.
 
@@ -229,7 +205,7 @@ uv run python -m planner review
 uv run python -m planner
 ```
 
-Use `planner review` first: its `Review brief` is the review intake surface. Use `schedule.yaml` for slot placement. Use `audit --full` only when the generic full-audit diagnostics matter for the review.
+Use `planner review` first: its concise active-stack health output is the review intake surface. Use `schedule.yaml` for slot placement.
 
 Default report is a **General Narrative Report**: short TL;DR first, then plain-language review-group interpretation. Expand non-obvious abbreviations on first mention. Produce a technical findings report only when the user asks for that format.
 
