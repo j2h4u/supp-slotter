@@ -21,9 +21,11 @@ components:
   notes: Nested within the 1400 mg fish-oil concentrate; not additive to the concentrate
     amount.
 notes: 'Official Solgar label: 1 softgel serving; 100 softgels; UPC 033984020580.
-  Fish-oil concentrate 1400 mg provides total omega-3 950 mg, comprising EPA 504 mg,
-  DHA 378 mg, and other omega-3 68 mg. EPA and DHA are ethyl esters. Gelatin, vegetable
-  glycerin, and natural mixed tocopherols are label excipients/antioxidant and are
-  not modeled as quantified active components. Suggested use and product presentation
+  The 1400 mg fish-oil concentrate provides total omega-3 950 mg, including EPA 504
+  mg and DHA 378 mg; the remaining 68 mg is other omega-3 by arithmetic (950 - 504 -
+  378). EPA and DHA are ethyl esters. The three components above are nested, nonadditive
+  composition facts; no aggregate or other component is modeled. Gelatin, vegetable
+  glycerin, and natural mixed tocopherols are label excipients/antioxidant and are not
+  modeled as quantified active components. Suggested use and product presentation
   remain separate from the planner''s presentation marker.'
 id: prd_htuhz2s2gt

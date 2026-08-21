@@ -3,11 +3,15 @@ form: EPA/DHA ethyl esters
 aliases:
 - fish oil concentrate
 notes: 'Concrete fish-oil concentrate identity for the Solgar Omega-3 product. The
-  official formulation supplies 1400 mg fish-oil concentrate per softgel, including
-  EPA 504 mg, DHA 378 mg, and other omega-3 68 mg; the nested EPA/DHA amounts are
-  product composition facts and are not additive to the concentrate amount. Food scheduling
-  is a soft formulation-specific heuristic, not a universal rule for EPA or DHA. Sources:
-  Solgar official label; PMID 2847723; PMID 30799231.'
+  official formulation supplies 1400 mg fish-oil concentrate per softgel and 950 mg
+  total omega-3, including EPA 504 mg and DHA 378 mg; the remaining 68 mg is other
+  omega-3 by arithmetic (950 - 504 - 378). The nested EPA/DHA amounts are product
+  composition facts and are not additive to the concentrate amount. Food scheduling
+  is a soft ethyl-ester formulation heuristic, not a generic rule for EPA, DHA, or
+  krill oil. Bleeding is a conditional medication and surgery review context, not a
+  categorical blood-thinner claim. No supplemental vitamin E requirement is encoded;
+  see PMID 9168460 and PMID 31128941. Sources: Solgar official label; PMID 2847723;
+  PMID 30799231.'
 schedule:
   intake:
   - food_preferred
@@ -29,9 +33,36 @@ scheduling_assessment:
     - https://pubmed.ncbi.nlm.nih.gov/30799231/
     summary: The bounded evidence does not establish a general morning or evening
       clock-time preference for this fish-oil concentrate.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/30799231/
+    summary: The bounded evidence does not establish a workout- or activity-linked
+      timing rule for this fish-oil concentrate.
 knowledge:
   kind:
-  - omega3
+  - value: omega3
+    research_state: supported
+    sources:
+    - https://solgar.com.tr/urun/omega-3-950-mg/2057
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
+  pathway:
+  - value: omega3_eicosanoid
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
   quality:
-  - fat_soluble
+  - value: fat_soluble
+    research_state: supported
+    sources:
+    - https://solgar.com.tr/urun/omega-3-950-mg/2057
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
+  risk:
+  - value: bleeding_med_interaction
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/38742535/
+    - https://pubmed.ncbi.nlm.nih.gov/30571332/
 id: sub_sunkcr05vl
