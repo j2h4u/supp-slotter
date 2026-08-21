@@ -1,7 +1,7 @@
 id: sub_f7780f899b
 name: Potassium
 form: citrate
-notes: 'Water-soluble potassium citrate. Potassium-citrate urinary alkalinization/kidney-stone evidence is pharmacologic and does not transfer to the active TiM 66.5 mg elemental potassium/capsule electrolyte component. Significant interactions include ACE inhibitors, ARBs, potassium-sparing diuretics, and NSAIDs, which raise hyperkalemia risk. Sources: NIH ODS Potassium Fact Sheet.'
+notes: 'Water-soluble potassium citrate. The active TiM component supplies 66.5 mg elemental potassium per capsule; prescription urinary-alkalinization and meal/GI directions are pharmacologic or product-specific and do not establish a schedule for this low-dose electrolyte. Significant interaction contexts include renal impairment, ACE inhibitors, ARBs, potassium-sparing diuretics, and NSAIDs, which can raise hyperkalemia risk. Sources: NIH ODS Potassium Fact Sheet and DailyMed potassium labeling.'
 concerns:
 - kind: safety
   text: Review renal function, potassium exposure, and hyperkalemia-promoting medications; low-dose active electrolyte use does not establish a universal potassium timing rule.
@@ -10,27 +10,42 @@ scheduling_assessment:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Potassium-HealthProfessional/
+    - https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=3dd9c9eb-df19-4ec9-bc77-f3a159b33d94
     - https://pubmed.ncbi.nlm.nih.gov/1875495/
     summary: No direct fed-versus-fasted absorption evidence establishes a meal preference for potassium citrate; GI tolerance and pharmacologic dose contexts do not transfer to the active low-dose electrolyte component, and practice may vary by tolerability.
   timing:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Potassium-HealthProfessional/
+    - https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=3dd9c9eb-df19-4ec9-bc77-f3a159b33d94
     - https://pubmed.ncbi.nlm.nih.gov/1875495/
     summary: No comparative clock-time rule was demonstrated for potassium citrate; pharmacologic urinary-alkalinization timing does not transfer to this low-dose electrolyte.
   activity:
     conclusion: insufficient
     sources:
-    - https://ods.od.nih.gov/factsheets/Potassium-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/1875495/
-    summary: The active product is in training, but pharmacologic potassium studies do not establish pre-, during-, or post-workout placement for this low-dose electrolyte.
+    - https://pubmed.ncbi.nlm.nih.gov/33333771/
+    - https://pubmed.ncbi.nlm.nih.gov/38116803/
+    summary: Mixed oral-rehydration-solution studies do not establish pre-, during-, or post-workout placement for the active TiM low-dose potassium component.
 knowledge:
   context:
-  - workout_performance
+  - value: workout_performance
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/33333771/
+    - https://pubmed.ncbi.nlm.nih.gov/38116803/
   kind:
-  - mineral
+  - value: mineral
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Potassium-HealthProfessional/
   quality:
-  - electrolyte
+  - value: electrolyte
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Potassium-HealthProfessional/
   risk:
-  - hyperkalemia_med_interaction
-  - manual_review
+  - value: hyperkalemia_med_interaction
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Potassium-HealthProfessional/
+    - https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=3dd9c9eb-df19-4ec9-bc77-f3a159b33d94
