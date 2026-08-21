@@ -1,38 +1,59 @@
 id: sub_877c24aad4
 name: Nattokinase
-notes: 'Serine protease derived from Bacillus subtilis natto fermentation. FU is an activity-unit label; registered products differ materially, including active Airboy quick-release 6000 FU per 2 capsules (manufacturer/formulation not independently verified) and unassigned Minami 13000 FU. Empty-stomach use is a low-confidence soft heuristic, not established by human fed-versus-fasted comparison; the Airboy product is not the human NSK-SD preparation. Competing gastric, food, protease, and formulation mechanisms limit transfer. Preserve bounded bleeding/medication/procedure review; do not claim clot treatment or blood-viscosity reduction. Sources: PMID 17520440; PMID 23709455; NIH DSLD label 82020.'
+notes: 'Serine protease derived from Bacillus subtilis natto fermentation. FU is an activity-unit label; registered products differ materially, including active Airboy quick-release 6000 FU per 2 capsules (manufacturer/formulation not independently verified) and unassigned Minami 13000 FU. The exact Airboy quick-release product differs from the human NSK-SD preparation; human studies report surrogate coagulation/fibrinolytic markers, not clot treatment or a blood-pressure claim. Oral active bioavailability and food effects remain unresolved. Sources: PMID 17520440; PMID 23709455; PMID 26109079; PMID 19358933; NIH DSLD label 82020.'
 concerns:
-- kind: model_gap
-  text: Formulation and delivery may affect exposure, but enteric superiority is not established for the active quick-release Airboy product; no trait captures formulation-dependent intake requirements.
 - kind: safety
-  text: Review anticoagulants, antiplatelets, bleeding history, and planned procedures because human evidence includes coagulation-marker effects; this is not a categorical contraindication or fixed surgery-day interval.
-schedule:
-  intake:
-  - empty_preferred
+  text: Review anticoagulant and antiplatelet medicines, other bleeding-risk medicines, bleeding history, and planned procedures because human studies and case reports report coagulation/fibrinolytic marker effects; this is not a categorical contraindication or a fixed surgery-day interval.
 scheduling_assessment:
   intake:
-    conclusion: supports_preference
-    policy: empty_preferred
+    conclusion: insufficient
     sources:
     - https://pubmed.ncbi.nlm.nih.gov/17520440/
     - https://pubmed.ncbi.nlm.nih.gov/23709455/
     - https://api.ods.od.nih.gov/dsld/s3/pdf/82020.pdf
-    summary: Low-confidence soft empty-stomach heuristic from enzyme/gastric rationale and product-label direction; no human fed-versus-fasted comparison establishes it for exact Airboy quick-release 6000 FU per 2 capsules, which is not the human NSK-SD preparation, and competing mechanisms remain.
+    summary: No controlled human fed-versus-fasted comparison establishes an intake preference for the exact Airboy quick-release product; PMID 23709455 is a small oral pharmacokinetic pilot and DSLD label 82020 describes a different product, so food effects remain unresolved.
   timing:
     conclusion: insufficient
     sources:
     - https://pubmed.ncbi.nlm.nih.gov/23709455/
-    - https://api.ods.od.nih.gov/dsld/s3/pdf/82020.pdf
-    summary: No comparative clock-time rule was demonstrated; pharmacokinetic sampling times are not administration-time evidence.
+    - https://pubmed.ncbi.nlm.nih.gov/26109079/
+    - https://pubmed.ncbi.nlm.nih.gov/19358933/
+    summary: No comparative clock-time rule was demonstrated; pharmacokinetic sampling and study dosing times are not evidence for a morning, evening, or other administration-time preference.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/26109079/
+    - https://pubmed.ncbi.nlm.nih.gov/19358933/
+    summary: The cited studies address fibrinolytic or coagulation markers rather than exercise or activity timing, so no activity-linked placement rule was demonstrated.
 knowledge:
   context:
-  - vascular_health
+  - value: vascular_health
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/39076715/
+    - https://pubmed.ncbi.nlm.nih.gov/33843667/
   effect:
-  - fibrinolytic
+  - value: fibrinolytic
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/26109079/
+    - https://pubmed.ncbi.nlm.nih.gov/19358933/
   kind:
-  - enzyme
+  - value: enzyme
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/17520440/
   pathway:
-  - fibrinolysis_coagulation
+  - value: fibrinolysis_coagulation
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/26109079/
+    - https://pubmed.ncbi.nlm.nih.gov/19358933/
   risk:
-  - manual_review
-  - bleeding_med_interaction
+  - value: bleeding_med_interaction
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/26109079/
+    - https://pubmed.ncbi.nlm.nih.gov/19358933/
+    - https://pubmed.ncbi.nlm.nih.gov/18310985/
+    - https://pubmed.ncbi.nlm.nih.gov/35003944/
