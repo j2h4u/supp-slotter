@@ -2,24 +2,22 @@ id: sub_berbrn0001
 name: Berberine
 aliases:
 - berberine alkaloid
-notes: Plant alkaloid commonly proposed for cardiometabolic support. Meta-analyses
-  report lipid and glucose-marker improvements in some populations, but study quality,
-  heterogeneity, product form, and medication-interaction context make this a review
+notes: Plant alkaloid commonly proposed for cardiometabolic support. Meta-analyses report lipid and glucose-marker improvements
+  in some populations, but study quality, heterogeneity, product form, and medication-interaction context make this a review
   candidate rather than a routine LDL-C recommendation.
 concerns:
 - kind: safety
-  text: Review pregnancy, breastfeeding, antidiabetes medications, antihypertensives,
-    anticoagulants, statins, CYP/P-gp-sensitive drugs, and narrow-therapeutic-window
-    medicines before active use.
+  text: Review pregnancy, breastfeeding, antidiabetes medications, antihypertensives, anticoagulants, statins, CYP/P-gp-sensitive
+    drugs, and narrow-therapeutic-window medicines before active use.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - alkaloid
   effect:
   - lipid_metabolism_support
   - insulin_signaling_context
+  kind:
+  - alkaloid
   risk:
   - glucose_med_interaction
   - cyp450_med_interaction

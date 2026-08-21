@@ -1,20 +1,35 @@
 id: sub_p5qxdnxu9e
 name: Calcium
 form: lactate
-notes: Calcium lactate component from the TiM Electrolyte Caps label. Calcium supports
-  bone/tooth mineral structure and mediates muscle function, blood clotting, nerve
-  transmission, vascular contraction/dilation, and hormone secretion; vitamin D supports
+semantic_enrichment_attempted_on: '2026-08-13'
+notes: Calcium lactate component from the TiM Electrolyte Caps label. Calcium supports bone/tooth mineral structure and mediates
+  muscle function, blood clotting, nerve transmission, vascular contraction/dilation, and hormone secretion; vitamin D supports
   active calcium absorption.
-schedule:
+scheduling_assessment:
   intake:
-  - food_preferred
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/
+    - https://ods.od.nih.gov/factsheets/Calcium-Consumer/
+    summary: Calcium food guidance is salt-specific; evidence does not establish a meal preference for this exact calcium lactate component, and TiM's 24 mg calcium is split across dicalcium phosphate and lactate with source contributions unresolved.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/
+    summary: No comparative clock-time rule was demonstrated for calcium lactate.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/
+    summary: Training-stack reachability does not establish a pre-, during-, or post-workout calcium placement.
 knowledge:
-  is:
-  - electrolyte
-  - mineral
-  effect:
-  - bone_mineral_metabolism_support
   context:
   - workout_performance
+  effect:
+  - bone_mineral_metabolism_support
+  kind:
+  - mineral
   pathway:
   - vitamin_d_calcium_axis
+  quality:
+  - electrolyte

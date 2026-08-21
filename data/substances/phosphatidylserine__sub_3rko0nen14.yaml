@@ -1,14 +1,14 @@
 name: Phosphatidylserine
 aliases:
 - PS
-notes: 'Knowledge-only phospholipid nootropic reference card. Added as a membrane/cognitive
-  comparator to existing phosphatidylcholine and krill-oil phospholipid cards. Sources
-  checked: PubChem phosphatidylserine records and Cayman Chemical product information.'
+notes: 'Knowledge-only phospholipid nootropic reference card. Added as a membrane/cognitive comparator to existing phosphatidylcholine
+  and krill-oil phospholipid cards. Sources checked: PubChem phosphatidylserine records and Cayman Chemical product information.'
 knowledge:
-  is:
-  - fat_soluble
-  - nootropic
   effect:
   - phospholipid_membrane_context
   - stress_reactivity_context
+  quality:
+  - fat_soluble
+  role:
+  - nootropic
 id: sub_3rko0nen14

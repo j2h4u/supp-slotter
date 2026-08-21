@@ -1,0 +1,8 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
+
+ss:item ss:knowledge_assertions ss:a .
+ss:a a ss:KnowledgeAssertion ;
+  ss:knowledge_category "context" ;
+  ss:knowledge_value "antioxidant_protection" .
+ss:d a ss:Dashboard ; ss:declares_context "antioxidant_protection" .

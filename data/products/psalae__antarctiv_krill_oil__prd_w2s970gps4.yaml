@@ -1,0 +1,23 @@
+brand: Psalae
+name: Antarctiv Krill oil
+components:
+- substance: sub_646e568f61
+  label: Krill oil
+  amount: 500 mg per softgel
+- substance: sub_66b783576c
+  label: EPA
+  amount: 80 mg per softgel
+- substance: sub_xsqvv2fop0
+  label: DHA
+  amount: 40 mg per softgel
+- substance: sub_t8sx7e49j7
+  label: Phospholipids
+  amount: 100 mg per softgel
+- substance: sub_249199f726
+  label: Astaxanthin
+  amount: 200 mcg per softgel
+  notes: Label-disclosed astaxanthin amount; no further source identity disclosed.
+notes: 'Package: 120 softgels. Label also states omega-3 fatty acids 120 mg per softgel,
+  composed of EPA 80 mg and DHA 40 mg; the aggregate is retained here without a redundant
+  component.'
+id: prd_w2s970gps4

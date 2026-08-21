@@ -3,16 +3,16 @@ name: Cetyl myristoleate
 aliases:
 - CMO
 - cetyl myristoleate complex
-notes: Cetylated fatty acid blend with joint-lubrication positioning. Used in Animal
-  Flex Joint Lubrication Complex as proprietary blend component.
+notes: Cetylated fatty acid blend with joint-lubrication positioning. Used in Animal Flex Joint Lubrication Complex as proprietary
+  blend component.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - fatty_acid_derivative
+  context:
+  - connective_tissue_support
   effect:
   - joint_lubrication_context
   - joint_comfort_context
-  context:
-  - connective_tissue_support
+  kind:
+  - fatty_acid_derivative

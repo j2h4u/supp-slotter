@@ -1,15 +1,18 @@
 name: Immune / Barrier Review
-description: Candidate-comparison review cluster for basic immune support,
-  immune-modulation positioning, epithelial barrier immunity, immune-cell
-  context, and mucolytic support. This is not immune-disease classification.
+description: Candidate-comparison review cluster for basic immune support, immune-modulation positioning, epithelial barrier
+  immunity, immune-cell context, and mucolytic support. This is not immune-disease classification.
 benefit:
-  description: Immune and barrier-support review coverage across foundational
-    immune function, epithelial surfaces, immune-cell context, and mucolytic
-    support.
-from_traits:
-  effect:
-  - epithelial_immune_context
-  - immune_cell_context
-  - immune_function_support
-  - immune_modulation_context
-  - mucolytic_context
+  description: Immune and barrier-support review coverage across foundational immune function, epithelial surfaces, immune-cell
+    context, and mucolytic support.
+id: immune_barrier_review
+selectors:
+- category: effect
+  term: epithelial_immune_context
+- category: effect
+  term: immune_cell_context
+- category: effect
+  term: immune_function_support
+- category: effect
+  term: immune_modulation_context
+- category: effect
+  term: mucolytic_context

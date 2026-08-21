@@ -12,80 +12,58 @@ SEPARATOR = "─" * 41
 _WRAP_WIDTH = 79
 _INDENT = "    "
 
-_HEADERS: dict[str, str] = {
-    "safety": "Safety",
-    "data_quality": "Data Quality",
-    "model_gap": "Model Gaps",
-}
-
-_RELATION_STATUS_DESC: dict[str, str] = {
-    "actionable_now": "relation semantics fire for the current stack",
-    "active_pair_present": "both endpoints active; no absence warning",
-    "latent_one_side_present": "one endpoint active; relation does not fire",
-    "inactive": "both endpoints absent",
-}
-
-_CONCERN_STATUS_ORDER: dict[str, int] = {
-    "active": 0,
-    "inactive": 1,
-    "tracked-unassigned": 2,
-    "knowledge-only": 3,
-}
-
 
 def render_review(model: ReviewModel) -> None:
     _print_review_brief(model)
     _print_concerns(model)
     _print_relations(model)
-    _print_index_section(
-        "Risk flags",
-        model.risk_index,
-        "No risk flags on active substances.",
-    )
-    _print_index_section(
-        "Pathway memberships",
-        model.pathway_index,
-        "No pathway memberships on active substances.",
-    )
+    _print_knowledge_index(model)
     _print_dashboard_summary(model)
 
 
 def _print_review_brief(model: ReviewModel) -> None:
-    active_concerns_by_kind = {
-        kind: [entry for entry in model.concerns_by_kind[kind] if entry.status == "active"] for kind in _HEADERS
-    }
-    active_concerns_total = sum(len(entries) for entries in active_concerns_by_kind.values())
-    risk_total = sum(len(names) for names in model.risk_index.values())
-    dashboard_current_count = _dashboard_views_with_current_members(model)
-    dashboard_zero_current_count = len(model.dashboard_summary) - dashboard_current_count
+    concerns_total = sum(len(entries) for entries in model.concerns_by_kind.values())
+    knowledge_total = sum(
+        len(names)
+        for namespace in model.knowledge_index_order
+        for names in model.knowledge_index.get(namespace, {}).values()
+    )
+    primary_usage_state = min(model.dashboard_state_catalog.usage_states, key=lambda state: state.order)
+    dashboard_primary_count = _dashboard_views_with_usage_state(model, primary_usage_state.state)
+    dashboard_zero_primary = len(model.dashboard_summary) - dashboard_primary_count
 
     print("Review brief")
     print(SEPARATOR)
     print(
-        "  Active concerns: "
-        f"{active_concerns_total} "
-        f"(safety {len(active_concerns_by_kind['safety'])}, "
-        f"data_quality {len(active_concerns_by_kind['data_quality'])}, "
-        f"model_gap {len(active_concerns_by_kind['model_gap'])})"
+        "  Concerns: "
+        f"{concerns_total} ("
+        + ", ".join(
+            f"{_concern_label(model, kind)} {len(entries)}"
+            for kind, entries in model.concerns_by_kind.items()
+            if entries
+        )
+        + ")"
     )
     print(
-        "  Relation review: "
-        f"{len(model.relations_by_status['actionable_now'])} actionable now, "
-        f"{len(model.relations_by_status['active_pair_present'])} active context"
+        "  Relation outcomes: "
+        f"{sum(1 for rows in model.relations_by_status.values() for row in rows if row['warning_type'])} warnings, "
+        f"{sum(len(rows) for rows in model.relations_by_status.values())} authored relations"
     )
-    print(f"  Risk flags: {risk_total} active memberships across {len(model.risk_index)} risk groups")
+    print(
+        f"  Active knowledge facts: {knowledge_total} memberships across {len(model.knowledge_index_order)} categories"
+    )
     print(
         "  Dashboard coverage: "
-        f"{dashboard_current_count} views with current members, "
-        f"{dashboard_zero_current_count} with zero current members"
+        f"{dashboard_primary_count} views with {primary_usage_state.label} members, "
+        f"{dashboard_zero_primary} with zero {primary_usage_state.label} members"
     )
-    print("  Data-quality drilldown: run `planner audit --full` for active product source/identity gaps.")
     print()
 
 
 def _print_concerns(model: ReviewModel) -> None:
     any_output = False
-    for kind, header in _HEADERS.items():
+    for kind in model.concerns_by_kind:
+        header = _concern_label(model, kind)
         entries = model.concerns_by_kind[kind]
         if not entries:
             continue
@@ -94,7 +72,7 @@ def _print_concerns(model: ReviewModel) -> None:
         print(f"{header} ({len(entries)})")
         print(SEPARATOR)
         for entry in sorted(entries, key=_concern_sort_key):
-            print(f"  {entry.name} [{entry.status}]")
+            print(f"  {entry.name} ({entry.record.subject_kind}:{entry.record.subject_id})")
             wrapped = textwrap.fill(
                 entry.text,
                 width=_WRAP_WIDTH,
@@ -108,6 +86,13 @@ def _print_concerns(model: ReviewModel) -> None:
         print("No concerns recorded.")
 
 
+def _concern_label(model: ReviewModel, kind: str) -> str:
+    label = model.concern_kind_labels.get(kind)
+    if not isinstance(label, str) or not label.strip():
+        raise ValueError(f"ontology concern kind {kind!r} has no authored presentation label")
+    return label
+
+
 def _print_relations(model: ReviewModel) -> None:
     total_relations = sum(len(v) for v in model.relations_by_status.values())
     print()
@@ -117,20 +102,13 @@ def _print_relations(model: ReviewModel) -> None:
         print("  No relations defined.")
         return
 
-    for status in (
-        "actionable_now",
-        "active_pair_present",
-        "latent_one_side_present",
-        "inactive",
-    ):
+    for status in model.relation_status_order:
         entries = model.relations_by_status[status]
         if not entries:
             continue
-        desc = _RELATION_STATUS_DESC.get(status, "")
-        suffix = f"  [{desc}]" if desc else ""
-        print(f"\n  {status} ({len(entries)}){suffix}")
-        for entry in sorted(entries, key=_relation_sort_key):
-            relation_type = entry["type"]
+        print(f"\n  {status} ({len(entries)})")
+        for entry in sorted(entries, key=lambda item: _relation_sort_key(item, model.relation_type_order)):
+            relation_type = _relation_type_label(model, entry["type"])
             source = entry["source"]
             target = entry["target"]
             reason = entry["reason"]
@@ -138,17 +116,38 @@ def _print_relations(model: ReviewModel) -> None:
             line = f"[{relation_type}] {source} -> {target}"
             if presence:
                 line += f" [{presence}]"
+            if entry["warning_type"]:
+                line += f" [warning: {entry['warning_type']}]"
             if reason:
                 line += f": {reason}"
             print(f"    {line}")
+            _print_relation_metadata(entry)
             if entry["show_matches"]:
                 _print_relation_match_details(entry)
 
 
-def _relation_sort_key(entry: RelationReviewRow) -> tuple[str, str]:
+def _relation_sort_key(entry: RelationReviewRow, relation_type_order: tuple[str, ...]) -> tuple[int, str]:
     relation_type = entry["type"]
     source = entry["source"]
-    return (relation_type, source.casefold())
+    try:
+        order = relation_type_order.index(relation_type)
+    except ValueError as error:
+        raise ValueError(f"ontology relation type {relation_type!r} has no authored presentation order") from error
+    return (order, source.casefold())
+
+
+def _relation_type_label(model: ReviewModel, relation_type: str) -> str:
+    label = model.relation_type_labels.get(relation_type)
+    if not isinstance(label, str) or not label.strip():
+        raise ValueError(f"ontology relation type {relation_type!r} has no authored presentation label")
+    return label
+
+
+def _print_relation_metadata(entry: RelationReviewRow) -> None:
+    if "severity" in entry:
+        print(f"      severity: {entry['severity']}")
+    if "action" in entry:
+        print(f"      action: {entry['action']}")
 
 
 def _print_relation_match_details(entry: RelationReviewRow) -> None:
@@ -192,9 +191,26 @@ def _print_index_section(
             print(f"    - {name}")
 
 
-def _concern_sort_key(entry: ConcernEntry) -> tuple[int, str, str]:
-    status_order = _CONCERN_STATUS_ORDER.get(entry.status, 99)
-    return (status_order, entry.name.casefold(), entry.text.casefold())
+def _print_knowledge_index(model: ReviewModel) -> None:
+    for namespace in model.knowledge_index_order:
+        entries = model.knowledge_index.get(namespace, {})
+        title = _knowledge_namespace_label(model, namespace)
+        _print_index_section(
+            title,
+            entries,
+            f"No {title.casefold()} on active substances.",
+        )
+
+
+def _knowledge_namespace_label(model: ReviewModel, namespace: str) -> str:
+    label = model.knowledge_namespace_labels.get(namespace)
+    if not isinstance(label, str) or not label.strip():
+        raise ValueError(f"ontology knowledge namespace {namespace!r} has no authored presentation label")
+    return label
+
+
+def _concern_sort_key(entry: ConcernEntry) -> tuple[str, str]:
+    return (entry.name.casefold(), entry.text.casefold())
 
 
 def _print_dashboard_summary(model: ReviewModel) -> None:
@@ -206,20 +222,27 @@ def _print_dashboard_summary(model: ReviewModel) -> None:
         print("  (Dashboards lacking both benefit: and risk: blocks are excluded from this summary.)")
         return
 
-    for name, entry in sorted(model.dashboard_summary.items(), key=lambda x: x[0].casefold()):
+    for entry in sorted(model.dashboard_summary.values(), key=lambda item: (item["name"].casefold(), item["id"])):
+        name = entry["name"]
         members = _dashboard_members(entry)
         total = len(members)
-        current_count = _count_members_by_usage(members, "current")
-        on_shelf_count = _count_members_by_usage(members, "on_shelf")
-        knowledge_only_count = _count_members_by_tracking(members, "no_tracked_product")
-        unassigned_count = _count_members_by_usage(members, "unassigned")
-        print(
-            f"  {name}: {total} relevant substances "
-            f"(current stack: {current_count}, "
-            f"on shelf: {on_shelf_count}, "
-            f"knowledge only: {knowledge_only_count}, "
-            f"tracked unassigned: {unassigned_count})"
+        usage_counts = {
+            state.state: _count_members_by_usage(members, state.state)
+            for state in model.dashboard_state_catalog.usage_states
+        }
+        tracking_counts = {
+            state.state: _count_members_by_tracking(members, state.state)
+            for state in model.dashboard_state_catalog.product_tracking_states
+        }
+        usage_summary = ", ".join(
+            f"{state.label}: {usage_counts[state.state]}"
+            for state in sorted(model.dashboard_state_catalog.usage_states, key=lambda state: state.order)
         )
+        tracking_summary = ", ".join(
+            f"{state.label}: {tracking_counts[state.state]}"
+            for state in sorted(model.dashboard_state_catalog.product_tracking_states, key=lambda state: state.order)
+        )
+        print(f"  {name}: {total} relevant substances (usage: {usage_summary}; tracking: {tracking_summary})")
 
 
 def _dashboard_members(entry: DashboardReviewEntryWithMembers) -> list[DashboardMember]:
@@ -237,10 +260,10 @@ def _count_members_by_tracking(members: list[DashboardMember], state: str) -> in
     return sum(1 for member in members if _member_product_tracking_state(member) == state)
 
 
-def _dashboard_views_with_current_members(model: ReviewModel) -> int:
+def _dashboard_views_with_usage_state(model: ReviewModel, state: str) -> int:
     count = 0
     for entry in model.dashboard_summary.values():
-        if _count_members_by_usage(_dashboard_members(entry), "current") > 0:
+        if _count_members_by_usage(_dashboard_members(entry), state) > 0:
             count += 1
     return count
 

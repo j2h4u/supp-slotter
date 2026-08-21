@@ -1,21 +1,31 @@
 id: sub_157418854b
 name: Vitamin B12
 form: methylcobalamin
-notes: 'Coenzyme B-Complex component: methylcobalamin active B12 form. Review context:
-  B12 is required for central nervous system development/function, healthy red blood
-  cell formation, and DNA synthesis. Relation source: Linus Pauling Institute Folate;
-  NIH ODS Folate/B12.'
-schedule:
+semantic_enrichment_attempted_on: '2026-08-13'
+notes: 'Coenzyme B-Complex component: methylcobalamin active B12 form. NIH ODS does not establish a supplemental-form absorption difference; preserve product formulation disclosure. Review context: B12 is required for central nervous
+  system development/function, healthy red blood cell formation, and DNA synthesis. Relation source: Linus Pauling Institute
+  Folate; NIH ODS Folate/B12.'
+scheduling_assessment:
   intake:
-  - food_preferred
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/28223907/
+    summary: Research on vitamin B12 does not directly establish a general fed or fasted preference for methylcobalamin specifically.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/28223907/
+    summary: No general clock-time rule was demonstrated for methylcobalamin supplementation.
 knowledge:
-  is:
-  - vitamin
+  context:
+  - neurocognitive_support
   effect:
   - dna_synthesis_support
   - nervous_system_support
   - red_blood_cell_support
-  context:
-  - neurocognitive_support
+  kind:
+  - vitamin
   pathway:
   - methylation_cycle

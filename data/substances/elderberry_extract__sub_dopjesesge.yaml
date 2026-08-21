@@ -3,25 +3,20 @@ form: extract
 aliases:
 - Sambucus nigra
 - Black elderberry
-notes: 'Knowledge-only popular immune botanical reference card. Added because elderberry
-  is a common cold/flu-season supplement category. Source checked: NCCIH elderberry
-  usefulness and safety page.'
+notes: 'Knowledge-only popular immune botanical reference card. Added because elderberry is a common cold/flu-season supplement
+  category. Source checked: NCCIH elderberry usefulness and safety page.'
 concerns:
 - kind: safety
-  text: Review pregnancy/breastfeeding, autoimmune or immunosuppressive medication
-    context, and product preparation quality; raw or improperly prepared elderberry
-    plant parts are not equivalent to standardized supplement extracts.
-schedule:
-  intake:
-  - food_neutral
+  text: Review pregnancy/breastfeeding, autoimmune or immunosuppressive medication context, and product preparation quality;
+    raw or improperly prepared elderberry plant parts are not equivalent to standardized supplement extracts.
 knowledge:
-  is:
-  - botanical
-  - flavonoid
-  effect:
-  - immune_modulation_context
-  risk:
-  - manual_review
   context:
   - antioxidant_protection
+  effect:
+  - immune_modulation_context
+  kind:
+  - botanical
+  - flavonoid
+  risk:
+  - manual_review
 id: sub_dopjesesge

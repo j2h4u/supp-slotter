@@ -1,20 +1,29 @@
 id: sub_3e3b246a6f
 name: Vanadium
-notes: Generic elemental vanadium contribution. Product cards keep the concrete
-  source form in component labels and notes. National Academies DRI review says
-  no biological role in humans has been identified; vanadium can mimic insulin in
-  laboratory animals, while pharmacologic diabetes-study doses greatly exceed
-  usual dietary intakes and the adult UL is 1.8 mg/day elemental vanadium.
+semantic_enrichment_attempted_on: '2026-08-13'
+notes: Generic elemental vanadium contribution. The active trace-mineral product supplies 750 mcg elemental vanadium from 3.75 mg vanadyl sulfate; another registered product uses vanadium citrate. Product form and dose bound applicability. No human essentiality or benefit transfers from pharmacologic findings.
+  National Academies DRI review says no biological role in humans has been identified; vanadium can mimic insulin in laboratory
+  animals, while pharmacologic diabetes-study doses greatly exceed usual dietary intakes and the adult UL is 1.8 mg/day elemental
+  vanadium.
 concerns:
 - kind: safety
-  text: Review as a glucose/insulin-context trace mineral rather than routine
-    essential support; current product dose is below the adult UL but far above
-    usual dietary intake estimates, and antidiabetes medication context matters.
-schedule:
-  intake:
-  - food_preferred
+  text: Review as a glucose/insulin-context trace mineral rather than routine essential support; current product dose is below
+    the adult UL but far above usual dietary intake estimates, and antidiabetes medication context matters.
 knowledge:
-  is:
+  kind:
   - mineral
   risk:
   - glucose_med_interaction
+scheduling_assessment:
+  intake:
+    conclusion: insufficient
+    sources:
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC4181337/
+    - https://www.efsa.europa.eu/en/press/news/080226-0
+    summary: The cited evidence does not establish an intake preference for vanadyl sulfate; it addresses vanadium generally or other forms and comparators.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC4181337/
+    - https://www.efsa.europa.eu/en/press/news/080226-0
+    summary: No general clock-time scheduling rule was demonstrated.

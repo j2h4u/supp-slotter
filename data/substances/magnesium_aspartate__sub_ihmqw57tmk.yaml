@@ -3,18 +3,18 @@ name: Magnesium
 form: aspartate
 aliases:
 - Mg aspartate
-notes: Magnesium chelated with aspartate; common multivitamin Mg form. Used alongside
-  magnesium oxide in Optimum Nutrition Opti-Men. Review context - treat as a magnesium
-  source for enzyme/energy, glucose, blood-pressure, nerve/muscle, bone-mineral,
+notes: Magnesium chelated with aspartate; common multivitamin Mg form. Used alongside magnesium oxide in Optimum Nutrition
+  Opti-Men. Review context - treat as a magnesium source for enzyme/energy, glucose, blood-pressure, nerve/muscle, bone-mineral,
   and vitamin-D/calcium-axis review while preserving the aspartate form.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - electrolyte
-  - mineral
   effect:
   - bone_mineral_metabolism_support
+  kind:
+  - mineral
   pathway:
   - vitamin_d_calcium_axis
+  quality:
+  - electrolyte

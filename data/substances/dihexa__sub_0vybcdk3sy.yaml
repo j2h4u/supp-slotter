@@ -3,26 +3,23 @@ aliases:
 - PNB-0408
 - N-hexanoic-Tyr-Ile-(6)-aminohexanoic amide
 - Hexanoyl-Tyr-Ile-Ahx-NH2
-notes: Knowledge-only experimental nootropic peptide reference card. Published preclinical
-  literature describes Dihexa as an angiotensin-IV-derived HGF/c-Met potentiator with
-  synaptogenic/procognitive effects in animal models; it is not a routine supplement
-  or approved human therapy. Sources checked - PubMed 25187433; PubChem CID 129010512.
+notes: Knowledge-only experimental nootropic peptide reference card. Published preclinical literature describes Dihexa as
+  an angiotensin-IV-derived HGF/c-Met potentiator with synaptogenic/procognitive effects in animal models; it is not a routine
+  supplement or approved human therapy. Sources checked - PubMed 25187433; PubChem CID 129010512.
 concerns:
 - kind: safety
-  text: Research-chemical / experimental nootropic context; human efficacy, dosing,
-    pharmacokinetics, long-term safety, interaction profile, product quality, and
-    HGF/c-Met growth-factor pathway risk are not established for routine use.
+  text: Research-chemical / experimental nootropic context; human efficacy, dosing, pharmacokinetics, long-term safety, interaction
+    profile, product quality, and HGF/c-Met growth-factor pathway risk are not established for routine use.
 - kind: model_gap
-  text: The ontology does not yet have a dedicated HGF/c-Met or growth-factor-pathway
-    trait; neurotrophic_support plus manual_review is sufficient until more cards
-    need that axis.
+  text: The ontology does not yet have a dedicated HGF/c-Met or growth-factor-pathway trait; neurotrophic_support plus manual_review
+    is sufficient until more cards need that axis.
 knowledge:
-  is:
-  - nootropic
   effect:
   - neurotrophic_support
   - learning_context
   - memory_recall_context
   risk:
   - manual_review
+  role:
+  - nootropic
 id: sub_0vybcdk3sy

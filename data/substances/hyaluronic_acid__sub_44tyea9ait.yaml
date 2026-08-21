@@ -3,16 +3,15 @@ name: Hyaluronic acid
 aliases:
 - HA
 - sodium hyaluronate
-notes: Glycosaminoglycan with joint-lubrication and connective-tissue positioning.
-  Used in Animal Flex Joint Lubrication Complex.
+notes: Glycosaminoglycan with joint-lubrication and connective-tissue positioning. Used in Animal Flex Joint Lubrication Complex.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - glycosaminoglycan
+  context:
+  - connective_tissue_support
   effect:
   - glycosaminoglycan_context
   - joint_lubrication_context
-  context:
-  - connective_tissue_support
+  kind:
+  - glycosaminoglycan

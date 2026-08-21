@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from planner.cards.product import format_product_name
 from planner.cards.substance import format_substance_name
-from planner.cards.warning_actions import warning_action
 from planner.contracts import Product, Substance
-from planner.domain_constants import WARNING_CATEGORY_LABELS
+from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.warning_policy import warning_action, warning_category_label, warning_concern_label
 
 
 def _format_warning_entities(
@@ -20,19 +20,6 @@ def _format_warning_entities(
     if isinstance(product_id, str):
         product = products.get(product_id)
         out["product"] = format_product_name(product) if product is not None else product_id
-
-    if str(warning.get("type") or "") == "risk_cluster_load":
-        cluster = warning.get("cluster")
-        if isinstance(cluster, str) and cluster:
-            out["risk"] = cluster
-            out["concern"] = cluster
-        active_members = warning.get("active")
-        if isinstance(active_members, list):
-            out["active"] = [
-                format_substance_name(substances[sid]) if sid in substances else str(sid)
-                for sid in active_members
-                if isinstance(sid, str)
-            ]
 
     substance_id = warning.get("substance")
     if isinstance(substance_id, str):
@@ -60,57 +47,41 @@ def _format_warning_entities(
     return out
 
 
-def _derive_concern_text(
-    warning_type: str,
-    trait: str,
-    relation: str,
-    warning: dict[str, object],
-) -> str:
-    """Return the human-readable concern label, or "" to defer to the caller.
-
-    Sentinel contract: when warning_type == "risk_cluster_load", the `concern`
-    field is already populated by `_format_warning_entities` (sourced from the
-    `cluster` field). Returning "" here signals `humanize_warning` to keep that
-    pre-populated value rather than overwriting it.
-    """
-    if warning_type == "risk_cluster_load":
-        return ""
-    if trait:
-        return trait.split(":", 1)[1].replace("_", " ")
-    if relation:
-        return relation.replace("_", " ")
-    return warning_type.replace("_", " ")
-
-
 def humanize_warning(
     warning: dict[str, object],
     *,
     products: dict[str, Product],
     substances: dict[str, Substance],
+    ontology_bundle: OntologyBundle,
 ) -> dict[str, object]:
-    warning_type = str(warning.get("type") or "review")
-    trait = str(warning.get("trait") or "")
-    relation = str(warning.get("relation") or "")
+    warning_type_raw = warning.get("type")
+    if not isinstance(warning_type_raw, str) or not warning_type_raw:
+        raise ValueError("schedule warning is missing required ontology warning type")
+    warning_type = warning_type_raw
+    trait_raw = warning.get("trait")
+    relation_raw = warning.get("relation")
+    if trait_raw is not None and not isinstance(trait_raw, str):
+        raise ValueError(f"schedule warning trait id is malformed: {trait_raw!r}")
+    if relation_raw is not None and not isinstance(relation_raw, str):
+        raise ValueError(f"schedule warning relation id is malformed: {relation_raw!r}")
+    trait = trait_raw or ""
+    relation = relation_raw or ""
 
     out: dict[str, object] = {
-        "category": WARNING_CATEGORY_LABELS.get(warning_type, "Review"),
+        "category": warning_category_label(warning_type, ontology_bundle),
     }
     out.update(_format_warning_entities(warning, products, substances))
 
-    concern = _derive_concern_text(warning_type, trait, relation, warning)
-    if concern:
-        out["concern"] = concern
+    out["concern"] = warning_concern_label(warning_type, trait, relation, ontology_bundle)
 
     message = warning.get("message") or warning.get("reason")
     if isinstance(message, str) and message and "operator attention" not in message:
         out["note"] = message
     action = warning.get("action")
-    out["action"] = action if isinstance(action, str) and action else warning_action(warning_type, trait, relation)
+    out["action"] = (
+        action if isinstance(action, str) and action else warning_action(warning_type, trait, relation, ontology_bundle)
+    )
     severity = warning.get("severity")
     if severity is not None:
         out["severity"] = severity
     return out
-
-
-def is_generic_manual_review_warning(warning: dict[str, object]) -> bool:
-    return warning.get("trait") == "risk:manual_review"

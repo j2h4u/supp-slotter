@@ -1,0 +1,144 @@
+id: https://j2h4u.github.io/supp-slotter/ontology/v1/relation-model
+name: supp_slotter_relation_model
+prefixes:
+  ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
+  linkml: https://w3id.org/linkml/
+default_prefix: ss
+default_range: string
+imports:
+  - linkml:types
+  - model
+
+enums:
+  Severity:
+    permissible_values:
+      critical:
+      high:
+      medium:
+      low:
+  RelationSelectorForm:
+    permissible_values:
+      term:
+      entity:
+  RelationType:
+    description: Relation type identifiers are authored in the relation type catalog.
+    # The compiler injects the catalog's IDs into the generated JSON Schema.
+    # Keeping values out of this LinkML model prevents this structural schema
+    # from becoming a second, manually maintained relation vocabulary.
+
+classes:
+  RelationCatalog:
+    description: Authored operational relation vocabulary consumed by runtime review and warning policy.
+    slots: [relation_types]
+    slot_usage:
+      relation_types: {required: true, inlined: true, inlined_as_list: true}
+  OperationalRelationType:
+    description: Authored runtime-facing relation type metadata.
+    slots: [id, label, order, directional, source_selector_forms, target_selector_forms]
+    slot_usage:
+      id: {required: true, range: RelationType}
+      label: {required: true}
+      order: {required: true}
+      directional: {required: true}
+      source_selector_forms: {required: true}
+      target_selector_forms: {required: true}
+  RelationAssertionCatalog:
+    description: Authored supplement relation assertions consumed by the read model and reviewer surfaces.
+    annotations:
+      relation_id_uniqueness: required
+      relation_id_uniqueness_source: relations[]
+      relation_id_uniqueness_field: id
+    slots: [relations]
+    slot_usage:
+      relations: {required: true, inlined: true, inlined_as_list: true}
+  RelationAssertionRecord:
+    slots:
+      - id
+      - relation_type
+      - assertion_kind
+      - semantic_family
+      - severity
+      - reason
+      - action
+      - research_state
+      - sources
+      - source_selector
+      - target_selector
+    slot_usage:
+      id: {required: true, pattern: '^[a-z][a-z0-9_]*$'}
+      relation_type: {required: true, range: RelationType}
+      assertion_kind: {required: true}
+      semantic_family: {required: true}
+      reason: {required: true}
+      action: {range: string, inlined: false}
+      research_state: {range: ResearchState, multivalued: false}
+      sources: {multivalued: true, inlined_as_list: true}
+      source_selector:
+        required: true
+        range: RelationAssertionSelector
+        inlined: true
+      target_selector:
+        required: true
+        range: RelationAssertionSelector
+        inlined: true
+  RelationAssertionSelector:
+    slots: [entity, category, term]
+    exactly_one_of:
+      - slot_conditions:
+          entity: {required: true}
+          category: {maximum_cardinality: 0}
+          term: {maximum_cardinality: 0}
+      - slot_conditions:
+          entity: {maximum_cardinality: 0}
+          category: {required: true}
+          term: {required: true}
+    slot_usage:
+      entity:
+        required: false
+        range: RelationAssertionEntitySelector
+        inlined: true
+      category: {required: false, pattern: '\S'}
+      term: {required: false, range: string, pattern: '\S'}
+  RelationAssertionEntitySelector:
+    slots: [entity_id, name]
+    exactly_one_of:
+      - slot_conditions:
+          entity_id: {required: true}
+          name: {maximum_cardinality: 0}
+      - slot_conditions:
+          entity_id: {maximum_cardinality: 0}
+          name: {required: true}
+    slot_usage:
+      entity_id: {required: false, range: Substance, pattern: '\S'}
+      name: {required: false, pattern: '\S'}
+
+slots:
+  relation_types:
+    multivalued: true
+    range: OperationalRelationType
+    inlined: true
+    inlined_as_list: true
+  order:
+    range: integer
+  directional:
+    description: Whether reversing a relation's resolved endpoints changes its assertion identity; directionless relations are unordered pairs and duplicate reverse orientations are rejected.
+    range: boolean
+  source_selector_forms:
+    description: Authoring/review contract for valid source selector shapes; runtime placement policy is declared separately in scheduling policy catalogs.
+    multivalued: true
+    range: RelationSelectorForm
+  target_selector_forms:
+    description: Authoring/review contract for valid target selector shapes; runtime placement policy is declared separately in scheduling policy catalogs.
+    multivalued: true
+    range: RelationSelectorForm
+  relations:
+    multivalued: true
+    range: RelationAssertionRecord
+    inlined: true
+    inlined_as_list: true
+  assertion_kind:
+  semantic_family:
+  relation_type: {range: RelationType}
+  severity:
+    range: Severity
+  reason:

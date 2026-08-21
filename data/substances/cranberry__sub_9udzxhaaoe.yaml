@@ -4,18 +4,18 @@ aliases:
 - Vaccinium macrocarpon
 - cranberry extract
 - proanthocyanidin source
-notes: Berry source of proanthocyanidins; commonly used for urinary-tract and antioxidant
-  context. Polyphenol load may carry mild antiplatelet potential at concentrated extract
-  doses.
+notes: Berry source of proanthocyanidins; commonly used for urinary-tract and antioxidant context. Polyphenol load may carry
+  mild antiplatelet potential at concentrated extract doses.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - botanical
-  - antioxidant
+  context:
+  - antioxidant_protection
   effect:
   - urinary_tract_context
   - urinary_adhesion_context
-  context:
-  - antioxidant_protection
+  kind:
+  - botanical
+  role:
+  - antioxidant

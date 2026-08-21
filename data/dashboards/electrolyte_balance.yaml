@@ -1,9 +1,12 @@
 name: Electrolyte Balance
-description: Review cluster for electrolyte balance across sodium, potassium, magnesium, calcium, fluid balance, blood-pressure, heart-rhythm, and nerve/muscle context.
+description: Review cluster for electrolyte balance across sodium, potassium, magnesium, calcium, fluid balance, blood-pressure,
+  heart-rhythm, and nerve/muscle context.
 benefit:
-  description: Electrolyte-balance coverage across well-being, fluid balance, blood-pressure, heart-rhythm, and nerve/muscle function.
-from_traits:
-  is:
-  - electrolyte
-  effect:
-  - fluid_balance_context
+  description: Electrolyte-balance coverage across well-being, fluid balance, blood-pressure, heart-rhythm, and nerve/muscle
+    function.
+id: electrolyte_balance
+selectors:
+- category: effect
+  term: fluid_balance_context
+- category: quality
+  term: electrolyte
