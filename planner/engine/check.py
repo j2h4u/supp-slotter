@@ -126,7 +126,7 @@ def _extend_card_validation_errors(
     errors: list[str],
     info: list[str],
     bundle: OntologyBundle,
-) -> CheckResult | None:  # noqa: too-many-locals
+) -> CheckResult | None:
     policies = load_scheduling_policies(bundle)
     trait_ids = set(policies)
     all_substance_files = sorted(paths.substances.glob("*.yaml"))
@@ -148,6 +148,13 @@ def _extend_card_validation_errors(
 
     stacks_errors, stacks_info = validate_stacks(paths, product_ids, bundle)
     errors.extend(stacks_errors)
+    _append_stack_diagnostics(paths, bundle, stacks_info, info)
+    dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
+    errors.extend(check_dashboards(dashboard_files, trait_ids, paths, bundle, substances, info))
+    return None
+
+
+def _append_stack_diagnostics(paths: Paths, bundle: OntologyBundle, stacks_info: list[str], info: list[str]) -> None:
     unstacked = [message for message in stacks_info if "has no stack entry" in message]
     info.extend(message for message in stacks_info if message not in unstacked)
     if unstacked:
@@ -157,6 +164,3 @@ def _extend_card_validation_errors(
             f"({product_ids}); add them to `{bundle.runtime_program.glue_contract.inactive_stack_name}` "
             "if still owned, or leave outside stacks intentionally."
         )
-    dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
-    errors.extend(check_dashboards(dashboard_files, trait_ids, paths, bundle, substances, info))
-    return None

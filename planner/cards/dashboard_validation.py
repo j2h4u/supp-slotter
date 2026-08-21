@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
 from typing import cast
 
@@ -36,7 +37,7 @@ def _check_dashboard_file(
     dashboard_paths_by_id: dict[str, Path],
     substances: dict[str, Substance],
     info: list[str] | None,
-) -> list[str]:  # noqa: complex-structure
+) -> list[str]:
     try:
         dashboard = load_card_mapping(path, "dashboard")
     except CardLoadError as error:
@@ -56,6 +57,18 @@ def _check_dashboard_file(
     selectors = dashboard.get("selectors")
     if not isinstance(selectors, list):
         return errors
+    errors.extend(_check_dashboard_selectors(path, selectors, substances, bundle, info))
+    return errors
+
+
+def _check_dashboard_selectors(
+    path: Path,
+    selectors: Sequence[object],
+    substances: dict[str, Substance],
+    bundle: OntologyBundle,
+    info: list[str] | None,
+) -> list[str]:
+    errors: list[str] = []
     for index, raw in enumerate(selectors):
         if not isinstance(raw, dict):
             continue

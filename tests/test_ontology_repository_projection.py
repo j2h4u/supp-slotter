@@ -9,7 +9,7 @@ from planner.ontology.artifacts import load_ontology
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.projection import _project_repository_with_projection, project_repository
 from rdflib import URIRef
-from rdflib.namespace import RDF, XSD
+from rdflib.namespace import RDF
 
 BASE = "https://example.test/ontology/"
 
