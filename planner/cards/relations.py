@@ -6,7 +6,15 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Literal, NamedTuple, cast
 
-from planner.contracts import CardLoadError, Relation, RelationSelector, RelationType, Severity, Substance
+from planner.contracts import (
+    CardLoadError,
+    Relation,
+    RelationSelector,
+    RelationType,
+    ResearchState,
+    Severity,
+    Substance,
+)
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.selector import (
     RelationTypeContract,
@@ -16,6 +24,7 @@ from planner.ontology.selector import (
     selector_identity_key,
     validate_relation_selector_form,
 )
+from planner.ontology.schema_enums import schema_enum_values
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue, load_yaml
@@ -53,7 +62,7 @@ def load_global_relations(
     seen_directionless: dict[tuple[str, frozenset[str]], int] = {}
     for index, raw_entry in enumerate(entries):
         path = f"{paths.relations_file}: relations[{index}]"
-        entry = _validated_relation_entry(raw_entry, paths.relations_file, path)
+        entry = _validated_relation_entry(raw_entry, paths.relations_file, path, bundle)
         relation_type = entry.get("relation_type")
         if not isinstance(relation_type, str) or relation_type not in relation_types:
             raise CardLoadError(
@@ -84,7 +93,9 @@ def load_global_relations(
     return result
 
 
-def _validated_relation_entry(raw: object, path: Path, label: str) -> dict[str, object]:
+def _validated_relation_entry(
+    raw: object, path: Path, label: str, bundle: OntologyBundle
+) -> dict[str, object]:
     if not isinstance(raw, dict):
         raise CardLoadError(path, f"{label} must be a mapping")
     entry = cast(dict[str, object], raw)
@@ -96,10 +107,21 @@ def _validated_relation_entry(raw: object, path: Path, label: str) -> dict[str, 
         value = entry[field]
         if not isinstance(value, str) or not value.strip():
             raise CardLoadError(path, f"{label}.{field} must be a non-empty string")
-    for field in ("action", "severity", "assertion_kind", "semantic_family"):
+    for field in ("action", "severity", "assertion_kind", "semantic_family", "research_state"):
         value = entry.get(field)
         if value is not None and (not isinstance(value, str) or not value.strip()):
             raise CardLoadError(path, f"{label}.{field} must be a non-empty string when present")
+    state = entry.get("research_state", "unassessed")
+    state_values = frozenset(schema_enum_values(bundle, "ResearchState"))
+    if state not in state_values:
+        raise CardLoadError(path, f"{label}.research_state is not in ontology ResearchState")
+    sources = entry.get("sources", [])
+    if not isinstance(sources, list) or any(
+        not isinstance(source, str) or not source.strip() for source in sources
+    ):
+        raise CardLoadError(path, f"{label}.sources must be a list of non-empty strings")
+    if state != "unassessed" and not sources:
+        raise CardLoadError(path, f"{label}.sources must be non-empty for research_state {state!r}")
     return entry
 
 
@@ -149,6 +171,8 @@ def _relation_from_mapping(  # noqa: PLR0913, PLR0917
         severity=cast(Severity | None, relation.get("severity")),
         assertion_kind=_optional_str(relation.get("assertion_kind")),
         semantic_family=_optional_str(relation.get("semantic_family")),
+        research_state=cast(ResearchState, relation.get("research_state", "unassessed")),
+        sources=tuple(cast(list[str], relation.get("sources", []))),
     )
 
 

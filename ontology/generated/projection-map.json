@@ -494,6 +494,22 @@
           "name": "knowledge_value",
           "range": "string",
           "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "research_state",
+          "range": "ResearchState",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "sources",
+          "range": "string",
+          "required": false
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/KnowledgeAssertion"
@@ -987,6 +1003,14 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
+          "name": "research_state",
+          "range": "ResearchState",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
           "name": "semantic_family",
           "range": "string",
           "required": true
@@ -1006,6 +1030,14 @@
           "name": "source_selector",
           "range": "RelationAssertionSelector",
           "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "sources",
+          "range": "string",
+          "required": false
         },
         {
           "inlined": true,
@@ -3471,6 +3503,12 @@
             },
             {
               "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/research_state",
+              "source": "relations[].research_state",
+              "subject": "relations[]"
+            },
+            {
+              "kind": "slot",
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_family",
               "source": "relations[].semantic_family",
               "subject": "relations[]"
@@ -3519,6 +3557,12 @@
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/term",
               "source": "relations[].source_selector.term",
               "subject": "relations[].source_selector"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/sources",
+              "source": "relations[].sources[]",
+              "subject": "relations[]"
             },
             {
               "kind": "inlined-node",
@@ -3890,6 +3934,24 @@
               "kind": "slot",
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/knowledge_value",
               "source": "knowledge.<key>[]",
+              "subject": "knowledge.<key>[]"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/research_state",
+              "source": "knowledge.<key>[].research_state",
+              "subject": "knowledge.<key>[]"
+            },
+            {
+              "kind": "sequence",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/sources",
+              "source": "knowledge.<key>[].sources[]",
+              "subject": "knowledge.<key>[]"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/knowledge_value",
+              "source": "knowledge.<key>[].value",
               "subject": "knowledge.<key>[]"
             },
             {

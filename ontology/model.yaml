@@ -18,6 +18,13 @@ enums:
       supports_no_rule:
       insufficient:
       conflicting:
+  ResearchState:
+    permissible_values:
+      unassessed:
+      anecdotal:
+      searched_insufficient:
+      mechanistic_only:
+      supported:
   ProductUsePattern:
     permissible_values:
       not_every_day:
@@ -44,7 +51,7 @@ classes:
   Concern:
     slots: [concern_kind, concern_text]
   KnowledgeAssertion:
-    slots: [knowledge_category, knowledge_value]
+    slots: [knowledge_category, knowledge_value, research_state, sources]
   ScheduleAssertion:
     slots: [schedule_axis, schedule_value]
   SchedulingAssessment:
@@ -209,6 +216,7 @@ slots:
   concern_text: {}
   knowledge_category: {}
   knowledge_value: {}
+  research_state: {range: ResearchState}
   schedule_axis: {}
   schedule_value: {}
   slots: {multivalued: true, range: Slot, inlined: true, inlined_as_list: true}

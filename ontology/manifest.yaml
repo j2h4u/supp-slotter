@@ -85,6 +85,9 @@ repository_projection:
         - {kind: inlined-node, source: "knowledge.<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/knowledge_assertions, target: KnowledgeAssertion}
         - {kind: path-token, source: "knowledge.<key>[]", subject: "knowledge.<key>[]", token: "<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/knowledge_category}
         - {kind: slot, source: "knowledge.<key>[]", subject: "knowledge.<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/knowledge_value}
+        - {kind: slot, source: "knowledge.<key>[].value", subject: "knowledge.<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/knowledge_value}
+        - {kind: slot, source: "knowledge.<key>[].research_state", subject: "knowledge.<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/research_state}
+        - {kind: sequence, source: "knowledge.<key>[].sources[]", subject: "knowledge.<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/sources}
         - {kind: sequence, source: "schedule.prefer_with[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/prefer_with, target: Substance}
         - {kind: inlined-node, source: "schedule.intake[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_assertions, target: ScheduleAssertion}
         - {kind: path-token, source: "schedule.intake[]", subject: "schedule.intake[]", token: "intake[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axis}
@@ -175,6 +178,8 @@ repository_projection:
         - {kind: slot, source: "relations[].assertion_kind", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/assertion_kind}
         - {kind: slot, source: "relations[].id", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
         - {kind: slot, source: "relations[].reason", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/reason}
+        - {kind: slot, source: "relations[].research_state", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/research_state}
+        - {kind: sequence, source: "relations[].sources[]", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/sources}
         - {kind: slot, source: "relations[].semantic_family", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_family}
         - {kind: slot, source: "relations[].severity", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/severity}
         - {kind: slot, source: "relations[].relation_type", subject: "relations[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/relation_type}

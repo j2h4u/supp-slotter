@@ -188,6 +188,34 @@ def test_relation_loader_rejects_non_list_and_invalid_selector_entry(tmp_path: P
         load_global_relations(Paths.from_root(tmp_path), ontology_bundle(), {})
 
 
+def test_relation_loader_normalizes_legacy_and_reads_research_state_metadata(tmp_path: Path) -> None:
+    path = tmp_path / "data" / "relations.yaml"
+    path.parent.mkdir()
+    relation = {
+        "id": "rel_research_state_probe",
+        "relation_type": "supports",
+        "source_selector": {"entity": {"name": "Known"}},
+        "target_selector": {"entity": {"name": "Target"}},
+        "reason": "research-state loader probe",
+        "assertion_kind": "ontology_assertion",
+        "semantic_family": "research_state_probe",
+    }
+    path.write_text(yaml.safe_dump({"relations": [relation]}), encoding="utf-8")
+    substances = {
+        "sub_known000": Substance("sub_known000", "Known"),
+        "sub_target00": Substance("sub_target00", "Target"),
+    }
+    legacy = load_global_relations(Paths.from_root(tmp_path), ontology_bundle(), substances)[0]
+    assert legacy.research_state == "unassessed"
+    assert legacy.sources == ()
+
+    relation.update({"research_state": "mechanistic_only", "sources": ["https://example.test/mechanism"]})
+    path.write_text(yaml.safe_dump({"relations": [relation]}), encoding="utf-8")
+    structured = load_global_relations(Paths.from_root(tmp_path), ontology_bundle(), substances)[0]
+    assert structured.research_state == "mechanistic_only"
+    assert structured.sources == ("https://example.test/mechanism",)
+
+
 @pytest.mark.parametrize("side", ["source", "target"])
 def test_relation_loader_enforces_per_side_selector_forms(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, side: str
@@ -372,6 +400,56 @@ def test_substance_loader_accepts_known_and_registered_unused_terms(tmp_path: Pa
     assert substance.knowledge_assertions[0].value == "mineral"
     assert substance.schedule_assertions[0].axis == "intake"
     assert substance.schedule_assertions[0].value == "fat_meal_required"
+
+
+def test_substance_loader_normalizes_legacy_and_reads_research_state_metadata(tmp_path: Path) -> None:
+    legacy_path = tmp_path / "legacy.yaml"
+    legacy_path.write_text(
+        yaml.safe_dump({"id": "sub_zz0000zzzz", "name": "Legacy", "knowledge": {"kind": ["mineral"]}}),
+        encoding="utf-8",
+    )
+    legacy = load_substance(legacy_path, ontology_bundle())
+    assert legacy.knowledge_assertions[0].research_state == "unassessed"
+    assert legacy.knowledge_assertions[0].sources == ()
+
+    structured_path = tmp_path / "structured.yaml"
+    structured_path.write_text(
+        yaml.safe_dump(
+            {
+                "id": "sub_zz0000zzzz",
+                "name": "Structured",
+                "knowledge": {
+                    "kind": [
+                        {
+                            "value": "mineral",
+                            "research_state": "supported",
+                            "sources": ["https://example.test/evidence"],
+                        }
+                    ]
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    structured = load_substance(structured_path, ontology_bundle())
+    assert structured.knowledge_assertions[0].research_state == "supported"
+    assert structured.knowledge_assertions[0].sources == ("https://example.test/evidence",)
+
+
+def test_substance_loader_rejects_research_state_without_sources(tmp_path: Path) -> None:
+    path = tmp_path / "invalid.yaml"
+    path.write_text(
+        yaml.safe_dump(
+            {
+                "id": "sub_zz0000zzzz",
+                "name": "Invalid",
+                "knowledge": {"kind": [{"value": "mineral", "research_state": "supported"}]},
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(CardLoadError, match="sources"):
+        load_substance(path, ontology_bundle())
 
 
 def test_substance_loader_joins_preference_assessment_to_same_axis_schedule_fact(tmp_path: Path) -> None:

@@ -13,11 +13,12 @@ from planner.engine import (
     cmd_check,
     cmd_find,
     cmd_grooming_next,
+    cmd_grooming_research,
     cmd_review,
     cmd_review_substance,
     cmd_show,
 )
-from planner.engine.results import GroomingResult, ReviewResult, ShowResult
+from planner.engine.results import GroomingResult, ResearchStateResult, ReviewResult, ShowResult
 
 CommandHandler = Callable[[argparse.Namespace, Path | None], int]
 
@@ -76,6 +77,9 @@ def main(data_root: Path | None = None) -> None:
         default=None,
         help="positive maximum number of cards (default from ontology policy)",
     )
+    grooming_research = grooming_sub.add_parser("research", help="list active assertions by research state")
+    grooming_research.add_argument("--state", required=True, help="research state enum value")
+    grooming_research.add_argument("--limit", type=int, default=None, help="positive maximum number of assertions")
 
     review_substance = sub.add_parser(
         "review-substance",
@@ -122,9 +126,13 @@ def _run_find(args: argparse.Namespace, data_root: Path | None) -> int:
 
 
 def _run_grooming(args: argparse.Namespace, data_root: Path | None) -> int:
-    if cast(str, args.grooming_cmd) != "next":
-        return 2
-    return _print_result(cmd_grooming_next(cast(int, args.limit), data_root=data_root))
+    if cast(str, args.grooming_cmd) == "next":
+        return _print_result(cmd_grooming_next(cast(int, args.limit), data_root=data_root))
+    if cast(str, args.grooming_cmd) == "research":
+        return _print_result(
+            cmd_grooming_research(cast(str, args.state), cast(int | None, args.limit), data_root=data_root)
+        )
+    return 2
 
 
 def _run_review(_args: argparse.Namespace, data_root: Path | None) -> int:
@@ -145,10 +153,10 @@ def _exit_with_result(result: ReviewResult | ShowResult) -> None:
     sys.exit(_print_result(result))
 
 
-def _print_result(result: ReviewResult | ShowResult | GroomingResult) -> int:
+def _print_result(result: ReviewResult | ShowResult | GroomingResult | ResearchStateResult) -> int:
     if result.output:
         print(result.output, end="")
-    if isinstance(result, (ReviewResult, GroomingResult)) and result.stderr:
+    if isinstance(result, (ReviewResult, GroomingResult, ResearchStateResult)) and result.stderr:
         print(result.stderr, end="", file=sys.stderr)
     return result.exit_code
 

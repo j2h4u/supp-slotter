@@ -60,6 +60,8 @@ classes:
       - severity
       - reason
       - action
+      - research_state
+      - sources
       - source_selector
       - target_selector
     slot_usage:
@@ -69,6 +71,8 @@ classes:
       semantic_family: {required: true}
       reason: {required: true}
       action: {range: string, inlined: false}
+      research_state: {range: ResearchState, multivalued: false}
+      sources: {multivalued: true, inlined_as_list: true}
       source_selector:
         required: true
         range: RelationAssertionSelector

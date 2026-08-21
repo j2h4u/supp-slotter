@@ -22,6 +22,7 @@ type SlotNear = str
 type RelationType = str
 type Severity = str
 type ConcernKind = str
+type ResearchState = str
 type AssignmentSourceKind = str
 
 
@@ -62,6 +63,8 @@ class CardLoadError(Exception):
 class KnowledgeAssertion:
     category: str
     value: str
+    research_state: ResearchState = "unassessed"
+    sources: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -261,6 +264,8 @@ class OntologyAssertion:
     target_selector: RelationSelector
     action: str | None = None
     severity: Severity | None = None
+    research_state: ResearchState = "unassessed"
+    sources: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -274,6 +279,8 @@ class Relation:
     severity: Severity | None = None
     assertion_kind: str | None = None
     semantic_family: str | None = None
+    research_state: ResearchState = "unassessed"
+    sources: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

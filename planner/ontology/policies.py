@@ -307,6 +307,8 @@ def load_ontology_assertions(bundle: OntologyBundle) -> tuple[OntologyAssertion,
                 target_selector=target,
                 action=action if isinstance(action, str) else None,
                 severity=cast(Severity | None, severity),
+                research_state=cast(str, raw.get("research_state", "unassessed")),
+                sources=tuple(item for item in raw.get("sources", []) if isinstance(item, str)),
             )
         )
     return tuple(assertions)
@@ -337,6 +339,8 @@ def project_ontology_assertions(
             target_selector=relation.target_selector,
             action=relation.action,
             severity=relation.severity,
+            research_state=relation.research_state,
+            sources=relation.sources,
         )
         for relation in relations
         if relation.id not in generated_ids

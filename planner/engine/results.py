@@ -70,6 +70,27 @@ class GroomingResult:
 
 
 @dataclass(frozen=True)
+class ResearchStateCandidate:
+    kind: str
+    id: str
+    research_state: str
+    detail: str
+    sources: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class ResearchStateResult:
+    exit_code: int
+    candidates: list[ResearchStateCandidate]
+    research_state: str
+    limit: int
+    total_matching: int
+    shown: int
+    output: str = ""
+    stderr: str = ""
+
+
+@dataclass(frozen=True)
 class ShowResult:
     exit_code: int
     output: str = ""

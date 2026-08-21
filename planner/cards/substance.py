@@ -99,9 +99,38 @@ def _knowledge_assertions(
             raise CardLoadError(path, f"{path}: knowledge.{category} must be a list")
         values = cast(list[object] | tuple[object, ...], values)
         predicate = f"knowledge.{category}"
-        assertions.extend(
-            KnowledgeAssertion(category, term) for term in _canonical_terms(values, path, predicate, canonical_terms)
-        )
+        known = canonical_terms.get(predicate, frozenset())
+        state_values = frozenset(schema_enum_values(bundle, "ResearchState"))
+        for index, raw in enumerate(values):
+            state = "unassessed"
+            sources: tuple[str, ...] = ()
+            if isinstance(raw, str):
+                term = raw
+            elif isinstance(raw, Mapping):
+                record = cast(Mapping[str, object], raw)
+                if set(record) - {"value", "research_state", "sources"} or "value" not in record:
+                    raise CardLoadError(path, f"{path}: {predicate}[{index}] has unsupported fields")
+                term = record["value"]
+                state = record.get("research_state", "unassessed")
+                raw_sources = record.get("sources", [])
+                if not isinstance(raw_sources, list) or any(
+                    not isinstance(source, str) or not source.strip() for source in raw_sources
+                ):
+                    raise CardLoadError(
+                        path, f"{path}: {predicate}[{index}].sources must be a list of non-empty strings"
+                    )
+                sources = tuple(cast(list[str], raw_sources))
+            else:
+                raise CardLoadError(path, f"{path}: {predicate}[{index}] must be a string or mapping")
+            if not isinstance(term, str) or term not in known:
+                raise CardLoadError(path, f"{path}: term '{predicate}:{term}' is not in canonical ontology vocabulary")
+            if not isinstance(state, str) or state not in state_values:
+                raise CardLoadError(
+                    path, f"{path}: {predicate}[{index}].research_state is not in ontology ResearchState"
+                )
+            if state != "unassessed" and not sources:
+                raise CardLoadError(path, f"{path}: {predicate}[{index}].sources must be non-empty for {state!r}")
+            assertions.append(KnowledgeAssertion(category, term, state, sources))
     return tuple(assertions)
 
 

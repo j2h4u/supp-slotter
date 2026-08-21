@@ -176,8 +176,7 @@ def _append_unknown_term_errors(
 ) -> None:
     if not isinstance(values, list):
         return
-    errors.extend(
-        f"{path}: term '{category}:{term}' is not in canonical ontology vocabulary"
-        for term in values
-        if isinstance(term, str) and term not in known
-    )
+    for value in values:
+        term = value.get("value") if isinstance(value, Mapping) else value
+        if isinstance(term, str) and term not in known:
+            errors.append(f"{path}: term '{category}:{term}' is not in canonical ontology vocabulary")

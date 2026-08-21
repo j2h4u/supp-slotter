@@ -63,8 +63,34 @@
         "context": {
           "description": "Authored card assertion field context.",
           "items": {
-            "pattern": "^[a-z][a-z0-9_]*$",
-            "type": "string"
+            "oneOf": [
+              {
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "research_state": {
+                    "$ref": "#/$defs/ResearchState"
+                  },
+                  "sources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "value": {
+                    "pattern": "^[a-z][a-z0-9_]*$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "value"
+                ],
+                "type": "object"
+              }
+            ]
           },
           "type": [
             "array",
@@ -75,8 +101,34 @@
         "effect": {
           "description": "Authored card assertion field effect.",
           "items": {
-            "pattern": "^[a-z][a-z0-9_]*$",
-            "type": "string"
+            "oneOf": [
+              {
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "research_state": {
+                    "$ref": "#/$defs/ResearchState"
+                  },
+                  "sources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "value": {
+                    "pattern": "^[a-z][a-z0-9_]*$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "value"
+                ],
+                "type": "object"
+              }
+            ]
           },
           "type": [
             "array",
@@ -87,8 +139,34 @@
         "kind": {
           "description": "Authored card assertion field kind.",
           "items": {
-            "pattern": "^[a-z][a-z0-9_]*$",
-            "type": "string"
+            "oneOf": [
+              {
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "research_state": {
+                    "$ref": "#/$defs/ResearchState"
+                  },
+                  "sources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "value": {
+                    "pattern": "^[a-z][a-z0-9_]*$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "value"
+                ],
+                "type": "object"
+              }
+            ]
           },
           "type": [
             "array",
@@ -99,8 +177,34 @@
         "pathway": {
           "description": "Authored card assertion field pathway.",
           "items": {
-            "pattern": "^[a-z][a-z0-9_]*$",
-            "type": "string"
+            "oneOf": [
+              {
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "research_state": {
+                    "$ref": "#/$defs/ResearchState"
+                  },
+                  "sources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "value": {
+                    "pattern": "^[a-z][a-z0-9_]*$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "value"
+                ],
+                "type": "object"
+              }
+            ]
           },
           "type": [
             "array",
@@ -111,8 +215,34 @@
         "quality": {
           "description": "Authored card assertion field quality.",
           "items": {
-            "pattern": "^[a-z][a-z0-9_]*$",
-            "type": "string"
+            "oneOf": [
+              {
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "research_state": {
+                    "$ref": "#/$defs/ResearchState"
+                  },
+                  "sources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "value": {
+                    "pattern": "^[a-z][a-z0-9_]*$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "value"
+                ],
+                "type": "object"
+              }
+            ]
           },
           "type": [
             "array",
@@ -123,8 +253,34 @@
         "risk": {
           "description": "Authored card assertion field risk.",
           "items": {
-            "pattern": "^[a-z][a-z0-9_]*$",
-            "type": "string"
+            "oneOf": [
+              {
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "research_state": {
+                    "$ref": "#/$defs/ResearchState"
+                  },
+                  "sources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "value": {
+                    "pattern": "^[a-z][a-z0-9_]*$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "value"
+                ],
+                "type": "object"
+              }
+            ]
           },
           "type": [
             "array",
@@ -135,8 +291,34 @@
         "role": {
           "description": "Authored card assertion field role.",
           "items": {
-            "pattern": "^[a-z][a-z0-9_]*$",
-            "type": "string"
+            "oneOf": [
+              {
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "type": "string"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "research_state": {
+                    "$ref": "#/$defs/ResearchState"
+                  },
+                  "sources": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "value": {
+                    "pattern": "^[a-z][a-z0-9_]*$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "value"
+                ],
+                "type": "object"
+              }
+            ]
           },
           "type": [
             "array",
@@ -481,6 +663,18 @@
         "knowledge_value": {
           "type": [
             "string",
+            "null"
+          ]
+        },
+        "research_state": {
+          "$ref": "#/$defs/ResearchState"
+        },
+        "sources": {
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
             "null"
           ]
         }
@@ -964,6 +1158,9 @@
         "relation_type": {
           "$ref": "#/$defs/RelationType"
         },
+        "research_state": {
+          "$ref": "#/$defs/ResearchState"
+        },
         "semantic_family": {
           "type": "string"
         },
@@ -972,6 +1169,15 @@
         },
         "source_selector": {
           "$ref": "#/$defs/RelationAssertionSelector"
+        },
+        "sources": {
+          "items": {
+            "type": "string"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         },
         "target_selector": {
           "$ref": "#/$defs/RelationAssertionSelector"
@@ -1109,6 +1315,18 @@
         "semantic_family"
       ],
       "title": "RelationWarningFilterField",
+      "type": "string"
+    },
+    "ResearchState": {
+      "description": "",
+      "enum": [
+        "unassessed",
+        "anecdotal",
+        "searched_insufficient",
+        "mechanistic_only",
+        "supported"
+      ],
+      "title": "ResearchState",
       "type": "string"
     },
     "RuntimeAssignmentAxisPolicy": {

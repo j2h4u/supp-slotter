@@ -26,7 +26,13 @@ def substance_record(substance_id: str, substance: Substance, ontology_bundle: O
         "id": substance_id,
         "name": substance.name,
         "knowledge_assertions": [
-            {"knowledge_category": row.category, "knowledge_value": row.value} for row in substance.knowledge_assertions
+            {
+                "knowledge_category": row.category,
+                "knowledge_value": row.value,
+                "research_state": row.research_state,
+                "sources": list(row.sources),
+            }
+            for row in substance.knowledge_assertions
         ],
         "schedule_assertions": [
             {"schedule_axis": row.axis, "schedule_value": row.value} for row in substance.schedule_assertions
@@ -61,6 +67,8 @@ def relation_record(
         "reason": relation.reason,
         **({"action": relation.action} if relation.action is not None else {}),
         **({"severity": relation.severity} if relation.severity is not None else {}),
+        "research_state": relation.research_state,
+        "sources": list(relation.sources),
     }
 
 
@@ -94,6 +102,8 @@ def ontology_assertion_record(
         "reason": assertion.reason,
         **({"action": assertion.action} if assertion.action is not None else {}),
         **({"severity": assertion.severity} if assertion.severity is not None else {}),
+        "research_state": assertion.research_state,
+        "sources": list(assertion.sources),
     }
 
 

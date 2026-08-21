@@ -640,6 +640,9 @@
     "relations": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relations"
     },
+    "research_state": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/research_state"
+    },
     "result": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/result"
     },

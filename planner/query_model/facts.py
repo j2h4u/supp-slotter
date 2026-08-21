@@ -162,7 +162,7 @@ def _assertions(value: object, *, field: str, substance_id: str) -> tuple[Mappin
         raise OntologyInfrastructureError(f"substance {substance_id} {field} must be a list", code=MALFORMED)
     values = cast(list[object], value)
     required_fields = {
-        "knowledge_assertions": {"knowledge_category", "knowledge_value"},
+        "knowledge_assertions": {"knowledge_category", "knowledge_value", "research_state", "sources"},
         "schedule_assertions": {"schedule_axis", "schedule_value"},
     }[field]
     assertions: list[Mapping[str, object]] = []
@@ -176,10 +176,19 @@ def _assertions(value: object, *, field: str, substance_id: str) -> tuple[Mappin
             raise OntologyInfrastructureError(
                 f"substance {substance_id} {field}[{index}] has malformed fields", code=MALFORMED
             )
-        if any(not isinstance(value := mapping[key], str) or not value.strip() for key in required_fields):
+        scalar_fields = required_fields - {"sources"}
+        if any(not isinstance(value := mapping[key], str) or not value.strip() for key in scalar_fields):
             raise OntologyInfrastructureError(
                 f"substance {substance_id} {field}[{index}] has malformed values", code=MALFORMED
             )
+        if field == "knowledge_assertions":
+            sources = mapping["sources"]
+            if not isinstance(sources, list) or any(
+                not isinstance(source, str) or not source.strip() for source in sources
+            ):
+                raise OntologyInfrastructureError(
+                    f"substance {substance_id} {field}[{index}] has malformed values", code=MALFORMED
+                )
         assertions.append(mapping)
     return tuple(assertions)
 

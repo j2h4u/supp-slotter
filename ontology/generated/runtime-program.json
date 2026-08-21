@@ -598,11 +598,11 @@
     ]
   },
   "provenance": {
-    "compiler_sha256": "7ffa18ca9cc9de184a6f38ac137f152e186fba47c24b3bb205e04c5ecb122bea",
+    "compiler_sha256": "c9c6cb4980bf7914a3d21901e1eee78b403c804898b834c74888b22e0228ce4e",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
     "source_sha256": "8936f8557915a6398c71b25984da920c85c5648736d6c4faf5cf2212e53f8331"
   },
   "schema_version": "2",
-  "source_hash": "6e41a71ccba372f534e1c6007db699cf6b5fb4da2e2c750622a60ae415cf9ac8"
+  "source_hash": "c6e0e7da6982fbae7812c5560d6e8c72fd3b4933894637b24290d44fd605ca38"
 }

@@ -12,7 +12,12 @@ from planner.cards.product import load_product_registry
 from planner.cards.relations import check_global_relations, load_global_relations
 from planner.cards.substance import load_substance_registry
 from planner.contracts import CardLoadError, Product, Substance
-from planner.engine.results import GroomingCandidate, GroomingResult
+from planner.engine.results import (
+    GroomingCandidate,
+    GroomingResult,
+    ResearchStateCandidate,
+    ResearchStateResult,
+)
 from planner.ontology.artifacts import OntologyBundle, load_ontology
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.policies import load_scheduling_policies
@@ -20,11 +25,91 @@ from planner.ontology.runtime_program import (
     SUPPORTED_GROOMING_ELIGIBILITY,
     RuntimeSemanticEnrichmentGroomingPolicy,
 )
+from planner.ontology.schema_enums import schema_enum_values
 from planner.paths import ROOT, Paths
 from planner.query_model import build_stack_read_model
 from planner.query_model.surreal import SurrealLoadContext
 from planner.schema_validation import validate_schemas
 from planner.yaml_io import load_yaml, load_yaml_mapping
+
+
+def cmd_grooming_research(
+    research_state: str, limit: int | None = None, data_root: Path | None = None
+) -> ResearchStateResult:
+    """List active-reachable assertions in one categorical research state."""
+    resolved_limit = limit if limit is not None else 50
+    if resolved_limit <= 0:
+        message = "grooming research: --limit must be a positive integer"
+        return ResearchStateResult(1, [], research_state, resolved_limit, 0, 0, stderr=message + "\n")
+    bundle = load_ontology(ROOT / "ontology")
+    if research_state not in schema_enum_values(bundle, "ResearchState"):
+        message = f"grooming research: invalid --state {research_state!r}"
+        return ResearchStateResult(1, [], research_state, resolved_limit, 0, 0, stderr=message + "\n")
+    paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
+    stdout_buf, stderr_buf = io.StringIO(), io.StringIO()
+    with contextlib.redirect_stdout(stdout_buf), contextlib.redirect_stderr(stderr_buf):
+        try:
+            schema_result = validate_schemas(paths, bundle)
+            if schema_result != 0:
+                return ResearchStateResult(
+                    schema_result, [], research_state, resolved_limit, 0, 0, stderr=stderr_buf.getvalue()
+                )
+            substances = load_substance_registry(paths, bundle)
+            products = load_product_registry(paths, bundle)
+            relations_data = load_yaml(paths.relations_file)
+            relation_errors = check_global_relations(relations_data, substances, paths, bundle)
+            if relation_errors:
+                _print_errors(relation_errors)
+                return ResearchStateResult(1, [], research_state, resolved_limit, 0, 0, stderr=stderr_buf.getvalue())
+            relations = load_global_relations(paths, bundle, substances)
+            read_model = build_stack_read_model(
+                substances,
+                relations,
+                products,
+                context=SurrealLoadContext(
+                    policies=load_scheduling_policies(bundle),
+                    stacks_data=_stacks_for_grooming_read_model(paths),
+                    pillbox_stack_names=None,
+                    dashboards=None,
+                ),
+                ontology_bundle=bundle,
+            )
+            rows = read_model.research_state_assertions(read_model.active_substance_ids(), research_state)
+            candidates = [
+                ResearchStateCandidate(
+                    kind=str(row["kind"]),
+                    id=str(row["id"]),
+                    research_state=research_state,
+                    detail=_research_detail(row),
+                    sources=tuple(str(item) for item in row.get("sources", []) if isinstance(item, str)),
+                )
+                for row in rows
+            ]
+            _render_research_candidates(candidates[:resolved_limit], len(candidates), research_state)
+            return ResearchStateResult(
+                0, candidates[:resolved_limit], research_state, resolved_limit, len(candidates),
+                min(len(candidates), resolved_limit), stdout_buf.getvalue(), stderr_buf.getvalue()
+            )
+        except (CardLoadError, OntologyInfrastructureError) as error:
+            message = error.message if isinstance(error, CardLoadError) else str(error)
+            return ResearchStateResult(1, [], research_state, resolved_limit, 0, 0, stderr=message + "\n")
+
+
+def _research_detail(row: dict[str, object]) -> str:
+    if row["kind"] == "knowledge":
+        return f"{row.get('name', row['id'])}: {row.get('category', '')}={row.get('value', '')}"
+    return f"{row.get('type', '')}: {row.get('source', '')} -> {row.get('target', '')}"
+
+
+def _render_research_candidates(
+    candidates: list[ResearchStateCandidate], total_matching: int, research_state: str
+) -> None:
+    print(f"Research-state queue ({research_state}): {total_matching} matching, showing {len(candidates)}")
+    if not candidates:
+        print("  none")
+        return
+    for candidate in candidates:
+        print(f"  {candidate.kind} {candidate.id} — {candidate.detail}")
 
 
 def cmd_grooming_next(limit: int | None = None, data_root: Path | None = None) -> GroomingResult:

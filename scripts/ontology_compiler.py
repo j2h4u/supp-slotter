@@ -1051,6 +1051,27 @@ def _apply_card_uniqueness(
         if not isinstance(property_schema, dict):
             raise OntologyInfrastructureError(f"Generated CardKnowledge field {field!r} is missing")
         property_schema["uniqueItems"] = True
+        items = property_schema.get("items")
+        if not isinstance(items, dict):
+            raise OntologyInfrastructureError(f"Generated CardKnowledge field {field!r} has no item schema")
+        property_schema["items"] = {
+            "oneOf": [
+                dict(items),
+                {
+                    "additionalProperties": False,
+                    "properties": {
+                        "value": dict(items),
+                        "research_state": {"$ref": "#/$defs/ResearchState"},
+                        "sources": {
+                            "items": {"type": "string"},
+                            "type": "array",
+                        },
+                    },
+                    "required": ["value"],
+                    "type": "object",
+                },
+            ]
+        }
 
 
 def _apply_scheduling_assessment_schema(generated_schema: dict[str, object]) -> None:
@@ -3404,6 +3425,8 @@ def _load_ontology_assertions(  # noqa: PLR0917
                 "target_selector",
                 "assertion_kind",
                 "semantic_family",
+                "research_state",
+                "sources",
             }
             if set(row) - allowed:
                 raise OntologyInfrastructureError(f"Ontology assertion {identifier!r} has unsupported fields")
@@ -3450,6 +3473,17 @@ def _load_ontology_assertions(  # noqa: PLR0917
             for field in ("action", "severity"):
                 if field in row:
                     normalized[field] = _required_string(row, field)
+            if "research_state" in row:
+                normalized["research_state"] = _required_string(row, "research_state")
+            if "sources" in row:
+                raw_sources = row["sources"]
+                if not isinstance(raw_sources, list) or any(
+                    not isinstance(source, str) or not source.strip() for source in raw_sources
+                ):
+                    raise OntologyInfrastructureError(
+                        f"Ontology assertion {identifier!r} sources must be a list of non-empty strings"
+                    )
+                normalized["sources"] = list(raw_sources)
             result[identifier] = normalized
     return dict(sorted(result.items()))
 
