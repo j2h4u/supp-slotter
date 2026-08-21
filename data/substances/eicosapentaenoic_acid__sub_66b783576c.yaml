@@ -3,7 +3,7 @@ name: Eicosapentaenoic acid
 aliases:
 - EPA
 semantic_enrichment_attempted_on: '2026-08-13'
-notes: 'Omega-3 fatty acid component listed as EPA on the active Psalae krill-oil label at 80 mg per softgel. The EPA amount is known; carrier allocation/source form remains unresolved. Formulation, dose, and bleeding-medication context limit transferability. NIH ODS and human PK evidence do not establish a product-independent meal or clock-time rule. Vitamin E is relevant antioxidant context for omega-3 PUFA intake.'
+notes: 'EPA occurs here as daily 80 mg krill/phospholipid and episodic 504 mg fish-oil ethyl ester. Gram-dose evidence is not magnitude-applicable to these products; bleeding remains medication and surgery review context, and skin findings conflict. No product-independent meal or clock-time rule is established.'
 concerns:
 - kind: data_quality
   text: The active Psalae krill-oil label discloses 80 mg EPA per softgel, but the EPA carrier allocation/source form remains unresolved; Minami Nattokinase lists EPA/fish oil without a per-component amount.
@@ -24,16 +24,41 @@ scheduling_assessment:
     summary: Meal-relative PK findings do not establish a morning or evening clock-time rule; no clock preference is justified for the exact form and dose.
 knowledge:
   context:
-  - skin_support
-  - vascular_health
+  - value: skin_support
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/15362934/
+    - https://pubmed.ncbi.nlm.nih.gov/24311515/
+    - https://pubmed.ncbi.nlm.nih.gov/27572109/
+  - value: vascular_health
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/23326753/
   effect:
-  - platelet_aggregation_modulation
+  - value: platelet_aggregation_modulation
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/1991153/
+    - https://pubmed.ncbi.nlm.nih.gov/3039190/
   kind:
-  - omega3
+  - value: omega3
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
   pathway:
-  - omega3_eicosanoid
+  - value: omega3_eicosanoid
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/18206980/
   quality:
-  - fat_soluble
+  - value: fat_soluble
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
   risk:
-  - manual_review
-  - bleeding_med_interaction
+  - value: bleeding_med_interaction
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/30571332/
