@@ -146,10 +146,7 @@ def _group_research_cards(
         product_names = tuple(
             sorted(products[product_id].name for product_id in product_ids.get(substance_id, set()) & active_products)
         )
-        related = tuple(
-            relation for relation in relations
-            if substance_id in relation.subject_ids
-        )
+        related = tuple(relation for relation in relations if substance_id in relation.subject_ids)
         # Relation endpoint IDs are carried by the query row but are not part of
         # the public provenance candidate. Attach them before rendering below.
         cards.append(
@@ -173,7 +170,9 @@ def _group_research_cards(
                 ),
             )
         )
-    cards.sort(key=lambda card: (-card.active_product_count, -card.unresolved_item_count, card.name.casefold(), card.id))
+    cards.sort(
+        key=lambda card: (-card.active_product_count, -card.unresolved_item_count, card.name.casefold(), card.id)
+    )
     return cards
 
 
