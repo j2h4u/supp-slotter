@@ -136,12 +136,17 @@ relations:
   target_selector:
     entity:
       name: Iodine
-- reason: Vitamin C can enhance nonheme iron absorption by reducing ferric iron and forming soluble complexes; review vitamin
-    C context when iron supplementation is active.
+- severity: low
+  reason: Vitamin C can enhance nonheme iron absorption by reducing ferric iron and forming soluble iron-ascorbate complexes, but the effect depends on the iron matrix, meal composition, iron status, and form; review this context only when relevant iron supplementation is active.
+  action: Review only when nonheme iron supplementation or other relevant iron context is active; no required vitamin C supplement, co-dose, separation interval, or guaranteed outcome is established.
   id: rel_supports_009
   relation_type: supports
   assertion_kind: ontology_assertion
   semantic_family: absorption_interaction_claim
+  research_state: supported
+  sources:
+  - https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/
+  - https://lpi.oregonstate.edu/mic/minerals/iron
   source_selector:
     entity:
       name: Vitamin C
