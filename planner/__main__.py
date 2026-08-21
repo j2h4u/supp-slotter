@@ -22,18 +22,15 @@ CommandHandler = Callable[[argparse.Namespace, Path | None], int]
 
 def main(data_root: Path | None = None) -> None:
     parser = argparse.ArgumentParser(
-        description="Supplement Slot Planner",
+        description="Supplement Slot Planner (no command prints the schedule)",
         epilog=(
             "Usage:\n"
-            "  python -m planner                        — show schedule (default)\n"
-            "  python -m planner check                  — validate data files only\n"
-            "  python -m planner review                 — concerns, relations, fact memberships\n"
-            "  python -m planner find <words>           — search cards\n"
-            "  python -m planner groom                  — show the next grooming card\n"
-            "\n"
-            "Notes:\n"
-            "  check and the default command automatically generate missing\n"
-            "  product/substance ids and rename files when the fix is deterministic."
+            "Commands:\n"
+            "  (none)                         — print the schedule\n"
+            "  check                          — normalize deterministic refs, then validate\n"
+            "  find WORDS...                  — search cards\n"
+            "  review                         — active-stack health and review\n"
+            "  groom                          — next priority grooming card"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -46,12 +43,6 @@ def main(data_root: Path | None = None) -> None:
         help="search existing product/substance cards by multiple words",
     )
     find_parser.add_argument("query", nargs="+", help="search words")
-    find_parser.add_argument(
-        "--limit",
-        type=int,
-        default=8,
-        help="maximum results per section",
-    )
     sub.add_parser(
         "review",
         help="knowledge-section review of active stack (concerns, relations, fact memberships)",
@@ -84,7 +75,7 @@ def _run_check(_args: argparse.Namespace, data_root: Path | None) -> int:
 
 
 def _run_find(args: argparse.Namespace, data_root: Path | None) -> int:
-    return cmd_find(cast(list[str], args.query), cast(int, args.limit), data_root=data_root).exit_code
+    return cmd_find(cast(list[str], args.query), 8, data_root=data_root).exit_code
 
 
 def _run_grooming(args: argparse.Namespace, data_root: Path | None) -> int:
