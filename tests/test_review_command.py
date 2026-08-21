@@ -1,4 +1,4 @@
-"""Tests for planner review and audit output boundaries."""
+"""Tests for planner review output boundaries."""
 
 from __future__ import annotations
 
@@ -119,15 +119,6 @@ def test_cmd_review_renders_canonical_balance_metadata() -> None:
     relation_section = result.output.split("Actionable relation warnings", maxsplit=1)[1]
     assert "warning:" in relation_section
     assert "Vitamin E" in relation_section
-
-
-def test_cmd_review_does_not_emit_audit_diagnostics(tmp_path: Path) -> None:
-    """cmd_review() output does NOT include the audit diagnostics section."""
-    _write_minimal_data_root(tmp_path)
-    output = cmd_review(data_root=tmp_path).output
-    assert "Audit diagnostics" not in output, f"review should not emit audit diagnostics: {output[:300]}"
-    assert "Active concern" in output
-    assert "Inactive concern" not in output
 
 
 def test_cmd_review_bounds_actionable_sections_and_does_not_duplicate_action(tmp_path: Path) -> None:

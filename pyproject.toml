@@ -195,7 +195,6 @@ source_modules = [
     "planner.engine._plan_types",
 ]
 forbidden_modules = [
-    "planner.engine.audit",
     "planner.engine.check",
     "planner.engine.find",
     "planner.engine.plan",

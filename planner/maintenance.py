@@ -190,7 +190,12 @@ def _print_summary(
         return
 
     if suppress_output:
-        print(f"auto-maintenance: renamed {changed} file(s)", file=sys.stderr)
+        print(
+            "auto-maintenance: normalized "
+            f"{len(substance_renames)} substance ID(s), {substance_file_moves} substance file move(s), "
+            f"{len(product_renames)} product ID(s), and {product_file_moves} product file move(s)",
+            file=sys.stderr,
+        )
         return
 
     print(f"normalized substances: {len(substance_renames)} ids, {substance_file_moves} filenames")

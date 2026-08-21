@@ -22,11 +22,11 @@ CommandHandler = Callable[[argparse.Namespace, Path | None], int]
 
 def main(data_root: Path | None = None) -> None:
     parser = argparse.ArgumentParser(
-        description="Supplement Slot Planner (no command prints the schedule)",
+        description="Supplement Slot Planner; bare invocation prints the schedule",
         epilog=(
             "Usage:\n"
             "Commands:\n"
-            "  (none)                         — print the schedule\n"
+            "  (bare invocation)              — print the schedule\n"
             "  check                          — normalize deterministic refs, then validate\n"
             "  find WORDS...                  — search cards\n"
             "  review                         — active-stack health and review\n"
