@@ -3,9 +3,19 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
+import pytest
 import yaml
+from planner.cards.stacks import normalize_stack_entries
 
 from tests.planner_fixture import PlannerFixtureInput, check_in_temp_dir, write_minimal_planner_fixture, write_yaml
+
+
+def test_normalization_rejects_product_assigned_to_active_and_inactive_stacks() -> None:
+    with pytest.raises(ValueError, match=r"prd_aaa0000001.*multiple stacks"):
+        normalize_stack_entries({
+            "daily": ["prd_aaa0000001"],
+            "inactive": ["prd_aaa0000001"],
+        })
 
 
 def test_malformed_stack_entry_reports_schema_error(tmp_path: Path) -> None:
@@ -13,11 +23,11 @@ def test_malformed_stack_entry_reports_schema_error(tmp_path: Path) -> None:
         tmp_path,
         PlannerFixtureInput(
             stack_items={"prd_aaa0000001": {"stack": "daily"}},
-            products={"prd_aaa0000001": [("sub_aaa0000001", ["timing:wake"])]},
+            products={"prd_aaa0000001": [("sub_aaa0000001", ["timing:energy_like"])]},
             traits={
-                "timing:wake": {
-                    "label": "Wake",
-                    "description": "Fixture wake timing.",
+                "timing:energy_like": {
+                    "label": "Energy-like",
+                    "description": "Fixture energy-like timing.",
                     "applies_when": "Fixture only.",
                 }
             },

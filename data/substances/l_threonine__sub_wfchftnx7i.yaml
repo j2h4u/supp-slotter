@@ -2,14 +2,13 @@ id: sub_wfchftnx7i
 name: L-Threonine
 aliases:
 - threonine
-notes: Essential amino acid; common in multivitamin amino-acid blends. Review context
-  - protein synthesis and essential-amino-acid context; blend presence does not imply
-  dose adequacy.
+notes: Essential amino acid; common in multivitamin amino-acid blends. Review context - protein synthesis and essential-amino-acid
+  context; blend presence does not imply dose adequacy.
 schedule:
   intake:
   - empty_preferred
 knowledge:
-  is:
-  - amino
   effect:
   - protein_synthesis_support
+  kind:
+  - amino

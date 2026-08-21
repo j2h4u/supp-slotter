@@ -1,0 +1,43 @@
+id: sub_396c221c31
+name: Picamilon
+form: sodium nicotinoyl gamma-aminobutyrate
+notes: 'Synthetic conjugate of GABA and niacin (nicotinic acid), developed in the
+  USSR. The registered Russian tablet instruction identifies the active substance
+  as the sodium salt of N-nicotinoyl-gamma-aminobutyric acid and states that tablets
+  are taken independently of meals. Classified as a prescription drug in Russia and
+  not a lawful dietary ingredient for US dietary supplements under FDA''s 2015 constituent
+  update. A 2023 broad-panel assay reported no activity for parent picamilon against
+  50 tested biological targets, including GABA receptors (PMID 36668678); this is
+  limited in-vitro evidence under tested conditions and does not establish clinical
+  inefficacy or resolve the contribution of metabolites. Blood-pressure and other
+  pharmacologic context require clinician review. Sources: registered Russian instruction
+  (Medi.ru); Russian medicines registry; FDA constituent update Nov 2015; PubMed 36668678.'
+concerns:
+- kind: safety
+  text: Prescription drug in Russia, banned as supplement in US — regulatory status
+    has no dedicated trait
+scheduling_assessment:
+  intake:
+    conclusion: supports_no_rule
+    sources:
+    - https://medi.ru/instrukciya/pikamilon_22339/
+    summary: The registered Russian tablet instruction states that Picamilon is taken
+      independently of meals, supporting no executable food-state rule for this product
+      form.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://medi.ru/instrukciya/pikamilon_22339/
+    summary: The registered instruction provides indication-specific regimens but
+      does not establish a general clock-time preference; timing remains insufficient
+      for this planner.
+knowledge:
+  context:
+  - cortisol_reduction
+  - neurocognitive_support
+  - sleep_recovery
+  - vascular_health
+  risk:
+  - manual_review
+  role:
+  - pharmaceutical

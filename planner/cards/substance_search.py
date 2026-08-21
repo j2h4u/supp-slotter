@@ -2,24 +2,22 @@
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 from planner.cards.search import collect_search_strings, combined_search_score
 from planner.cards.substance import format_substance_name, load_substance
-from planner.contracts import CardLoadError
 from planner.domain_constants import FIND_MIN_SCORE
+from planner.ontology.artifacts import OntologyBundle
 from planner.paths import Paths
 
 
-def find_substance_results(query: str, paths: Paths) -> list[tuple[float, str, str, Path]]:
+def find_substance_results(query: str, paths: Paths, bundle: OntologyBundle) -> list[tuple[float, str, str, Path]]:
     results: list[tuple[float, str, str, Path]] = []
     for path in sorted(paths.substances.glob("*.yaml")):
-        try:
-            substance = load_substance(path)
-        except CardLoadError as e:
-            print(f"warning: skipping substance card: {e.message}", file=sys.stderr)
-            continue
+        # Search is an all-cards operation.  A malformed card makes the
+        # result set incomplete, so surface the canonical loader failure
+        # instead of reporting a misleading successful partial search.
+        substance = load_substance(path, bundle)
         identity_values = [
             substance.id,
             substance.name,

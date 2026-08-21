@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from typing import cast
 
+from planner.contracts import Product, StackEntry
+
+NOT_EVERY_DAY_USE_PATTERN = "not_every_day"
+
 
 def build_placement_notes(schedule: dict[str, object]) -> list[dict[str, object]]:
     """Extract per-product placement notes for products that have a scheduling tradeoff.
@@ -37,11 +41,21 @@ def build_placement_notes(schedule: dict[str, object]) -> list[dict[str, object]
     return sorted(notes, key=lambda entry: str(entry["product"]).casefold())
 
 
-def build_schedule_summary(schedule: dict[str, object]) -> dict[str, object]:
+def build_schedule_summary(
+    schedule: dict[str, object],
+    products: dict[str, Product] | None = None,
+    stack_entries: dict[str, StackEntry] | None = None,
+) -> dict[str, object]:
+    take = _build_take(schedule)
+    usage_groups = _build_usage_groups(products, stack_entries)
+    return {"take": take, "usage_groups": usage_groups}
+
+
+def _build_take(schedule: dict[str, object]) -> dict[str, list[str]]:
     take: dict[str, list[str]] = {}
     pillboxes_obj = schedule.get("pillboxes", {})
     if not isinstance(pillboxes_obj, dict):
-        return {"take": take}
+        return take
     pillboxes = cast(dict[str, object], pillboxes_obj)
     for pillbox_name, pillbox_obj in pillboxes.items():
         if not isinstance(pillbox_obj, dict):
@@ -64,4 +78,31 @@ def build_schedule_summary(schedule: dict[str, object]) -> dict[str, object]:
                 lines.append(f"{cast(str, slot.get('label'))}: {', '.join(str(product) for product in product_names)}")
         if lines:
             take[pillbox_name] = lines
-    return {"take": take}
+    return take
+
+
+def _build_usage_groups(
+    products: dict[str, Product] | None,
+    stack_entries: dict[str, StackEntry] | None,
+) -> dict[str, list[str]]:
+    usage_groups: dict[str, list[str]] = {"daily_base": [], "not_every_day": []}
+    if products is None or stack_entries is None:
+        return usage_groups
+    for product_id, entry in stack_entries.items():
+        if entry.get("stack") != "daily":
+            continue
+        product = products.get(product_id)
+        if product is None:
+            continue
+        product_name = _product_display_name(product)
+        group = "not_every_day" if product.use_pattern == NOT_EVERY_DAY_USE_PATTERN else "daily_base"
+        usage_groups[group].append(product_name)
+    for group in usage_groups.values():
+        group.sort(key=str.casefold)
+    return usage_groups
+
+
+def _product_display_name(product: Product) -> str:
+    if product.brand and product.brand != "unknown":
+        return f"{product.brand} - {product.name}"
+    return product.name or product.id

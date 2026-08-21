@@ -1,0 +1,12 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
+
+# Both terms are in the canonical registry.  sleep_disruptive is deliberately
+# registered even though no current substance projects it.
+ss:used a ss:ScheduleAssertion ;
+  ss:schedule_axis "intake" ;
+  ss:schedule_value "food_preferred" .
+ss:registered_unused a ss:ScheduleAssertion ;
+  ss:schedule_axis "timing" ;
+  ss:schedule_value "sleep_disruptive" .
+

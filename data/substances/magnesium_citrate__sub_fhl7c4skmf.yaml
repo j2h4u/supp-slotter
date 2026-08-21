@@ -1,20 +1,37 @@
 id: sub_fhl7c4skmf
 name: Magnesium
 form: citrate
-notes: Magnesium citrate component from the TiM Electrolyte Caps label. NIH ODS
-  describes magnesium as a cofactor for more than 300 enzyme systems, including
-  energy production, glucose and blood-pressure regulation, muscle/nerve function,
-  calcium/potassium ion transport, normal heart rhythm, and bone structure.
-schedule:
+semantic_enrichment_attempted_on: '2026-08-13'
+notes: Magnesium citrate component from the TiM Electrolyte Caps label. Citrate tends to be more bioavailable than oxide or sulfate, but this is not meal or workout evidence. NIH ODS describes magnesium as a cofactor for more
+  than 300 enzyme systems, including energy production, glucose and blood-pressure regulation, muscle/nerve function, calcium/potassium
+  ion transport, normal heart rhythm, and bone structure.
+scheduling_assessment:
   intake:
-  - food_preferred
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/14596323/
+    summary: Citrate formulation bioavailability does not establish a general fed or fasted preference; tolerability and any practical meal choice remain product- and person-dependent.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/14596323/
+    summary: No general clock-time rule was demonstrated; formulation bioavailability is not clock evidence.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/14596323/
+    summary: The training product context and formulation evidence do not establish pre-, during-, or post-workout placement for magnesium.
 knowledge:
-  is:
-  - electrolyte
-  - mineral
-  effect:
-  - bone_mineral_metabolism_support
   context:
   - workout_performance
+  effect:
+  - bone_mineral_metabolism_support
+  kind:
+  - mineral
   pathway:
   - vitamin_d_calcium_axis
+  quality:
+  - electrolyte

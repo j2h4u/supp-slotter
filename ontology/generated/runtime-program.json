@@ -1,0 +1,608 @@
+{
+  "format_version": "ontology-runtime-program-v1",
+  "projection": {
+    "assignment_axes": [
+      {
+        "assignment_field": "intake",
+        "assignment_source": "schedule",
+        "axis": "intake",
+        "id": "assignment_axis_intake",
+        "maximum_cardinality": 1,
+        "minimum_cardinality": 0,
+        "order": 0
+      },
+      {
+        "assignment_field": "timing",
+        "assignment_source": "schedule",
+        "axis": "timing",
+        "id": "assignment_axis_timing",
+        "maximum_cardinality": 1,
+        "minimum_cardinality": 0,
+        "order": 1
+      },
+      {
+        "assignment_field": "activity",
+        "assignment_source": "schedule",
+        "axis": "activity",
+        "id": "assignment_axis_activity",
+        "maximum_cardinality": 1,
+        "minimum_cardinality": 0,
+        "order": 2
+      }
+    ],
+    "concern_catalog": [
+      {
+        "concern_kind": "safety",
+        "id": "concern_warning_safety",
+        "warning_type": "safety_concern"
+      }
+    ],
+    "constraint_execution_policies": [
+      {
+        "aggregation": "distinct_constraint",
+        "blocks_slots": true,
+        "id": "separate_products_same_slot",
+        "match_direction": "symmetric",
+        "operation": "separate_products_same_slot",
+        "score_delta": -1,
+        "scores_advisory": true,
+        "selector_resolution": "require_nonempty"
+      }
+    ],
+    "dashboard_state_catalog": {
+      "product_tracking_states": [
+        {
+          "id": "dashboard_tracking_tracked",
+          "label": "Tracked product",
+          "order": 0,
+          "state": "tracked_product"
+        },
+        {
+          "id": "dashboard_tracking_none",
+          "label": "No tracked product",
+          "order": 1,
+          "state": "no_tracked_product"
+        }
+      ],
+      "product_tracking_truth_table": [
+        {
+          "id": "tracking_false",
+          "state": "no_tracked_product",
+          "tracked_product_presence": false
+        },
+        {
+          "id": "tracking_true",
+          "state": "tracked_product",
+          "tracked_product_presence": true
+        }
+      ],
+      "usage_states": [
+        {
+          "id": "dashboard_usage_current",
+          "label": "Current",
+          "order": 0,
+          "state": "current"
+        },
+        {
+          "id": "dashboard_usage_on_shelf",
+          "label": "On shelf",
+          "order": 1,
+          "state": "on_shelf"
+        },
+        {
+          "id": "dashboard_usage_unassigned",
+          "label": "Unassigned",
+          "order": 2,
+          "state": "unassigned"
+        },
+        {
+          "id": "dashboard_usage_not_current",
+          "label": "Not current",
+          "order": 3,
+          "state": "not_current"
+        }
+      ],
+      "usage_truth_table": [
+        {
+          "active_stack_membership": false,
+          "id": "usage_false_false_false",
+          "inactive_stack_membership": false,
+          "state": "not_current",
+          "tracked_product_presence": false
+        },
+        {
+          "active_stack_membership": false,
+          "id": "usage_false_false_true",
+          "inactive_stack_membership": false,
+          "state": "unassigned",
+          "tracked_product_presence": true
+        },
+        {
+          "active_stack_membership": false,
+          "id": "usage_false_true_false",
+          "inactive_stack_membership": true,
+          "state": "on_shelf",
+          "tracked_product_presence": false
+        },
+        {
+          "active_stack_membership": false,
+          "id": "usage_false_true_true",
+          "inactive_stack_membership": true,
+          "state": "on_shelf",
+          "tracked_product_presence": true
+        },
+        {
+          "active_stack_membership": true,
+          "id": "usage_true_false_false",
+          "inactive_stack_membership": false,
+          "state": "current",
+          "tracked_product_presence": false
+        },
+        {
+          "active_stack_membership": true,
+          "id": "usage_true_false_true",
+          "inactive_stack_membership": false,
+          "state": "current",
+          "tracked_product_presence": true
+        },
+        {
+          "active_stack_membership": true,
+          "id": "usage_true_true_false",
+          "inactive_stack_membership": true,
+          "state": "current",
+          "tracked_product_presence": false
+        },
+        {
+          "active_stack_membership": true,
+          "id": "usage_true_true_true",
+          "inactive_stack_membership": true,
+          "state": "current",
+          "tracked_product_presence": true
+        }
+      ]
+    },
+    "effect_match_dimensions": [
+      {
+        "id": "match_near",
+        "key": "near",
+        "slot_field": "near",
+        "value_type": "slot_near"
+      },
+      {
+        "id": "match_food",
+        "key": "food",
+        "slot_field": "food",
+        "value_type": "boolean"
+      }
+    ],
+    "effect_scoring": {
+      "aggregation_mode": "sum_unique_component_assignments",
+      "balance_penalty_expression": "balance_weight * sum(slot_count^2)",
+      "balance_weight": 0.5,
+      "id": "effect_scoring",
+      "objective_function": "slot_score_plus_prefer_with_minus_quadratic_balance_penalty",
+      "prefer_with_bonus": 3,
+      "scores": [
+        {
+          "id": "prefer_strong",
+          "level": "prefer_strong",
+          "score": 4
+        },
+        {
+          "id": "prefer",
+          "level": "prefer",
+          "score": 2
+        },
+        {
+          "id": "avoid",
+          "level": "avoid",
+          "score": -2
+        },
+        {
+          "id": "avoid_strong",
+          "level": "avoid_strong",
+          "score": -4
+        }
+      ],
+      "tie_break": "stable_slot_order"
+    },
+    "engine_contract": {
+      "conformance_scenarios": [
+        {
+          "expected": "one entity_id resolves one ID; an unscoped sibling collision fails closed",
+          "fixture": "selector_exact_form",
+          "id": "selector_exact_form",
+          "semantic": "selector_resolution"
+        },
+        {
+          "expected": "known canonical term with no matching card returns empty",
+          "fixture": "selector_empty_term",
+          "id": "selector_empty_term",
+          "semantic": "selector_resolution"
+        },
+        {
+          "expected": "two components sharing one policy contribute weight two; unknown assertion contributes zero",
+          "fixture": "component_votes",
+          "id": "component_votes",
+          "semantic": "component_vote_aggregation"
+        },
+        {
+          "expected": "inactive is excluded, absent membership is unassigned, daily not_every_day is presented separately",
+          "fixture": "stack_and_episodic",
+          "id": "stack_and_episodic",
+          "semantic": "stack_partition"
+        },
+        {
+          "expected": "not_every_day remains in daily assignment and changes presentation grouping only",
+          "fixture": "episodic_presentation",
+          "id": "episodic_presentation",
+          "semantic": "episodic_presentation"
+        },
+        {
+          "expected": "symmetric forward and reverse pairs match; same-product pair emits warning and does not split product",
+          "fixture": "constraint_directions",
+          "id": "constraint_directions",
+          "semantic": "constraint_pair_evaluation"
+        },
+        {
+          "expected": "zero/one/many active targets produce no pair/pair/warning-without-bonus",
+          "fixture": "prefer_with_cardinality",
+          "id": "prefer_with_cardinality",
+          "semantic": "prefer_with_resolution"
+        },
+        {
+          "expected": "fewest candidates, then highest maximum score, then source order",
+          "fixture": "candidate_priority",
+          "id": "candidate_priority",
+          "semantic": "candidate_feasibility"
+        },
+        {
+          "expected": "higher total wins; equal total uses stable slot-order lexicographic tuple",
+          "fixture": "objective_tie",
+          "id": "objective_tie",
+          "semantic": "objective_and_tie_break"
+        },
+        {
+          "expected": "all four source/target active combinations map to declared statuses and warning sides",
+          "fixture": "relation_presence",
+          "id": "relation_presence",
+          "semantic": "relation_warning_truth"
+        }
+      ],
+      "id": "planner_engine_contract",
+      "protocol_version": "supp-slotter.engine-contract/v1",
+      "result_mode": "exact_assignment",
+      "semantics": [
+        {
+          "category": "selectors",
+          "id": "selector_resolution",
+          "rule": "entity_id resolves one stable card; name resolves all exact-name cards; term resolves all cards carrying the canonical term; empty and unsupported outcomes remain distinct; exact_form requires an entity_id and is required when same-name siblings exist.",
+          "source_of_truth": "ontology/scheduling-model.yaml + ontology/vocabulary.yaml + verified substance cards"
+        },
+        {
+          "category": "schedule_projection",
+          "id": "component_vote_aggregation",
+          "rule": "emit at most one assignment per component and axis; group rows by policy_id; group weight is row count; apply each matching effect once at that weight; round score*weight before summing; missing assertions contribute zero.",
+          "source_of_truth": "ontology/runtime-policy.yaml + substance schedule_assertions"
+        },
+        {
+          "category": "stack_state",
+          "id": "stack_partition",
+          "rule": "normalize each product into one stack; only the configured inactive stack is excluded from planning; absent membership is unassigned; any other stack is active and selects slots from its matching pillbox.",
+          "source_of_truth": "data/stacks.yaml + ontology/runtime-policy.yaml"
+        },
+        {
+          "category": "presentation",
+          "id": "episodic_presentation",
+          "rule": "use_pattern not_every_day remains in the daily scheduling stack and changes presentation grouping only; it does not define recurrence, dosage, or calendar semantics.",
+          "source_of_truth": "ProductCard.use_pattern + data/products"
+        },
+        {
+          "category": "constraints",
+          "id": "constraint_pair_evaluation",
+          "rule": "evaluate operation pairs over product component IDs; symmetric matching checks both orientations; blocks_slots rejects a same-slot candidate; scores_advisory adds one score_delta per matched constraint and unordered product pair; intra-product matches warn because one product cannot be separated.",
+          "source_of_truth": "ontology/scheduling-constraints.yaml + ontology/runtime-policy.yaml"
+        },
+        {
+          "category": "preferences",
+          "id": "prefer_with_resolution",
+          "rule": "resolve each target against active component items; zero targets award no pair; one target creates one unordered pair; multiple targets warn and award no pair; self-pairs are ignored; duplicate/reverse pairs collapse.",
+          "source_of_truth": "SubstanceCard.schedule.prefer_with + ontology/runtime-policy.yaml"
+        },
+        {
+          "category": "search_inputs",
+          "id": "candidate_feasibility",
+          "rule": "initial candidates are slots whose stack equals the item stack; hard pair constraints are evaluated against already assigned slot items during search; item priority is fewest candidates, highest maximum base score, then source sequence.",
+          "source_of_truth": "pillbox slots + data/stacks.yaml + ontology/runtime-policy.yaml"
+        },
+        {
+          "category": "optimization",
+          "id": "objective_and_tie_break",
+          "rule": "maximize slot_score + advisory_penalties + prefer_with_bonus - balance_weight*sum(slot_count^2); use stable slot order and lexicographic item assignment tuple for equal totals within the declared tolerance.",
+          "source_of_truth": "ontology/runtime-policy.yaml"
+        },
+        {
+          "category": "warnings",
+          "id": "relation_warning_truth",
+          "rule": "active endpoint truth is intersection with components of products in non-inactive stacks; classify all four endpoint states; apply authored filters and active sides; preserve reverse output; deduplicate by endpoint/type key.",
+          "source_of_truth": "ontology/runtime-policy.yaml + relation assertion projection"
+        }
+      ]
+    },
+    "glue_contract": {
+      "id": "planner_glue_contract",
+      "inactive_stack_name": "inactive",
+      "prefer_with_pair_modes": [
+        "undirected_same_slot_bonus"
+      ],
+      "prefer_with_source_fields": [
+        "prefer_with"
+      ],
+      "prefer_with_target_resolutions": [
+        "exactly_one_active_item"
+      ],
+      "relation_endpoint_selector_kinds": [
+        "entity",
+        "term"
+      ],
+      "relation_presence_active_sides": [
+        "both",
+        "none",
+        "source",
+        "target"
+      ],
+      "relation_presence_truth_table": [
+        {
+          "source_active": false,
+          "target_active": false
+        },
+        {
+          "source_active": false,
+          "target_active": true
+        },
+        {
+          "source_active": true,
+          "target_active": false
+        },
+        {
+          "source_active": true,
+          "target_active": true
+        }
+      ],
+      "relation_selector_forms": [
+        "entity_id",
+        "name",
+        "term"
+      ],
+      "relation_warning_active_sides": [
+        "both",
+        "source",
+        "target"
+      ],
+      "relation_warning_filter_fields": [
+        "assertion_kind",
+        "semantic_family"
+      ],
+      "source_kind_roles": [
+        "assignment_source"
+      ],
+      "source_kinds": [
+        "assignment"
+      ],
+      "warning_emitter_ids": [
+        "intra_product_constraint_conflict",
+        "prefer_with_resolver",
+        "trait_review_assignment"
+      ]
+    },
+    "prefer_with_policy": {
+      "id": "prefer_with_policy",
+      "pair_mode": "undirected_same_slot_bonus",
+      "source_field": "prefer_with",
+      "target_resolution": "exactly_one_active_item"
+    },
+    "relation_presence_statuses": [
+      {
+        "description": "both endpoints active",
+        "id": "relation_presence_both_active",
+        "source_active": true,
+        "status": "both_active",
+        "target_active": true
+      },
+      {
+        "description": "source active, target absent",
+        "id": "relation_presence_missing_target",
+        "source_active": true,
+        "status": "missing_target",
+        "target_active": false
+      },
+      {
+        "description": "target active, source absent",
+        "id": "relation_presence_missing_source",
+        "source_active": false,
+        "status": "missing_source",
+        "target_active": true
+      },
+      {
+        "description": "both endpoints absent",
+        "id": "relation_presence_neither_active",
+        "source_active": false,
+        "status": "neither_active",
+        "target_active": false
+      }
+    ],
+    "relation_warning_rules": [
+      {
+        "active_side": "both",
+        "filter_field": "assertion_kind",
+        "filter_value": "clinical_review_signal",
+        "id": "relation_warning_review_with_present",
+        "relation_kind": "review_with",
+        "reverse_output": false,
+        "warning_type": "review_with_substance_present"
+      },
+      {
+        "active_side": "source",
+        "filter_field": "semantic_family",
+        "filter_value": "nutrient_balance_review_signal",
+        "id": "relation_warning_missing_balance_forward",
+        "relation_kind": "balance",
+        "reverse_output": false,
+        "warning_type": "missing_balance_substance"
+      },
+      {
+        "active_side": "target",
+        "filter_field": "semantic_family",
+        "filter_value": "nutrient_balance_review_signal",
+        "id": "relation_warning_missing_balance_reverse",
+        "relation_kind": "balance",
+        "reverse_output": true,
+        "warning_type": "missing_balance_substance"
+      },
+      {
+        "active_side": "target",
+        "filter_field": "assertion_kind",
+        "filter_value": "ontology_assertion",
+        "id": "relation_warning_missing_support",
+        "relation_kind": "supports",
+        "reverse_output": false,
+        "warning_type": "missing_support_substance"
+      }
+    ],
+    "selector_form_capabilities": [
+      {
+        "endpoint_kind": "entity",
+        "id": "selector_form_entity_id",
+        "selector_form": "entity_id",
+        "show_match_details": false
+      },
+      {
+        "endpoint_kind": "entity",
+        "id": "selector_form_name",
+        "selector_form": "name",
+        "show_match_details": true
+      },
+      {
+        "endpoint_kind": "term",
+        "id": "selector_form_term",
+        "selector_form": "term",
+        "show_match_details": true
+      }
+    ],
+    "semantic_enrichment_grooming": {
+      "default_batch_size": 10,
+      "eligibility": "active_reachable_substance_without_semantic_enrichment_attempt",
+      "id": "semantic_enrichment_grooming",
+      "roi_order_desc": [
+        "active_unique_product_count",
+        "total_unique_product_count"
+      ]
+    },
+    "slot_near_values": [
+      "wake",
+      "breakfast",
+      "day_meal",
+      "sleep",
+      "workout_before",
+      "workout_after"
+    ],
+    "source_kind_values": [
+      {
+        "applies_to": [
+          "assignment_source"
+        ],
+        "id": "source_kind_assignment",
+        "source_kind": "assignment"
+      }
+    ],
+    "warning_emitters": [
+      {
+        "default_message": "prefer_with target maps to multiple active stack items; no bonus awarded",
+        "emitter": "prefer_with_resolver",
+        "id": "warning_emitter_prefer_with_resolver",
+        "warning_type": "ambiguous_prefer_with"
+      },
+      {
+        "default_message": "Scheduling constraint applies inside one physical product; scheduling keeps the product together and emits this warning.",
+        "emitter": "intra_product_constraint_conflict",
+        "id": "warning_emitter_intra_product_constraint_conflict",
+        "warning_type": "intra_product_scheduling_constraint_conflict"
+      },
+      {
+        "default_message": "Manual review required.",
+        "emitter": "trait_review_assignment",
+        "id": "warning_emitter_trait_review_assignment",
+        "warning_type": "trait_review"
+      }
+    ],
+    "warning_trait_actions": [
+      {
+        "action_text": "Review this substance/product context manually before treating the schedule as final.",
+        "id": "warning_trait_manual_review",
+        "trait_id": "risk:manual_review"
+      },
+      {
+        "action_text": "Review total daily amount across products and avoid accidental stacking.",
+        "id": "warning_trait_narrow_therapeutic_window",
+        "trait_id": "risk:narrow_therapeutic_window"
+      },
+      {
+        "action_text": "Review potassium-related medication context before using this stack.",
+        "id": "warning_trait_hyperkalemia_med_interaction",
+        "trait_id": "risk:hyperkalemia_med_interaction"
+      }
+    ],
+    "warning_types": [
+      {
+        "action_text": "Review this safety concern before treating the schedule as final.",
+        "id": "warning_safety_concern",
+        "label": "Safety concern",
+        "warning_type": "safety_concern"
+      },
+      {
+        "action_text": "Review this product manually; competing components are inside one physical product and cannot be separated by scheduling.",
+        "id": "warning_intra_product_scheduling_constraint_conflict",
+        "label": "Component conflict inside one product",
+        "warning_type": "intra_product_scheduling_constraint_conflict"
+      },
+      {
+        "action_text": "Choose the intended companion product before relying on co-location.",
+        "id": "warning_ambiguous_prefer_with",
+        "label": "Companion product is ambiguous",
+        "warning_type": "ambiguous_prefer_with"
+      },
+      {
+        "action_text": "Review this ontology trait before treating the schedule as final.",
+        "id": "warning_trait_review",
+        "label": "Trait review",
+        "warning_type": "trait_review"
+      },
+      {
+        "action_text": "Review whether the paired balancing substance should be present in the active stack.",
+        "id": "warning_missing_balance_substance",
+        "label": "Missing balancing substance",
+        "warning_type": "missing_balance_substance"
+      },
+      {
+        "action_text": "Review whether this support relationship is applicable in context; absence from the tracked stack alone does not establish a need to add or supplement it.",
+        "id": "warning_missing_support_substance",
+        "label": "Conditional support review",
+        "warning_type": "missing_support_substance"
+      },
+      {
+        "action_text": "Review this active pairing; the planner surfaces it for operator review and does not separate it by slot.",
+        "id": "warning_review_with_substance_present",
+        "label": "Active review pairing",
+        "warning_type": "review_with_substance_present"
+      }
+    ]
+  },
+  "provenance": {
+    "compiler_sha256": "c9c6cb4980bf7914a3d21901e1eee78b403c804898b834c74888b22e0228ce4e",
+    "manifest_schema_version": "2",
+    "source": "ontology/runtime-policy.yaml",
+    "source_sha256": "8936f8557915a6398c71b25984da920c85c5648736d6c4faf5cf2212e53f8331"
+  },
+  "schema_version": "2",
+  "source_hash": "c6e0e7da6982fbae7812c5560d6e8c72fd3b4933894637b24290d44fd605ca38"
+}

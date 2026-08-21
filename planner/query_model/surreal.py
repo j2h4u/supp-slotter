@@ -11,78 +11,113 @@ from typing import cast
 
 from surrealdb import Surreal
 
-from planner.contracts import Dashboard, Product, Relation, Substance, TraitDef
+from planner.contracts import (
+    Dashboard,
+    OntologyAssertion,
+    Product,
+    Relation,
+    SchedulingConstraint,
+    SchedulingPolicy,
+    Substance,
+)
+from planner.ontology.artifacts import OntologyBundle
 from planner.query_model.session import SurrealSession
 from planner.query_model.surreal_records import (
     dashboard_record,
+    ontology_assertion_record,
     product_record,
-    relation_record,
+    scheduling_constraint_execution_plan_record,
+    scheduling_constraint_record,
     substance_record,
-    trait_record,
 )
+from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
 
 
 @dataclass(frozen=True, slots=True)
 class SurrealLoadContext:
-    trait_defs: dict[str, TraitDef] | None
+    policies: dict[str, SchedulingPolicy] | None
     stacks_data: dict[str, list[str]] | None
     pillbox_stack_names: set[str] | None
     dashboards: dict[str, Dashboard] | None
+    scheduling_constraints: tuple[SchedulingConstraint, ...] = ()
+    scheduling_constraint_plans: tuple[SchedulingConstraintExecutionPlan, ...] = ()
+    ontology_assertions: tuple[OntologyAssertion, ...] = ()
 
 
 def build_surreal_session(
     substances: dict[str, Substance],
     relations: list[Relation],
     products: dict[str, Product] | None = None,
+    *,
     load_context: SurrealLoadContext | None = None,
+    ontology_bundle: OntologyBundle,
 ) -> SurrealSession:
     """Load domain objects into an in-memory SurrealDB session."""
     context = load_context or SurrealLoadContext(
-        trait_defs=None,
+        policies=None,
         stacks_data=None,
         pillbox_stack_names=None,
         dashboards=None,
+        scheduling_constraints=(),
+        scheduling_constraint_plans=(),
+        ontology_assertions=(),
     )
     db = cast(SurrealSession, Surreal("mem://"))
     db.use("planner", "read_model")
 
-    _load_substances(db, substances)
-    _load_relations(db, relations, substances, context.trait_defs)
-    _load_products(db, products)
-    _load_traits(db, context.trait_defs)
+    _load_substances(db, substances, ontology_bundle)
+    _load_ontology_assertions(db, context.ontology_assertions, substances, ontology_bundle)
+    _load_scheduling_constraints(db, context.scheduling_constraints, substances, ontology_bundle)
+    _load_scheduling_constraint_plans(db, context.scheduling_constraint_plans)
+    _load_products(db, products, ontology_bundle)
     _load_stacks(db, context.stacks_data)
     _load_pillboxes(db, context.pillbox_stack_names)
-    _load_dashboards(db, context.dashboards)
+    _load_dashboards(db, context.dashboards, ontology_bundle)
     return db
 
 
-def _load_substances(db: SurrealSession, substances: dict[str, Substance]) -> None:
+def _load_substances(db: SurrealSession, substances: dict[str, Substance], ontology_bundle: OntologyBundle) -> None:
     for substance_id, substance in substances.items():
-        db.create("substance", substance_record(substance_id, substance))
+        db.create("substance", substance_record(substance_id, substance, ontology_bundle))
 
 
-def _load_relations(
+def _load_ontology_assertions(
     db: SurrealSession,
-    relations: list[Relation],
+    assertions: tuple[OntologyAssertion, ...],
     substances: dict[str, Substance],
-    trait_defs: dict[str, TraitDef] | None,
+    ontology_bundle: OntologyBundle,
 ) -> None:
-    for relation in relations:
-        db.create("relation", relation_record(relation, substances, trait_defs))
+    for assertion in assertions:
+        db.create("ontology_assertion", ontology_assertion_record(assertion, substances, ontology_bundle))
 
 
-def _load_products(db: SurrealSession, products: dict[str, Product] | None) -> None:
+def _load_scheduling_constraints(
+    db: SurrealSession,
+    constraints: tuple[SchedulingConstraint, ...],
+    substances: dict[str, Substance],
+    ontology_bundle: OntologyBundle,
+) -> None:
+    for constraint in constraints:
+        db.create("scheduling_constraint", scheduling_constraint_record(constraint, substances, ontology_bundle))
+
+
+def _load_scheduling_constraint_plans(
+    db: SurrealSession,
+    plans: tuple[SchedulingConstraintExecutionPlan, ...],
+) -> None:
+    for plan in plans:
+        db.create("scheduling_constraint_execution_plan", scheduling_constraint_execution_plan_record(plan))
+
+
+def _load_products(
+    db: SurrealSession,
+    products: dict[str, Product] | None,
+    ontology_bundle: OntologyBundle,
+) -> None:
     if not products:
         return
     for product_id, product in products.items():
-        db.create("product", product_record(product_id, product))
-
-
-def _load_traits(db: SurrealSession, trait_defs: dict[str, TraitDef] | None) -> None:
-    if not trait_defs:
-        return
-    for trait_id, trait in trait_defs.items():
-        db.create("trait", trait_record(trait_id, trait))
+        db.create("product", product_record(product_id, product, ontology_bundle))
 
 
 def _load_stacks(db: SurrealSession, stacks_data: dict[str, list[str]] | None) -> None:
@@ -99,8 +134,12 @@ def _load_pillboxes(db: SurrealSession, pillbox_stack_names: set[str] | None) ->
         db.create("pillbox", {"stack_name": stack_name})
 
 
-def _load_dashboards(db: SurrealSession, dashboards: dict[str, Dashboard] | None) -> None:
+def _load_dashboards(
+    db: SurrealSession,
+    dashboards: dict[str, Dashboard] | None,
+    ontology_bundle: OntologyBundle,
+) -> None:
     if not dashboards:
         return
-    for slug, dashboard in dashboards.items():
-        db.create("dashboard", dashboard_record(slug, dashboard))
+    for dashboard in dashboards.values():
+        db.create("dashboard", dashboard_record(dashboard, ontology_bundle))

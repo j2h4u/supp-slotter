@@ -1,0 +1,37 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
+
+ss:first a ss:RelationAssertionRecord ;
+  ss:id "first" ; ss:relation_type "balance" ;
+  ss:source_selector ss:first_source ; ss:target_selector ss:first_target .
+ss:second a ss:RelationAssertionRecord ;
+  ss:id "second" ; ss:relation_type "balance" ;
+  ss:source_selector ss:second_source ; ss:target_selector ss:second_target .
+ss:first_source a ss:RelationAssertionSelector ; ss:entity ss:first_entity .
+ss:first_entity a ss:RelationAssertionEntitySelector ;
+  ss:entity_id <https://j2h4u.github.io/supp-slotter/ontology/v1/substance/sub_d997f98e03> .
+ss:first_target a ss:RelationAssertionSelector ; ss:entity ss:first_target_entity .
+ss:first_target_entity a ss:RelationAssertionEntitySelector ;
+  ss:entity_id <https://j2h4u.github.io/supp-slotter/ontology/v1/substance/sub_3k09vfu199> .
+ss:second_source a ss:RelationAssertionSelector ; ss:entity ss:second_source_entity .
+ss:second_source_entity a ss:RelationAssertionEntitySelector ;
+  ss:entity_id <https://j2h4u.github.io/supp-slotter/ontology/v1/substance/sub_3k09vfu199> .
+ss:second_target a ss:RelationAssertionSelector ; ss:entity ss:second_entity .
+ss:second_entity a ss:RelationAssertionEntitySelector ; ss:name "N-Acetyl Cysteine" .
+
+# Same full resolved name family and same target: this exact aggregate key is
+# a duplicate even though the assertion IDs differ.
+ss:family_first a ss:RelationAssertionRecord ;
+  ss:id "family_first" ; ss:relation_type "balance" ;
+  ss:source_selector ss:family_source ; ss:target_selector ss:family_target .
+ss:family_second a ss:RelationAssertionRecord ;
+  ss:id "family_second" ; ss:relation_type "balance" ;
+  ss:source_selector ss:family_source_2 ; ss:target_selector ss:family_target_2 .
+ss:family_source a ss:RelationAssertionSelector ; ss:entity ss:family_entity .
+ss:family_entity a ss:RelationAssertionEntitySelector ; ss:name "Magnesium" .
+ss:family_source_2 a ss:RelationAssertionSelector ; ss:entity ss:family_entity_2 .
+ss:family_entity_2 a ss:RelationAssertionEntitySelector ; ss:name "Magnesium" .
+ss:family_target a ss:RelationAssertionSelector ; ss:entity ss:family_target_entity .
+ss:family_target_entity a ss:RelationAssertionEntitySelector ; ss:name "N-Acetyl Cysteine" .
+ss:family_target_2 a ss:RelationAssertionSelector ; ss:entity ss:family_target_entity_2 .
+ss:family_target_entity_2 a ss:RelationAssertionEntitySelector ; ss:name "N-Acetyl Cysteine" .

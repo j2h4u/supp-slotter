@@ -16,7 +16,9 @@ Use this page as the map. The README is the product front door; these docs are t
 
 ## Maintainers
 
+- [Ontology Cutover Decision And Completion Plan](decisions/ontology-cutover-decision-20260821.md) — expert-panel record, bounded completion cluster, and final branch acceptance criteria.
 - [Ontology Facts](ontology-facts.md) — current unresolved ontology pressure points only.
+- [Evidence Coverage Grooming](evidence-coverage-grooming.md) — deferred, non-authoritative proposal for future evidence-coverage review.
 - [MCP Position](mcp-position.md) — why an MCP server is deferred until the product surface is clearer.
 - [planner/](../planner/) — CLI/runtime package.
 - [tests/](../tests/) — regression tests for validation, review, scheduling, and maintenance behavior.

@@ -3,14 +3,13 @@ name: Flaxseed oil
 aliases:
 - linseed oil
 - ALA source
-notes: Plant-source omega-3 carrier (alpha-linolenic acid / ALA). Used in Animal Flex
-  Joint Lubrication Complex with reported 50% ALA content. ALA source, not direct
-  EPA/DHA omega-3 coverage.
+notes: Plant-source omega-3 carrier (alpha-linolenic acid / ALA). Used in Animal Flex Joint Lubrication Complex with reported
+  50% ALA content. ALA source, not direct EPA/DHA omega-3 coverage.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
-  - fat_soluble
   effect:
   - joint_lubrication_context
+  quality:
+  - fat_soluble

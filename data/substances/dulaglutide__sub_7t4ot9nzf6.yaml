@@ -1,22 +1,19 @@
 name: Dulaglutide
 aliases:
 - Trulicity
-notes: Knowledge-only prescription GLP-1 receptor agonist card for diabetes and cardiometabolic
-  interaction review. Sources checked - DailyMed Trulicity label; FDA unapproved GLP-1
-  drugs page.
+notes: Knowledge-only prescription GLP-1 receptor agonist card for diabetes and cardiometabolic interaction review. Sources
+  checked - DailyMed Trulicity label; FDA unapproved GLP-1 drugs page.
 concerns:
 - kind: safety
-  text: Prescription incretin drug; review indication, dose titration, MTC/MEN2 contraindication,
-    pancreatitis, gallbladder disease, severe GI effects, dehydration/acute kidney
-    injury, hypoglycemia with insulin/secretagogues or glucose-lowering supplements,
-    delayed gastric emptying/oral-med absorption, pregnancy planning, and compounded/unapproved
-    product risk.
+  text: Prescription incretin drug; review indication, dose titration, MTC/MEN2 contraindication, pancreatitis, gallbladder
+    disease, severe GI effects, dehydration/acute kidney injury, hypoglycemia with insulin/secretagogues or glucose-lowering
+    supplements, delayed gastric emptying/oral-med absorption, pregnancy planning, and compounded/unapproved product risk.
 knowledge:
-  is:
-  - pharmaceutical
-  effect:
+  context:
   - incretin_drug_context
   risk:
   - incretin_drug_medical_review
   - manual_review
+  role:
+  - pharmaceutical
 id: sub_7t4ot9nzf6

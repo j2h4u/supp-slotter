@@ -7,7 +7,6 @@ urls:
 components:
 - substance: sub_877c24aad4
   amount: 13000 FU
-  primary: true
 - substance: sub_66b783576c
   label: EPA
   notes: Public reseller labels list EPA in the formula but do not expose a per-component

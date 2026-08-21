@@ -1,20 +1,27 @@
 name: Mitochondrial Health
-description: 'Поддержка митохондриальной функции: транспорт жирных кислот в матрикс,
-  ETC/NAD support, CoA and B-vitamin cofactor context, phosphocreatine energy buffer,
-  and mitochondrial redox context. Bruce Ames triad pattern (carnitine + CoQ10 + ALA)
+description: 'Поддержка митохондриальной функции: транспорт жирных кислот в матрикс, ETC/NAD support, CoA and B-vitamin cofactor
+  context, phosphocreatine energy buffer, and mitochondrial redox context. Bruce Ames triad pattern (carnitine + CoQ10 + ALA)
   remains a high-signal review pattern inside this broader cluster.'
 benefit:
-  description: Mitochondrial support coverage across fatty-acid transport, ETC/NAD
-    support, CoA/B-vitamin cofactors, phosphocreatine buffering, and mitochondrial
-    redox context.
-from_traits:
-  context:
-  - mitochondrial_health
-  effect:
-  - electron_transport_support
-  - mitochondrial_biogenesis_context
-  - mitochondrial_fatty_acid_transport
-  - mitochondrial_redox_cofactor
-  - nad_precursor_support
-  - phosphocreatine_support
-  - redox_metabolism_support
+  description: Mitochondrial support coverage across fatty-acid transport, ETC/NAD support, CoA/B-vitamin cofactors, phosphocreatine
+    buffering, and mitochondrial redox context.
+id: mitochondrial_health
+selectors:
+- category: context
+  term: mitochondrial_health
+- category: effect
+  term: electron_transport_support
+- category: effect
+  term: mitochondrial_biogenesis_context
+- category: effect
+  term: mitochondrial_fatty_acid_transport
+- category: effect
+  term: mitochondrial_redox_cofactor
+- category: effect
+  term: nad_precursor_support
+- category: effect
+  term: phosphocreatine_support
+- category: effect
+  term: redox_metabolism_support
+declares_context:
+- mitochondrial_health

@@ -1,16 +1,22 @@
 name: Skin Support
-description: 'Cluster для review-поддержки кожи шире прежнего barrier-only фокуса:
-  skin barrier, photoprotection, oxidative stress, inflammation tone, and collagen-adjacent
-  support.'
+description: 'Cluster для review-поддержки кожи шире прежнего barrier-only фокуса: skin barrier, photoprotection, oxidative
+  stress, inflammation tone, and collagen-adjacent support.'
 benefit:
-  description: Skin support coverage across barrier lipids, photoprotection, antioxidant
-    pressure, inflammatory tone, and collagen-adjacent cofactors.
-from_traits:
-  context:
-  - skin_support
-  effect:
-  - anti_inflammatory_context
-  - collagen_matrix_support
-  - skin_barrier_context
-  - skin_matrix_context
-  - wound_healing_support
+  description: Skin support coverage across barrier lipids, photoprotection, antioxidant pressure, inflammatory tone, and
+    collagen-adjacent cofactors.
+id: skin_support
+selectors:
+- category: context
+  term: skin_support
+- category: effect
+  term: anti_inflammatory_context
+- category: effect
+  term: collagen_matrix_support
+- category: effect
+  term: skin_barrier_context
+- category: effect
+  term: skin_matrix_context
+- category: effect
+  term: wound_healing_support
+declares_context:
+- skin_support

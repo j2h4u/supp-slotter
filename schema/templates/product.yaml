@@ -18,9 +18,17 @@
 # id is assigned by `uv run python -m planner check` — do NOT set it manually.
 # Leave the field absent and run: uv run python -m planner check
 
-name: ""     # Required. Product name as it appears on the label.
+name: ""     # Required. Concise bottle-facing/commercial product title.
              # Convention: omit the brand name here (it goes in brand:).
-             # Example: "Acetyl L-Carnitine (ALCAR)", "Ultra-Mag", "Vitamin D3 5000 IU"
+             # Do not add chemical form, dose/strength, package count, or ontology
+             # qualifiers merely for technical completeness. Preserve genuine
+             # commercial names that inherently contain a form term.
+             # Route technical detail to the field that owns it:
+             #   chemical form -> substance.form or component.label
+             #   dose/strength -> component.amount
+             #   package count -> product notes
+             #   ontology semantics -> substance knowledge/notes
+             # Examples: "Acetyl L-Carnitine", "Ultra-Mag", "Vitamin D3"
 
 # brand: ""  # Manufacturer or brand name. Example: "Source Naturals", "Jarrow Formulas"
 
@@ -38,10 +46,8 @@ name: ""     # Required. Product name as it appears on the label.
 # an exact substance name+form, alias, or filename stem; `uv run python -m planner check`
 # rewrites unique matches to sub_* and fails on unknown or ambiguous names.
 #
-# For single-ingredient products: one component, no primary: field needed.
-# For multi-ingredient products: mark the therapeutically primary substance
-# with primary: true; leave others unmarked (they default to secondary and
-# contribute to scheduling traits at reduced weight).
+# For single-ingredient products: one component is enough.
+# For multi-ingredient products: add one component entry per substance.
 # ---------------------------------------------------------------------------
 
 components:
@@ -50,17 +56,15 @@ components:
                    # for this ingredient (e.g. "Vitamin B6 as pyridoxine HCl").
   # amount: ""     # Dose as printed on the label, e.g. "500 mg", "1000 IU", "10 mcg".
   # notes: ""      # Component-level notes, e.g. sourcing caveat or form clarification.
-  # primary: true  # Set to true for the main therapeutic ingredient in multi-component
-                   # products. Omit for single-ingredient products. When any component
-                   # has primary: true, unmarked components are treated as secondary
-                   # (their traits score at reduced weight and never block slot assignment).
 
 # Add more components as needed:
 # - substance: "Magnesium glycinate"
 #   label: ""
 #   amount: ""
-#   primary: false  # Explicitly secondary (same as omitting primary: when another
-                    # component has primary: true)
+
+# Optional presentation marker. Omit for the daily-base presentation. This
+# does not change stack routing, slot scoring, constraints, or dose/frequency.
+# use_pattern: not_every_day
 
 # ---------------------------------------------------------------------------
 # NOTES & CONCERNS
@@ -71,9 +75,9 @@ components:
              # status. Reference the sources you used.
 
 # concerns:
-# - kind: data_quality  # safety | model_gap | data_quality
-#   text: ""            # Specific concern. Shown by `planner review` with
-#                       # active/inactive/tracked-unassigned membership labels. Examples:
+# - kind: data_quality  # See ontology/model.yaml ConcernKind.
+#   text: ""            # Specific concern. Shown by `planner review` under its
+#                       # kind heading (safety, model_gap, or data_quality). Examples:
 #                       #   "Secondary sources disagree on B6 amount; verify label."
 #                       #   "Discontinued product; Supplement Facts from secondary source."
 #

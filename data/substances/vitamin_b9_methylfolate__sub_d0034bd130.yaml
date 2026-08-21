@@ -1,20 +1,29 @@
 id: sub_d0034bd130
 name: Vitamin B9
 form: methylfolate
-notes: 'Coenzyme B-Complex component: methylfolate active B9 form, relevant to methylation
-  support and MTHFR context. Relation source: Linus Pauling Institute Folate; NIH
-  ODS Folate/B12.'
-schedule:
+semantic_enrichment_attempted_on: '2026-08-13'
+notes: 'Coenzyme B-Complex component: methylfolate active B9 form. The active Country Life product lists 667 mcg DFE per 2 capsules as L-5-methyltetrahydrofolate calcium salt; other registered products use a methylfolate glucosamine salt. Form and MTHFR applicability remain product-specific; no superiority claim is established. Relation source: Linus Pauling Institute Folate; NIH ODS Folate/B12.'
+scheduling_assessment:
   intake:
-  - food_preferred
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Folate-HealthProfessional/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC9399872/
+    summary: Research on folate and methylfolate does not directly establish a general fed or fasted preference for this exact form.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Folate-HealthProfessional/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC9399872/
+    summary: No general clock-time rule was demonstrated for methylfolate supplementation.
 knowledge:
-  is:
-  - vitamin
+  context:
+  - neurocognitive_support
   effect:
   - dna_synthesis_support
   - homocysteine_metabolism_support
   - red_blood_cell_support
-  context:
-  - neurocognitive_support
+  kind:
+  - vitamin
   pathway:
   - methylation_cycle

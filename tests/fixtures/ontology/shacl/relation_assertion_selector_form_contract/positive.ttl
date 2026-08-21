@@ -1,0 +1,16 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
+
+ss:balance_entity a ss:RelationAssertionRecord ;
+  ss:id "balance_entity" ;
+  ss:relation_type "balance" ;
+  ss:source_selector ss:balance_entity_source ;
+  ss:target_selector ss:balance_entity_target .
+ss:balance_entity_source a ss:RelationAssertionSelector ;
+  ss:entity ss:balance_entity_source_identity .
+ss:balance_entity_source_identity a ss:RelationAssertionEntitySelector ;
+  ss:entity_id <https://j2h4u.github.io/supp-slotter/ontology/v1/substance/sub_3k09vfu199> .
+ss:balance_entity_target a ss:RelationAssertionSelector ;
+  ss:entity ss:balance_entity_target_identity .
+ss:balance_entity_target_identity a ss:RelationAssertionEntitySelector ;
+  ss:name "Magnesium" .

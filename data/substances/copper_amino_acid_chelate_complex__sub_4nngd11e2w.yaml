@@ -1,15 +1,14 @@
 id: sub_4nngd11e2w
 name: Copper
 form: amino acid chelate complex
-notes: Copper amino acid chelate complex as listed on Solaray Zinc Copper and
-  Country Life Core Daily-1. Kept separate from sulfate and bisglycinate/glycinate
-  labels for source-form review; copper dosing remains narrow and zinc-sensitive
-  per NIH ODS.
+notes: Copper amino acid chelate complex as listed on Solaray Zinc Copper and Country Life Core Daily-1. Kept separate from
+  sulfate and bisglycinate/glycinate labels for source-form review; copper dosing remains narrow and zinc-sensitive per NIH
+  ODS.
 schedule:
   intake:
   - food_preferred
 knowledge:
-  is:
+  kind:
   - mineral
   risk:
   - manual_review

@@ -12,8 +12,7 @@ components:
   amount: 1 mg
 notes: Vitamir Lion's Mane + B6 concrete product formula; public label text lists
   Lion's Mane extract polysaccharides/beta-glucans and vitamin B6 as pyridoxine
-  hydrochloride. Product-level food tolerance is represented through the Lion's
-  Mane substance scheduling trait.
+  hydrochloride.
 concerns:
 - kind: data_quality
   text: Public Vitamir label text captures polysaccharides/beta-glucans, but not

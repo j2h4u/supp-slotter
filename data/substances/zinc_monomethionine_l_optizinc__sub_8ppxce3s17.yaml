@@ -4,24 +4,33 @@ form: monomethionine / L-OptiZinc
 aliases:
 - L-OptiZinc
 - zinc monomethionine
-notes: Zinc monomethionine form listed on NOW Foods L-OptiZinc and Country Life
-  Core Daily-1. Kept separate because methionine-chelated zinc is product-distinct;
-  NIH ODS notes zinc is required for hundreds of enzymes and supports immune function,
-  protein/DNA synthesis, wound healing, and cell signaling. Higher supplemental zinc
-  can depress copper status.
-schedule:
-  intake:
-  - food_preferred
+semantic_enrichment_attempted_on: '2026-08-13'
+notes: Zinc monomethionine form listed on active Life Extension Only Trace Minerals (20 mg elemental zinc) and other registered products. Kept separate because methionine-chelated zinc is product-distinct; phytate and meal composition can reduce absorption while food may improve tolerability, so these directions do not establish a universal meal rule. NIH ODS notes zinc is required for hundreds of enzymes and supports immune function, protein/DNA synthesis, wound healing, and cell signaling. Higher supplemental zinc can depress copper status; no fixed copper/iron interval or form-superiority claim is established.
 knowledge:
-  is:
-  - mineral
+  context:
+  - skin_support
   effect:
   - dna_synthesis_support
   - immune_function_support
   - protein_synthesis_support
   - skin_barrier_context
   - wound_healing_support
+  kind:
+  - mineral
   risk:
   - zinc_copper_balance_review
-  context:
-  - skin_support
+scheduling_assessment:
+  intake:
+    conclusion: insufficient
+    sources:
+    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.924
+    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/1375057/
+    summary: The cited evidence does not establish an intake preference for zinc monomethionine / L-OptiZinc; it addresses zinc generally or other forms and comparators.
+  timing:
+    conclusion: insufficient
+    sources:
+    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.924
+    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/1375057/
+    summary: No general clock-time scheduling rule was demonstrated.
