@@ -28,4 +28,11 @@ components:
 notes: Multi-trace-mineral complex; current Life Extension Supplement Facts list
   zinc, copper, manganese, chromium, molybdenum, boron, and vanadium components.
   Selenium, iodine, and silica are not listed as active Supplement Facts components
-  on the current official label.
+  on the current official label. The official label says to take one capsule daily
+  with food; this product-level instruction does not establish a universal food
+  preference for its individual components.
+concerns:
+- kind: model_gap
+  text: The product-level direction to take one capsule daily with food cannot be
+    executed as a component-level schedule assertion; do not generalize it to
+    copper or the other minerals.

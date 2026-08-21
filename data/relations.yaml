@@ -1,8 +1,9 @@
 relations:
 - severity: medium
-  reason: Long-term high-dose zinc supplementation can depress copper status; zinc and copper status should be reviewed together
-    in long-term stacks.
-  action: Review zinc/copper balance in long-term active stacks.
+  reason: Sustained high zinc exposure can lower copper status; this is a chronic balance-review signal, not evidence for acute
+    co-dose harm or same-product separation.
+  action: Review zinc/copper balance for sustained high-zinc exposure; do not split the same product or apply a universal zinc-copper
+    interval.
   id: rel_balance_001
   relation_type: balance
   assertion_kind: clinical_review_signal

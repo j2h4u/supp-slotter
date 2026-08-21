@@ -3,13 +3,17 @@ name: Copper
 form: bisglycinate
 aliases:
 - copper glycinate chelate
-notes: Chelated copper form used where labels call out bisglycinate/glycinate chelate. Copper has a narrow review window;
-  NIH ODS notes high zinc intake can impair copper absorption and the adult UL is 10 mg/day. Copper is a cuproenzyme cofactor
-  for energy production, iron metabolism, connective tissue synthesis, neurotransmitter synthesis, and copper-containing superoxide
-  dismutases.
+notes: Chelated copper form used where labels call out bisglycinate/glycinate chelate. Copper is a cuproenzyme cofactor for
+  energy production, iron metabolism, connective tissue synthesis, neurotransmitter synthesis, and copper-containing superoxide
+  dismutases. NIH ODS notes that sustained high zinc intake can impair copper absorption and gives an adult UL of 10 mg/day;
+  EFSA 10.2903/j.efsa.2008.718 is a general copper source, not evidence that bisglycinate is superior to other forms. No general
+  meal, clock-time, or activity schedule is established.
 knowledge:
   context:
-  - connective_tissue_support
+  - value: connective_tissue_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
   effect:
   - value: antioxidant_enzyme_cofactor
     research_state: supported
@@ -24,20 +28,32 @@ knowledge:
     sources:
     - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
   kind:
-  - mineral
+  - value: mineral
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
+    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2008.718
   risk:
-  - manual_review
-  - narrow_therapeutic_window
+  - value: narrow_therapeutic_window
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
 scheduling_assessment:
   intake:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
     - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2008.718
-    summary: The cited evidence does not establish an intake preference for copper bisglycinate; it addresses copper generally and lacks a validated bisglycinate-specific comparator rule.
+    summary: No direct fed-versus-fasted comparison establishes an intake preference for copper bisglycinate; the cited evidence addresses copper generally and does not validate a form-specific comparator rule.
   timing:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
     - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2008.718
-    summary: No general clock-time scheduling rule was demonstrated.
+    summary: No direct clock-time comparison establishes a general timing rule for copper bisglycinate.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
+    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2008.718
+    summary: No activity or workout comparison establishes an activity-linked placement rule for copper bisglycinate.
