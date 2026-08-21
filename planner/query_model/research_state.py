@@ -56,5 +56,6 @@ def collect_research_state_assertions(
             "reason": relation.get("reason", ""),
             "research_state": research_state,
             "sources": string_list(relation.get("sources")),
+            "substance_ids": sorted(endpoints & active_substances),
         })
     return sorted(rows, key=lambda row: (str(row["kind"]), str(row["id"]), str(row.get("value", ""))))

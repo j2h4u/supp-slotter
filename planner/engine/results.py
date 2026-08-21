@@ -76,18 +76,45 @@ class ResearchStateCandidate:
     research_state: str
     detail: str
     sources: tuple[str, ...] = ()
+    subject_ids: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class ResearchStateCard:
+    """Card-oriented grooming unit with assertion provenance retained."""
+
+    id: str
+    name: str
+    path: Path
+    total_product_count: int
+    active_product_count: int
+    active_product_names: tuple[str, ...]
+    assertions: tuple[ResearchStateCandidate, ...]
+    related_relations: tuple[ResearchStateCandidate, ...] = ()
+    assessment_status: str = "wholly_unassessed"
+
+    @property
+    def unresolved_item_count(self) -> int:
+        """Facts plus distinct relation leads shown for this card."""
+        return len(self.assertions) + len({relation.id for relation in self.related_relations})
 
 
 @dataclass(frozen=True)
 class ResearchStateResult:
     exit_code: int
-    candidates: list[ResearchStateCandidate]
+    cards: list[ResearchStateCard]
     research_state: str
     limit: int
     total_matching: int
     shown: int
+    assertion_count: int = 0
     output: str = ""
     stderr: str = ""
+
+    @property
+    def candidates(self) -> list[ResearchStateCandidate]:
+        """Flattened provenance view retained for callers of the old API."""
+        return [assertion for card in self.cards for assertion in (*card.assertions, *card.related_relations)]
 
 
 @dataclass(frozen=True)

@@ -15,6 +15,7 @@ from planner.contracts import CardLoadError, Product, Substance
 from planner.engine.results import (
     GroomingCandidate,
     GroomingResult,
+    ResearchStateCard,
     ResearchStateCandidate,
     ResearchStateResult,
 )
@@ -36,7 +37,7 @@ from planner.yaml_io import load_yaml, load_yaml_mapping
 def cmd_grooming_research(
     research_state: str, limit: int | None = None, data_root: Path | None = None
 ) -> ResearchStateResult:
-    """List active-reachable assertions in one categorical research state."""
+    """List active-reachable cards, retaining assertion-level provenance."""
     resolved_limit = limit if limit is not None else 50
     if resolved_limit <= 0:
         message = "grooming research: --limit must be a positive integer"
@@ -84,17 +85,29 @@ def cmd_grooming_research(
                     sources=tuple(
                         str(item) for item in cast(list[object], row.get("sources", [])) if isinstance(item, str)
                     ),
+                    subject_ids=tuple(
+                        str(item) for item in cast(list[object], row.get("substance_ids", [])) if isinstance(item, str)
+                    ),
                 )
                 for row in rows
             ]
-            _render_research_candidates(candidates[:resolved_limit], len(candidates), research_state)
+            cards = _group_research_cards(candidates, substances, products, paths, research_state)
+            _render_research_cards(
+                cards[:resolved_limit],
+                len(cards),
+                research_state,
+                len(candidates),
+                sum(card.assessment_status == "wholly_unassessed" for card in cards),
+                sum(card.assessment_status == "partially_assessed" for card in cards),
+            )
             return ResearchStateResult(
                 0,
-                candidates[:resolved_limit],
+                cards[:resolved_limit],
                 research_state,
                 resolved_limit,
+                len(cards),
+                min(len(cards), resolved_limit),
                 len(candidates),
-                min(len(candidates), resolved_limit),
                 stdout_buf.getvalue(),
                 stderr_buf.getvalue(),
             )
@@ -109,15 +122,87 @@ def _research_detail(row: dict[str, object]) -> str:
     return f"{row.get('type', '')}: {row.get('source', '')} -> {row.get('target', '')}"
 
 
-def _render_research_candidates(
-    candidates: list[ResearchStateCandidate], total_matching: int, research_state: str
+def _group_research_cards(
+    candidates: list[ResearchStateCandidate],
+    substances: dict[str, Substance],
+    products: dict[str, Product],
+    paths: Paths,
+    research_state: str,
+) -> list[ResearchStateCard]:
+    by_card: dict[str, list[ResearchStateCandidate]] = {}
+    relations: list[ResearchStateCandidate] = []
+    for candidate in candidates:
+        if candidate.kind == "knowledge":
+            by_card.setdefault(candidate.id, []).append(candidate)
+        else:
+            relations.append(candidate)
+            for substance_id in candidate.subject_ids:
+                by_card.setdefault(substance_id, [])
+    product_ids = _product_ids_by_substance(products)
+    active_products = _active_product_ids(load_ontology(ROOT / "ontology"), _stacks_for_grooming_read_model(paths))
+    cards: list[ResearchStateCard] = []
+    for substance_id, assertions in by_card.items():
+        substance = substances[substance_id]
+        product_names = tuple(
+            sorted(products[product_id].name for product_id in product_ids.get(substance_id, set()) & active_products)
+        )
+        related = tuple(
+            relation for relation in relations
+            if substance_id in relation.subject_ids
+        )
+        # Relation endpoint IDs are carried by the query row but are not part of
+        # the public provenance candidate. Attach them before rendering below.
+        cards.append(
+            ResearchStateCard(
+                id=substance_id,
+                name=substance.name,
+                path=_substance_path(paths, substance),
+                total_product_count=len(product_ids.get(substance_id, set())),
+                active_product_count=len(product_names),
+                active_product_names=product_names,
+                assertions=tuple(assertions),
+                related_relations=related,
+                assessment_status=(
+                    "no_matching_knowledge"
+                    if not assertions
+                    else (
+                        "wholly_unassessed"
+                        if all(item.research_state == research_state for item in substance.knowledge_assertions)
+                        else "partially_assessed"
+                    )
+                ),
+            )
+        )
+    cards.sort(key=lambda card: (-card.active_product_count, -card.unresolved_item_count, card.name.casefold(), card.id))
+    return cards
+
+
+def _render_research_cards(
+    cards: list[ResearchStateCard],
+    total_cards: int,
+    research_state: str,
+    assertion_count: int,
+    whole: int,
+    partial: int,
 ) -> None:
-    print(f"Research-state queue ({research_state}): {total_matching} matching, showing {len(candidates)}")
-    if not candidates:
+    print(
+        f"Research-state card queue ({research_state}): {total_cards} cards, "
+        f"showing {len(cards)} (whole={whole}, partial={partial}; {assertion_count} assertions)"
+    )
+    if not cards:
         print("  none")
         return
-    for candidate in candidates:
-        print(f"  {candidate.kind} {candidate.id} — {candidate.detail}")
+    for card in cards:
+        products = ", ".join(card.active_product_names) or "no active products"
+        print(
+            f"  card {card.id} — {card.name} [{card.assessment_status}; "
+            f"active_products={card.active_product_count}; total_products={card.total_product_count}; "
+            f"unresolved={card.unresolved_item_count}; products={products}]"
+        )
+        for assertion in card.assertions:
+            print(f"    {assertion.kind} {assertion.detail}")
+        for relation in card.related_relations:
+            print(f"    relation {relation.detail}")
 
 
 def cmd_grooming_next(limit: int | None = None, data_root: Path | None = None) -> GroomingResult:

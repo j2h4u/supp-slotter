@@ -77,9 +77,9 @@ def main(data_root: Path | None = None) -> None:
         default=None,
         help="positive maximum number of cards (default from ontology policy)",
     )
-    grooming_research = grooming_sub.add_parser("research", help="list active assertions by research state")
+    grooming_research = grooming_sub.add_parser("research", help="list active substance cards by research state")
     grooming_research.add_argument("--state", required=True, help="research state enum value")
-    grooming_research.add_argument("--limit", type=int, default=None, help="positive maximum number of assertions")
+    grooming_research.add_argument("--limit", type=int, default=None, help="positive maximum number of cards")
 
     review_substance = sub.add_parser(
         "review-substance",
