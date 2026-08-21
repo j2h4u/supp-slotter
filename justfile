@@ -55,7 +55,7 @@ _supply-chain-pins:
 
 # Check declared Python dependencies against imports.
 _deptry:
-    uv run deptry planner scripts tests --known-first-party planner --known-first-party scripts --known-first-party tests --per-rule-ignores "DEP004=coverage|linkml|linkml_runtime"
+    uv run deptry planner scripts tests --known-first-party planner --known-first-party scripts --known-first-party tests --per-rule-ignores "DEP004=coverage|linkml|linkml_runtime|pytest_crap"
 
 # Run the canonical static type checker.
 _typecheck:
