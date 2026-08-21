@@ -36,8 +36,6 @@ def load_substance(path: Path, bundle: OntologyBundle) -> Substance:
         raise CardLoadError(path, errors[0])
     schedule = cast(dict[str, object], data.get("schedule") or {})
     knowledge = cast(dict[str, object], data.get("knowledge") or {})
-    if "semantic_enrichment_attempted_on" in data and data["semantic_enrichment_attempted_on"] is None:
-        raise CardLoadError(path, f"{path}: semantic_enrichment_attempted_on must be an ISO calendar date when present")
     schedule_assertions = _schedule_assertions(schedule, path, bundle)
     try:
         return Substance(
@@ -53,7 +51,6 @@ def load_substance(path: Path, bundle: OntologyBundle) -> Substance:
             scheduling_assessments=_scheduling_assessments(
                 data.get("scheduling_assessment"), path, bundle, schedule_assertions
             ),
-            semantic_enrichment_attempted_on=cast(str | None, data.get("semantic_enrichment_attempted_on")),
         )
     except KeyError as e:
         raise CardLoadError(path, f"{path}: missing required field {e}") from e

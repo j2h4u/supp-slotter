@@ -1,6 +1,5 @@
 id: sub_877c24aad4
 name: Nattokinase
-semantic_enrichment_attempted_on: '2026-08-13'
 notes: 'Serine protease derived from Bacillus subtilis natto fermentation. FU is an activity-unit label; registered products differ materially, including active Airboy quick-release 6000 FU per 2 capsules (manufacturer/formulation not independently verified) and unassigned Minami 13000 FU. Empty-stomach use is a low-confidence soft heuristic, not established by human fed-versus-fasted comparison; the Airboy product is not the human NSK-SD preparation. Competing gastric, food, protease, and formulation mechanisms limit transfer. Preserve bounded bleeding/medication/procedure review; do not claim clot treatment or blood-viscosity reduction. Sources: PMID 17520440; PMID 23709455; NIH DSLD label 82020.'
 concerns:
 - kind: model_gap

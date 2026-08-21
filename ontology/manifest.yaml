@@ -78,7 +78,6 @@ repository_projection:
         - {kind: slot, source: form, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/form}
         - {kind: sequence, source: "aliases[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/aliases}
         - {kind: slot, source: notes, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/notes}
-        - {kind: slot, source: semantic_enrichment_attempted_on, datatype: http://www.w3.org/2001/XMLSchema#date, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_enrichment_attempted_on}
         - {kind: inlined-node, source: "concerns[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/concerns, target: Concern}
         - {kind: slot, source: "concerns[].kind", subject: "concerns[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/concern_kind}
         - {kind: slot, source: "concerns[].text", subject: "concerns[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/concern_text}

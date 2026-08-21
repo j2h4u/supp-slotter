@@ -1940,14 +1940,6 @@
           "required": true
         },
         {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "semantic_enrichment_grooming",
-          "range": "RuntimeSemanticEnrichmentGroomingPolicy",
-          "required": true
-        },
-        {
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": true,
@@ -2233,36 +2225,6 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSelectorFormCapability"
-    },
-    {
-      "name": "RuntimeSemanticEnrichmentGroomingPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "eligibility",
-          "range": "SemanticEnrichmentGroomingEligibility",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "roi_order_desc",
-          "range": "SemanticEnrichmentGroomingMetric",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSemanticEnrichmentGroomingPolicy"
     },
     {
       "name": "RuntimeSourceKindValuePolicy",
@@ -3220,14 +3182,6 @@
           "name": "scheduling_assessment",
           "range": "SchedulingAssessment",
           "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "semantic_enrichment_attempted_on",
-          "range": "date",
-          "required": false
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Substance"
@@ -3305,14 +3259,6 @@
           "multivalued": false,
           "name": "scheduling_assessment",
           "range": "SchedulingAssessment",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "semantic_enrichment_attempted_on",
-          "range": "date",
           "required": false
         }
       ],
@@ -4117,12 +4063,6 @@
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/summary",
               "source": "scheduling_assessment.timing.summary",
               "subject": "scheduling_assessment.timing"
-            },
-            {
-              "datatype": "http://www.w3.org/2001/XMLSchema#date",
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_enrichment_attempted_on",
-              "source": "semantic_enrichment_attempted_on"
             }
           ],
           "maintenance": {

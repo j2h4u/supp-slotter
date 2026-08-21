@@ -1,7 +1,6 @@
 id: sub_fd899525d3
 name: Vitamin B7
 form: biotin
-semantic_enrichment_attempted_on: '2026-08-13'
 notes: 'Coenzyme B-Complex component. NIH ODS describes biotin as a cofactor for carboxylases involved in fatty-acid, glucose, and amino-acid metabolism. Lab-interference evidence commonly concerns 5–10 mg/day, versus the active product serving at 0.2 mg; risk remains assay-specific and does not establish a universal withholding interval.'
 scheduling_assessment:
   intake:

@@ -1,6 +1,5 @@
 id: sub_a3ec9f9c52
 name: Tadalafil
-semantic_enrichment_attempted_on: '2026-08-13'
 notes: 'PDE5 inhibitor. The exact active Tadalista source/formulation is absent; the product is retained as an informational interaction/review placeholder. DailyMed tadalafil tablets may be taken with or without food, but that label is not prescribing guidance for this product or its user-reported 1.25 mg amount. Preserve PDE5/NO-cGMP context without off-label endothelial, typical-morning, or synergy claims. Source: DailyMed tadalafil label.'
 concerns:
 - kind: safety

@@ -1,6 +1,5 @@
 id: sub_ddf8d310d2
 name: Chromium
-semantic_enrichment_attempted_on: '2026-08-13'
 notes: Generic elemental chromium contribution. Product cards keep the concrete source form in component labels and notes.
   NIH ODS describes trivalent chromium as an insulin-action / glucose-metabolism review context, but evidence for routine
   glycemic benefit is mixed and not clinically decisive for healthy users.

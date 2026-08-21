@@ -170,7 +170,6 @@ class Substance:
     notes: str | None = None
     concerns: tuple[Concern, ...] = ()
     scheduling_assessments: tuple[SchedulingAssessment, ...] = ()
-    semantic_enrichment_attempted_on: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

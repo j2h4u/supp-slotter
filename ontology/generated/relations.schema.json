@@ -1928,9 +1928,6 @@
           },
           "type": "array"
         },
-        "semantic_enrichment_grooming": {
-          "$ref": "#/$defs/RuntimeSemanticEnrichmentGroomingPolicy"
-        },
         "slot_near_values": {
           "items": {
             "type": "string"
@@ -1981,7 +1978,6 @@
         "relation_presence_statuses",
         "selector_form_capabilities",
         "dashboard_state_catalog",
-        "semantic_enrichment_grooming",
         "runtime_projection"
       ],
       "title": "RuntimePolicyCatalog",
@@ -2158,31 +2154,6 @@
         "show_match_details"
       ],
       "title": "RuntimeSelectorFormCapability",
-      "type": "object"
-    },
-    "RuntimeSemanticEnrichmentGroomingPolicy": {
-      "additionalProperties": false,
-      "description": "Read-only queue policy. Product counts are distinct registered Product cards; active means present in any non-inactive stack, with repeated membership counted once. ROI ordering is operational, not medical quality scoring.",
-      "properties": {
-        "eligibility": {
-          "$ref": "#/$defs/SemanticEnrichmentGroomingEligibility"
-        },
-        "id": {
-          "type": "string"
-        },
-        "roi_order_desc": {
-          "items": {
-            "$ref": "#/$defs/SemanticEnrichmentGroomingMetric"
-          },
-          "type": "array"
-        }
-      },
-      "required": [
-        "id",
-        "eligibility",
-        "roi_order_desc"
-      ],
-      "title": "RuntimeSemanticEnrichmentGroomingPolicy",
       "type": "object"
     },
     "RuntimeSourceKindValuePolicy": {
@@ -3070,23 +3041,6 @@
       "title": "SemanticCategory",
       "type": "object"
     },
-    "SemanticEnrichmentGroomingEligibility": {
-      "description": "",
-      "enum": [
-        "active_reachable_substance_without_semantic_enrichment_attempt"
-      ],
-      "title": "SemanticEnrichmentGroomingEligibility",
-      "type": "string"
-    },
-    "SemanticEnrichmentGroomingMetric": {
-      "description": "",
-      "enum": [
-        "active_unique_product_count",
-        "total_unique_product_count"
-      ],
-      "title": "SemanticEnrichmentGroomingMetric",
-      "type": "string"
-    },
     "Severity": {
       "description": "",
       "enum": [
@@ -3266,14 +3220,6 @@
               "type": "null"
             }
           ]
-        },
-        "semantic_enrichment_attempted_on": {
-          "description": "Date of a bounded semantic/evidence enrichment attempt; not a completeness, freshness, safety, approval, or scheduling claim.",
-          "format": "date",
-          "type": [
-            "string",
-            "null"
-          ]
         }
       },
       "required": [
@@ -3353,14 +3299,6 @@
             {
               "type": "null"
             }
-          ]
-        },
-        "semantic_enrichment_attempted_on": {
-          "description": "Date of a bounded semantic/evidence enrichment attempt; not a completeness, freshness, safety, approval, or scheduling claim.",
-          "format": "date",
-          "type": [
-            "string",
-            "null"
           ]
         }
       },

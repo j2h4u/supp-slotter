@@ -206,37 +206,6 @@ def test_runtime_derives_presence_active_side_from_endpoint_truth_state() -> Non
     }
 
 
-def test_runtime_decodes_semantic_enrichment_grooming_policy() -> None:
-    runtime = load_runtime_program(ONTOLOGY)
-    policy = runtime.semantic_enrichment_grooming
-    assert policy.id == "semantic_enrichment_grooming"
-    assert policy.eligibility == "active_reachable_substance_without_semantic_enrichment_attempt"
-    assert policy.roi_order_desc == ("active_unique_product_count", "total_unique_product_count")
-
-
-@pytest.mark.parametrize(
-    ("mutation", "message"),
-    [
-        (lambda policy: policy.pop("eligibility"), "closed shape"),
-        (lambda policy: policy.__setitem__("eligibility", "unknown"), "unsupported eligibility"),
-        (lambda policy: policy.__setitem__("roi_order_desc", []), "must be non-empty"),
-        (lambda policy: policy.__setitem__("roi_order_desc", ["unknown_metric"]), "unsupported metric"),
-        (
-            lambda policy: policy.__setitem__("roi_order_desc", ["active_unique_product_count"] * 2),
-            "duplicate semantic values",
-        ),
-    ],
-)
-def test_runtime_decode_rejects_invalid_semantic_enrichment_grooming_policy(mutation, message: str) -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    policy = cast(dict[str, object], projection["semantic_enrichment_grooming"])
-    mutation(policy)
-
-    with pytest.raises(OntologyInfrastructureError, match=message):
-        decode_runtime_program(payload)
-
-
 def _runtime_payload() -> dict[str, object]:
     return cast(
         dict[str, object],

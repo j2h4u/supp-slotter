@@ -1,7 +1,6 @@
 id: sub_230c5c820e
 name: Vitamin B1
 form: thiamine
-semantic_enrichment_attempted_on: '2026-08-13'
 notes: 'Coenzyme B-Complex component: active product supplies thiamine hydrochloride plus thiamine cocarboxylase chloride, 50 mg total per 2 capsules. Generic thiamine context is retained without asserting whole-card active/coenzymated superiority. Thiamin is a core cofactor for cellular energy metabolism and normal cell growth/function.'
 scheduling_assessment:
   intake:

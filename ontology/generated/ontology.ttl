@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 353fa3f91e76bd28fd0fde525456e3ae207e7a077437ec3134c6b81aa7f5cec1
+# source-hash: 462412bbc346d001f8448010a3c5480ced52c62f8eaf6b09fffc579218c72e39
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -150,9 +150,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSelectorFormCapability> a ss:SchemaClass ;
   ss:name "RuntimeSelectorFormCapability" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSemanticEnrichmentGroomingPolicy> a ss:SchemaClass ;
-  ss:name "RuntimeSemanticEnrichmentGroomingPolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSourceKindValuePolicy> a ss:SchemaClass ;
   ss:name "RuntimeSourceKindValuePolicy" .
@@ -759,12 +756,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_category> a ss:SchemaSlot ;
   ss:name "semantic_category" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_enrichment_attempted_on> a ss:SchemaSlot ;
-  ss:name "semantic_enrichment_attempted_on" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_enrichment_grooming> a ss:SchemaSlot ;
-  ss:name "semantic_enrichment_grooming" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_family> a ss:SchemaSlot ;
   ss:name "semantic_family" .

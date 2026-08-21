@@ -2,7 +2,6 @@ id: sub_66b783576c
 name: Eicosapentaenoic acid
 aliases:
 - EPA
-semantic_enrichment_attempted_on: '2026-08-13'
 notes: 'EPA occurs here as daily 80 mg krill/phospholipid and episodic 504 mg fish-oil ethyl ester. Gram-dose evidence is not magnitude-applicable to these products; bleeding remains medication and surgery review context, and skin findings conflict. No product-independent meal or clock-time rule is established.'
 concerns:
 - kind: data_quality

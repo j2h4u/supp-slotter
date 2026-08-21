@@ -42,7 +42,7 @@ classes:
       label: {required: true}
   Substance:
     is_a: IdentifiedNode
-    slots: [aliases, form, notes, concerns, prefer_with, knowledge_assertions, schedule_assertions, scheduling_assessment, semantic_enrichment_attempted_on]
+    slots: [aliases, form, notes, concerns, prefer_with, knowledge_assertions, schedule_assertions, scheduling_assessment]
   Product:
     is_a: IdentifiedNode
     slots: [brand, components, urls, notes, concerns, use_pattern]
@@ -149,7 +149,7 @@ classes:
       prefer_with: {multivalued: true, minimum_cardinality: 1, inlined_as_list: true, range: string, pattern: '^sub_[a-z0-9]{10}$'}
   SubstanceCard:
     description: Source-facing canonical substance card contract.
-    slots: [id, name, form, aliases, notes, concerns, knowledge, schedule, scheduling_assessment, semantic_enrichment_attempted_on]
+    slots: [id, name, form, aliases, notes, concerns, knowledge, schedule, scheduling_assessment]
     slot_usage:
       id: {required: true, pattern: '^sub_[a-z0-9]{10}$'}
       name: {required: true, pattern: '^.+$'}
@@ -158,7 +158,6 @@ classes:
       knowledge: {range: CardKnowledge, inlined: true}
       schedule: {range: CardSchedule, inlined: true}
       scheduling_assessment: {range: SchedulingAssessment, inlined: true, multivalued: false}
-      semantic_enrichment_attempted_on: {range: date, multivalued: false}
   ProductCard:
     description: Source-facing canonical product card contract.
     annotations:
@@ -202,9 +201,6 @@ slots:
   knowledge_assertions: {multivalued: true, range: KnowledgeAssertion, inlined: true, inlined_as_list: true}
   schedule_assertions: {multivalued: true, range: ScheduleAssertion, inlined: true, inlined_as_list: true}
   scheduling_assessment: {range: SchedulingAssessment, inlined: true}
-  semantic_enrichment_attempted_on:
-    description: Date of a bounded semantic/evidence enrichment attempt; not a completeness, freshness, safety, approval, or scheduling claim.
-    range: date
   intake: {range: SchedulingAssessmentRecord, inlined: true, multivalued: false}
   timing: {range: SchedulingAssessmentRecord, inlined: true, multivalued: false}
   activity: {range: SchedulingAssessmentRecord, inlined: true, multivalued: false}

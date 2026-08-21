@@ -1,7 +1,6 @@
 id: sub_f7780f899b
 name: Potassium
 form: citrate
-semantic_enrichment_attempted_on: '2026-08-13'
 notes: 'Water-soluble potassium citrate. Potassium-citrate urinary alkalinization/kidney-stone evidence is pharmacologic and does not transfer to the active TiM 66.5 mg elemental potassium/capsule electrolyte component. Significant interactions include ACE inhibitors, ARBs, potassium-sparing diuretics, and NSAIDs, which raise hyperkalemia risk. Sources: NIH ODS Potassium Fact Sheet.'
 concerns:
 - kind: safety

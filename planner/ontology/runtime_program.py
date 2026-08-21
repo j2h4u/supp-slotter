@@ -20,8 +20,6 @@ IMPLEMENTED_OBJECTIVE_FUNCTION = "slot_score_plus_prefer_with_minus_quadratic_ba
 IMPLEMENTED_BALANCE_PENALTY_EXPRESSION = "balance_weight * sum(slot_count^2)"
 IMPLEMENTED_TIE_BREAK = "stable_slot_order"
 IMPLEMENTED_AGGREGATION_MODE = "sum_unique_component_assignments"
-SUPPORTED_GROOMING_ELIGIBILITY = "active_reachable_substance_without_semantic_enrichment_attempt"
-SUPPORTED_GROOMING_METRICS = frozenset({"active_unique_product_count", "total_unique_product_count"})
 
 
 def _error(label: str, message: str) -> OntologyInfrastructureError:
@@ -295,13 +293,6 @@ class RuntimePreferWithPolicy:
 
 
 @dataclass(frozen=True, slots=True)
-class RuntimeSemanticEnrichmentGroomingPolicy:
-    id: str
-    eligibility: str
-    roi_order_desc: tuple[str, ...]
-
-
-@dataclass(frozen=True, slots=True)
 class RuntimeConstraintExecutionPolicy:
     id: str
     operation: str
@@ -484,7 +475,6 @@ class RuntimeProgram:
     relation_presence_statuses: tuple[RuntimeRelationPresenceStatusPolicy, ...]
     selector_form_capabilities: tuple[RuntimeSelectorFormCapability, ...]
     dashboard_state_catalog: RuntimeDashboardStateCatalog
-    semantic_enrichment_grooming: RuntimeSemanticEnrichmentGroomingPolicy
 
     @property
     def effect_score_levels(self) -> frozenset[str]:
@@ -538,7 +528,6 @@ _PROJECTION_RECORDS: Mapping[str, type[object]] = {
     "glue_contract": RuntimeGlueContract,
     "effect_scoring": RuntimeEffectScoring,
     "prefer_with_policy": RuntimePreferWithPolicy,
-    "semantic_enrichment_grooming": RuntimeSemanticEnrichmentGroomingPolicy,
     "source_kind_values": RuntimeSourceKindValuePolicy,
     "assignment_axes": RuntimeAssignmentAxis,
     "effect_match_dimensions": RuntimeEffectMatchDimension,
@@ -562,7 +551,6 @@ _MAPPING_RECORD_PATHS = frozenset({
     "glue_contract",
     "effect_scoring",
     "prefer_with_policy",
-    "semantic_enrichment_grooming",
     "dashboard_state_catalog",
 })
 RUNTIME_PROJECTION_FIELDS: Mapping[str, frozenset[str]] = MappingProxyType({
@@ -661,18 +649,6 @@ def _dimension(row: Mapping[str, object], label: str) -> RuntimeEffectMatchDimen
         _str(row["slot_field"], f"{label}.slot_field"),
         _str(row["value_type"], f"{label}.value_type"),
     )
-
-
-def _semantic_enrichment_grooming(row: Mapping[str, object], label: str) -> RuntimeSemanticEnrichmentGroomingPolicy:
-    eligibility = _str(row["eligibility"], f"{label}.eligibility")
-    if eligibility != SUPPORTED_GROOMING_ELIGIBILITY:
-        raise _error(f"{label}.eligibility", f"unsupported eligibility {eligibility!r}")
-    metrics = _strings(row["roi_order_desc"], f"{label}.roi_order_desc")
-    if not metrics:
-        raise _error(f"{label}.roi_order_desc", "must be non-empty")
-    if any(metric not in SUPPORTED_GROOMING_METRICS for metric in metrics):
-        raise _error(f"{label}.roi_order_desc", "contains an unsupported metric")
-    return RuntimeSemanticEnrichmentGroomingPolicy(_str(row["id"], f"{label}.id"), eligibility, metrics)
 
 
 def _policy(row: Mapping[str, object], label: str) -> RuntimeConstraintExecutionPolicy:
@@ -993,12 +969,6 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         _str(prefer["target_resolution"], "prefer_with_policy.target_resolution"),
         _str(prefer["pair_mode"], "prefer_with_policy.pair_mode"),
     )
-    grooming = _exact_map(
-        projection.get("semantic_enrichment_grooming"),
-        "semantic_enrichment_grooming",
-        RUNTIME_PROJECTION_FIELDS["semantic_enrichment_grooming"],
-    )
-    grooming_obj = _semantic_enrichment_grooming(grooming, "semantic_enrichment_grooming")
     source_kind_values = _typed_rows(
         projection["source_kind_values"],
         "source_kind_values",
@@ -1160,7 +1130,6 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         relation_presence_statuses,
         selector_form_capabilities,
         dashboard_state_catalog,
-        grooming_obj,
     )
 
 

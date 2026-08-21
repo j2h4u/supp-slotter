@@ -139,6 +139,3 @@ def test_scheduling_assessment_projects_one_typed_envelope_and_three_axes() -> N
         records = list(graph.objects(envelope_node, URIRef(base + axis)))
         assert len(records) == 1
         assert (records[0], RDF.type, URIRef(base + "SchedulingAssessmentRecord")) in graph
-    marker = list(graph.objects(substance, URIRef(base + "semantic_enrichment_attempted_on")))
-    assert len(marker) == 1
-    assert marker[0].datatype == XSD.date

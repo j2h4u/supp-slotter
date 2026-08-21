@@ -122,10 +122,6 @@ prefer_with_policy:
   source_field: prefer_with
   target_resolution: exactly_one_active_item
   pair_mode: undirected_same_slot_bonus
-semantic_enrichment_grooming:
-  id: semantic_enrichment_grooming
-  eligibility: active_reachable_substance_without_semantic_enrichment_attempt
-  roi_order_desc: [active_unique_product_count, total_unique_product_count]
 slot_near_values: [wake, breakfast, day_meal, sleep, workout_before, workout_after]
 warning_types:
   - id: warning_safety_concern
@@ -326,9 +322,6 @@ runtime_projection:
   - id: prefer_with_policy
     target: prefer_with_policy
     source: prefer_with_policy
-  - id: semantic_enrichment_grooming
-    target: semantic_enrichment_grooming
-    source: semantic_enrichment_grooming
   - id: slot_near_values
     target: slot_near_values
     source: slot_near_values

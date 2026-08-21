@@ -1,7 +1,6 @@
 id: sub_799419116d
 name: Vitamin B6
 form: pyridoxal 5 phosphate
-semantic_enrichment_attempted_on: '2026-08-13'
 notes: 'Active/coenzymated B6 form used by the Coenzyme B-Complex product. ODS does not establish a categorical P5P absorption or neuropathy-safety advantage over other supplemental forms. Review context: B6 coenzyme forms participate in amino-acid/protein metabolism, neurotransmitter biosynthesis, and homocysteine handling.'
 concerns:
 - kind: safety

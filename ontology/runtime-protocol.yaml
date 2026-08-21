@@ -31,13 +31,6 @@ enums:
       both:
       source:
       target:
-  SemanticEnrichmentGroomingEligibility:
-    permissible_values:
-      active_reachable_substance_without_semantic_enrichment_attempt:
-  SemanticEnrichmentGroomingMetric:
-    permissible_values:
-      active_unique_product_count:
-      total_unique_product_count:
 
 classes:
   Condition:
@@ -51,7 +44,7 @@ classes:
     slots: [operator, field, value, weight, trace_key]
   RuntimePolicyCatalog:
     description: Typed executable policy contract consumed by planner runtime.
-    slots: [id, engine_contract, glue_contract, source_kind_values, effect_match_dimensions, assignment_axes, slot_near_values, constraint_execution_policies, effect_scoring, prefer_with_policy, warning_types, warning_emitters, warning_trait_actions, concern_catalog, relation_warning_rules, relation_presence_statuses, selector_form_capabilities, dashboard_state_catalog, semantic_enrichment_grooming, runtime_projection]
+    slots: [id, engine_contract, glue_contract, source_kind_values, effect_match_dimensions, assignment_axes, slot_near_values, constraint_execution_policies, effect_scoring, prefer_with_policy, warning_types, warning_emitters, warning_trait_actions, concern_catalog, relation_warning_rules, relation_presence_statuses, selector_form_capabilities, dashboard_state_catalog, runtime_projection]
     slot_usage:
       source_kind_values: {required: true, inlined: true, inlined_as_list: true}
       engine_contract: {required: true, inlined: true}
@@ -69,7 +62,6 @@ classes:
       relation_presence_statuses: {required: true, inlined: true, inlined_as_list: true}
       selector_form_capabilities: {required: true, inlined: true, inlined_as_list: true}
       dashboard_state_catalog: {required: true, inlined: true}
-      semantic_enrichment_grooming: {required: true, inlined: true}
       runtime_projection: {required: true, inlined: true, inlined_as_list: true}
       glue_contract: {required: true, inlined: true}
   RuntimeGlueContract:
@@ -167,13 +159,6 @@ classes:
       source_field: {required: true}
       target_resolution: {required: true}
       pair_mode: {required: true}
-  RuntimeSemanticEnrichmentGroomingPolicy:
-    description: Read-only queue policy. Product counts are distinct registered Product cards; active means present in any non-inactive stack, with repeated membership counted once. ROI ordering is operational, not medical quality scoring.
-    slots: [id, eligibility, roi_order_desc]
-    slot_usage:
-      id: {required: true}
-      eligibility: {required: true, range: SemanticEnrichmentGroomingEligibility}
-      roi_order_desc: {required: true, multivalued: true, range: SemanticEnrichmentGroomingMetric}
   RuntimeConstraintExecutionPolicy:
     slots: [id, operation, match_direction, aggregation, selector_resolution, blocks_slots, scores_advisory, score_delta]
     slot_usage:
@@ -293,7 +278,6 @@ slots:
   balance_penalty_expression:
   tie_break:
   prefer_with_policy: {range: RuntimePreferWithPolicy, inlined: true}
-  semantic_enrichment_grooming: {range: RuntimeSemanticEnrichmentGroomingPolicy, inlined: true}
   effect_match_dimensions: {multivalued: true, range: RuntimeEffectMatchDimensionPolicy, inlined: true, inlined_as_list: true}
   warning_types: {multivalued: true, range: RuntimeWarningTypePolicy, inlined: true, inlined_as_list: true}
   warning_emitters: {multivalued: true, range: RuntimeWarningEmitterPolicy, inlined: true, inlined_as_list: true}
