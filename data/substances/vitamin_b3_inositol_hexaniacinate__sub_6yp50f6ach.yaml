@@ -5,24 +5,40 @@ aliases:
 - inositol hexanicotinate
 - IHN
 - IH6N
-notes: 'Marketed as a flush-free esterified niacin form; inositol hexaniacinate absorption is variable and generally lower than nicotinic acid or nicotinamide, so efficacy and meal behavior are not equivalent. Used in Natural Factors BioCoenzymated Active B Complex and Country Life Coenzyme B-Complex.'
+notes: 'Inositol hexaniacinate (IHN/IH6N) is an esterified niacin form distinct from nicotinic acid and nicotinamide. It is marketed as flush-free, but that outcome is not guaranteed; NIH ODS describes variable absorption averaging about 30% lower than nicotinic acid. Controlled human studies do not establish nicotinic-acid-equivalent lipid efficacy: a 2013 trial found no lipid improvement versus placebo, and a small pharmacokinetic study found no detectable bioavailability. Do not project nicotinic-acid efficacy, meal instructions, or high-dose risks onto this exact form. Used in Natural Factors BioCoenzymated Active B Complex and Country Life Coenzyme B-Complex.'
 scheduling_assessment:
   intake:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/
-    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.949
-    summary: Research on niacin and inositol hexaniacinate does not directly establish a general fed or fasted preference for this exact form.
+    - https://pubmed.ncbi.nlm.nih.gov/23351578/
+    - https://countrylifevitamins.com/products/coenzyme-b-complex-caps
+    summary: No direct fed-versus-fasted comparison establishes a meal preference for inositol hexaniacinate; the Country Life before/between-meals instruction is vendor guidance, and a with-meal trial is not a fed-versus-fasted comparison.
   timing:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/
-    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.949
-    summary: No general clock-time rule was demonstrated for inositol hexaniacinate supplementation.
+    - https://pubmed.ncbi.nlm.nih.gov/23351578/
+    summary: No general clock-time preference was demonstrated for inositol hexaniacinate supplementation.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/23351578/
+    summary: The cited evidence does not establish a workout- or activity-linked timing rule for inositol hexaniacinate; no workout placement is supported.
 knowledge:
   context:
-  - mitochondrial_health
+  - value: mitochondrial_health
+    research_state: mechanistic_only
+    sources:
+    - https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/
   pathway:
-  - nad_metabolism
+  - value: nad_metabolism
+    research_state: mechanistic_only
+    sources:
+    - https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/
