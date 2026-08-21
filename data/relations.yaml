@@ -20,10 +20,15 @@ relations:
 - severity: medium
   reason: Folate and B12 should be reviewed together for methylation/homocysteine context; methionine synthase requires both,
     and high folate can complicate B12-deficiency interpretation.
+  action: Review folate and B12 status together; this is a clinical review signal, not a co-dose or separation rule.
   id: rel_balance_002
   relation_type: balance
   assertion_kind: clinical_review_signal
   semantic_family: nutrient_balance_review_signal
+  research_state: supported
+  sources:
+  - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
+  - https://ods.od.nih.gov/factsheets/Folate-HealthProfessional/
   source_selector:
     entity:
       name: Vitamin B12
@@ -193,10 +198,17 @@ relations:
     term: pde5_inhibition
 - severity: medium
   reason: Metformin can reduce vitamin B12 absorption/status; review B12 context when metformin is active.
+  action: Review B12 status and metformin exposure when metformin is active; no interval or scheduling penalty is established.
   id: rel_review_with_002
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: supported
+  sources:
+  - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
+  - https://pmc.ncbi.nlm.nih.gov/articles/PMC4069007/
+  - https://pubmed.ncbi.nlm.nih.gov/28447237/
+  - https://pmc.ncbi.nlm.nih.gov/articles/PMC2874129/
   source_selector:
     entity:
       entity_id: sub_605u9zvqt2
@@ -206,12 +218,17 @@ relations:
 - severity: medium
   reason: Gastric acid suppression can reduce absorption of food-bound vitamin B12; review B12 context when acid-suppressing
     medication is active.
-  action: Review B12 status and duration of acid-suppressing medication exposure rather than treating the medication and B12
-    context as independent.
+  action: Review B12 status and duration of acid-suppressing medication exposure, distinguishing food-bound from crystalline supplemental B12; no separation rule is established.
   id: rel_review_with_003
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: supported
+  sources:
+  - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
+  - https://pubmed.ncbi.nlm.nih.gov/37060552/
+  - https://pubmed.ncbi.nlm.nih.gov/19262546/
+  - https://pmc.ncbi.nlm.nih.gov/articles/PMC9762528/
   source_selector:
     category: effect
     term: gastric_acid_suppressing_drug_context

@@ -1,9 +1,7 @@
 id: sub_157418854b
 name: Vitamin B12
 form: methylcobalamin
-notes: 'Coenzyme B-Complex component: methylcobalamin active B12 form. NIH ODS does not establish a supplemental-form absorption difference; preserve product formulation disclosure. Review context: B12 is required for central nervous
-  system development/function, healthy red blood cell formation, and DNA synthesis. Relation source: Linus Pauling Institute
-  Folate; NIH ODS Folate/B12.'
+notes: 'Coenzyme B-Complex component: methylcobalamin active B12 form. Physiological and deficiency context: vitamin B12 is required for central nervous system development and function, DNA synthesis, and healthy red blood cell formation; these functions and deficiency-repletion contexts do not establish cognitive or performance enhancement in people who are replete. NIH ODS does not establish methylcobalamin superiority over other supplemental B12 forms; preserve product formulation disclosure.'
 scheduling_assessment:
   intake:
     conclusion: insufficient
@@ -17,14 +15,43 @@ scheduling_assessment:
     - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
     - https://pubmed.ncbi.nlm.nih.gov/28223907/
     summary: No general clock-time rule was demonstrated for methylcobalamin supplementation.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
+    summary: The cited evidence does not establish a workout- or activity-linked timing rule for methylcobalamin supplementation.
 knowledge:
   context:
-  - neurocognitive_support
+  - value: neurocognitive_support
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/32414424/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC8000524/
   effect:
-  - dna_synthesis_support
-  - nervous_system_support
-  - red_blood_cell_support
+  - value: dna_synthesis_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/35589199/
+  - value: nervous_system_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/3374544/
+  - value: red_blood_cell_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/30500928/
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/30500928/
   pathway:
-  - methylation_cycle
+  - value: methylation_cycle
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/35589199/
