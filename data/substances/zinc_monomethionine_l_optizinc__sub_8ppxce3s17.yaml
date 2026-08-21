@@ -10,15 +10,30 @@ knowledge:
   context:
   - skin_support
   effect:
-  - dna_synthesis_support
-  - immune_function_support
-  - protein_synthesis_support
+  - value: dna_synthesis_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
+  - value: immune_function_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
+  - value: protein_synthesis_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
   - skin_barrier_context
-  - wound_healing_support
+  - value: wound_healing_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
   kind:
   - mineral
   risk:
-  - zinc_copper_balance_review
+  - value: zinc_copper_balance_review
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
 scheduling_assessment:
   intake:
     conclusion: insufficient
