@@ -214,10 +214,13 @@ def _print_dashboard_summary(model: ReviewModel) -> None:
 
     primary_usage_state = min(model.dashboard_state_catalog.usage_states, key=lambda state: state.order)
     with_current = sum(
-        1 for entry in model.dashboard_summary.values()
+        1
+        for entry in model.dashboard_summary.values()
         if any(_member_usage_state(member) == primary_usage_state.state for member in _dashboard_members(entry))
     )
-    print(f"  {with_current} with {primary_usage_state.label} members; {len(model.dashboard_summary) - with_current} without.")
+    print(
+        f"  {with_current} with {primary_usage_state.label} members; {len(model.dashboard_summary) - with_current} without."
+    )
 
 
 def _dashboard_members(entry: DashboardReviewEntryWithMembers) -> list[DashboardMember]:

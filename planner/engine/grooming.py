@@ -77,15 +77,14 @@ def _select_work_items(paths: Paths, bundle: OntologyBundle) -> tuple[tuple[Groo
         (substance, active_products, owned_relations.get(substance.id, ()))
         for substance in substances.values()
         if substance.id in reachable_ids
-        and _open_knowledge_count(substance, policy.open_research_state)
-        + len(owned_relations.get(substance.id, ()))
+        and _open_knowledge_count(substance, policy.open_research_state) + len(owned_relations.get(substance.id, ()))
         > 0
     ]
     metrics: dict[str, dict[str, object]] = {
         substance.id: {
-            "active_unique_product_count": len(
-                {product.id for product in active_products if _has_substance(product, substance.id)}
-            ),
+            "active_unique_product_count": len({
+                product.id for product in active_products if _has_substance(product, substance.id)
+            }),
             "open_owned_item_count": _open_knowledge_count(substance, policy.open_research_state)
             + len(owned_relations.get(substance.id, ())),
             "substance_id": substance.id,
@@ -128,10 +127,7 @@ def _active_products(
 ) -> tuple[Product, ...]:
     inactive = bundle.runtime_program.glue_contract.inactive_stack_name
     active_ids = {
-        product_id
-        for stack_name, product_ids in stacks.items()
-        if stack_name != inactive
-        for product_id in product_ids
+        product_id for stack_name, product_ids in stacks.items() if stack_name != inactive for product_id in product_ids
     }
     return tuple(product for product in products.values() if product.id in active_ids)
 
@@ -192,9 +188,7 @@ def _selector_label(selector: object) -> str:
     )
 
 
-def _rank_key(
-    metrics: Mapping[str, object], fields: tuple[RuntimeGroomingRankFieldPolicy, ...]
-) -> tuple[object, ...]:
+def _rank_key(metrics: Mapping[str, object], fields: tuple[RuntimeGroomingRankFieldPolicy, ...]) -> tuple[object, ...]:
     key: list[object] = []
     for field in fields:
         name = field.field
@@ -234,10 +228,16 @@ def _build_work_item(
     assessments = tuple(
         GroomAssessment(
             axis=axis.axis,
-            conclusion=(authored_assessments[axis.axis].conclusion if axis.axis in authored_assessments else "unassessed"),
+            conclusion=(
+                authored_assessments[axis.axis].conclusion if axis.axis in authored_assessments else "unassessed"
+            ),
             policy=(authored_assessments[axis.axis].policy if axis.axis in authored_assessments else None),
             sources=(authored_assessments[axis.axis].sources if axis.axis in authored_assessments else ()),
-            summary=(authored_assessments[axis.axis].summary if axis.axis in authored_assessments else "Open: no authored scheduling assessment."),
+            summary=(
+                authored_assessments[axis.axis].summary
+                if axis.axis in authored_assessments
+                else "Open: no authored scheduling assessment."
+            ),
         )
         for axis in sorted(bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
     )
@@ -249,7 +249,9 @@ def _build_work_item(
         form=substance.form,
         notes=substance.notes,
         active_unique_product_count=len(products),
-        open_owned_item_count=_open_knowledge_count(substance, bundle.runtime_program.grooming_policy.open_research_state)
+        open_owned_item_count=_open_knowledge_count(
+            substance, bundle.runtime_program.grooming_policy.open_research_state
+        )
         + len(open_relations),
         active_products=products,
         knowledge=knowledge,

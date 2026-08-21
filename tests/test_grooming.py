@@ -58,13 +58,27 @@ def _fixture(tmp_path):
     substances = {
         a: Substance(a, "Alpha", knowledge_assertions=(KnowledgeAssertion("kind", "x"),)),
         b: Substance(
-        b,
+            b,
             "Beta",
             knowledge_assertions=(KnowledgeAssertion("kind", "y"),),
         ),
     }
-    product = Product("prd_aaaaaaaaaa", "Active product", (ProductComponent(a, "label", "1 mg", "context"),), notes="product notes", use_pattern="not_every_day")
-    relation = Relation("rel_fixture", "review_with", "lead", RelationSelector(entity_id=a), RelationSelector(entity_id=b), research_state="unassessed", sources=("stored-source",))
+    product = Product(
+        "prd_aaaaaaaaaa",
+        "Active product",
+        (ProductComponent(a, "label", "1 mg", "context"),),
+        notes="product notes",
+        use_pattern="not_every_day",
+    )
+    relation = Relation(
+        "rel_fixture",
+        "review_with",
+        "lead",
+        RelationSelector(entity_id=a),
+        RelationSelector(entity_id=b),
+        research_state="unassessed",
+        sources=("stored-source",),
+    )
     paths = Paths.from_root(tmp_path)
     return paths, substances, {product.id: product}, [relation], {"daily": [product.id]}, a, b
 
@@ -96,7 +110,9 @@ def test_policy_selection_count_and_owner_direction_change_execution(tmp_path, m
     monkeypatch.setattr(grooming, "_load_inputs", lambda _paths, _bundle: (substances, products, relations, stacks))
 
     product = products["prd_aaaaaaaaaa"]
-    products[product.id] = replace(product, components=(*product.components, ProductComponent(b, "peer", "2 mg", "peer context")))
+    products[product.id] = replace(
+        product, components=(*product.components, ProductComponent(b, "peer", "2 mg", "peer context"))
+    )
     two = replace(base, selection_count=2)
     selected, _ = grooming._select_work_items(paths, _fixture_bundle(two))
     assert len(selected) == 2
