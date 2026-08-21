@@ -374,13 +374,14 @@ def test_support_relation_accepts_active_supporter_from_another_product(
     review_result = cmd_review(data_root=tmp_path)
 
     assert review_result.exit_code == 0, review_result.output
-    relations_output = review_result.output.split("Relations", maxsplit=1)[1].split(
+    relations_output = review_result.output.split("Actionable relation warnings", maxsplit=1)[1].split(
         "Dashboard coverage",
         maxsplit=1,
     )[0]
-    selenium_nac_line = "[Support relationship] Selenium -> N-Acetyl Cysteine"
-    assert selenium_nac_line in relations_output
-    assert "both_active" in relations_output
+    # The concise review surface prints actionable warnings only.  An active
+    # supporter in another product therefore produces no warning or relation
+    # catalog row.
+    assert "Selenium -> N-Acetyl Cysteine" not in relations_output
 
 
 def _remove_component_from_product(
