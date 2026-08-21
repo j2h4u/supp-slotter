@@ -1,26 +1,54 @@
 name: Choline
 form: bitartrate
-notes: Choline bitartrate form disclosed on the GLS Ежовик гребенчатый с холином label.
-  The label amount is for choline bitartrate and is not reinterpreted as elemental
-  choline. Human evidence found higher TMAO/platelet reactivity at 1,000 mg/day
-  choline bitartrate (411 mg free choline); direct harm and applicability to this
-  product's 160 mg compound mass/capsule are not established. The planner is
+notes: >-
+  Choline bitartrate form disclosed on the GLS Ежовик гребенчатый с холином label;
+  the physical label amount is 160 mg choline bitartrate per capsule and is not
+  reinterpreted as elemental choline. Choline is an essential nutrient with
+  intrinsic roles in acetylcholine synthesis, methyl-group metabolism, and
+  phospholipid membrane structure; these physiological roles do not establish
+  cognitive enhancement. Human TMAO formation is dependent on choline form,
+  exposure, and gut-microbiome context; biomarker findings do not establish
+  clinical harm, a clinical risk threshold, or a schedule. The planner is
   dose-agnostic.
 id: sub_kwudyhex2o
 scheduling_assessment:
   intake:
     conclusion: insufficient
     sources:
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC8783899/
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC6835836/
-    - https://ods.od.nih.gov/factsheets/Choline-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/31652561/
+    - https://pubmed.ncbi.nlm.nih.gov/32722424/
+    - https://pubmed.ncbi.nlm.nih.gov/34287673/
     summary: No fed-vs-fasted comparison establishes an intake preference for choline bitartrate.
   timing:
     conclusion: insufficient
     sources:
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC4536529/
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC4920398/
+    - https://pubmed.ncbi.nlm.nih.gov/26271904/
+    - https://pubmed.ncbi.nlm.nih.gov/27341028/
     summary: No AM-vs-PM or energy-related comparison establishes a clock-time preference.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/26271904/
+    - https://pubmed.ncbi.nlm.nih.gov/27341028/
+    summary: No workout- or activity-linked comparison establishes an exercise timing preference.
 knowledge:
+  effect:
+  - value: cholinergic_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Choline-HealthProfessional/
+  - value: phospholipid_membrane_context
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Choline-HealthProfessional/
   pathway:
-  - tmao_precursor
+  - value: methylation_cycle
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Choline-HealthProfessional/
+  - value: tmao_precursor
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/32722424/
+    - https://pubmed.ncbi.nlm.nih.gov/34287673/
+    - https://pubmed.ncbi.nlm.nih.gov/33872583/
