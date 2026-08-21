@@ -427,8 +427,8 @@ relations:
     entity:
       name: Iron
 - severity: medium
-  reason: High calcium co-ingestion can reduce zinc absorption in controlled human studies, but dose, meal, salt, and long-term clinical relevance are not established for every product form.
-  action: Review calcium and zinc context together; prefer separate slots when feasible without imposing a universal separation interval.
+  reason: Calcium reduced zinc absorption in some high-calcium/co-ingestion studies while ordinary-food studies did not; the signal is dose-, meal-, phytate-, salt-, and endpoint-dependent, and long-term relevance remains unresolved.
+  action: Review calcium and zinc context together; prefer separate slots only when feasible for independently schedulable products, never split a combination or impose a universal interval.
   id: rel_review_with_017
   relation_type: review_with
   assertion_kind: clinical_review_signal
@@ -437,7 +437,7 @@ relations:
   sources:
   - https://pubmed.ncbi.nlm.nih.gov/8194505/
   - https://pubmed.ncbi.nlm.nih.gov/9174476/
-  - https://ods.od.nih.gov/factsheets/calcium-HealthProfessional/
+  - https://pubmed.ncbi.nlm.nih.gov/19176739/
   source_selector:
     entity:
       name: Calcium

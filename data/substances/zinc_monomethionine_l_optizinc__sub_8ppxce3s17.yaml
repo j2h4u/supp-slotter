@@ -4,10 +4,13 @@ form: monomethionine / L-OptiZinc
 aliases:
 - L-OptiZinc
 - zinc monomethionine
-notes: Zinc monomethionine form listed on active Life Extension Only Trace Minerals (20 mg elemental zinc) and other registered products. Kept separate because methionine-chelated zinc is product-distinct; phytate and meal composition can reduce absorption while food may improve tolerability, so these directions do not establish a universal meal rule. NIH ODS notes zinc is required for hundreds of enzymes and supports immune function, protein/DNA synthesis, wound healing, and cell signaling. Higher supplemental zinc can depress copper status; no fixed copper/iron interval or form-superiority claim is established.
+notes: Zinc monomethionine / L-OptiZinc is a product-specific zinc form listed on Life Extension Only Trace Minerals (20 mg elemental zinc) and other registered products; this preserves form identity without implying superiority. NIH ODS supports generic zinc physiology including immune function, protein and DNA synthesis, wound healing, and cell signaling. Phytate and meal composition can affect absorption, while food may improve tolerability, but this evidence does not establish a universal food rule. Chronic supplemental zinc can affect copper balance, and substantial concurrent supplemental iron context warrants review, but neither establishes a fixed separation interval.
 knowledge:
   context:
-  - skin_support
+  - value: skin_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
   effect:
   - value: dna_synthesis_support
     research_state: supported
@@ -21,13 +24,15 @@ knowledge:
     research_state: supported
     sources:
     - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
-  - skin_barrier_context
   - value: wound_healing_support
     research_state: supported
     sources:
     - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
   kind:
-  - mineral
+  - value: mineral
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
   risk:
   - value: zinc_copper_balance_review
     research_state: supported
@@ -37,14 +42,20 @@ scheduling_assessment:
   intake:
     conclusion: insufficient
     sources:
-    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.924
+    - https://www.lifeextension.com/vitamins-supplements/item01328/only-trace-minerals
     - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
     - https://pubmed.ncbi.nlm.nih.gov/1375057/
-    summary: The cited evidence does not establish an intake preference for zinc monomethionine / L-OptiZinc; it addresses zinc generally or other forms and comparators.
+    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.924
+    summary: The Life Extension product provides a with-food instruction, while the cited zinc evidence addresses generic zinc or other forms and comparators; together they do not establish an intake preference for zinc monomethionine / L-OptiZinc or a universal food rule.
   timing:
     conclusion: insufficient
     sources:
-    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.924
     - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/1375057/
-    summary: No general clock-time scheduling rule was demonstrated.
+    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.924
+    summary: No general clock-time scheduling rule was demonstrated for zinc monomethionine / L-OptiZinc.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
+    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.924
+    summary: No workout- or activity-linked placement rule was demonstrated for zinc monomethionine / L-OptiZinc.
