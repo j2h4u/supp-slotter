@@ -1,42 +1,27 @@
 # Evidence Coverage Grooming
 
-> **Status: Minimal active-card attempt queue and current scheduling-assessment subset implemented; broader coverage
-> proposal deferred.** Substance cards now carry optional per-axis
+> **Status: Card-level grooming contract.** Substance cards carry optional per-axis
 > `scheduling_assessment` states with sources and summaries. The generated
 > schedule journal exposes deterministic `no-scheduling-fact` observations and
 > per-axis `unassessed` versus researched conclusions, while assessment metadata
 > is isolated from scheduler scoring and placement. The minimal queue is exposed
-> by `uv run python -m planner grooming research --state unassessed --limit N`
-> (default `N=1`): it supplies one priority card by default and includes
-> only active, reachable Substance cards with no
-> `semantic_enrichment_attempted_on` field. The header reports total remaining
-> and shown counts; each candidate reports unique total and active Product
-> active Product and unresolved-item counts. Queue ordering is active Product
-> count descending, unresolved knowledge/relation item count descending, then
-> case-folded name and ID. A present ISO date excludes a card
-> permanently. This marker and queue are read-only and do not add expiry,
-> ownership, tasks, scores, auto-write, or product-level state. The
-> EvidenceQuestion catalog, coverage scoring, and broader workflow/task
-> machinery remain deferred and are not implemented here.
+> Run `uv run python -m planner groom` to receive one deterministic
+> active-reachable whole-card dossier. There is no public research-state filter,
+> batch selector, manual limit, or competing queue. The EvidenceQuestion
+> catalog, coverage scoring, and broader workflow/task machinery remain
+> deferred and are not implemented here.
 
-**Active grooming contract.** A Substance card is the unit of work. The CLI
-supplies one priority active-reachable card by default. An orchestrator may add
-one card only when current output shows a concrete shared relation, exact
+**Active grooming contract.** Run `uv run python -m planner groom`. The
+returned card dossier is the complete work and acceptance unit. Luna collects
+all card evidence, Sol adjudicates, Luna implements, then targeted checks or
+recomputation inspect actual output before `groom` is rerun for the next card.
+An optional second card is allowed only for a concrete shared relation, exact
 repeated claim, or clearly shared narrow evidence context; predicate/category
-equality alone is insufficient. Both assigned cards receive one holistic
-bounded pass over all meaningful unresolved knowledge assertions and relation
-leads, plus applicable scheduling questions; each relation has one owner.
-Assertion-level `research_state` and `sources` are provenance fields, not
-separate queue tasks. `--limit N` is manual viewing/explicit orchestration
-control, not a standard batch size. Priority is active Product count descending,
-then unresolved knowledge/relation item count descending, then stable name/ID;
-both counts are transparent workflow ROI signals, not weighted scores, medical
-confidence, or ontology semantics. Report progress in cards: the current
-`main` baseline is 37 active-reachable cards, 36 needing work (25 wholly
-unassessed and 11 partially assessed); 170 underlying rows are not 170 jobs.
-Unknown/no evidence is an allowed assessed result using the existing states.
-This workflow adds no numeric confidence, evidence graph, owner/reviewer/
-lifecycle fields, forced completeness, or broad medical scope.
+equality alone is insufficient. Both cards are completed holistically and each
+relation has one deterministic owner. Assertion-level `research_state` and
+`sources` remain internal provenance; `searched_insufficient` is valid
+completion. No public filter, batch size, score, medical confidence, evidence
+graph, governance fields, forced completeness, or broad medical scope is added.
 
 The authoritative marker ownership, distinct Product-count semantics, and
 operational (not medical) ROI principle are defined in the [Domain Model](domain-model.md#core-objects).

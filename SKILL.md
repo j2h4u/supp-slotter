@@ -85,16 +85,13 @@ grooming; this skill is only the quick operator surface.
 
 Quick rules:
 
-- Grooming is card-level work: the CLI supplies one priority Substance card by
-  default, and that complete card is the work/acceptance unit. An orchestrator
-  may assign one additional card only when current output shows a concrete
-  shared relation, exact repeated claim, or clearly shared narrow evidence
-  context; predicate/category equality alone is insufficient. Complete every
-  assigned card holistically. Relations have one owner. `research_state` and
-  `sources` on assertions are provenance, not separate queue jobs. `--limit N`
-  is manual viewing/explicit orchestration control, not a standard batch size.
-  Report progress in cards; active-product reach/count is workflow ROI, not
-  medical confidence or ontology semantics.
+- Grooming is card-level work. Run `uv run python -m planner groom`; it returns
+  one deterministic active-reachable whole-card dossier. Luna collects all card
+  evidence, Sol adjudicates, and Luna implements; run the targeted check or
+  recomputation against actual output, then rerun `groom` for the next card.
+  Cards remain atomic; relations have one deterministic owner.
+  Assertion-level `research_state` and `sources` are internal provenance, not
+  queue tasks or public filters. `searched_insufficient` is a valid completion.
 
 - Search first with `uv run python -m planner find "<product substance form alias>"`;
   reuse matching Product/Substance/form identities and do not use grep/glob as

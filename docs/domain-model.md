@@ -12,31 +12,14 @@ adjudicate, validate, and commit.
 
 **Substance** (`data/substances/*.yaml`) is an active ingredient or concrete chemical/form. It owns scheduling traits, substance-level notes, aliases, and unresolved concerns. It is the reusable catalog layer by default and should remain through normal onboarding. Use `form` when a named ingredient has distinct practical forms, for example `name: B6` plus `form: pyridoxine HCl`. Substance `id` is a stable opaque key such as `sub_3918fe347e`; it does not change when `name` or `form` changes. Filenames remain readable and include the stable id, for example `magnesium_glycinate__sub_7e02eab0d1.yaml`. Use `aliases` for abbreviations and synonyms such as `NAC`, `EPA`, or `Taxifolin`; aliases do not affect IDs.
 
-`semantic_enrichment_attempted_on` is an optional, immutable queue marker on a
-Substance card. It records that a bounded semantic/evidence enrichment attempt
-was made; it does not assert completeness, freshness, safety, approval, or any
-scheduling fact. The read-only grooming queue considers only active-reachable
-Substances without this marker. Its Product counts are distinct registered
-Product cards: active means the Product appears in any non-`inactive` stack,
-with repeated membership counted once. Its ROI ordering prioritizes gaps that
-could improve the greatest number of active Products; this is operational
-triage, not medical importance, quality, or recommendation scoring.
-
-The queue's work unit is the Substance card, not an individual knowledge
-assertion or relation row. The CLI supplies one priority card by default. An
-orchestrator may add one card only for a concrete shared relation, exact
-repeated claim, or clearly shared narrow evidence context; predicate/category
-equality alone is insufficient. Both assigned cards receive one holistic pass
-over meaningful unresolved knowledge assertions, relation leads, and applicable
-scheduling questions. Relations have one owner. `research_state` and `sources`
-on assertions remain provenance. `--limit N` is manual viewing/explicit
-orchestration control, not a standard batch size. The
-current `main` planning baseline is 37 active-reachable cards, 36 needing work
-(25 wholly unassessed and 11 partially assessed); 170 underlying rows must not
-be presented as 170 jobs. Priority is transparent workflow ROI: active Product
-count descending, then unresolved knowledge/relation item count descending,
-then stable card name/ID. These are not weighted scores, medical confidence,
-or ontology semantics.
+Grooming is invoked with `uv run python -m planner groom` and returns one
+deterministic active-reachable whole-card dossier. Cards are atomic work and
+acceptance units. Luna collects card evidence, Sol adjudicates, Luna
+implements, and the operator runs targeted checks/recomputation before rerunning
+`groom` for the next card. There is no public research-state filter or batch
+selector. Assertion-level `research_state` and `sources` are internal
+provenance; `searched_insufficient` is a valid completion. Relations have one
+deterministic owner.
 
 **Product** (`data/products/*.yaml`) is a physical label-backed item. It owns `brand`, formula components, component labels/amounts when known, product description URLs, product notes, and label ambiguity. A product may contain one or many substances. Product components are canonical as `sub_*` IDs; during drafting, `uv run python -m planner check` may rewrite exact substance name/form, alias, or filename-stem refs to IDs when the match is unique. Product `id` is a stable opaque key such as `prd_83dffd67bf`; it does not change when `brand` or `name` changes. Product filenames use readable parts plus the id, for example `minami_healthy_foods__nattokinase__prd_83dffd67bf.yaml`; if the brand is genuinely unknown, use `unknown`. Product cards are user-specific stack state by default. An optional `use_pattern: not_every_day` is a presentation marker only: omission means the `daily_base` presentation, and the marker never changes stack routing, slot scoring, constraints, relations, or the physical schedule.
 
