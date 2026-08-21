@@ -1,7 +1,7 @@
 id: sub_67fc2be8aa
 name: Vitamin B2
 form: riboflavin
-notes: "Coenzyme B-Complex component: riboflavin-5-phosphate active B2 form. Human oral-absorption evidence supports a soft food preference for free riboflavin and FMN/riboflavin-5'-phosphate. Direct sources: https://doi.org/10.1002/jps.2600550305, https://doi.org/10.1002/jps.2600560112, https://www.ncbi.nlm.nih.gov/books/NBK114322/, https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/"
+notes: "This card represents free riboflavin, distinct from the separate riboflavin 5'-phosphate (R5P) card; Country Life's mixed active label lists both forms. Human meal-absorption evidence supports a soft food preference, not a required meal or fat meal. No clinical efficacy claim is made."
 schedule:
   intake:
   - food_preferred
@@ -14,7 +14,8 @@ scheduling_assessment:
     - https://doi.org/10.1002/jps.2600560112
     - https://www.ncbi.nlm.nih.gov/books/NBK114322/
     - https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/
-    summary: Human fed and meal-absorption evidence supports a soft food preference for free riboflavin and FMN/riboflavin-5'-phosphate.
+    - https://countrylifevitamins.com/products/coenzyme-b-complex-caps
+    summary: Direct human meal-absorption evidence supports a soft food preference for free riboflavin, not a required meal or fat meal; the Country Life before/between-meals instruction is lower-authority vendor guidance.
   timing:
     conclusion: insufficient
     sources:
@@ -22,15 +23,46 @@ scheduling_assessment:
     - https://doi.org/10.1002/jps.2600560112
     - https://www.ncbi.nlm.nih.gov/books/NBK114322/
     - https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/
+    - https://countrylifevitamins.com/products/coenzyme-b-complex-caps
     summary: No general clock-time rule was demonstrated for riboflavin supplementation.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/
+    - https://www.ncbi.nlm.nih.gov/books/NBK114322/
+    - https://countrylifevitamins.com/products/coenzyme-b-complex-caps
+    summary: No workout-related evidence establishes pre-, during-, or post-workout placement for riboflavin.
 knowledge:
   context:
-  - mitochondrial_health
+  - value: mitochondrial_health
+    research_state: mechanistic_only
+    sources:
+    - https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/
+    - https://www.ncbi.nlm.nih.gov/books/NBK114322/
   effect:
-  - cellular_function_support
-  - nutrient_metabolism_support
+  - value: cellular_function_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/
+  - value: nutrient_metabolism_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/
+    - https://www.ncbi.nlm.nih.gov/books/NBK114322/
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/
+    - https://www.ncbi.nlm.nih.gov/books/NBK114322/
   pathway:
-  - flavin_redox
-  - methylation_cycle
+  - value: flavin_redox
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/
+    - https://www.ncbi.nlm.nih.gov/books/NBK114322/
+  - value: methylation_cycle
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/12560354/
+    - https://ods.od.nih.gov/factsheets/Riboflavin-HealthProfessional/
