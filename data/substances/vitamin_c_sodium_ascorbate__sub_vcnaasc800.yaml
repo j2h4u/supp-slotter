@@ -4,7 +4,7 @@ form: sodium ascorbate
 aliases:
 - L-ascorbate sodium
 - L-аскорбат натрия
-notes: Sodium ascorbate vitamin C form from VitaMeal Vitamin C. Product label lists L-sodium ascorbate 900 mg, including vitamin C 800 mg and approximately 104 mg sodium. Buffered vitamin C antioxidant and collagen-hydroxylation context is retained; sodium is separately modeled on the Product component.
+notes: 'This card represents the sodium ascorbate component of the exact VitaMeal Vitamin C product, not a generic sodium-ascorbate product. The VitaMeal label lists 900 mg L-sodium ascorbate, including 800 mg vitamin C and approximately 104 mg sodium; the product page is the source for the product composition and meal direction. Generic vitamin C physiology transfers to this form as vitamin C context, but does not establish superiority of sodium ascorbate or any other supplemental form. Buffered vitamin C context is retained; sodium is separately modeled on the Product component.'
 schedule:
   intake:
   - food_preferred
@@ -13,19 +13,38 @@ scheduling_assessment:
     conclusion: supports_preference
     policy: food_preferred
     sources:
-    - https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/
     - https://vitameal.com/catalog/product-239/
-    summary: Low-confidence soft food/tolerance heuristic for this exact 900 mg sodium-ascorbate product; food may support adherence and GI comfort, but this is not an absorption requirement or universal co-schedule.
+    - https://lpi.oregonstate.edu/mic/vitamins/vitamin-C/supplemental-forms
+    summary: 'Low-confidence soft food/product-tolerance preference for this exact 900 mg sodium-ascorbate product, reflecting the VitaMeal meal direction and buffered-form tolerability context; food is not an absorption requirement or universal co-schedule.'
   timing:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/
-    summary: No comparative clock-time rule was demonstrated for sodium ascorbate.
+    - https://lpi.oregonstate.edu/mic/vitamins/vitamin-C/supplemental-forms
+    summary: No comparative clock-time rule was demonstrated for sodium ascorbate or supplemental vitamin C forms.
 knowledge:
   context:
-  - connective_tissue_support
-  - skin_support
+  - value: connective_tissue_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/
+    - https://lpi.oregonstate.edu/mic/vitamins/vitamin-C
+  - value: skin_support
+    research_state: mechanistic_only
+    sources:
+    - https://lpi.oregonstate.edu/mic/health-disease/skin-health/vitamin-C
+    - https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/
+    - https://lpi.oregonstate.edu/mic/vitamins/vitamin-C/supplemental-forms
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/
+    - https://lpi.oregonstate.edu/mic/vitamins/vitamin-C/supplemental-forms
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/
+    - https://lpi.oregonstate.edu/mic/vitamins/vitamin-C
+    - https://lpi.oregonstate.edu/mic/vitamins/vitamin-C/supplemental-forms
