@@ -169,8 +169,6 @@ That flow keeps the system from turning into a giant undifferentiated supplement
 | `uv run python -m planner` | Regenerate `schedule.yaml` and print the compact pillbox view |
 | `uv run python -m planner check` | Validate cards, references, stacks, canonical ontology terms, and deterministic maintenance |
 | `uv run python -m planner review` | Review authored concerns, relations, fact memberships, and dashboard coverage |
-| `uv run python -m planner audit` | Inspect structural diagnostics such as duplicates, unused traits, and empty clusters |
-| `uv run python -m planner audit --full` | Include the generic full-audit diagnostics |
 | `uv run python -m planner find "<words>"` | Search products and substances by name, alias, form, ID, URL, or card text |
 
 ## Data Model

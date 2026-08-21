@@ -15,16 +15,23 @@ from planner.schema_validation import schema_errors
 
 
 def check_dashboards(
-    dashboard_files: list[Path], _policy_ids: set[str], _paths: Paths, bundle: OntologyBundle
+    dashboard_files: list[Path], _policy_ids: set[str], _paths: Paths, bundle: OntologyBundle,
+    substances: dict[str, Substance] | None = None, info: list[str] | None = None,
 ) -> list[str]:
     dashboard_paths_by_id: dict[str, Path] = {}
-    return [error for path in dashboard_files for error in _check_dashboard_file(path, bundle, dashboard_paths_by_id)]
+    return [
+        error
+        for path in dashboard_files
+        for error in _check_dashboard_file(path, bundle, dashboard_paths_by_id, substances or {}, info)
+    ]
 
 
 def _check_dashboard_file(
     path: Path,
     bundle: OntologyBundle,
     dashboard_paths_by_id: dict[str, Path],
+    substances: dict[str, Substance],
+    info: list[str] | None,
 ) -> list[str]:
     try:
         dashboard = load_card_mapping(path, "dashboard")
@@ -54,13 +61,16 @@ def _check_dashboard_file(
             continue
         resolution = resolve_dashboard_selector(
             RelationSelector(category=category, term=term),
-            {},
+            substances,
             bundle,
         )
         if resolution.outcome not in {"resolved", "empty"}:
             errors.append(
                 f"{path}: selectors[{index}] term '{category}:{term}' is not in canonical ontology vocabulary"
             )
+        elif resolution.outcome == "empty":
+            if info is not None:
+                info.append(f"{path}: selectors[{index}] term '{category}:{term}' resolves to no substance cards")
     return errors
 
 

@@ -82,7 +82,7 @@ def _print_concerns(model: ReviewModel) -> None:
             )
             print(wrapped)
         if len(ordered) > len(shown):
-            print(f"  … {len(ordered) - len(shown)} more concerns; inspect source cards or audit for the full catalog.")
+            print(f"  … {len(ordered) - len(shown)} more concerns; inspect source cards for the full catalog.")
         any_output = True
 
     if not any_output:

@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import cast
 
 from planner.engine import (
-    cmd_audit,
     cmd_check,
     cmd_find,
     cmd_grooming_next,
@@ -29,7 +28,6 @@ def main(data_root: Path | None = None) -> None:
             "  python -m planner                        — show schedule (default)\n"
             "  python -m planner check                  — validate data files only\n"
             "  python -m planner review                 — concerns, relations, fact memberships\n"
-            "  python -m planner audit                  — diagnostics and card-quality checks\n"
             "  python -m planner find <words>           — search cards\n"
             "  python -m planner groom                  — show the next grooming card\n"
             "\n"
@@ -42,13 +40,6 @@ def main(data_root: Path | None = None) -> None:
     sub = parser.add_subparsers(dest="cmd", required=False)
 
     sub.add_parser("check", help="validate all YAML data files")
-
-    audit_parser = sub.add_parser("audit", help="diagnostics and card-quality checks")
-    audit_parser.add_argument(
-        "--full",
-        action="store_true",
-        help="also include the generic full-audit diagnostics",
-    )
 
     find_parser = sub.add_parser(
         "find",
@@ -75,7 +66,6 @@ def main(data_root: Path | None = None) -> None:
     args = parser.parse_args()
     command = cast(str | None, args.cmd)
     handlers: dict[str, CommandHandler] = {
-        "audit": _run_audit,
         "check": _run_check,
         "find": _run_find,
         "groom": _run_grooming,
@@ -87,10 +77,6 @@ def main(data_root: Path | None = None) -> None:
     handler = handlers.get(command)
     if handler is not None:
         sys.exit(handler(args, data_root))
-
-
-def _run_audit(args: argparse.Namespace, data_root: Path | None) -> int:
-    return cmd_audit(data_root=data_root, full=cast(bool, args.full)).exit_code
 
 
 def _run_check(_args: argparse.Namespace, data_root: Path | None) -> int:

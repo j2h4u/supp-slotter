@@ -80,7 +80,6 @@ def test_fast_unit_suite_selects_curated_modules_in_one_invocation(
         [
             "test_plan_search.py",
             "test_warning_humanization.py",
-            "test_audit_command.py",
             "test_ontology_artifacts.py",
         ],
     )
@@ -140,7 +139,7 @@ def test_runtime_scenarios_selects_exact_modules_and_nodes_in_order(
     assert "-n" not in pytest_command
     assert "--dist" not in pytest_command
     output = capsys.readouterr().out
-    assert "Running runtime-scenarios suite (19 targets)\n" in output
+    assert "Running runtime-scenarios suite (18 targets)\n" in output
     assert output.count("elapsed=") == 2
 
 
@@ -191,7 +190,6 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
             *(path.relative_to(Path("tests")).as_posix() for path in run_unit_gate.FAST_UNIT_MODULES),
             *(path.relative_to(Path("tests")).as_posix() for path in run_unit_gate.COVERAGE_ONLY_MODULES),
             "test_scheduler_reviewer_authority.py",
-            "test_audit_command.py",
         ],
     )
     calls: list[list[str]] = []
@@ -218,9 +216,9 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
         "tests/test_product_validation.py",
         "tests/test_read_model_relations.py",
         "tests/test_relation_conflicts.py",
-        "tests/test_review_command.py",
+            "tests/test_review_command.py",
+            "tests/test_review_substance_command.py",
         "tests/test_run_unit_gate.py",
-        "tests/test_scheduling_constraint_audit.py",
         "tests/test_scheduling_constraint_runtime.py",
         "tests/test_scheduling_units.py",
         "tests/test_schemas.py",
@@ -255,7 +253,7 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
     assert run_unit_gate._coverage_inventory_items() == expected_inventory
     assert not set(expected_inventory) & {path.as_posix() for path in run_unit_gate.ONTOLOGY_CONTRACT_MODULES}
     output = capsys.readouterr().out
-    assert "Running coverage suite (24 targets)\n" in output
+    assert "Running coverage suite (23 targets)\n" in output
     assert output.count("elapsed=") == 2
 
 

@@ -19,7 +19,7 @@ The current working surface remains:
 - YAML source files under `data/`;
 - `uv run python -m planner check` for validation and deterministic maintenance;
 - `uv run python -m planner` for schedule generation;
-- `uv run python -m planner review` and `audit` for review surfaces;
+- `uv run python -m planner review` for review surfaces;
 - agent-assisted edits through the repository, followed by the normal validation
   gate.
 
@@ -37,7 +37,7 @@ workflows, for example:
 - discovery of available ontology axes;
 - preview of relation endpoints and dashboard membership;
 - validation of a proposed stack edit before apply;
-- review/audit summaries that do not expose raw files.
+- review summaries that do not expose raw files.
 
 We do not yet know whether that surface would be simpler, safer, or more useful
 than the current YAML + CLI workflow.

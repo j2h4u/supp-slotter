@@ -1,12 +1,10 @@
 """Engine subpackage: re-exports cmd_* and result dataclasses for the CLI entrypoint."""
 
-from planner.engine.audit import cmd_audit
 from planner.engine.check import cmd_check
 from planner.engine.find import cmd_find
 from planner.engine.grooming import cmd_grooming_next, cmd_grooming_research
 from planner.engine.plan import cmd_plan
 from planner.engine.results import (
-    AuditResult,
     CheckResult,
     FindResult,
     PlanResult,
@@ -20,7 +18,6 @@ from planner.engine.review import cmd_review
 from planner.engine.show import cmd_show
 
 __all__ = [
-    "AuditResult",
     "CheckResult",
     "FindResult",
     "PlanResult",
@@ -29,7 +26,6 @@ __all__ = [
     "ResearchStateResult",
     "ReviewResult",
     "ShowResult",
-    "cmd_audit",
     "cmd_check",
     "cmd_find",
     "cmd_grooming_next",

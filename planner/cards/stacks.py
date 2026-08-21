@@ -103,5 +103,20 @@ def validate_stacks(
         stacks_path,
         bundle.runtime_program.glue_contract.inactive_stack_name,
     )
+    pillboxes_path = paths.data / "pillboxes.yaml"
+    try:
+        pillboxes = load_yaml(pillboxes_path)
+        pillbox_stacks = {
+            str(value["stack"])
+            for value in pillboxes.values()
+            if isinstance(value, dict) and isinstance(value.get("stack"), str)
+        }
+        for stack_name in stacks_data:
+            if isinstance(stack_name, str) and stack_name not in pillbox_stacks:
+                alignment_info.append(
+                    f"{stacks_path}: stack '{stack_name}' has no pillbox; add a pillbox or remove the stack"
+                )
+    except CardLoadError:
+        pass
     errors.extend(alignment_errors)
     return errors, alignment_info

@@ -21,8 +21,7 @@ fact memberships, and dashboard counts.
 Use `schedule.yaml` for generated slot placement, humanized warnings, placement
 notes, and explanations. Do not edit it directly.
 
-Use `planner audit --full` only when its generic full-audit diagnostics matter
-for the current review.
+Use `planner check` to validate source-data references before the current review.
 
 ## Source Completion
 
@@ -80,7 +79,6 @@ Pass to the review:
 
 - `planner review` brief and relevant detailed sections;
 - slot layout from `schedule.yaml`;
-- generic full-audit diagnostics from `planner audit --full` only when relevant;
 - user context from `docs/private/`;
 - explicit framing that this is informational analysis, not medical advice.
 

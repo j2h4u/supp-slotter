@@ -101,10 +101,3 @@ class ResearchStateResult:
 class ShowResult:
     exit_code: int
     output: str = ""
-
-
-@dataclass(frozen=True)
-class AuditResult:
-    exit_code: int
-    cleanup: dict[str, list[str]] = field(default_factory=dict[str, list[str]])
-    full: dict[str, list[str]] = field(default_factory=dict[str, list[str]])

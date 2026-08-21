@@ -4,7 +4,6 @@ import ast
 from pathlib import Path
 
 COMMANDS_REQUIRING_SYNTHETIC_ROOT = frozenset({
-    "cmd_audit",
     "cmd_check",
     "cmd_find",
     "cmd_plan",

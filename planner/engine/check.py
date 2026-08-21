@@ -150,5 +150,5 @@ def _extend_card_validation_errors(
     errors.extend(stacks_errors)
     info.extend(stacks_info)
     dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
-    errors.extend(check_dashboards(dashboard_files, trait_ids, paths, bundle))
+    errors.extend(check_dashboards(dashboard_files, trait_ids, paths, bundle, substances, info))
     return None

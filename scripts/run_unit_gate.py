@@ -55,13 +55,11 @@ COVERAGE_ONLY_MODULES = (
     Path("tests/test_review_command.py"),
     Path("tests/test_review_substance_command.py"),
     Path("tests/test_card_reference_integrity.py"),
-    Path("tests/test_scheduling_constraint_audit.py"),
     Path("tests/test_pillbox_loader_contract.py"),
     Path("tests/test_formal_uniqueness.py"),
 )
 RUNTIME_SCENARIOS_MODULES = (
     Path("tests/test_advisory_search_contract.py"),
-    Path("tests/test_audit_command.py"),
     Path("tests/test_cutover_vertical_scenarios.py"),
     Path("tests/test_engine_contract.py"),
     Path("tests/test_find_command.py"),

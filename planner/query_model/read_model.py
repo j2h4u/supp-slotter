@@ -5,8 +5,6 @@ from __future__ import annotations
 from planner.contracts import Product, Relation, Substance
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.policies import project_ontology_assertions
-from planner.query_model.audit import collect_cleanup_sections
-from planner.query_model.audit_full import collect_full_audit_sections
 from planner.query_model.facts import (
     active_fact_index,
     active_substance_ids,
@@ -106,19 +104,6 @@ class StackReadModel:
             item_products=item_products,
         )
 
-    def cleanup_sections(
-        self,
-        substances: dict[str, Substance],
-    ) -> dict[str, list[str]]:
-        return collect_cleanup_sections(self._db, substances, self._ontology_bundle)
-
-    def full_audit_sections(
-        self,
-        substances: dict[str, Substance],
-        products: dict[str, Product],
-    ) -> dict[str, list[str]]:
-        return collect_full_audit_sections(self._db, substances, products, self._ontology_bundle)
-
 
 def build_stack_read_model(
     substances: dict[str, Substance],
@@ -131,7 +116,7 @@ def build_stack_read_model(
     """Build the command-scoped read model from loaded YAML/domain objects."""
     loaded_context = context or SurrealLoadContext(None, None, None, None)
     assertions = project_ontology_assertions(relations, ontology_bundle)
-    # Raw constraints are retained for audit/provenance rows, while this
+    # Raw constraints are retained for provenance rows, while this
     # boundary is the canonical fallback for callers that do not already own a
     # command-level compilation.  A supplied typed tuple is reused verbatim so
     # the planner command's exactly-once compilation is not repeated here.

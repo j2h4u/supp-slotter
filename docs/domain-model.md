@@ -140,9 +140,9 @@ Runtime card data lives under `data/products/`, `data/substances/`,
 `data/stacks.yaml`, `data/dashboards/`, and the relation input declared by the
 manifest.
 
-Authored YAML data plus the ontology manifest/catalogs are the source of truth. `planner/contracts.py` is a typed runtime contract for those loaded shapes, not an independent ontology authority. Commands build an in-memory SurrealDB read model from those objects for graph-style queries: relation status, stack usage, dashboard member projections, fact indexes, and audit cross-references.
+Authored YAML data plus the ontology manifest/catalogs are the source of truth. `planner/contracts.py` is a typed runtime contract for those loaded shapes, not an independent ontology authority. Commands build an in-memory SurrealDB read model from those objects for graph-style queries: relation status, stack usage, dashboard member projections, and fact indexes.
 
-SurrealDB is not persistent storage and does not write source data. The SurrealQL boundary lives under `planner/query_model/`; scheduler, review, and audit code should use the read-model facade instead of importing the SurrealDB SDK or raw query functions.
+SurrealDB is not persistent storage and does not write source data. The SurrealQL boundary lives under `planner/query_model/`; scheduler and review code should use the read-model facade instead of importing the SurrealDB SDK or raw query functions.
 
 ## Scheduling Semantics
 
@@ -154,7 +154,7 @@ represent depleted/not-owned/reference/candidate cards.
 
 `uv run python -m planner` writes a full review schedule and prints a compact pillbox view. `summary.take` is grouped by pillbox and remains the complete physical schedule, so `daily` is the ordinary recurring organizer and `training` is workout-only timing. `summary.usage_groups` is a presentation index for active products in the `daily` stack, separating `daily_base` from `not_every_day`; it is not a recurrence or dose model. Each pillbox contains slots with `products` and expanded `substances`. If a substance has `form`, the form is shown in parentheses. The schedule also includes non-warning `placement_notes`, `benefits`, `risks`, a `pairwise_journal` of resolved prefer-together/separation decisions and intra-product conflicts, and per-product `explanations`. Do not edit `schedule.yaml` directly; edit source cards and regenerate it.
 
-Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`; other concern kinds remain review-only annotations. Use `uv run python -m planner review` to see all authored concerns grouped by kind (safety / data_quality / model_gap), together with relation review, active fact memberships, and dashboard membership. Use `uv run python -m planner audit` for structural diagnostics. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
+Active `concerns` of kind `safety` are surfaced as review warnings in `schedule.yaml`; other concern kinds remain review-only annotations. Use `uv run python -m planner review` to see all authored concerns grouped by kind (safety / data_quality / model_gap), together with relation review, active fact memberships, and dashboard membership. This keeps uncertain or not-yet-modeled facts visible without forcing a new trait or relation type.
 
 Dashboard-cluster output is review-only. Each dashboard cluster must define `benefit`, `risk`, or both. Cluster membership is computed at plan time from `selectors:`. The planner reports a neutral `members` list and separates independent facts for each member: `relevance.matched_traits`, `product_tracking.state`, and `usage.state`. Catalog presence is implicit because every member comes from a registered substance card. This means a substance can be relevant to a goal without implying that the goal is covered, missing, recommended, or safe. Expert gap/recommendation status belongs in an advisory review artifact, not in deterministic planner output. Dashboard clusters never affect slot assignment.
 
@@ -248,7 +248,7 @@ Practical order:
 2. Add or enrich physical product cards.
 3. Put products into `daily`, `training`, or `inactive` in `data/stacks.yaml`. Leave cards outside all stacks for reference/depletion/candidate states.
 4. Add relations, ontology terms, or dashboard projections only when they express reusable review/scheduling behavior.
-5. Run `uv run python -m planner check`; run `review`, `audit`, or the default planner command when the changed surface needs that output.
+5. Run `uv run python -m planner check`; run `review` or the default planner command when the changed surface needs that output.
 
 ## Ontology Term Semantics
 
@@ -378,15 +378,9 @@ Relations may define optional `action` text for generated review output. Relatio
 - Do not add taxonomy unless the planner, validator, warnings, or downstream consumers use it. `kind:*` slugs are an approved exception for intrinsic pharmacological categories; use the defined set in the Ontology Term Semantics section rather than inventing new slugs.
 - To add a substance to a dashboard cluster, update the membership source named by that dashboard's `selectors:`. Prefer semantic axes (`kind:`, `effect:`, `risk:`, `pathway:`) and add/refine the underlying reusable fact on the substance card. Use `context:` only for explicit operator-curated review contexts with no cleaner axis. Do not edit the dashboard yaml as an explicit member list, because membership is computed dynamically from selectors at plan time.
 
-Use `uv run python -m planner audit` to list deterministic diagnostics: valid
-knowledge-only substance cards, tracked-unassigned products (outside stacks), unused
-review traits, potential
-duplicate cards, empty stacks, and stack/pillbox mismatches. Use
-`uv run python -m planner audit --full` only when its generic diagnostics matter for
-the current task. Component `amount` values are optional label/context metadata for
-human review, not a dose-computation contract and not a quality gate by themselves. Audit findings are review hints;
-unknown amounts, knowledge-only cards, potential duplicates, or intentionally unused
-scheduler capabilities do not automatically mean wrong.
+Use `uv run python -m planner check` to validate source-data references. Component
+`amount` values are optional label/context metadata for human review, not a
+dose-computation contract and not a quality gate by themselves.
 
 Slot IDs must be unique across all pillboxes. The planner keeps slot IDs flat in explanations and tests, so `check` rejects duplicate slot IDs instead of silently namespacing them.
 
