@@ -1,7 +1,7 @@
 id: sub_a873e428ee
 name: Vitamin B6
 form: pyridoxine HCl
-notes: Pyridoxine hydrochloride B6 form; may be present in multiple products simultaneously.
+notes: 'Country Life lists 50 mg total vitamin B6 per 2 capsules across pyridoxine HCl, pyridoxal-5-phosphate (P5P), and pyridoxine alpha-ketoglutarate hydrochloride; the split between forms is not disclosed. B6 intrinsic biology supports amino-acid/protein metabolism, neurotransmitter biosynthesis, and homocysteine handling, but no clinical cognition or homocysteine benefit, or categorical safety superiority over other supplemental forms, is established.'
 scheduling_assessment:
   intake:
     conclusion: insufficient
@@ -15,19 +15,46 @@ scheduling_assessment:
     - https://www.ncbi.nlm.nih.gov/books/NBK114313/
     - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
     summary: No general clock-time rule was demonstrated for pyridoxine HCl supplementation.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
+    summary: No workout- or activity-linked placement rule was demonstrated for pyridoxine HCl supplementation.
 concerns:
 - kind: safety
   text: 'Long-term supplemental vitamin B6 exposure can cause sensory peripheral neuropathy; review cumulative supplemental B6 intake across all forms and products and duration. Sources: NIH ODS Vitamin B6 (https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/) and EFSA 2023 guidance (https://doi.org/10.2903/j.efsa.2023.8006).'
 knowledge:
   context:
-  - neurocognitive_support
+  - value: neurocognitive_support
+    research_state: mechanistic_only
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
   effect:
-  - amino_acid_metabolism_support
-  - homocysteine_metabolism_support
-  - neurotransmitter_synthesis_support
+  - value: amino_acid_metabolism_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
+  - value: homocysteine_metabolism_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
+  - value: neurotransmitter_synthesis_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
   pathway:
-  - methylation_cycle
+  - value: methylation_cycle
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
   risk:
-  - b6_neuropathy_long_term
+  - value: b6_neuropathy_long_term
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
+    - https://doi.org/10.2903/j.efsa.2023.8006
