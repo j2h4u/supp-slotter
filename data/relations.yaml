@@ -223,10 +223,16 @@ relations:
       name: Vitamin B12
 - severity: high
   reason: Methotrexate is a folate antagonist; review folate context when methotrexate is active.
+  action: Review folate context with the prescribing clinician when methotrexate is active; no L-5-MTHF regimen, add/withhold, substitution, or scheduling rule is established.
   id: rel_review_with_004
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: supported
+  sources:
+  - https://ods.od.nih.gov/factsheets/Folate-HealthProfessional/
+  - https://pubmed.ncbi.nlm.nih.gov/18945303/
+  - https://pubmed.ncbi.nlm.nih.gov/24737913/
   source_selector:
     entity:
       entity_id: sub_zqfp9n314s
@@ -234,10 +240,14 @@ relations:
     entity:
       name: Vitamin B9
 - reason: Sulfasalazine can reduce folate absorption/status; review folate context when sulfasalazine is active.
+  action: Review folate context when sulfasalazine is active; no folate requirement, dose, or scheduling rule is established.
   id: rel_review_with_005
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: supported
+  sources:
+  - https://ods.od.nih.gov/factsheets/Folate-HealthProfessional/
   source_selector:
     entity:
       entity_id: sub_tqihchk7rd
