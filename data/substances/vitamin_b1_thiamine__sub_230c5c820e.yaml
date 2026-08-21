@@ -1,27 +1,50 @@
 id: sub_230c5c820e
 name: Vitamin B1
 form: thiamine
-notes: 'Coenzyme B-Complex component: active product supplies thiamine hydrochloride plus thiamine cocarboxylase chloride, 50 mg total per 2 capsules. Generic thiamine context is retained without asserting whole-card active/coenzymated superiority. Thiamin is a core cofactor for cellular energy metabolism and normal cell growth/function.'
+notes: 'Country Life Coenzyme B-Complex supplies thiamine hydrochloride plus thiamine cocarboxylase chloride, 50 mg total per 2 capsules; the split between forms is not disclosed, and no superiority of the coenzyme form over thiamine hydrochloride is established. Thiamin is a core cofactor for cellular energy metabolism and normal cell growth/function.'
 scheduling_assessment:
   intake:
     conclusion: insufficient
     sources:
-    - https://ajcn.nutrition.org/article/S0002-9165%2823%2932783-7/fulltext
     - https://ods.od.nih.gov/factsheets/Thiamin-HealthProfessional/
-    summary: Research on thiamin's metabolic role does not directly establish a general fed or fasted preference for this exact form.
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC9960539/
+    summary: Evidence does not establish a general fed or fasted preference for the mixed thiamine hydrochloride and thiamine cocarboxylase chloride product; formulation-specific evidence does not identify a meal-state rule for this exact mixture.
   timing:
     conclusion: insufficient
     sources:
-    - https://ajcn.nutrition.org/article/S0002-9165%2823%2932783-7/fulltext
     - https://ods.od.nih.gov/factsheets/Thiamin-HealthProfessional/
     summary: No general clock-time rule was demonstrated for thiamin supplementation.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/8815395/
+    - https://pubmed.ncbi.nlm.nih.gov/25566430/
+    summary: Exercise-related thiamin evidence does not establish a pre-, during-, or post-workout placement rule for supplementation.
 knowledge:
   context:
-  - mitochondrial_health
-  - neurocognitive_support
+  - value: mitochondrial_health
+    research_state: mechanistic_only
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/31019473/
+    - https://pubmed.ncbi.nlm.nih.gov/35304818/
+  - value: neurocognitive_support
+    research_state: searched_insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Thiamin-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/25849949/
   effect:
-  - cellular_function_support
+  - value: cellular_function_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Thiamin-HealthProfessional/
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Thiamin-HealthProfessional/
   pathway:
-  - thiamine_energy_metabolism
+  - value: thiamine_energy_metabolism
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Thiamin-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/31019473/
