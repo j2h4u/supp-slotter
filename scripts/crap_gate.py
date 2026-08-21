@@ -32,10 +32,10 @@ def collect_scores(source_root: Path, coverage_file: Path) -> list[FunctionScore
 
 
 def violations(scores: Sequence[FunctionScore], threshold: float = DEFAULT_THRESHOLD) -> list[FunctionScore]:
-    """Return scores strictly above the standard CRAP threshold."""
+    """Return scores at or above the standard CRAP threshold."""
 
     return sorted(
-        (score for score in scores if score.crap > threshold),
+        (score for score in scores if score.crap >= threshold),
         key=lambda score: (-score.crap, score.file_path, score.start_line, score.name),
     )
 
@@ -61,7 +61,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     scores = collect_scores(source_root, coverage_file)
     failed = violations(scores)
     if failed:
-        print(f"CRAP gate failed: {len(failed)} function(s) exceed threshold {DEFAULT_THRESHOLD:.0f}")
+        print(f"CRAP gate failed: {len(failed)} function(s) meet or exceed threshold {DEFAULT_THRESHOLD:.0f}")
         for score in failed:
             print(
                 f"  {score.file_path}:{score.start_line} {score.name} "

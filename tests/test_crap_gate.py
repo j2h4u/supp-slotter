@@ -45,3 +45,9 @@ def test_violations_allow_simple_uncovered_glue() -> None:
     score = FunctionScore("glue", "planner/glue.py", 1, 2, 1, 0.0, 2.0)
 
     assert violations([score]) == []
+
+
+def test_violations_block_the_threshold_boundary() -> None:
+    score = FunctionScore("boundary", "planner/boundary.py", 1, 2, 5, 0.0, DEFAULT_THRESHOLD)
+
+    assert violations([score]) == [score]
