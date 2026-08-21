@@ -40,7 +40,7 @@ def test_research_state_grooming_current_card_summary_and_relation_attachment() 
     assert sum(card.assessment_status == "partially_assessed" for card in result.cards) == 11
     relation_ids = [relation.id for card in result.cards for relation in card.related_relations]
     assert relation_ids
-    assert len(set(card.id for card in result.cards)) == 36
+    assert len({card.id for card in result.cards}) == 36
     assert len(set(relation_ids)) < len(relation_ids)  # multi-endpoint leads attach to each relevant card
 
 

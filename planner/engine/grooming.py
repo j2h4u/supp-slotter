@@ -6,7 +6,7 @@ import contextlib
 import io
 import sys
 from pathlib import Path
-from typing import cast
+from typing import NamedTuple, cast
 
 from planner.cards.product import load_product_registry
 from planner.cards.relations import check_global_relations, load_global_relations
@@ -15,8 +15,8 @@ from planner.contracts import CardLoadError, Product, Substance
 from planner.engine.results import (
     GroomingCandidate,
     GroomingResult,
-    ResearchStateCard,
     ResearchStateCandidate,
+    ResearchStateCard,
     ResearchStateResult,
 )
 from planner.ontology.artifacts import OntologyBundle, load_ontology
@@ -29,9 +29,17 @@ from planner.ontology.runtime_program import (
 from planner.ontology.schema_enums import schema_enum_values
 from planner.paths import ROOT, Paths
 from planner.query_model import build_stack_read_model
+from planner.query_model.read_model import StackReadModel
 from planner.query_model.surreal import SurrealLoadContext
 from planner.schema_validation import validate_schemas
 from planner.yaml_io import load_yaml, load_yaml_mapping
+
+
+class _ResearchRenderStats(NamedTuple):
+    total_cards: int
+    assertion_count: int
+    whole: int
+    partial: int
 
 
 def cmd_grooming_research(
@@ -55,26 +63,10 @@ def cmd_grooming_research(
                 return ResearchStateResult(
                     schema_result, [], research_state, resolved_limit, 0, 0, stderr=stderr_buf.getvalue()
                 )
-            substances = load_substance_registry(paths, bundle)
-            products = load_product_registry(paths, bundle)
-            relations_data = load_yaml(paths.relations_file)
-            relation_errors = check_global_relations(relations_data, substances, paths, bundle)
-            if relation_errors:
-                _print_errors(relation_errors)
+            inputs = _load_research_inputs(paths, bundle)
+            if inputs is None:
                 return ResearchStateResult(1, [], research_state, resolved_limit, 0, 0, stderr=stderr_buf.getvalue())
-            relations = load_global_relations(paths, bundle, substances)
-            read_model = build_stack_read_model(
-                substances,
-                relations,
-                products,
-                context=SurrealLoadContext(
-                    policies=load_scheduling_policies(bundle),
-                    stacks_data=_stacks_for_grooming_read_model(paths),
-                    pillbox_stack_names=None,
-                    dashboards=None,
-                ),
-                ontology_bundle=bundle,
-            )
+            substances, products, read_model = inputs
             rows = read_model.research_state_assertions(read_model.active_substance_ids(), research_state)
             candidates = [
                 ResearchStateCandidate(
@@ -92,14 +84,8 @@ def cmd_grooming_research(
                 for row in rows
             ]
             cards = _group_research_cards(candidates, substances, products, paths, research_state)
-            _render_research_cards(
-                cards[:resolved_limit],
-                len(cards),
-                research_state,
-                len(candidates),
-                sum(card.assessment_status == "wholly_unassessed" for card in cards),
-                sum(card.assessment_status == "partially_assessed" for card in cards),
-            )
+            stats = _research_render_stats(cards, candidates)
+            _render_research_cards(cards[:resolved_limit], research_state, stats)
             return ResearchStateResult(
                 0,
                 cards[:resolved_limit],
@@ -114,6 +100,32 @@ def cmd_grooming_research(
         except (CardLoadError, OntologyInfrastructureError) as error:
             message = error.message if isinstance(error, CardLoadError) else str(error)
             return ResearchStateResult(1, [], research_state, resolved_limit, 0, 0, stderr=message + "\n")
+
+
+def _load_research_inputs(
+    paths: Paths, bundle: OntologyBundle
+) -> tuple[dict[str, Substance], dict[str, Product], StackReadModel] | None:
+    substances = load_substance_registry(paths, bundle)
+    products = load_product_registry(paths, bundle)
+    relations_data = load_yaml(paths.relations_file)
+    relation_errors = check_global_relations(relations_data, substances, paths, bundle)
+    if relation_errors:
+        _print_errors(relation_errors)
+        return None
+    relations = load_global_relations(paths, bundle, substances)
+    read_model = build_stack_read_model(
+        substances,
+        relations,
+        products,
+        context=SurrealLoadContext(
+            policies=load_scheduling_policies(bundle),
+            stacks_data=_stacks_for_grooming_read_model(paths),
+            pillbox_stack_names=None,
+            dashboards=None,
+        ),
+        ontology_bundle=bundle,
+    )
+    return substances, products, read_model
 
 
 def _research_detail(row: dict[str, object]) -> str:
@@ -176,17 +188,22 @@ def _group_research_cards(
     return cards
 
 
-def _render_research_cards(
-    cards: list[ResearchStateCard],
-    total_cards: int,
-    research_state: str,
-    assertion_count: int,
-    whole: int,
-    partial: int,
-) -> None:
+def _research_render_stats(
+    cards: list[ResearchStateCard], candidates: list[ResearchStateCandidate]
+) -> _ResearchRenderStats:
+    return _ResearchRenderStats(
+        total_cards=len(cards),
+        assertion_count=len(candidates),
+        whole=sum(card.assessment_status == "wholly_unassessed" for card in cards),
+        partial=sum(card.assessment_status == "partially_assessed" for card in cards),
+    )
+
+
+def _render_research_cards(cards: list[ResearchStateCard], research_state: str, stats: _ResearchRenderStats) -> None:
     print(
-        f"Research-state card queue ({research_state}): {total_cards} cards, "
-        f"showing {len(cards)} (whole={whole}, partial={partial}; {assertion_count} assertions)"
+        f"Research-state card queue ({research_state}): {stats.total_cards} cards, "
+        f"showing {len(cards)} (whole={stats.whole}, partial={stats.partial}; "
+        f"{stats.assertion_count} assertions)"
     )
     if not cards:
         print("  none")
