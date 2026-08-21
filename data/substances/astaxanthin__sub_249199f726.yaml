@@ -21,10 +21,28 @@ scheduling_assessment:
     summary: No clock-time comparison establishes a timing rule for astaxanthin.
 knowledge:
   context:
-  - skin_support
+  - value: skin_support
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/29941810/
+    - https://pubmed.ncbi.nlm.nih.gov/32202443/
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC8472736/
   kind:
-  - carotenoid
+  - value: carotenoid
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/33549728/
+    - https://pubmed.ncbi.nlm.nih.gov/24402174/
   quality:
-  - fat_soluble
+  - value: fat_soluble
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/36363994/
+    - https://pubmed.ncbi.nlm.nih.gov/19734684/
+    - https://pubmed.ncbi.nlm.nih.gov/12885395/
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: mechanistic_only
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/33549728/
+    - https://doi.org/10.1016/j.nut.2021.111272
