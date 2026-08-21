@@ -2,22 +2,43 @@
 
 ## Decision Summary
 
-Supp Slotter will evaluate `feature/executable-ontology-contract` as the sole
-long-term product line. The branch is strategically preferred because it makes
+**Decision: ADOPT FEATURE.** Supp Slotter will treat
+`feature/executable-ontology-contract` as the sole long-term product line. The
+branch is strategically preferred because it makes
 supplement identities, relationships, scheduling policies, evidence, stacks,
 pillboxes, and slots explicit and portable instead of leaving their meaning
 distributed across Python behavior.
 
-This is not yet a decision to merge the feature branch into `main`. The feature
-branch must first complete the bounded cutover cluster in this document. At the
-end, the project will make one explicit choice:
+This is a product-line decision, not a decision to merge the feature branch
+into `main`. The bounded cutover cluster is complete, and the project has made
+the explicit choice:
 
 - **ADOPT FEATURE** — the ontology branch becomes the only maintained product
-  line; or
-- **REJECT FEATURE** — retain the Python-centered planner and port only the
-  independently valuable product improvements.
+  line.
 
 Maintaining both branches is not an acceptable outcome.
+
+### Final acceptance evidence
+
+The final `just release` gate is green: smoke `3`, ontology A/B/C `23/19/61`,
+runtime `50`, coverage `225`; `basedpyright` is clean and corpus conformance is
+`true`. Fresh planner output contains daily base `10`, episodic `4`, and
+training `4`, with every expected product appearing exactly once. Warm runtime
+is `4.67s`. The grooming research filter reports `196` matching records and
+shows `5`; the Kaizen audit is **ADOPTABLE**. Catalog/data preservation is
+**PASS**, and no substantive product blocker remains.
+
+The following items are consciously deferred: TypeDB deployment/importer work,
+dose and recurrence modeling, broader medical evidence adjudication, and
+optional future inference. They remain outside this cutover and do not weaken
+the adoption decision.
+
+The current Python-first planner was tactically successful and delivered value
+quickly, but is strategically closed because its domain semantics remained
+fragmented. It is preserved at remote branch
+`archive/python-first-planner-20260821` for historical reference only, not as
+maintained legacy or a compatibility target. This documentation commit does
+not merge the feature branch into `main`.
 
 ## Product Context
 
@@ -244,18 +265,18 @@ changes.
 All mandatory criteria must pass. A partial result is not a reason to maintain
 both branches.
 
-| Area | Mandatory acceptance criterion | Evidence |
-| --- | --- | --- |
-| Product behavior | Daily, episodic, and training schedules are useful, complete, and explainable on the real shelf. | Fresh scenario outputs and product review. |
-| Semantic preservation | Every old interaction and every active-reachable scheduling change has an explicit retain, weaken, neutralize, or retire decision. | Adjudication inventories with canonical source references. |
-| Data preservation | Expected products, substances, stable identities, forms, and component links survive without unintended duplication or loss. | Branch inventory and projection checks. |
-| Single source of truth | Supplement facts, relations, policies, parameters, and supported operations are authored outside Python exactly once. | Boundary audit showing Python-only mechanics. |
-| Solver contract | Aggregation, constraints, objective, balancing, and tie-breaking are declared well enough to reimplement without reading Python. | Engine protocol plus conformance scenarios. |
-| Portability | A future TypeDB importer can be written from canonical sources and projection contracts without discovering domain semantics in Python. | Mapping inventory covering entities, relations, policies, and derived facts. |
-| Formal consistency | Canonical sources generate fresh artifacts and reject malformed or unsupported semantics. | Focused ontology and corpus gates. |
-| Operability | Planner runtime is acceptable for the interactive CLI and has no unexplained cold-compilation path. | Recorded cold/warm measurements and agreed budget. |
-| Maintainability | The formal stack has one authoring path; generated artifacts and tests do not duplicate independent authorities. | Maintenance-surface review. |
-| Scope control | No dose engine, recurrence scheduler, TypeDB deployment, or new medical expert system was added to complete the cutover. | Final diff and decision review. |
+| Area | Status | Mandatory acceptance criterion | Evidence |
+| --- | --- | --- | --- |
+| Product behavior | PASS | Daily, episodic, and training schedules are useful, complete, and explainable on the real shelf. | Smoke `3`; fresh planner daily base `10`, episodic `4`, training `4`, all exactly once. |
+| Semantic preservation | PASS | Every old interaction and every active-reachable scheduling change has an explicit retain, weaken, neutralize, or retire decision. | Interaction and scheduling adjudication inventories; coverage `225`. |
+| Data preservation | PASS | Expected products, substances, stable identities, forms, and component links survive without unintended duplication or loss. | Catalog closure and projection checks; catalog/data criterion PASS. |
+| Single source of truth | PASS | Supplement facts, relations, policies, parameters, and supported operations are authored outside Python exactly once. | Boundary audit, formal engine contract, and Kaizen audit ADOPTABLE. |
+| Solver contract | PASS | Aggregation, constraints, objective, balancing, and tie-breaking are declared well enough to reimplement without reading Python. | Engine protocol and conformance coverage `225`; runtime `50`. |
+| Portability | PASS | A future TypeDB importer can be written from canonical sources and projection contracts without discovering domain semantics in Python. | Stable-ID catalog/projection inventory; TypeDB remains a future non-goal. |
+| Formal consistency | PASS | Canonical sources generate fresh artifacts and reject malformed or unsupported semantics. | Final `just release` green; ontology A/B/C `23/19/61`; corpus conforms `true`. |
+| Operability | PASS | Planner runtime is acceptable for the interactive CLI and has no unexplained cold-compilation path. | Runtime `50`; warm planner run `4.67s`. |
+| Maintainability | PASS | The formal stack has one authoring path; generated artifacts and tests do not duplicate independent authorities. | `basedpyright` clean; grooming research filter `196` matching/showing `5`; Kaizen ADOPTABLE. |
+| Scope control | PASS | No dose engine, recurrence scheduler, TypeDB deployment, or new medical expert system was added to complete the cutover. | Final diff and decision review; deferred items recorded above. |
 
 ## Final Decision Rules
 
