@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: a3b6c4e8b4ee59bde07c8215957535adc46247a96c15d9f1733c58d8293ceffc
+# source-hash: 6e41a71ccba372f534e1c6007db699cf6b5fb4da2e2c750622a60ae415cf9ac8
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -117,6 +117,15 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectScoringPolicy> a ss:SchemaClass ;
   ss:name "RuntimeEffectScoringPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEngineConformanceScenario> a ss:SchemaClass ;
+  ss:name "RuntimeEngineConformanceScenario" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEngineContract> a ss:SchemaClass ;
+  ss:name "RuntimeEngineContract" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEngineSemantic> a ss:SchemaClass ;
+  ss:name "RuntimeEngineSemantic" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGlueContract> a ss:SchemaClass ;
   ss:name "RuntimeGlueContract" .
@@ -355,6 +364,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/conditions> a ss:SchemaSlot ;
   ss:name "conditions" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/conformance_scenarios> a ss:SchemaSlot ;
+  ss:name "conformance_scenarios" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint_execution_policies> a ss:SchemaSlot ;
   ss:name "constraint_execution_policies" .
 
@@ -406,6 +418,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/endpoint_kind> a ss:SchemaSlot ;
   ss:name "endpoint_kind" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/engine_contract> a ss:SchemaSlot ;
+  ss:name "engine_contract" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/entity> a ss:SchemaSlot ;
   ss:name "entity" .
 
@@ -421,6 +436,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/executable> a ss:SchemaSlot ;
   ss:name "executable" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/expected> a ss:SchemaSlot ;
+  ss:name "expected" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/expression> a ss:SchemaSlot ;
   ss:name "expression" .
 
@@ -432,6 +450,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/filter_value> a ss:SchemaSlot ;
   ss:name "filter_value" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/fixture> a ss:SchemaSlot ;
+  ss:name "fixture" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/food> a ss:SchemaSlot ;
   ss:name "food" .
@@ -574,6 +595,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/product_tracking_truth_table> a ss:SchemaSlot ;
   ss:name "product_tracking_truth_table" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/protocol_version> a ss:SchemaSlot ;
+  ss:name "protocol_version" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/quality> a ss:SchemaSlot ;
   ss:name "quality" .
 
@@ -625,6 +649,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/result> a ss:SchemaSlot ;
   ss:name "result" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/result_mode> a ss:SchemaSlot ;
+  ss:name "result_mode" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/reverse_output> a ss:SchemaSlot ;
   ss:name "reverse_output" .
 
@@ -648,6 +675,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/role> a ss:SchemaSlot ;
   ss:name "role" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/rule> a ss:SchemaSlot ;
+  ss:name "rule" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/runtime_projection> a ss:SchemaSlot ;
   ss:name "runtime_projection" .
@@ -721,6 +751,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/selectors> a ss:SchemaSlot ;
   ss:name "selectors" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/semantic> a ss:SchemaSlot ;
+  ss:name "semantic" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_categories> a ss:SchemaSlot ;
   ss:name "semantic_categories" .
 
@@ -735,6 +768,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_family> a ss:SchemaSlot ;
   ss:name "semantic_family" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/semantics> a ss:SchemaSlot ;
+  ss:name "semantics" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/severity> a ss:SchemaSlot ;
   ss:name "severity" .
@@ -774,6 +810,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/source_kinds> a ss:SchemaSlot ;
   ss:name "source_kinds" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/source_of_truth> a ss:SchemaSlot ;
+  ss:name "source_of_truth" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/source_selector> a ss:SchemaSlot ;
   ss:name "source_selector" .
@@ -2910,6 +2949,12 @@
   ss:rationale "Calcium can compete with zinc for absorption when co-administered." ;
   ss:action "Keep calcium and zinc away from the same slot when they are in separate products." .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots> ss:blocks_slots false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots> ss:scores_advisory true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots> ss:score_delta -1 .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/source_selector> a ss:SchedulingConstraintSelector .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots> ss:source_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/source_selector> .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/source_selector/entity> a ss:SchedulingConstraintEntitySelector .
@@ -2922,31 +2967,17 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/target_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/target_selector/entity> .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/target_selector/entity> ss:name "Zinc" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots> a ss:SchedulingConstraintRecord ;
-  ss:id "sc_tocopherol_tocotrienol_separate_slots" ;
-  ss:operation "separate_products_same_slot" ;
-  ss:rationale "Vitamin E tocopherols and tocotrienols can compete for absorption and tissue uptake when co-administered." ;
-  ss:action "Keep tocopherol and tocotrienol products away from the same slot." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/source_selector> a ss:SchedulingConstraintSelector .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots> ss:source_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/source_selector> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/source_selector/entity> a ss:SchedulingConstraintEntitySelector .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/source_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/source_selector/entity> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/source_selector/entity> ss:entity_id <https://j2h4u.github.io/supp-slotter/ontology/v1/substance/sub_844a87d72b> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/source_selector> ss:scope "exact_form" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/target_selector> a ss:SchedulingConstraintSelector .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots> ss:target_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/target_selector> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/target_selector/entity> a ss:SchedulingConstraintEntitySelector .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/target_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/target_selector/entity> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/target_selector/entity> ss:entity_id <https://j2h4u.github.io/supp-slotter/ontology/v1/substance/sub_5723eafac4> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_tocopherol_tocotrienol_separate_slots/target_selector> ss:scope "exact_form" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots> a ss:SchedulingConstraintRecord ;
   ss:id "sc_zinc_copper_separate_slots" ;
   ss:operation "separate_products_same_slot" ;
   ss:rationale "Zinc and copper can compete for absorption when co-administered." ;
   ss:action "Keep zinc and copper away from the same slot when they are in separate products." .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots> ss:blocks_slots false .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots> ss:scores_advisory true .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots> ss:score_delta -1 .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/source_selector> a ss:SchedulingConstraintSelector .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots> ss:source_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/source_selector> .

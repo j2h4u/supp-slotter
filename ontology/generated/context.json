@@ -112,6 +112,15 @@
     "RuntimeEffectScoringPolicy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectScoringPolicy"
     },
+    "RuntimeEngineConformanceScenario": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEngineConformanceScenario"
+    },
+    "RuntimeEngineContract": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEngineContract"
+    },
+    "RuntimeEngineSemantic": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEngineSemantic"
+    },
     "RuntimeGlueContract": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGlueContract"
     },
@@ -349,6 +358,9 @@
     "conditions": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/conditions"
     },
+    "conformance_scenarios": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/conformance_scenarios"
+    },
     "constraint_execution_policies": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/constraint_execution_policies"
     },
@@ -400,6 +412,9 @@
     "endpoint_kind": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/endpoint_kind"
     },
+    "engine_contract": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/engine_contract"
+    },
     "entity": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/entity"
     },
@@ -415,6 +430,9 @@
     "executable": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/executable"
     },
+    "expected": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/expected"
+    },
     "expression": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/expression"
     },
@@ -426,6 +444,9 @@
     },
     "filter_value": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/filter_value"
+    },
+    "fixture": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/fixture"
     },
     "food": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/food"
@@ -568,6 +589,9 @@
     "product_tracking_truth_table": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/product_tracking_truth_table"
     },
+    "protocol_version": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/protocol_version"
+    },
     "quality": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/quality"
     },
@@ -619,6 +643,9 @@
     "result": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/result"
     },
+    "result_mode": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/result_mode"
+    },
     "reverse_output": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/reverse_output"
     },
@@ -642,6 +669,9 @@
     },
     "role": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/role"
+    },
+    "rule": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/rule"
     },
     "runtime_projection": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/runtime_projection"
@@ -715,6 +745,9 @@
     "selectors": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/selectors"
     },
+    "semantic": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/semantic"
+    },
     "semantic_categories": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/semantic_categories"
     },
@@ -729,6 +762,9 @@
     },
     "semantic_family": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/semantic_family"
+    },
+    "semantics": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/semantics"
     },
     "severity": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/severity"
@@ -768,6 +804,9 @@
     },
     "source_kinds": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/source_kinds"
+    },
+    "source_of_truth": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/source_of_truth"
     },
     "source_selector": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/source_selector"

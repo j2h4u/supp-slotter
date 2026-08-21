@@ -206,6 +206,129 @@
       ],
       "tie_break": "stable_slot_order"
     },
+    "engine_contract": {
+      "conformance_scenarios": [
+        {
+          "expected": "one entity_id resolves one ID; an unscoped sibling collision fails closed",
+          "fixture": "selector_exact_form",
+          "id": "selector_exact_form",
+          "semantic": "selector_resolution"
+        },
+        {
+          "expected": "known canonical term with no matching card returns empty",
+          "fixture": "selector_empty_term",
+          "id": "selector_empty_term",
+          "semantic": "selector_resolution"
+        },
+        {
+          "expected": "two components sharing one policy contribute weight two; unknown assertion contributes zero",
+          "fixture": "component_votes",
+          "id": "component_votes",
+          "semantic": "component_vote_aggregation"
+        },
+        {
+          "expected": "inactive is excluded, absent membership is unassigned, daily not_every_day is presented separately",
+          "fixture": "stack_and_episodic",
+          "id": "stack_and_episodic",
+          "semantic": "stack_partition"
+        },
+        {
+          "expected": "not_every_day remains in daily assignment and changes presentation grouping only",
+          "fixture": "episodic_presentation",
+          "id": "episodic_presentation",
+          "semantic": "episodic_presentation"
+        },
+        {
+          "expected": "symmetric forward and reverse pairs match; same-product pair emits warning and does not split product",
+          "fixture": "constraint_directions",
+          "id": "constraint_directions",
+          "semantic": "constraint_pair_evaluation"
+        },
+        {
+          "expected": "zero/one/many active targets produce no pair/pair/warning-without-bonus",
+          "fixture": "prefer_with_cardinality",
+          "id": "prefer_with_cardinality",
+          "semantic": "prefer_with_resolution"
+        },
+        {
+          "expected": "fewest candidates, then highest maximum score, then source order",
+          "fixture": "candidate_priority",
+          "id": "candidate_priority",
+          "semantic": "candidate_feasibility"
+        },
+        {
+          "expected": "higher total wins; equal total uses stable slot-order lexicographic tuple",
+          "fixture": "objective_tie",
+          "id": "objective_tie",
+          "semantic": "objective_and_tie_break"
+        },
+        {
+          "expected": "all four source/target active combinations map to declared statuses and warning sides",
+          "fixture": "relation_presence",
+          "id": "relation_presence",
+          "semantic": "relation_warning_truth"
+        }
+      ],
+      "id": "planner_engine_contract",
+      "protocol_version": "supp-slotter.engine-contract/v1",
+      "result_mode": "exact_assignment",
+      "semantics": [
+        {
+          "category": "selectors",
+          "id": "selector_resolution",
+          "rule": "entity_id resolves one stable card; name resolves all exact-name cards; term resolves all cards carrying the canonical term; empty and unsupported outcomes remain distinct; exact_form requires an entity_id and is required when same-name siblings exist.",
+          "source_of_truth": "ontology/scheduling-model.yaml + ontology/vocabulary.yaml + verified substance cards"
+        },
+        {
+          "category": "schedule_projection",
+          "id": "component_vote_aggregation",
+          "rule": "emit at most one assignment per component and axis; group rows by policy_id; group weight is row count; apply each matching effect once at that weight; round score*weight before summing; missing assertions contribute zero.",
+          "source_of_truth": "ontology/runtime-policy.yaml + substance schedule_assertions"
+        },
+        {
+          "category": "stack_state",
+          "id": "stack_partition",
+          "rule": "normalize each product into one stack; only the configured inactive stack is excluded from planning; absent membership is unassigned; any other stack is active and selects slots from its matching pillbox.",
+          "source_of_truth": "data/stacks.yaml + ontology/runtime-policy.yaml"
+        },
+        {
+          "category": "presentation",
+          "id": "episodic_presentation",
+          "rule": "use_pattern not_every_day remains in the daily scheduling stack and changes presentation grouping only; it does not define recurrence, dosage, or calendar semantics.",
+          "source_of_truth": "ProductCard.use_pattern + data/products"
+        },
+        {
+          "category": "constraints",
+          "id": "constraint_pair_evaluation",
+          "rule": "evaluate operation pairs over product component IDs; symmetric matching checks both orientations; blocks_slots rejects a same-slot candidate; scores_advisory adds one score_delta per matched constraint and unordered product pair; intra-product matches warn because one product cannot be separated.",
+          "source_of_truth": "ontology/scheduling-constraints.yaml + ontology/runtime-policy.yaml"
+        },
+        {
+          "category": "preferences",
+          "id": "prefer_with_resolution",
+          "rule": "resolve each target against active component items; zero targets award no pair; one target creates one unordered pair; multiple targets warn and award no pair; self-pairs are ignored; duplicate/reverse pairs collapse.",
+          "source_of_truth": "SubstanceCard.schedule.prefer_with + ontology/runtime-policy.yaml"
+        },
+        {
+          "category": "search_inputs",
+          "id": "candidate_feasibility",
+          "rule": "initial candidates are slots whose stack equals the item stack; hard pair constraints are evaluated against already assigned slot items during search; item priority is fewest candidates, highest maximum base score, then source sequence.",
+          "source_of_truth": "pillbox slots + data/stacks.yaml + ontology/runtime-policy.yaml"
+        },
+        {
+          "category": "optimization",
+          "id": "objective_and_tie_break",
+          "rule": "maximize slot_score + advisory_penalties + prefer_with_bonus - balance_weight*sum(slot_count^2); use stable slot order and lexicographic item assignment tuple for equal totals within the declared tolerance.",
+          "source_of_truth": "ontology/runtime-policy.yaml"
+        },
+        {
+          "category": "warnings",
+          "id": "relation_warning_truth",
+          "rule": "active endpoint truth is intersection with components of products in non-inactive stacks; classify all four endpoint states; apply authored filters and active sides; preserve reverse output; deduplicate by endpoint/type key.",
+          "source_of_truth": "ontology/runtime-policy.yaml + relation assertion projection"
+        }
+      ]
+    },
     "glue_contract": {
       "id": "planner_glue_contract",
       "inactive_stack_name": "inactive",
@@ -478,8 +601,8 @@
     "compiler_sha256": "7ffa18ca9cc9de184a6f38ac137f152e186fba47c24b3bb205e04c5ecb122bea",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "dd669e75b90eeaa50257b0ef4424edb5fe984e9ee722b17fe9031db1d53ecd9b"
+    "source_sha256": "8936f8557915a6398c71b25984da920c85c5648736d6c4faf5cf2212e53f8331"
   },
   "schema_version": "2",
-  "source_hash": "a3b6c4e8b4ee59bde07c8215957535adc46247a96c15d9f1733c58d8293ceffc"
+  "source_hash": "6e41a71ccba372f534e1c6007db699cf6b5fb4da2e2c750622a60ae415cf9ac8"
 }

@@ -203,6 +203,41 @@ class RuntimeGlueContract:
 
 
 @dataclass(frozen=True, slots=True)
+class RuntimeEngineSemantic:
+    """One externally observable engine rule declared by the ontology."""
+
+    id: str
+    category: str
+    rule: str
+    source_of_truth: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeEngineConformanceScenario:
+    """A stable fixture identity and expected protocol outcome."""
+
+    id: str
+    semantic: str
+    fixture: str
+    expected: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeEngineContract:
+    """Versioned protocol metadata for independent scheduler implementations."""
+
+    id: str
+    protocol_version: str
+    result_mode: str
+    semantics: tuple[RuntimeEngineSemantic, ...]
+    conformance_scenarios: tuple[RuntimeEngineConformanceScenario, ...]
+
+
+IMPLEMENTED_ENGINE_CONTRACT_PROTOCOL = "supp-slotter.engine-contract/v1"
+IMPLEMENTED_ENGINE_RESULT_MODES = frozenset({"exact_assignment"})
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimeSourceKindValuePolicy:
     id: str
     source_kind: str
@@ -433,6 +468,7 @@ class RuntimeProgram:
     format_version: str
     schema_version: str
     source_hash: str
+    engine_contract: RuntimeEngineContract
     glue_contract: RuntimeGlueContract
     source_kind_values: tuple[RuntimeSourceKindValuePolicy, ...]
     assignment_axes: tuple[RuntimeAssignmentAxis, ...]
@@ -497,6 +533,9 @@ class RuntimeProgram:
 # record fields from the DTOs keeps the two boundaries closed together when a
 # retained runtime field is added or removed.
 _PROJECTION_RECORDS: Mapping[str, type[object]] = {
+    "engine_contract": RuntimeEngineContract,
+    "engine_contract.semantics": RuntimeEngineSemantic,
+    "engine_contract.conformance_scenarios": RuntimeEngineConformanceScenario,
     "glue_contract": RuntimeGlueContract,
     "effect_scoring": RuntimeEffectScoring,
     "prefer_with_policy": RuntimePreferWithPolicy,
@@ -520,6 +559,7 @@ _PROJECTION_RECORDS: Mapping[str, type[object]] = {
     "dashboard_state_catalog.product_tracking_truth_table": RuntimeDashboardProductTrackingTruthState,
 }
 _MAPPING_RECORD_PATHS = frozenset({
+    "engine_contract",
     "glue_contract",
     "effect_scoring",
     "prefer_with_policy",
@@ -567,6 +607,24 @@ def _source_kind(row: Mapping[str, object], label: str) -> RuntimeSourceKindValu
         _str(row["id"], f"{label}.id"),
         _str(row["source_kind"], f"{label}.source_kind"),
         _strings(row["applies_to"], f"{label}.applies_to"),
+    )
+
+
+def _engine_semantic(row: Mapping[str, object], label: str) -> RuntimeEngineSemantic:
+    return RuntimeEngineSemantic(
+        _str(row["id"], f"{label}.id"),
+        _str(row["category"], f"{label}.category"),
+        _str(row["rule"], f"{label}.rule"),
+        _str(row["source_of_truth"], f"{label}.source_of_truth"),
+    )
+
+
+def _engine_scenario(row: Mapping[str, object], label: str) -> RuntimeEngineConformanceScenario:
+    return RuntimeEngineConformanceScenario(
+        _str(row["id"], f"{label}.id"),
+        _str(row["semantic"], f"{label}.semantic"),
+        _str(row["fixture"], f"{label}.fixture"),
+        _str(row["expected"], f"{label}.expected"),
     )
 
 
@@ -816,6 +874,58 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     if set(root) != expected_root:
         raise _error("", "has an invalid top-level shape")
     projection = _exact_map(root.get("projection"), "projection", RUNTIME_PROJECTION_FIELDS[""])
+    engine_raw = _exact_map(
+        projection.get("engine_contract"),
+        "engine_contract",
+        RUNTIME_PROJECTION_FIELDS["engine_contract"],
+    )
+    engine_semantics = _typed_rows(
+        engine_raw["semantics"],
+        "engine_contract.semantics",
+        _engine_semantic,
+        semantic_keys=(("id",),),
+        fields=RUNTIME_PROJECTION_ROW_FIELDS["engine_contract.semantics"],
+    )
+    engine_scenarios = _typed_rows(
+        engine_raw["conformance_scenarios"],
+        "engine_contract.conformance_scenarios",
+        _engine_scenario,
+        semantic_keys=(("id",),),
+        fields=RUNTIME_PROJECTION_ROW_FIELDS["engine_contract.conformance_scenarios"],
+    )
+    if not engine_semantics or not engine_scenarios:
+        raise _error("engine_contract", "requires non-empty semantics and conformance_scenarios")
+    semantic_ids = {row.id for row in engine_semantics}
+    unknown_scenario_semantics = sorted({row.semantic for row in engine_scenarios} - semantic_ids)
+    if unknown_scenario_semantics:
+        raise _error(
+            "engine_contract.conformance_scenarios",
+            "references unknown semantics: " + ", ".join(unknown_scenario_semantics),
+        )
+    engine_contract = RuntimeEngineContract(
+        _str(engine_raw["id"], "engine_contract.id"),
+        _str(engine_raw["protocol_version"], "engine_contract.protocol_version"),
+        _str(engine_raw["result_mode"], "engine_contract.result_mode"),
+        cast(tuple[RuntimeEngineSemantic, ...], engine_semantics),
+        cast(tuple[RuntimeEngineConformanceScenario, ...], engine_scenarios),
+    )
+    if engine_contract.protocol_version != IMPLEMENTED_ENGINE_CONTRACT_PROTOCOL:
+        raise _error(
+            "engine_contract.protocol_version",
+            f"is not implemented: {engine_contract.protocol_version!r}",
+        )
+    if engine_contract.result_mode not in IMPLEMENTED_ENGINE_RESULT_MODES:
+        raise _error(
+            "engine_contract.result_mode",
+            f"is not implemented: {engine_contract.result_mode!r}",
+        )
+    scenario_semantics = {row.semantic for row in engine_scenarios}
+    missing_scenario_semantics = sorted(semantic_ids - scenario_semantics)
+    if missing_scenario_semantics:
+        raise _error(
+            "engine_contract.conformance_scenarios",
+            "missing semantic coverage: " + ", ".join(missing_scenario_semantics),
+        )
     glue_raw = _exact_map(projection.get("glue_contract"), "glue_contract", RUNTIME_PROJECTION_FIELDS["glue_contract"])
     truth = _truth_table(
         glue_raw.get("relation_presence_truth_table"),
@@ -1037,6 +1147,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         _str(root["format_version"], "format_version"),
         _str(root["schema_version"], "schema_version"),
         _str(root["source_hash"], "source_hash"),
+        engine_contract,
         glue,
         source_kind_values,
         assignment_axes,

@@ -1450,6 +1450,94 @@
       "title": "RuntimeEffectScoringPolicy",
       "type": "object"
     },
+    "RuntimeEngineConformanceScenario": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "expected": {
+          "type": "string"
+        },
+        "fixture": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "semantic": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "semantic",
+        "fixture",
+        "expected"
+      ],
+      "title": "RuntimeEngineConformanceScenario",
+      "type": "object"
+    },
+    "RuntimeEngineContract": {
+      "additionalProperties": false,
+      "description": "Versioned observable scheduler contract. Values describe the generic execution protocol; they are not supplement facts.",
+      "properties": {
+        "conformance_scenarios": {
+          "items": {
+            "$ref": "#/$defs/RuntimeEngineConformanceScenario"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "protocol_version": {
+          "type": "string"
+        },
+        "result_mode": {
+          "type": "string"
+        },
+        "semantics": {
+          "items": {
+            "$ref": "#/$defs/RuntimeEngineSemantic"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "protocol_version",
+        "result_mode",
+        "semantics",
+        "conformance_scenarios"
+      ],
+      "title": "RuntimeEngineContract",
+      "type": "object"
+    },
+    "RuntimeEngineSemantic": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "category": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "rule": {
+          "type": "string"
+        },
+        "source_of_truth": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "category",
+        "rule",
+        "source_of_truth"
+      ],
+      "title": "RuntimeEngineSemantic",
+      "type": "object"
+    },
     "RuntimeGlueContract": {
       "additionalProperties": false,
       "description": "",
@@ -1586,6 +1674,9 @@
         "effect_scoring": {
           "$ref": "#/$defs/RuntimeEffectScoringPolicy"
         },
+        "engine_contract": {
+          "$ref": "#/$defs/RuntimeEngineContract"
+        },
         "glue_contract": {
           "$ref": "#/$defs/RuntimeGlueContract"
         },
@@ -1655,6 +1746,7 @@
       },
       "required": [
         "id",
+        "engine_contract",
         "glue_contract",
         "source_kind_values",
         "effect_match_dimensions",

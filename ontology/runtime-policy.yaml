@@ -1,4 +1,56 @@
 id: runtime_policy
+engine_contract:
+  id: planner_engine_contract
+  protocol_version: supp-slotter.engine-contract/v1
+  result_mode: exact_assignment
+  semantics:
+    - id: selector_resolution
+      category: selectors
+      rule: "entity_id resolves one stable card; name resolves all exact-name cards; term resolves all cards carrying the canonical term; empty and unsupported outcomes remain distinct; exact_form requires an entity_id and is required when same-name siblings exist."
+      source_of_truth: ontology/scheduling-model.yaml + ontology/vocabulary.yaml + verified substance cards
+    - id: component_vote_aggregation
+      category: schedule_projection
+      rule: "emit at most one assignment per component and axis; group rows by policy_id; group weight is row count; apply each matching effect once at that weight; round score*weight before summing; missing assertions contribute zero."
+      source_of_truth: ontology/runtime-policy.yaml + substance schedule_assertions
+    - id: stack_partition
+      category: stack_state
+      rule: "normalize each product into one stack; only the configured inactive stack is excluded from planning; absent membership is unassigned; any other stack is active and selects slots from its matching pillbox."
+      source_of_truth: data/stacks.yaml + ontology/runtime-policy.yaml
+    - id: episodic_presentation
+      category: presentation
+      rule: "use_pattern not_every_day remains in the daily scheduling stack and changes presentation grouping only; it does not define recurrence, dosage, or calendar semantics."
+      source_of_truth: ProductCard.use_pattern + data/products
+    - id: constraint_pair_evaluation
+      category: constraints
+      rule: "evaluate operation pairs over product component IDs; symmetric matching checks both orientations; blocks_slots rejects a same-slot candidate; scores_advisory adds one score_delta per matched constraint and unordered product pair; intra-product matches warn because one product cannot be separated."
+      source_of_truth: ontology/scheduling-constraints.yaml + ontology/runtime-policy.yaml
+    - id: prefer_with_resolution
+      category: preferences
+      rule: "resolve each target against active component items; zero targets award no pair; one target creates one unordered pair; multiple targets warn and award no pair; self-pairs are ignored; duplicate/reverse pairs collapse."
+      source_of_truth: SubstanceCard.schedule.prefer_with + ontology/runtime-policy.yaml
+    - id: candidate_feasibility
+      category: search_inputs
+      rule: "initial candidates are slots whose stack equals the item stack; hard pair constraints are evaluated against already assigned slot items during search; item priority is fewest candidates, highest maximum base score, then source sequence."
+      source_of_truth: pillbox slots + data/stacks.yaml + ontology/runtime-policy.yaml
+    - id: objective_and_tie_break
+      category: optimization
+      rule: "maximize slot_score + advisory_penalties + prefer_with_bonus - balance_weight*sum(slot_count^2); use stable slot order and lexicographic item assignment tuple for equal totals within the declared tolerance."
+      source_of_truth: ontology/runtime-policy.yaml
+    - id: relation_warning_truth
+      category: warnings
+      rule: "active endpoint truth is intersection with components of products in non-inactive stacks; classify all four endpoint states; apply authored filters and active sides; preserve reverse output; deduplicate by endpoint/type key."
+      source_of_truth: ontology/runtime-policy.yaml + relation assertion projection
+  conformance_scenarios:
+    - {id: selector_exact_form, semantic: selector_resolution, fixture: selector_exact_form, expected: "one entity_id resolves one ID; an unscoped sibling collision fails closed"}
+    - {id: selector_empty_term, semantic: selector_resolution, fixture: selector_empty_term, expected: "known canonical term with no matching card returns empty"}
+    - {id: component_votes, semantic: component_vote_aggregation, fixture: component_votes, expected: "two components sharing one policy contribute weight two; unknown assertion contributes zero"}
+    - {id: stack_and_episodic, semantic: stack_partition, fixture: stack_and_episodic, expected: "inactive is excluded, absent membership is unassigned, daily not_every_day is presented separately"}
+    - {id: episodic_presentation, semantic: episodic_presentation, fixture: episodic_presentation, expected: "not_every_day remains in daily assignment and changes presentation grouping only"}
+    - {id: constraint_directions, semantic: constraint_pair_evaluation, fixture: constraint_directions, expected: "symmetric forward and reverse pairs match; same-product pair emits warning and does not split product"}
+    - {id: prefer_with_cardinality, semantic: prefer_with_resolution, fixture: prefer_with_cardinality, expected: "zero/one/many active targets produce no pair/pair/warning-without-bonus"}
+    - {id: candidate_priority, semantic: candidate_feasibility, fixture: candidate_priority, expected: "fewest candidates, then highest maximum score, then source order"}
+    - {id: objective_tie, semantic: objective_and_tie_break, fixture: objective_tie, expected: "higher total wins; equal total uses stable slot-order lexicographic tuple"}
+    - {id: relation_presence, semantic: relation_warning_truth, fixture: relation_presence, expected: "all four source/target active combinations map to declared statuses and warning sides"}
 glue_contract:
   id: planner_glue_contract
   inactive_stack_name: inactive
@@ -227,6 +279,9 @@ dashboard_state_catalog:
 # changing a source or target here changes the executable projection without
 # duplicating policy-specific key lists in compiler code.
 runtime_projection:
+  - id: engine_contract
+    target: engine_contract
+    source: engine_contract
   - id: glue_contract
     target: glue_contract
     source: glue_contract

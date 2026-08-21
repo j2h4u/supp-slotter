@@ -51,9 +51,10 @@ classes:
     slots: [operator, field, value, weight, trace_key]
   RuntimePolicyCatalog:
     description: Typed executable policy contract consumed by planner runtime.
-    slots: [id, glue_contract, source_kind_values, effect_match_dimensions, assignment_axes, slot_near_values, constraint_execution_policies, effect_scoring, prefer_with_policy, warning_types, warning_emitters, warning_trait_actions, concern_catalog, relation_warning_rules, relation_presence_statuses, selector_form_capabilities, dashboard_state_catalog, semantic_enrichment_grooming, runtime_projection]
+    slots: [id, engine_contract, glue_contract, source_kind_values, effect_match_dimensions, assignment_axes, slot_near_values, constraint_execution_policies, effect_scoring, prefer_with_policy, warning_types, warning_emitters, warning_trait_actions, concern_catalog, relation_warning_rules, relation_presence_statuses, selector_form_capabilities, dashboard_state_catalog, semantic_enrichment_grooming, runtime_projection]
     slot_usage:
       source_kind_values: {required: true, inlined: true, inlined_as_list: true}
+      engine_contract: {required: true, inlined: true}
       effect_match_dimensions: {required: true, inlined: true, inlined_as_list: true}
       assignment_axes: {required: true, inlined: true, inlined_as_list: true}
       slot_near_values: {required: true, multivalued: true}
@@ -102,6 +103,29 @@ classes:
       prefer_with_source_fields: {required: true, multivalued: true}
       prefer_with_target_resolutions: {required: true, multivalued: true}
       prefer_with_pair_modes: {required: true, multivalued: true}
+  RuntimeEngineContract:
+    description: Versioned observable scheduler contract. Values describe the generic execution protocol; they are not supplement facts.
+    slots: [id, protocol_version, result_mode, semantics, conformance_scenarios]
+    slot_usage:
+      id: {required: true}
+      protocol_version: {required: true}
+      result_mode: {required: true}
+      semantics: {required: true, inlined: true, inlined_as_list: true}
+      conformance_scenarios: {required: true, inlined: true, inlined_as_list: true}
+  RuntimeEngineSemantic:
+    slots: [id, category, rule, source_of_truth]
+    slot_usage:
+      id: {required: true}
+      category: {required: true}
+      rule: {required: true}
+      source_of_truth: {required: true}
+  RuntimeEngineConformanceScenario:
+    slots: [id, semantic, fixture, expected]
+    slot_usage:
+      id: {required: true}
+      semantic: {required: true}
+      fixture: {required: true}
+      expected: {required: true}
   RuntimeProjectionDescriptor:
     slots: [id, target, source, children]
     slot_usage:
@@ -283,6 +307,7 @@ slots:
   runtime_projection: {multivalued: true, range: RuntimeProjectionDescriptor, inlined: true, inlined_as_list: true}
   assignment_axes: {multivalued: true, range: RuntimeAssignmentAxisPolicy, inlined: true, inlined_as_list: true}
   glue_contract: {range: RuntimeGlueContract, inlined: true}
+  engine_contract: {range: RuntimeEngineContract, inlined: true}
   inactive_stack_name:
   source_kinds: {multivalued: true}
   source_kind_roles: {multivalued: true}
@@ -296,6 +321,16 @@ slots:
   prefer_with_source_fields: {multivalued: true}
   prefer_with_target_resolutions: {multivalued: true}
   prefer_with_pair_modes: {multivalued: true}
+  protocol_version:
+  result_mode:
+  semantics: {multivalued: true, range: RuntimeEngineSemantic, inlined: true, inlined_as_list: true}
+  conformance_scenarios: {multivalued: true, range: RuntimeEngineConformanceScenario, inlined: true, inlined_as_list: true}
+  category:
+  rule:
+  source_of_truth:
+  semantic:
+  fixture:
+  expected:
   eligibility: {range: SemanticEnrichmentGroomingEligibility}
   roi_order_desc: {multivalued: true, range: SemanticEnrichmentGroomingMetric}
   default_batch_size: {range: integer}
