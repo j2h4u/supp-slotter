@@ -46,7 +46,7 @@ def cmd_grooming_research(
     research_state: str, limit: int | None = None, data_root: Path | None = None
 ) -> ResearchStateResult:
     """List active-reachable cards, retaining assertion-level provenance."""
-    resolved_limit = limit if limit is not None else 50
+    resolved_limit = limit if limit is not None else 1
     if resolved_limit <= 0:
         message = "grooming research: --limit must be a positive integer"
         return ResearchStateResult(1, [], research_state, resolved_limit, 0, 0, stderr=message + "\n")
@@ -259,9 +259,7 @@ def cmd_grooming_next(limit: int | None = None, data_root: Path | None = None) -
 def _grooming_next_inner(
     paths: Paths, bundle: OntologyBundle, limit: int | None
 ) -> tuple[int, list[GroomingCandidate], int, int]:
-    resolved_limit = (
-        limit if limit is not None else bundle.runtime_program.semantic_enrichment_grooming.default_batch_size
-    )
+    resolved_limit = limit if limit is not None else 1
     schema_result = validate_schemas(paths, bundle)
     if schema_result != 0:
         return schema_result, [], 0, resolved_limit

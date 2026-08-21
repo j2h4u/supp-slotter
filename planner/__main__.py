@@ -75,11 +75,13 @@ def main(data_root: Path | None = None) -> None:
         "--limit",
         type=int,
         default=None,
-        help="positive maximum number of cards (default from ontology policy)",
+        help="positive maximum number of cards (default: 1)",
     )
     grooming_research = grooming_sub.add_parser("research", help="list active substance cards by research state")
     grooming_research.add_argument("--state", required=True, help="research state enum value")
-    grooming_research.add_argument("--limit", type=int, default=None, help="positive maximum number of cards")
+    grooming_research.add_argument(
+        "--limit", type=int, default=None, help="positive maximum number of cards (default: 1)"
+    )
 
     review_substance = sub.add_parser(
         "review-substance",

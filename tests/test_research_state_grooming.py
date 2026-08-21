@@ -31,6 +31,15 @@ def test_research_state_grooming_limit_counts_cards_and_groups_assertions() -> N
     assert "170 assertions" in result.output
 
 
+def test_research_state_grooming_default_is_one_complete_card() -> None:
+    result = cmd_grooming_research("unassessed")
+
+    assert result.exit_code == 0, result.stderr
+    assert result.limit == result.shown == 1
+    assert len(result.cards[0].assertions) > 1
+    assert "36 cards, showing 1" in result.output
+
+
 def test_research_state_grooming_current_card_summary_and_relation_attachment() -> None:
     result = cmd_grooming_research("unassessed", limit=50)
 

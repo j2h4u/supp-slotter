@@ -62,15 +62,15 @@ def test_grooming_next_default_limit_counts_products_and_renders_total(tmp_path:
     result = cmd_grooming_next(data_root=tmp_path)
 
     assert result.exit_code == 0
-    assert result.limit == 10
-    assert result.total_remaining == result.shown == 2
-    assert result.output.startswith("Grooming queue: 2 remaining, showing 2\n")
-    assert [candidate.name for candidate in result.candidates] == ["zeta", "Alpha"]
+    assert result.limit == 1
+    assert result.total_remaining == 2
+    assert result.shown == 1
+    assert result.output.startswith("Grooming queue: 2 remaining, showing 1\n")
+    assert [candidate.name for candidate in result.candidates] == ["zeta"]
     assert (result.candidates[0].total_product_count, result.candidates[0].active_product_count) == (2, 1)
-    assert (result.candidates[1].total_product_count, result.candidates[1].active_product_count) == (1, 1)
     assert all(candidate.id != "sub_inactive01" for candidate in result.candidates)
     assert all(candidate.id != "sub_orphan0001" for candidate in result.candidates)
-    assert "Alpha" in result.output and "zeta" in result.output
+    assert "zeta" in result.output and "Alpha" not in result.output
     limited = cmd_grooming_next(limit=1, data_root=tmp_path)
     assert limited.total_remaining == 2
     assert limited.shown == 1
@@ -95,7 +95,7 @@ def test_grooming_next_orders_active_count_before_total_count(tmp_path: Path) ->
             )
         )
 
-    result = cmd_grooming_next(data_root=tmp_path)
+    result = cmd_grooming_next(limit=2, data_root=tmp_path)
 
     assert [candidate.id for candidate in result.candidates] == ["sub_alpha00001", "sub_beta000001"]
     assert (result.candidates[0].active_product_count, result.candidates[0].total_product_count) == (2, 2)
@@ -128,7 +128,7 @@ def test_grooming_next_uses_authored_metric_order_without_code_change(tmp_path: 
     object.__setattr__(bundle, "_runtime_program", runtime)
     monkeypatch.setattr("planner.engine.grooming.load_ontology", lambda _root: bundle)
 
-    result = cmd_grooming_next(data_root=tmp_path)
+    result = cmd_grooming_next(limit=2, data_root=tmp_path)
 
     assert [candidate.id for candidate in result.candidates] == ["sub_beta000001", "sub_alpha00001"]
 
