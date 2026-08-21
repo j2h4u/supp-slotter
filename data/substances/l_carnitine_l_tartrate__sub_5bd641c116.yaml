@@ -3,45 +3,78 @@ name: L-Carnitine
 form: L-tartrate
 aliases:
 - LCLT
-notes: 'L-tartrate salt form of L-carnitine. The active Primecraft product exposes 530 mg L-carnitine per capsule; higher-dose exercise protocols do not transfer directly. LCLT supports peripheral mitochondrial fatty-acid transport context; recovery and TMAO implications remain bounded, host-context-dependent review topics. Sources: FDA GRN 000993; PMID 15591001; PMC8704793; Primecraft label.'
+notes: 'L-tartrate salt form of L-carnitine. The active Primecraft label states 775 mg L-carnitine L-tartrate (LCLT) yielding 530 mg L-carnitine per capsule; exercise evidence commonly uses 1–3 g/day for multiweek protocols, so those protocols do not transfer directly to this product. LCLT supports peripheral mitochondrial fatty-acid transport context; recovery and TMAO implications remain bounded, host-context-dependent review topics. Sources: NIH ODS Carnitine; DailyMed levocarnitine; PMID 15591001; PMID 17313301; PMID 34684429; PMID 34959912; PMID 23563705; Primecraft label.'
 concerns:
 - kind: safety
-  text: TMAO cardiovascular risk is gut-microbiome and host-context dependent; surface as cardiometabolic review context rather
-    than treating L-carnitine as directly harmful in isolation.
+  text: TMAO formation from L-carnitine is gut-microbiome and host-context dependent; review cardiometabolic context rather than treating L-carnitine as directly harmful alone.
 scheduling_assessment:
   intake:
     conclusion: insufficient
     sources:
-    - https://www.fda.gov/media/154598/download?attachment=
+    - https://ods.od.nih.gov/factsheets/Carnitine-HealthProfessional/
     - https://pubmed.ncbi.nlm.nih.gov/15591001/
     - https://pmc.ncbi.nlm.nih.gov/articles/PMC8704793/
     - https://primekraft.ru/catalog/aminokisloty/zhiroszhigatel-l-carnitine-l-tartrate/l-carnitine-kapsuly/l-carnitine-l-tartrate-kapsuly-90-sht-/
-    summary: No fed-versus-fasted comparison establishes an intake preference for the active Primecraft LCLT product; its 530 mg L-carnitine exposure is not equivalent to higher-dose protocols.
+    summary: No direct comparison of fed versus fasted intake establishes a preference for the active Primecraft product; the 775 mg LCLT to 530 mg L-carnitine label exposure is not directly compared with the differing doses and forms in the cited protocols.
   timing:
     conclusion: insufficient
     sources:
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC8704793/
+    - https://ods.od.nih.gov/factsheets/Carnitine-HealthProfessional/
     - https://pubmed.ncbi.nlm.nih.gov/15591001/
-    summary: Acute pre/post protocols and pharmacokinetic sampling do not establish a superior clock time or an empty-stomach requirement.
+    - https://pubmed.ncbi.nlm.nih.gov/34959912/
+    - https://primekraft.ru/catalog/aminokisloty/zhiroszhigatel-l-carnitine-l-tartrate/l-carnitine-kapsuly/l-carnitine-l-tartrate-kapsuly-90-sht-/
+    summary: No direct comparison establishes a superior clock time or empty-stomach requirement for the active product; acute and multiweek protocols use doses and forms that are not directly compared with its label exposure.
   activity:
     conclusion: insufficient
     sources:
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC8704793/
+    - https://ods.od.nih.gov/factsheets/Carnitine-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/15591001/
+    - https://pubmed.ncbi.nlm.nih.gov/34684429/
+    - https://pubmed.ncbi.nlm.nih.gov/34959912/
     - https://www.mdpi.com/2072-6643/17/17/2784
-    summary: Exercise-context evidence is heterogeneous and dose/form dependent; active training membership does not establish any workout placement.
+    - https://primekraft.ru/catalog/aminokisloty/zhiroszhigatel-l-carnitine-l-tartrate/l-carnitine-kapsuly/l-carnitine-l-tartrate-kapsuly-90-sht-/
+    summary: No direct comparison establishes pre-workout, post-workout, or any-workout placement for the active product; exercise findings are dose-, form-, and protocol-dependent and do not directly compare its 530 mg L-carnitine exposure.
 knowledge:
   context:
-  - mitochondrial_health
-  - sleep_recovery
-  - workout_performance
+  - value: mitochondrial_health
+    research_state: mechanistic_only
+    sources:
+    - https://ods.od.nih.gov/factsheets/Carnitine-HealthProfessional/
+    - https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=0f749812-8f02-4eeb-91d9-5dd6fc9fa159
+  - value: workout_performance
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/34959912/
   effect:
-  - mitochondrial_fatty_acid_transport
-  - exercise_recovery_support
+  - value: mitochondrial_fatty_acid_transport
+    research_state: mechanistic_only
+    sources:
+    - https://ods.od.nih.gov/factsheets/Carnitine-HealthProfessional/
+    - https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=0f749812-8f02-4eeb-91d9-5dd6fc9fa159
+  - value: exercise_recovery_support
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/15591001/
+    - https://pubmed.ncbi.nlm.nih.gov/17313301/
+    - https://pubmed.ncbi.nlm.nih.gov/34684429/
+    - https://pubmed.ncbi.nlm.nih.gov/34959912/
   pathway:
-  - carnitine_shuttle
-  - tmao_precursor
+  - value: carnitine_shuttle
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Carnitine-HealthProfessional/
+    - https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=0f749812-8f02-4eeb-91d9-5dd6fc9fa159
+  - value: tmao_precursor
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/23563705/
   risk:
-  - manual_review
-  - tmao_cardiometabolic_review
+  - value: tmao_cardiometabolic_review
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/23563705/
   role:
-  - ergogenic
+  - value: ergogenic
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/34959912/
