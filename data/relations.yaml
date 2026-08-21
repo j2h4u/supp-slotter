@@ -169,15 +169,22 @@ relations:
     category: context
     term: incretin_drug_context
 - severity: medium
-  reason: Direct nitric-oxide, nitrate, citrulline, or arginine-donor support and PDE5 inhibition converge on vasodilation
-    and cGMP signaling; co-presence should be reviewed for additive blood-pressure lowering rather than treated as independent
-    vascular support.
-  action: Review symptomatic hypotension context when direct NO-support and PDE5-inhibitor substances are both active, especially
-    with nitrates, alpha-blockers, antihypertensives, alcohol, or baseline low blood pressure.
+  reason: Convergence is mechanistic; no isolated controlled citrulline-PDE5 hemodynamic study establishes a clinical interaction,
+    and this is not organic-nitrate equivalence.
+  action: Surface for human review only; do not infer a contraindication or scheduling rule.
   id: rel_review_with_001
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: mechanistic_only
+  sources:
+  - https://pubmed.ncbi.nlm.nih.gov/17662090/
+  - https://pubmed.ncbi.nlm.nih.gov/31889969/
+  - https://pubmed.ncbi.nlm.nih.gov/39385595/
+  - https://pubmed.ncbi.nlm.nih.gov/30150102/
+  - https://pubmed.ncbi.nlm.nih.gov/38731094/
+  - https://dailymed.nlm.nih.gov/dailymed/fdaDrugXsl.cfm?setid=78509a43-a907-4359-9022-f38c4f765880&type=display
+  - https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=cdab7ef5-39cb-45cc-b2bf-5f634f2f5499
   source_selector:
     category: effect
     term: nitric_oxide_support

@@ -1,10 +1,7 @@
 id: sub_3918fe347e
 name: L-Citrulline
 form: malate
-notes: 'L-Citrulline bonded with malic acid; the active unbranded product states 5 g with unresolved malate ratio and product metadata. Genius Pre is a registered but inactive product whose label states 6 g of 2:1 citrulline malate. Acute pre-exercise studies support only a low-confidence heuristic; no superiority over chronic random-time daily dosing is established. Converted to arginine and studied in nitric-oxide/exercise contexts. Sources: PMID 17953788; PMID 39662304; PMC13304508.'
-concerns:
-- kind: safety
-  text: Possible additive hypotension with PDE5 inhibitors or other vasodilators; this is a bounded review concern, not a demonstrated universal interaction threshold or timing rule.
+notes: 'Active unbranded 5 g has an unresolved citrulline:malate ratio; human evidence supports arginine/NO-cGMP biology but vascular/exercise outcomes are mixed.'
 schedule:
   activity:
   - pre_workout
@@ -30,20 +27,59 @@ scheduling_assessment:
     - https://pubmed.ncbi.nlm.nih.gov/17953788/
     - https://pubmed.ncbi.nlm.nih.gov/39662304/
     - https://pmc.ncbi.nlm.nih.gov/articles/PMC13304508/
-    summary: Low-confidence soft pre-workout heuristic from exercise-context studies; no superiority over chronic random-time dosing is established, and this task makes no product, stack, or pillbox representation change.
+    summary: Low-confidence soft pre-workout heuristic from exercise-context studies; no direct comparison establishes superiority over chronic random-time dosing, and this task makes no product, stack, or pillbox representation change.
 knowledge:
   context:
-  - vascular_health
-  - workout_performance
+  - value: vascular_health
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/17662090/
+    - https://pubmed.ncbi.nlm.nih.gov/31889969/
+    - https://pubmed.ncbi.nlm.nih.gov/39385595/
+  - value: workout_performance
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/34010809/
+    - https://pubmed.ncbi.nlm.nih.gov/34176406/
+    - https://pubmed.ncbi.nlm.nih.gov/37155582/
+    - https://pubmed.ncbi.nlm.nih.gov/42356270/
   effect:
-  - nitric_oxide_support
-  - vasodilator
+  - value: nitric_oxide_support
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/17953788/
+    - https://pubmed.ncbi.nlm.nih.gov/17662090/
+    - https://pubmed.ncbi.nlm.nih.gov/34134794/
+  - value: vasodilator
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/17662090/
+    - https://pubmed.ncbi.nlm.nih.gov/31889969/
+    - https://pubmed.ncbi.nlm.nih.gov/39385595/
   kind:
-  - amino
+  - value: amino
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/17953788/
   pathway:
-  - nitric_oxide_cgmp
+  - value: nitric_oxide_cgmp
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/17953788/
+    - https://pubmed.ncbi.nlm.nih.gov/17662090/
   risk:
-  - manual_review
-  - hypotension_med_interaction
+  - value: hypotension_med_interaction
+    research_state: mechanistic_only
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/31889969/
+    - https://pubmed.ncbi.nlm.nih.gov/39385595/
+    - https://dailymed.nlm.nih.gov/dailymed/fdaDrugXsl.cfm?setid=78509a43-a907-4359-9022-f38c4f765880&type=display
+    - https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=cdab7ef5-39cb-45cc-b2bf-5f634f2f5499
   role:
-  - ergogenic
+  - value: ergogenic
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/34010809/
+    - https://pubmed.ncbi.nlm.nih.gov/34176406/
+    - https://pubmed.ncbi.nlm.nih.gov/37155582/
+    - https://pubmed.ncbi.nlm.nih.gov/42356270/
