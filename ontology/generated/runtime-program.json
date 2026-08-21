@@ -490,7 +490,6 @@
       }
     ],
     "semantic_enrichment_grooming": {
-      "default_batch_size": 10,
       "eligibility": "active_reachable_substance_without_semantic_enrichment_attempt",
       "id": "semantic_enrichment_grooming",
       "roi_order_desc": [
@@ -601,8 +600,8 @@
     "compiler_sha256": "c9c6cb4980bf7914a3d21901e1eee78b403c804898b834c74888b22e0228ce4e",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "8936f8557915a6398c71b25984da920c85c5648736d6c4faf5cf2212e53f8331"
+    "source_sha256": "4d392cda730a1a4999740248f4cc7192a04719ea20418a06b0b3960da8ad92e4"
   },
   "schema_version": "2",
-  "source_hash": "9ba4a5e4f31860c13c1f9388e5b26dcd647529fad69b2ceb75421a567286fb44"
+  "source_hash": "acaa66162bfae474be9eaa83be4e80c04cf1ebfb98dbae7b0d3920edd4325990"
 }

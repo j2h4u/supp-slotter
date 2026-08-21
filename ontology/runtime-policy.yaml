@@ -126,7 +126,6 @@ semantic_enrichment_grooming:
   id: semantic_enrichment_grooming
   eligibility: active_reachable_substance_without_semantic_enrichment_attempt
   roi_order_desc: [active_unique_product_count, total_unique_product_count]
-  default_batch_size: 10
 slot_near_values: [wake, breakfast, day_meal, sleep, workout_before, workout_after]
 warning_types:
   - id: warning_safety_concern

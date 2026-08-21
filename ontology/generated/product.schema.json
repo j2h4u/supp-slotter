@@ -2164,9 +2164,6 @@
       "additionalProperties": false,
       "description": "Read-only queue policy. Product counts are distinct registered Product cards; active means present in any non-inactive stack, with repeated membership counted once. ROI ordering is operational, not medical quality scoring.",
       "properties": {
-        "default_batch_size": {
-          "type": "integer"
-        },
         "eligibility": {
           "$ref": "#/$defs/SemanticEnrichmentGroomingEligibility"
         },
@@ -2183,8 +2180,7 @@
       "required": [
         "id",
         "eligibility",
-        "roi_order_desc",
-        "default_batch_size"
+        "roi_order_desc"
       ],
       "title": "RuntimeSemanticEnrichmentGroomingPolicy",
       "type": "object"

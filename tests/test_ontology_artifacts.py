@@ -212,7 +212,6 @@ def test_runtime_decodes_semantic_enrichment_grooming_policy() -> None:
     assert policy.id == "semantic_enrichment_grooming"
     assert policy.eligibility == "active_reachable_substance_without_semantic_enrichment_attempt"
     assert policy.roi_order_desc == ("active_unique_product_count", "total_unique_product_count")
-    assert policy.default_batch_size == 10
 
 
 @pytest.mark.parametrize(
@@ -226,7 +225,6 @@ def test_runtime_decodes_semantic_enrichment_grooming_policy() -> None:
             lambda policy: policy.__setitem__("roi_order_desc", ["active_unique_product_count"] * 2),
             "duplicate semantic values",
         ),
-        (lambda policy: policy.__setitem__("default_batch_size", 0), "must be positive"),
     ],
 )
 def test_runtime_decode_rejects_invalid_semantic_enrichment_grooming_policy(mutation, message: str) -> None:

@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 9ba4a5e4f31860c13c1f9388e5b26dcd647529fad69b2ceb75421a567286fb44
+source_hash: acaa66162bfae474be9eaa83be4e80c04cf1ebfb98dbae7b0d3920edd4325990
 categories:
   kind:
     allowed_predicates: &id005
@@ -2050,7 +2050,6 @@ runtime_policy:
     roi_order_desc:
     - active_unique_product_count
     - total_unique_product_count
-    default_batch_size: 10
   slot_near_values:
   - wake
   - breakfast

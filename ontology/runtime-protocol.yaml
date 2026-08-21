@@ -169,12 +169,11 @@ classes:
       pair_mode: {required: true}
   RuntimeSemanticEnrichmentGroomingPolicy:
     description: Read-only queue policy. Product counts are distinct registered Product cards; active means present in any non-inactive stack, with repeated membership counted once. ROI ordering is operational, not medical quality scoring.
-    slots: [id, eligibility, roi_order_desc, default_batch_size]
+    slots: [id, eligibility, roi_order_desc]
     slot_usage:
       id: {required: true}
       eligibility: {required: true, range: SemanticEnrichmentGroomingEligibility}
       roi_order_desc: {required: true, multivalued: true, range: SemanticEnrichmentGroomingMetric}
-      default_batch_size: {required: true, range: integer}
   RuntimeConstraintExecutionPolicy:
     slots: [id, operation, match_direction, aggregation, selector_resolution, blocks_slots, scores_advisory, score_delta]
     slot_usage:
@@ -333,7 +332,6 @@ slots:
   expected:
   eligibility: {range: SemanticEnrichmentGroomingEligibility}
   roi_order_desc: {multivalued: true, range: SemanticEnrichmentGroomingMetric}
-  default_batch_size: {range: integer}
   target:
   source:
   children: {multivalued: true, range: RuntimeProjectionDescriptor, inlined: true, inlined_as_list: true}

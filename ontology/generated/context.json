@@ -376,9 +376,6 @@
     "declares_context": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/declares_context"
     },
-    "default_batch_size": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/default_batch_size"
-    },
     "default_message": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/default_message"
     },

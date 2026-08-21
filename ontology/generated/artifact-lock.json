@@ -11,11 +11,11 @@
   "outputs": [
     {
       "path": "card.schema.json",
-      "sha256": "95c9c92a2af43ca834818eccb03aac74735f5ac2bb98594bc03af312f8bb2cf5"
+      "sha256": "e8fdceaf8d0ed199b2beef463f77502f3c2fbac7008f4405158498e9ad0882be"
     },
     {
       "path": "context.json",
-      "sha256": "9b3e247f43aea15c89b8a707c8fc85f5e371520d4dd0c1967145af22c94bc95e"
+      "sha256": "addf0335f6b8da9e96d580a252ef4da938653125ef788719ece0ea78600df84c"
     },
     {
       "path": "dashboard.schema.json",
@@ -23,7 +23,7 @@
     },
     {
       "path": "ontology.ttl",
-      "sha256": "cad7a382078367e30a068824d0dffb51dbddb4191e3d3dc99357ba211f83b254"
+      "sha256": "a3f5835f38aefb64e91e4d8c7fc333a8137768404022cf502c233f894b7c3ce1"
     },
     {
       "path": "pillboxes.schema.json",
@@ -31,31 +31,31 @@
     },
     {
       "path": "product.schema.json",
-      "sha256": "d13c3f47feaad727dea85e62e89539c3e500def119f218d73bb46883ea49172b"
+      "sha256": "f9bd746469c07e5a1a7036df8cb72a69bfca6526d08011b4d102f814168d380a"
     },
     {
       "path": "projection-map.json",
-      "sha256": "d309d970753d12f8099caf6e03a62a423e314f3cd1b8ef9de6501d8d5cce1e11"
+      "sha256": "a89f89aaa42d3758747554bede3141d3103d1c37cecce5c709c61bb79506f108"
     },
     {
       "path": "relations.schema.json",
-      "sha256": "0bd6ace017b804290e0fb6650e37a345a939925696c56a46e3bf6cea769a0fe5"
+      "sha256": "1544f537a4af946c244c14ad6fdbf5c2149f98b2f950df1c415d33f341af5155"
     },
     {
       "path": "runtime-program.json",
-      "sha256": "dd318ba72d0c7fdd3f033bc40909f3c357dd2e88ee0f284400783158fbe3de14"
+      "sha256": "8a94b59fe5cb5632a0c41f63970f4633fb4c2344399f4389082a62f01de8192a"
     },
     {
       "path": "runtime-vocabulary.yaml",
-      "sha256": "403cc989dadc586deb613c5a689b3e5387112baed2972b17c183d281592afab1"
+      "sha256": "617c3e4330ffd7d381a96a8acd65247780444b0a16d464698714ffc8fb8050c2"
     },
     {
       "path": "schema.json",
-      "sha256": "4e7a4a4c68d594dcc3365b5f2723c6ce7ad98b2b871064371dc479f785118c8e"
+      "sha256": "3d1e6d0db4fa3bd754cd72e0f6ad70a0f90d30f286364a84f9c8b62681b3402a"
     },
     {
       "path": "shapes.ttl",
-      "sha256": "3597425afd1e9123e396ad25f012ff721396de05bf1b852c70e998721efd75ca"
+      "sha256": "78844a43e2202cd912110ddb170732e1e6a4e7079185399cbc7d74917fb67f58"
     },
     {
       "path": "stacks.schema.json",
@@ -98,11 +98,11 @@
     },
     {
       "path": "ontology/runtime-policy.yaml",
-      "sha256": "8936f8557915a6398c71b25984da920c85c5648736d6c4faf5cf2212e53f8331"
+      "sha256": "4d392cda730a1a4999740248f4cc7192a04719ea20418a06b0b3960da8ad92e4"
     },
     {
       "path": "ontology/runtime-protocol.yaml",
-      "sha256": "b61351c9d17a59dad7d0bf3f9168e6e68e5b3e0a82fb70cb3fe7ba0877457121"
+      "sha256": "f19e894ae58051ef1f3719ec5476047d827a8a699e677e92e26da8f0170d5941"
     },
     {
       "path": "ontology/scheduling-constraints.yaml",

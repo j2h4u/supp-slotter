@@ -299,7 +299,6 @@ class RuntimeSemanticEnrichmentGroomingPolicy:
     id: str
     eligibility: str
     roi_order_desc: tuple[str, ...]
-    default_batch_size: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -673,10 +672,7 @@ def _semantic_enrichment_grooming(row: Mapping[str, object], label: str) -> Runt
         raise _error(f"{label}.roi_order_desc", "must be non-empty")
     if any(metric not in SUPPORTED_GROOMING_METRICS for metric in metrics):
         raise _error(f"{label}.roi_order_desc", "contains an unsupported metric")
-    batch_size = _int(row["default_batch_size"], f"{label}.default_batch_size")
-    if batch_size <= 0:
-        raise _error(f"{label}.default_batch_size", "must be positive")
-    return RuntimeSemanticEnrichmentGroomingPolicy(_str(row["id"], f"{label}.id"), eligibility, metrics, batch_size)
+    return RuntimeSemanticEnrichmentGroomingPolicy(_str(row["id"], f"{label}.id"), eligibility, metrics)
 
 
 def _policy(row: Mapping[str, object], label: str) -> RuntimeConstraintExecutionPolicy:

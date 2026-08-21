@@ -2241,14 +2241,6 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "default_batch_size",
-          "range": "integer",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
           "name": "eligibility",
           "range": "SemanticEnrichmentGroomingEligibility",
           "required": true
