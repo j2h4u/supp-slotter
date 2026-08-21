@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: aa580abc16be43c92db66d4da2353630cb0954b0b7b1b336cca413fb1d22210f
+source_hash: a286c49e0684a0c749e001fbb60245fff6571d2815d6759bae2239efe20670ad
 categories:
   kind:
     allowed_predicates: &id005
@@ -2394,9 +2394,10 @@ ontology_assertions:
     target_selector:
       entity:
         name: Copper
-    reason: Long-term high-dose zinc supplementation can depress copper status; zinc
-      and copper status should be reviewed together in long-term stacks.
-    action: Review zinc/copper balance in long-term active stacks.
+    reason: Sustained high zinc exposure can lower copper status; this is a chronic
+      balance-review signal, not evidence for acute co-dose harm or same-product separation.
+    action: Review zinc/copper balance for sustained high-zinc exposure; do not split
+      the same product or apply a universal zinc-copper interval.
     severity: medium
     research_state: supported
     sources:
@@ -2858,7 +2859,12 @@ ontology_assertions:
     target_selector:
       entity:
         name: Calcium
-    reason: Magnesium supports calcium homeostasis through PTH and vitamin D signaling.
+    reason: Magnesium participates in generic calcium-ion transport and bone physiology;
+      this biochemical relationship is not a form-specific clinical claim.
+    action: No co-dose, separation, or timing rule is established by this relationship.
+    research_state: mechanistic_only
+    sources:
+    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
   rel_supports_004:
     id: rel_supports_004
     relation_type: supports
@@ -2952,8 +2958,17 @@ ontology_assertions:
       entity:
         name: Iron
     reason: Vitamin C can enhance nonheme iron absorption by reducing ferric iron
-      and forming soluble complexes; review vitamin C context when iron supplementation
-      is active.
+      and forming soluble iron-ascorbate complexes, but the effect depends on the
+      iron matrix, meal composition, iron status, and form; review this context only
+      when relevant iron supplementation is active.
+    action: Review only when nonheme iron supplementation or other relevant iron context
+      is active; no required vitamin C supplement, co-dose, separation interval, or
+      guaranteed outcome is established.
+    severity: low
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/
+    - https://lpi.oregonstate.edu/mic/minerals/iron
   rel_supports_010:
     id: rel_supports_010
     relation_type: supports
