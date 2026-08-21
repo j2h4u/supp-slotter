@@ -31,12 +31,15 @@ applicable questions; they do not skip the common stages.
    neighboring forms, mechanisms, dashboard selectors, relations, and active
    stack matches. Prefer existing terms and choose deliberately among
    `schedule`, `knowledge`, concerns, relations, and dashboards.
-4. **Separate evidence collection from adjudication.** A Luna/evidence worker
-   performs a bounded, independent search over the finite applicable questions
-   (meal state, day phase, activity, and important review/interaction context).
-   Luna collects sources and candidate claims; Sol/the expert adjudicates what
-   is admitted against the repository's conservative threshold. Luna may
-   implement only admitted facts. Manufacturer instructions establish
+4. **Research cards holistically, then adjudicate.** The substance card is the
+   unit of grooming work. A normal batch is 10 cards, selected by the
+   read-only queue's active-product reach/ROI ordering. For each card, perform
+   one bounded pass over all meaningful unresolved knowledge assertions and
+   relation leads, as well as applicable scheduling questions; do not turn
+   assertion rows into separate jobs. A Luna/evidence worker collects sources
+   and candidate claims, and Sol/the expert adjudicates what is admitted
+   against the repository's conservative threshold. Luna may implement only
+   admitted facts. Manufacturer instructions establish
    formulation/composition and can be useful leads, but do not outrank
    independent medical or biochemical evidence for general scheduling or
    recommendations.
@@ -54,7 +57,9 @@ applicable questions; they do not skip the common stages.
 7. **Preserve research state.** Record negative or insufficient research so the
    same question is not repeatedly rediscovered. `insufficient`,
    `supports_no_rule`, and `conflicting` are assessed states; an omitted axis
-   is `unassessed`, not a claim of neutrality or support.
+   is `unassessed`, not a claim of neutrality or support. Knowledge and
+   relation `research_state` plus `sources` remain provenance on assertions;
+   they do not split the card into assertion-level queue tasks.
 8. **Clean and commit the coherent cluster.** Inspect `git diff` and
    `git status`, keep generated output separate from source edits, remove
    temporary artifacts, and commit the complete related documentation/data
@@ -89,13 +94,14 @@ unsupported claims out.
 
 Start from a concrete signal: a journal `no-scheduling-fact` or assessment
 state, weak explanation, mixed votes, warning, active dashboard goal, or an
-explicit user question. Define one finite set of questions, check applicability
-to the substance/form/product, search independently, and adjudicate the result.
-Update the assessed state even when the conclusion is `insufficient`,
-`supports_no_rule`, or `conflicting`; do not reopen an assessed question without
-new evidence or changed applicability. Add an executable `schedule.*` fact only
-when an adjudicated same-axis result supports it, then inspect the planner's
-actual explanation and any global balance effects.
+explicit user question. Treat the card as one holistic work item: inspect all
+meaningful unresolved knowledge assertions and relation leads in the same
+bounded pass, alongside scheduling applicability for the substance/form/product.
+Update provenance and assessed states even when the conclusion is
+`insufficient`, `supports_no_rule`, or `conflicting`; do not reopen an assessed
+assertion without new evidence or changed applicability. Add an executable
+`schedule.*` fact only when an adjudicated same-axis result supports it, then
+inspect the planner's actual explanation and any global balance effects.
 
 #### Practical evidence calibration
 
@@ -135,16 +141,18 @@ sets the evidence boundary, not a final card decision.
 
 ### Mandatory completion handoff
 
-For every new active Substance or semantic enrichment, the task/commit report
-must include this finite handoff. It is procedural state, not a new repository
-artifact or entity:
+For every new active Substance or card-level grooming batch, the task/commit
+report must include this finite handoff. It is procedural state, not a new
+repository artifact or entity:
 
 - label and exact Product/Substance/form identity captured;
 - ontology neighbors, existing terms, mechanisms, dashboards, relations, and
   active-stack matches checked;
-- finite research questions/axes named, including applicability boundaries;
+- cards completed and the bounded research questions/axes named for each,
+  including applicability boundaries;
 - Luna's independent evidence packet and search limits;
-- Sol's admitted and rejected claims, with the reason for each boundary;
+- Sol's admitted and rejected claims and relation leads, with the reason for
+  each boundary;
 - exact routing destinations for every admitted result, or an explicit no-change
   decision;
 - every omitted/unassessed axis named;
@@ -237,6 +245,16 @@ scheduling fact. Any present date permanently excludes the card from this
 minimal queue. The queue has no owners, tasks, scores, expiry, auto-write, or
 product-level marker, and it never affects scheduling.
 The authoritative ownership and ROI boundary is [Domain Model](domain-model.md#core-objects).
+
+The queue returns cards, not knowledge assertions or relation rows. A worker
+normally takes 10 cards and, for each card, researches/adjudicates every
+meaningful unresolved knowledge assertion and relation lead in one holistic
+pass. Assertion-level `research_state` and `sources` are retained as
+provenance and do not become separate jobs. Progress is reported in cards: the
+current `main` baseline is 37 active-reachable substance cards, 36 needing
+work (25 wholly unassessed and 11 partially assessed). The 170 underlying
+assertion/relation rows are evidence inventory, not 170 jobs. Active-product
+reach/count is the operational priority signal.
 
 ### Research-state glossary
 

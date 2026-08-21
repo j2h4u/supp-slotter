@@ -85,6 +85,13 @@ grooming; this skill is only the quick operator surface.
 
 Quick rules:
 
+- Grooming is card-level work: take the queue's normal batch of 10 Substance
+  cards and research/adjudicate all meaningful unresolved knowledge assertions
+  and relation leads for each card in one holistic pass. `research_state` and
+  `sources` on individual assertions are provenance, not separate queue jobs.
+  Report progress in cards, never as the count of underlying assertion rows;
+  active-product reach/count is the ROI priority signal.
+
 - Search first with `uv run python -m planner find "<product substance form alias>"`;
   reuse matching Product/Substance/form identities and do not use grep/glob as
   the identity check.

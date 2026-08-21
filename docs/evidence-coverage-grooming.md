@@ -17,6 +17,18 @@
 > EvidenceQuestion catalog, coverage scoring, and broader workflow/task
 > machinery remain deferred and are not implemented here.
 
+**Active grooming contract.** A Substance card is the unit of work. The queue
+returns a normal batch of 10 active-reachable cards, ordered by active-product
+reach/count for operational ROI. For each card, an agent performs one holistic
+bounded pass over all meaningful unresolved knowledge assertions and relation
+leads, plus applicable scheduling questions. Assertion-level `research_state`
+and `sources` are provenance fields, not separate queue tasks. Report progress
+in cards: the current `main` baseline is 37 active-reachable cards, 36 needing
+work (25 wholly unassessed and 11 partially assessed); 170 underlying rows are
+not 170 jobs. Unknown/no evidence is an allowed assessed result using the
+existing states. This workflow adds no numeric confidence, evidence graph,
+owner/reviewer/lifecycle fields, forced completeness, or broad medical scope.
+
 The authoritative marker ownership, distinct Product-count semantics, and
 operational (not medical) ROI principle are defined in the [Domain Model](domain-model.md#core-objects).
 
@@ -93,11 +105,14 @@ Material changes to the calibration standard or to a product's form, carrier,
 dose disclosure, or applicability trigger re-review of affected soft
 preferences; existing scheduling facts are not silently rewritten.
 
-## Deferred broader coverage design
+## Historical deferred design (not agent guidance)
 
-The following is a deliberately small future design, not the current card
-contract. If broader coverage work is approved, add an `EvidenceQuestion`
-catalog with these question IDs:
+The following text is retained as historical design context only. It is not the
+current card contract, queue behavior, or an implementation plan. Do not use
+it to create assertion-level jobs, numeric confidence/coverage, evidence
+graphs, ownership/lifecycle fields, forced completeness, or broad medical
+expansion. Any future redesign would require a separate product decision.
+If that decision is ever made, an `EvidenceQuestion` catalog might cover:
 
 - `meal_absorption`
 - `meal_tolerability`
@@ -111,8 +126,13 @@ carrier, matrix, chemical form, or formulation makes the question meaningful.
 Record product applicability, including carrier and matrix, rather than
 assuming that substance-level evidence transfers to every product.
 
-For that future design, represent an assessment at claim level with the smallest
-useful fields:
+For that historical sketch, any claim/assertion records would remain nested
+provenance within a card-level grooming pass; they must not become queue tasks
+or redefine the card work unit. Do not implement this deferred design merely
+to count assertions. If it is ever revisited, preserve the existing
+repository states and boundaries rather than adding numeric confidence,
+ownership, lifecycle, or forced-completeness machinery. The historical sketch
+would represent an assessment with fields such as:
 
 - `coverage`: `unassessed`, `assessed`, or `not_applicable`;
 - `conclusion`: `supports_preference`, `supports_no_rule`, `conflicting`, or
@@ -178,8 +198,9 @@ not average certainty, and do not call `coverage_score` a medical quality
 score. If no question is applicable, report that explicitly rather than
 manufacturing a zero. No card-level score may affect the planner score.
 
-If implemented, the broader evidence metadata would power only grooming,
-explanations, and audit. For this proposal, **active cards** are cards reachable from current
+If a separately approved design were implemented, its metadata would power
+only grooming, explanations, and audit. For this historical proposal,
+**active cards** are cards reachable from current
 stacks/products through the existing runtime data. This definition adds no new
 lifecycle or status vocabulary. The derived grooming view should include active
 cards with:
