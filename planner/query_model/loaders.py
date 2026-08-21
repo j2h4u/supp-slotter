@@ -45,15 +45,18 @@ def pillbox_stack_names(paths: Paths) -> set[str]:
     """Authored stack references declared by data/pillboxes.yaml."""
     path = paths.data / "pillboxes.yaml"
     raw = cast(dict[str, object], load_yaml_mapping(path))
-    return {_pillbox_stack_name(path, name, pillbox) for name, pillbox in raw.items()}
+    return {_validated_pillbox_stack(path, name, pillbox) for name, pillbox in raw.items()}
 
 
-def _pillbox_stack_name(path: Path, name: object, pillbox: object) -> str:
+def _validated_pillbox_stack(path: Path, name: object, pillbox: object) -> str:
     if not isinstance(name, str) or not name.strip():
         raise CardLoadError(path, f"{path}: pillbox names must be non-empty strings")
     if not isinstance(pillbox, dict):
         raise CardLoadError(path, f"{path}: pillbox {name!r} must be a mapping")
-    stack = cast(dict[str, object], pillbox).get("stack")
+    return _validated_stack_name(path, name, cast(dict[str, object], pillbox).get("stack"))
+
+
+def _validated_stack_name(path: Path, name: str, stack: object) -> str:
     if not isinstance(stack, str) or not stack.strip():
         raise CardLoadError(path, f"{path}: pillbox {name!r}.stack must be a non-empty string")
     return stack
