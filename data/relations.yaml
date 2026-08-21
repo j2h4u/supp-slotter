@@ -47,11 +47,17 @@ relations:
   target_selector:
     entity:
       entity_id: sub_d997f98e03
-- reason: Molybdenum cofactor enzymes metabolize sulfur-containing amino acids; NAC is a cysteine derivative.
+- reason: Molybdenum is a molybdopterin constituent used by sulfite oxidase in sulfur-amino-acid catabolism; NAC is the N-acetyl derivative/prodrug of L-cysteine. A small registered combination study changed the NAC form and added selenium, molybdenum, and glycine, but posted no results, so no molybdenum-attributable outcome is established.
   id: rel_supports_002
   relation_type: supports
   assertion_kind: ontology_assertion
   semantic_family: biochemical_mechanism_assertion
+  research_state: mechanistic_only
+  sources:
+  - https://ods.od.nih.gov/factsheets/Molybdenum-HealthProfessional/
+  - https://www.cancer.gov/publications/dictionaries/cancer-drug/def/acetylcysteine
+  - https://clinicaltrials.gov/study/NCT06252519
+  action: No co-dose, separation, timing, or outcome rule is established by this relationship.
   source_selector:
     entity:
       entity_id: sub_c55378389c
@@ -100,24 +106,6 @@ relations:
   target_selector:
     entity:
       name: Vitamin A
-- severity: low
-  reason: Vitamin E is a lipid-phase chain-breaking antioxidant that protects long-chain PUFA from lipid peroxidation. Human evidence does not establish that ordinary EPA/DHA intake requires extra vitamin E or that supplementation consistently improves oxidative biomarkers; the planner cannot assess total EPA/DHA exposure, dietary vitamin E, deficiency, or malabsorption.
-  action: Do not add supplemental vitamin E by default. Review dietary vitamin E/status only if total EPA/DHA exposure is high or low intake, deficiency, or malabsorption is plausible; if supplementation is considered, review dose and bleeding risk, especially with nattokinase, anticoagulants, or antiplatelets.
-  id: rel_supports_006
-  relation_type: supports
-  assertion_kind: ontology_assertion
-  semantic_family: biochemical_mechanism_assertion
-  research_state: mechanistic_only
-  sources:
-  - https://pubmed.ncbi.nlm.nih.gov/23557727/
-  - https://pubmed.ncbi.nlm.nih.gov/11684381/
-  - https://pubmed.ncbi.nlm.nih.gov/2282693/
-  source_selector:
-    entity:
-      name: Vitamin E
-  target_selector:
-    category: pathway
-    term: omega3_eicosanoid
 - reason: 'Vitamin D3 supports intestinal calcium absorption and bone physiology; this does not establish a calcium supplement requirement. Source: https://ods.od.nih.gov/factsheets/Vitamind-HealthProfessional/.'
   id: rel_supports_007
   relation_type: supports
@@ -351,11 +339,15 @@ relations:
     entity:
       entity_id: sub_ug92bkq5dh
 - severity: high
-  reason: Pyridoxine HCl can reduce levodopa effect when levodopa is used without a peripheral decarboxylase inhibitor.
+  reason: Pyridoxine HCl can reduce levodopa effect by increasing aromatic amino-acid decarboxylation when levodopa is used without carbidopa or another peripheral decarboxylase inhibitor; carbidopa inhibits this peripheral conversion.
+  action: Review the pyridoxine/levodopa pairing and whether carbidopa or another peripheral decarboxylase inhibitor is present; never infer that slot separation resolves this interaction.
   id: rel_review_with_012
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: supported
+  sources:
+  - https://dailymed.nlm.nih.gov/dailymed/fdaDrugXsl.cfm?setid=a7e669fc-c011-4e51-85e6-b68d4e4738a8&type=display
   source_selector:
     entity:
       entity_id: sub_a873e428ee
@@ -517,3 +509,39 @@ relations:
   target_selector:
     entity:
       entity_id: sub_5723eafac4
+- severity: low
+  reason: Small human studies show reduced manganese absorption or plasma uptake in human milk or after a 40 mg calcium load; the signal is matrix- and dose-specific and does not establish a universal calcium-manganese scheduling rule.
+  action: Review calcium and manganese as independently schedulable supplements; prefer separate slots when feasible, but never split a fixed multi-mineral product or impose a universal interval.
+  id: rel_review_with_022
+  relation_type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
+  research_state: supported
+  sources:
+  - https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/
+  - https://pubmed.ncbi.nlm.nih.gov/1957822/
+  - https://pubmed.ncbi.nlm.nih.gov/2010579/
+  source_selector:
+    entity:
+      name: Calcium
+  target_selector:
+    entity:
+      name: Manganese
+- severity: medium
+  reason: Iron and manganese absorption can compete or vary in dose-, matrix-, and iron-status-dependent contexts; human evidence supports a bidirectional absorption-review signal rather than proof of harm.
+  action: Review independently schedulable iron and manganese supplements and iron status; prefer separate slots when feasible, but do not infer harm or impose a universal interval.
+  id: rel_review_with_023
+  relation_type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
+  research_state: supported
+  sources:
+  - https://ods.od.nih.gov/factsheets/Iron-HealthProfessional/
+  - https://pubmed.ncbi.nlm.nih.gov/2058577/
+  - https://pubmed.ncbi.nlm.nih.gov/10393136/
+  source_selector:
+    entity:
+      name: Iron
+  target_selector:
+    entity:
+      name: Manganese
