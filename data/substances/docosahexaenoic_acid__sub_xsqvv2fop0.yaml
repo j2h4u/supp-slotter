@@ -3,7 +3,7 @@ name: Docosahexaenoic acid
 semantic_enrichment_attempted_on: '2026-08-13'
 aliases:
 - DHA
-notes: 'Omega-3 fatty acid component listed as DHA on Nature''s Truth Antarctic Krill Oil. Meal effects are formulation- and dose-dependent; no product-independent meal rule is established for the active low-dose krill reference. Source: Nature''s Truth/iHerb product label.'
+notes: 'DHA occurs here as low-dose krill phospholipid (40 mg) and higher-dose fish-oil ethyl ester (378 mg). Meal effects are formulation- and dose-dependent; no universal meal or clock-time rule is established. Platelet/bleeding, skin, and vascular findings are bounded by dose, formulation, and study context.'
 scheduling_assessment:
   intake:
     conclusion: insufficient
@@ -21,16 +21,43 @@ scheduling_assessment:
     summary: No comparative clock-time rule was demonstrated for DHA, and the form/carrier and dose do not support transferring a clock preference.
 knowledge:
   context:
-  - skin_support
-  - vascular_health
+  - value: skin_support
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/18241260/
+    - https://pubmed.ncbi.nlm.nih.gov/31480216/
+    - https://pubmed.ncbi.nlm.nih.gov/31518521/
+    - https://pubmed.ncbi.nlm.nih.gov/39169540/
+  - value: vascular_health
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/34505026/
   effect:
-  - platelet_aggregation_modulation
+  - value: platelet_aggregation_modulation
+    research_state: mechanistic_only
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/33222370/
+    - https://pubmed.ncbi.nlm.nih.gov/6229254/
   kind:
-  - omega3
+  - value: omega3
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
   pathway:
-  - omega3_eicosanoid
+  - value: omega3_eicosanoid
+    research_state: mechanistic_only
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/33222370/
+    - https://pubmed.ncbi.nlm.nih.gov/30266534/
   quality:
-  - fat_soluble
+  - value: fat_soluble
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
   risk:
-  - manual_review
-  - bleeding_med_interaction
+  - value: bleeding_med_interaction
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/38742535/
+    - https://pubmed.ncbi.nlm.nih.gov/37567449/
+    - https://pubmed.ncbi.nlm.nih.gov/30571332/

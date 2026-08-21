@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: acaa66162bfae474be9eaa83be4e80c04cf1ebfb98dbae7b0d3920edd4325990
+source_hash: 353fa3f91e76bd28fd0fde525456e3ae207e7a077437ec3134c6b81aa7f5cec1
 categories:
   kind:
     allowed_predicates: &id005
@@ -2835,6 +2835,11 @@ ontology_assertions:
       is plausible; if supplementation is considered, review dose and bleeding risk,
       especially with nattokinase, anticoagulants, or antiplatelets.
     severity: low
+    research_state: mechanistic_only
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/23557727/
+    - https://pubmed.ncbi.nlm.nih.gov/11684381/
+    - https://pubmed.ncbi.nlm.nih.gov/2282693/
   rel_supports_007:
     id: rel_supports_007
     relation_type: supports
