@@ -201,20 +201,38 @@ def _validation_shapes(shapes: Graph) -> Graph:
     shapes emitted by the compiler.
     """
 
-    ontology_terms = {
-        target
-        for shape in shapes.subjects(RDF.type, URIRef("http://www.w3.org/ns/shacl#NodeShape"))
-        for target in shapes.objects(shape, URIRef("http://www.w3.org/ns/shacl#targetClass"))
-        if isinstance(target, URIRef) and str(target).endswith("/OntologyTerm")
-    }
-    if len(ontology_terms) != 1:
-        raise OntologyInfrastructureError("Generated SHACL shapes have no unique OntologyTerm class")
-    ontology_term = next(iter(ontology_terms))
+    ontology_term = _ontology_term_class(shapes)
     return _remove_catalog_shapes(shapes, ontology_term)
 
 
+def _ontology_term_class(shapes: Graph) -> URIRef:
+    candidates = _ontology_term_candidates(shapes)
+    if len(candidates) != 1:
+        raise OntologyInfrastructureError("Generated SHACL shapes have no unique OntologyTerm class")
+    return next(iter(candidates))
+
+
+def _ontology_term_candidates(shapes: Graph) -> set[URIRef]:
+    candidates: set[URIRef] = set()
+    for shape in shapes.subjects(RDF.type, URIRef("http://www.w3.org/ns/shacl#NodeShape")):
+        candidates.update(
+            target
+            for target in shapes.objects(shape, URIRef("http://www.w3.org/ns/shacl#targetClass"))
+            if isinstance(target, URIRef) and str(target).endswith("/OntologyTerm")
+        )
+    return candidates
+
+
 def _remove_catalog_shapes(shapes: Graph, ontology_term: URIRef) -> Graph:
+    catalog_shapes = _catalog_shape_nodes(shapes, ontology_term)
     result = Graph()
+    for triple in shapes:
+        if triple[0] not in catalog_shapes:
+            result.add(triple)
+    return result
+
+
+def _catalog_shape_nodes(shapes: Graph, ontology_term: URIRef) -> set[Node]:
     registry_classes = {
         ontology_term,
         URIRef(f"{ontology_term.rsplit('/', 1)[0]}/SemanticCategory"),
@@ -222,15 +240,11 @@ def _remove_catalog_shapes(shapes: Graph, ontology_term: URIRef) -> Graph:
         URIRef(f"{ontology_term.rsplit('/', 1)[0]}/OperationalRelationType"),
     }
     generated_catalog_shapes = registry_classes | {URIRef(f"{value}Shape") for value in registry_classes}
-    catalog_shapes = {
+    return {
         shape
         for shape in shapes.subjects(RDF.type, URIRef("http://www.w3.org/ns/shacl#NodeShape"))
         if shape in generated_catalog_shapes
     }
-    for triple in shapes:
-        if triple[0] not in catalog_shapes:
-            result.add(triple)
-    return result
 
 
 def compose_validation_graph(
