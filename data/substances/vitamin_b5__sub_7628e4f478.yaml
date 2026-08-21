@@ -1,13 +1,7 @@
 id: sub_7628e4f478
 name: Vitamin B5
 semantic_enrichment_attempted_on: '2026-08-13'
-notes: 'Water-soluble Vitamin B5 family card. Registered products expose calcium pantothenate,
-  calcium D-pantothenate, and pantethine mixtures at Product level; exact chemistry
-  is Product-level and these forms are not chemically identical. The active Coenzyme
-  B-Complex supplies calcium D-pantothenate plus pantethine, 50 mg total per 2 capsules.
-  Pantothenic acid is an essential cofactor for CoA synthesis and fatty-acid metabolism;
-  no general meal, clock, or form-comparative rule is established. Source: NIH ODS
-  (Pantothenic Acid Fact Sheet).'
+notes: 'Water-soluble Vitamin B5 family card. BioGrace supplies 15 mg daily calcium pantothenate with stereochemistry unresolved; Country Life supplies 50 mg per 2 capsules as calcium D-pantothenate plus pantethine. These forms are not chemically identical and no general superiority rule is established. Mitochondrial relevance is biochemical CoA-based, not a demonstrated clinical outcome; pantethine evidence does not generalize to all B5 forms. No meal or clock-time rule is established. Source: NIH ODS (Pantothenic Acid Fact Sheet).'
 scheduling_assessment:
   intake:
     conclusion: insufficient
@@ -24,14 +18,21 @@ scheduling_assessment:
       forms.
 knowledge:
   context:
-  - mitochondrial_health
+  - value: mitochondrial_health
+    research_state: mechanistic_only
+    sources:
+    - https://ods.od.nih.gov/factsheets/PantothenicAcid-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/1672610/
   effect:
   - value: fatty_acid_metabolism_support
     research_state: supported
     sources:
     - https://ods.od.nih.gov/factsheets/PantothenicAcid-HealthProfessional/
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/PantothenicAcid-HealthProfessional/
   pathway:
   - value: coa_metabolism
     research_state: supported
