@@ -32,6 +32,7 @@ SMOKE_NODE_IDS = (
 )
 FAST_UNIT_MODULES = frozenset({
     Path("tests/test_cli_surface.py"),
+    Path("tests/test_crap_gate.py"),
     Path("tests/test_dashboard_schema.py"),
     Path("tests/test_fact_labels.py"),
     Path("tests/test_plan_relation_scheduling.py"),
@@ -151,7 +152,7 @@ def suite_inventory() -> dict[str, object]:
             "coverage": {
                 "selection": "fast-unit-plus-coverage-only-modules-and-unique-smoke-nodes",
                 "items": _coverage_inventory_items(),
-                "pytest_flags": ["--cov=planner", "--cov-report=", "--cov-fail-under=0"],
+                "pytest_flags": ["--cov=planner", "--cov-report=", "--crap"],
             },
             "runtime-scenarios": {
                 "selection": "curated-module-list-plus-fixed-node-ids",
@@ -188,7 +189,7 @@ def suite_inventory() -> dict[str, object]:
                     "runtime-scenarios",
                     "coverage",
                 ],
-                "policy": "rare full release-candidate gate; do not use for small edits",
+                "policy": "rare full release-candidate gate with blocking CRAP quality check; do not use for small edits",
             },
         },
     }
@@ -223,11 +224,17 @@ def _run_timed(command: Command, *, label: str, command_runner: CommandRunner) -
     return status
 
 
-def _pytest_command(targets: Sequence[str | Path], *, coverage: bool = False) -> list[str]:
+def _pytest_command(
+    targets: Sequence[str | Path], *, coverage: bool = False, crap: bool = False, append: bool = False
+) -> list[str]:
     command = [sys.executable, "-m", "pytest", "-q", "-m", PYTEST_MARKERS]
     command.extend(str(target) for target in targets)
     if coverage:
-        command.extend(("--cov=planner", "--cov-report=", "--cov-fail-under=0"))
+        command.extend(("--cov=planner", "--cov-report="))
+        if append:
+            command.append("--cov-append")
+    if crap:
+        command.append("--crap")
     return command
 
 
@@ -304,6 +311,7 @@ def _run_ontology_groups(
     *,
     command_runner: CommandRunner,
     timing_prefix: str,
+    coverage: bool = False,
 ) -> int:
     print(f"Running ontology-contract suite in {len(ONTOLOGY_CONTRACT_GROUPS)} groups", flush=True)
     for name, group in ONTOLOGY_CONTRACT_GROUPS:
@@ -323,7 +331,7 @@ def _run_ontology_groups(
             continue
         print(f"Running {name} group ({len(group_targets)} targets)", flush=True)
         status = _run_timed(
-            _pytest_command(group_targets),
+            _pytest_command(group_targets, coverage=coverage, append=coverage),
             label=f"{timing_prefix + ' ' if timing_prefix else ''}ontology {name.split(maxsplit=1)[0]} pytest",
             command_runner=command_runner,
         )
@@ -351,7 +359,7 @@ def _run_release_suite(
     print("Running release suite in 6 stages", flush=True)
     print(f"Running smoke stage ({len(smoke_targets)} targets)", flush=True)
     status = _run_timed(
-        _pytest_command(smoke_targets),
+        _pytest_command(smoke_targets, coverage=True, append=True),
         label="release smoke pytest",
         command_runner=command_runner,
     )
@@ -363,23 +371,24 @@ def _run_release_suite(
         ontology_targets,
         command_runner=command_runner,
         timing_prefix="release",
+        coverage=True,
     )
     if status != 0:
         return status
 
     print(f"Running runtime-scenarios stage ({len(runtime_targets)} targets)", flush=True)
     status = _run_timed(
-        _pytest_command(runtime_targets),
+        _pytest_command(runtime_targets, coverage=True, append=True),
         label="release runtime-scenarios pytest",
         command_runner=command_runner,
     )
     if status != 0:
         return status
 
-    print(f"Running coverage stage ({len(coverage_targets)} targets)", flush=True)
+    print(f"Running CRAP stage ({len(coverage_targets)} targets)", flush=True)
     return _run_timed(
-        _pytest_command(coverage_targets, coverage=True),
-        label="release coverage pytest",
+        _pytest_command(coverage_targets, coverage=True, crap=True, append=True),
+        label="release CRAP pytest",
         command_runner=command_runner,
     )
 
@@ -410,7 +419,7 @@ def run_unit_gate(
     if suite != "ontology-contract":
         print(f"Running {suite} suite ({len(targets)} targets)", flush=True)
         return _run_timed(
-            _pytest_command(targets, coverage=suite == "coverage"),
+            _pytest_command(targets, coverage=suite == "coverage", crap=suite == "coverage"),
             label=f"{suite} pytest",
             command_runner=command_runner,
         )

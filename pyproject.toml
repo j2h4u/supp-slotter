@@ -19,6 +19,7 @@ dev = [
     "linkml-runtime>=1.11.1",
     "pytest>=9.1.1",
     "pytest-cov>=7",
+    "pytest-crap>=0.3.0",
     "pytest-xdist>=3.8.0",
     "ruff>=0.15.22",
     "basedpyright>=1.39.9",
@@ -97,7 +98,6 @@ sigterm = true
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
-fail_under = 70
 
 [tool.vulture]
 paths = ["planner", "scripts", "tests"]

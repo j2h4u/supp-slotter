@@ -203,6 +203,7 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
     expected_inventory = [
         "tests/test_card_reference_integrity.py",
         "tests/test_cli_surface.py",
+        "tests/test_crap_gate.py",
         "tests/test_dashboard_review.py",
         "tests/test_dashboard_schema.py",
         "tests/test_fact_labels.py",
@@ -235,23 +236,21 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
         "tests/test_scheduler_reviewer_authority.py::test_reviewer_only_knowledge_does_not_change_slot_assignment",
         "--cov=planner",
         "--cov-report=",
-        "--cov-fail-under=0",
+        "--crap",
     ]
-    assert calls[1].count("--cov-fail-under=0") == 1
-    assert not any(
-        argument.startswith("--cov-fail-under=") and argument != "--cov-fail-under=0" for argument in calls[1]
-    )
+    assert calls[1].count("--crap") == 1
+    assert not any(argument.startswith("--cov-fail-under=") for argument in calls[1])
     assert "-n" not in calls[1]
     assert "--dist" not in calls[1]
     smoke_node = (
         "tests/test_scheduler_reviewer_authority.py::test_reviewer_only_knowledge_does_not_change_slot_assignment"
     )
     assert calls[1].count(smoke_node) == 1
-    assert len(calls[1][6:-3]) == len(set(calls[1][6:-3]))
+    assert len(calls[1][6:-2]) == len(set(calls[1][6:-2]))
     assert run_unit_gate._coverage_inventory_items() == expected_inventory
     assert not set(expected_inventory) & {path.as_posix() for path in run_unit_gate.ONTOLOGY_CONTRACT_MODULES}
     output = capsys.readouterr().out
-    assert "Running coverage suite (21 targets)\n" in output
+    assert "Running coverage suite (22 targets)\n" in output
     assert output.count("elapsed=") == 2
 
 
@@ -365,12 +364,16 @@ def test_release_suite_runs_six_ordered_pytest_stages_without_fast_unit(
     assert len(calls) == 7
     assert calls[0] == [run_unit_gate.sys.executable, "-m", "planner", "check"]
     assert len(pytest_calls) == 6
-    assert pytest_calls[0][6:] == list(run_unit_gate.SMOKE_NODE_IDS)
 
     def target_name(target: str) -> str:
         return target if "::" in target else Path(target).name
 
-    assert [[target_name(target) for target in call[6:]] for call in pytest_calls[1:4]] == [
+    def pytest_targets(call: list[str]) -> list[str]:
+        end = call.index("--cov=planner") if "--cov=planner" in call else len(call)
+        return call[6:end]
+
+    assert pytest_targets(pytest_calls[0]) == list(run_unit_gate.SMOKE_NODE_IDS)
+    assert [[target_name(target) for target in pytest_targets(call)] for call in pytest_calls[1:4]] == [
         [
             "test_linkml_core_schema.py",
             "test_ontology_compiler_outputs.py",
@@ -397,12 +400,14 @@ def test_release_suite_runs_six_ordered_pytest_stages_without_fast_unit(
         *(str(tests_root / path.relative_to(Path("tests"))) for path in run_unit_gate.RUNTIME_SCENARIOS_MODULES),
         *run_unit_gate.RUNTIME_SCENARIOS_NODE_IDS,
     ]
-    assert pytest_calls[4][6:] == runtime_targets
-    assert pytest_calls[5][-3:] == ["--cov=planner", "--cov-report=", "--cov-fail-under=0"]
-    assert pytest_calls[5].count("--cov=planner") == 1
-    assert pytest_calls[5].count("--cov-report=") == 1
-    assert pytest_calls[5].count("--cov-fail-under=0") == 1
-    assert not any("fast-unit" in target for target in pytest_calls[1][6:])
+    assert pytest_targets(pytest_calls[4]) == runtime_targets
+    assert pytest_calls[5][-4:] == ["--cov=planner", "--cov-report=", "--cov-append", "--crap"]
+    for call in pytest_calls:
+        assert call.count("--cov=planner") == 1
+        assert call.count("--cov-report=") == 1
+        assert call.count("--cov-append") == 1
+    assert pytest_calls[5].count("--crap") == 1
+    assert not any("fast-unit" in target for target in pytest_targets(pytest_calls[1]))
     output = capsys.readouterr().out
     assert output.count("elapsed=") == 7
     assert "Running release suite in 6 stages\n" in output

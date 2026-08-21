@@ -112,28 +112,31 @@ unit-gate-test:
 
 # Lint, type-check, and compile the isolated unit gate implementation.
 unit-gate-check:
-    uv run ruff check scripts/run_unit_gate.py tests/test_run_unit_gate.py
-    uv run ruff format --check scripts/run_unit_gate.py tests/test_run_unit_gate.py
-    scripts/run_bounded.sh -- uv run basedpyright scripts/run_unit_gate.py tests/test_run_unit_gate.py --warnings
-    uv run python -m compileall -q scripts/run_unit_gate.py tests/test_run_unit_gate.py
+    uv run ruff check scripts/crap_gate.py scripts/run_unit_gate.py tests/test_crap_gate.py tests/test_run_unit_gate.py
+    uv run ruff format --check scripts/crap_gate.py scripts/run_unit_gate.py tests/test_crap_gate.py tests/test_run_unit_gate.py
+    scripts/run_bounded.sh -- uv run basedpyright scripts/crap_gate.py scripts/run_unit_gate.py tests/test_crap_gate.py tests/test_run_unit_gate.py --warnings
+    uv run python -m compileall -q scripts/crap_gate.py scripts/run_unit_gate.py tests/test_crap_gate.py tests/test_run_unit_gate.py
 
 # Default local development confidence gate. Heavy gates stay explicit.
 verify: check smoke fast-unit corpus-projection
 
 # Full release candidate gate. Run before review/merge, not in small loops.
-# Coverage is the blocking full-suite release gate.
+# The bounded CRAP stage is the blocking test-quality gate.
 release: check _release-unit corpus-projection
 
-# One bounded release-unit run; the runner owns all six pytest stages.
+# One bounded release-unit run; the runner owns all six pytest stages and the
+# final CRAP check reuses the same curated coverage stage.
 _release-unit:
-    coverage_file="$(mktemp /tmp/supp-slotter-quality-coverage.XXXXXX)"; \
+    coverage_file="$(mktemp /tmp/supp-slotter-quality-crap.XXXXXX)"; \
     trap 'rm -f "$coverage_file"' EXIT; \
     scripts/run_bounded.sh -- env COVERAGE_FILE="$coverage_file" uv run python scripts/run_unit_gate.py --suite release && \
+    uv run python scripts/crap_gate.py --coverage "$coverage_file" && \
     COVERAGE_FILE="$coverage_file" uv run coverage report
 
-# Blocking coverage floor from one bounded curated-suite execution.
-coverage-check:
-    coverage_file="$(mktemp /tmp/supp-slotter-quality-coverage.XXXXXX)"; \
+# Blocking CRAP threshold from one bounded curated-suite execution.
+crap-check:
+    coverage_file="$(mktemp /tmp/supp-slotter-quality-crap.XXXXXX)"; \
     trap 'rm -f "$coverage_file"' EXIT; \
-    scripts/run_bounded.sh -- env COVERAGE_FILE="$coverage_file" uv run python scripts/run_unit_gate.py --suite coverage && \
+    scripts/run_bounded.sh -- env COVERAGE_FILE="$coverage_file" uv run python scripts/run_unit_gate.py --suite release && \
+    uv run python scripts/crap_gate.py --coverage "$coverage_file" && \
     COVERAGE_FILE="$coverage_file" uv run coverage report
