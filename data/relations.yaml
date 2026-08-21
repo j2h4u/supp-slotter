@@ -359,3 +359,81 @@ relations:
   target_selector:
     category: kind
     term: fiber
+- severity: medium
+  reason: Calcium can reduce iron absorption in some acute, dose- and meal-dependent contexts, but human evidence is mixed and the planner does not represent elemental dose, iron form, or food composition.
+  action: Review calcium and iron context together; prefer separate slots when feasible without treating co-presence as proof of harm or promising a fixed interval.
+  id: rel_review_with_016
+  relation_type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
+  source_selector:
+    entity:
+      name: Calcium
+  target_selector:
+    entity:
+      name: Iron
+- severity: medium
+  reason: High calcium co-ingestion can reduce zinc absorption in controlled human studies, but dose, meal, salt, and long-term clinical relevance are not established for every product form.
+  action: Review calcium and zinc context together; prefer separate slots when feasible without imposing a universal separation interval.
+  id: rel_review_with_017
+  relation_type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
+  source_selector:
+    entity:
+      name: Calcium
+  target_selector:
+    entity:
+      name: Zinc
+- severity: low
+  reason: L-lysine and L-arginine share cationic amino-acid transport, with human antagonism demonstrated at unusually high arginine exposure; routine supplement co-dosing effects are unproven.
+  action: Review unusually high-dose lysine/arginine use; no automatic slot separation is justified by the current dose-blind planner.
+  id: rel_review_with_018
+  relation_type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
+  source_selector:
+    entity:
+      name: L-Lysine
+  target_selector:
+    entity:
+      name: L-Arginine
+- severity: low
+  reason: Glycine and beta-alanine share transport and can interact at glycine-receptor systems in mechanistic preparations, but an ordinary-dose human supplement interaction is not established.
+  action: Treat glycine/beta-alanine transport or receptor competition as low-confidence review knowledge; do not separate slots automatically.
+  id: rel_review_with_019
+  relation_type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
+  source_selector:
+    entity:
+      name: Glycine
+  target_selector:
+    entity:
+      name: Beta-alanine
+- severity: low
+  reason: Glycine and taurine share some transport and receptor pharmacology in mechanistic preparations, but a practical human co-dose interaction is not established.
+  action: Treat glycine/taurine transport or receptor competition as low-confidence review knowledge; do not separate slots automatically.
+  id: rel_review_with_020
+  relation_type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
+  source_selector:
+    entity:
+      name: Glycine
+  target_selector:
+    entity:
+      name: Taurine
+- severity: low
+  reason: Tocopherol and tocotrienol forms have overlapping vitamin E handling but differential absorption and hepatic retention; human evidence does not establish harm from co-administration or a timing rule.
+  action: Review cumulative vitamin E dose and formulation when exact tocopherol and tocotrienol forms are both active; do not automatically separate slots.
+  id: rel_review_with_021
+  relation_type: review_with
+  assertion_kind: clinical_review_signal
+  semantic_family: clinical_review_signal
+  source_selector:
+    entity:
+      entity_id: sub_844a87d72b
+  target_selector:
+    entity:
+      entity_id: sub_5723eafac4

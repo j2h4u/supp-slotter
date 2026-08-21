@@ -7,6 +7,9 @@ scheduling_constraints:
     target_selector: {entity: {name: Copper}}
     rationale: Zinc and copper can compete for absorption when co-administered.
     action: Keep zinc and copper away from the same slot when they are in separate products.
+    blocks_slots: false
+    scores_advisory: true
+    score_delta: -1
   sc_calcium_iron_separate_slots:
     operation: separate_products_same_slot
     source_selector: {entity: {name: Calcium}}
@@ -22,9 +25,6 @@ scheduling_constraints:
     target_selector: {entity: {name: Zinc}}
     rationale: Calcium can compete with zinc for absorption when co-administered.
     action: Keep calcium and zinc away from the same slot when they are in separate products.
-  sc_tocopherol_tocotrienol_separate_slots:
-    operation: separate_products_same_slot
-    source_selector: {entity: {entity_id: sub_844a87d72b}, scope: exact_form}
-    target_selector: {entity: {entity_id: sub_5723eafac4}, scope: exact_form}
-    rationale: Vitamin E tocopherols and tocotrienols can compete for absorption and tissue uptake when co-administered.
-    action: Keep tocopherol and tocotrienol products away from the same slot.
+    blocks_slots: false
+    scores_advisory: true
+    score_delta: -1

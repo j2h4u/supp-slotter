@@ -27,13 +27,13 @@ from tests.helpers import ontology_bundle
 def test_generated_constraints_preserve_direct_runtime_fields() -> None:
     constraints = load_scheduling_constraints(ontology_bundle())
 
-    assert len(constraints) == 4
+    assert len(constraints) == 3
     assert {constraint.operation for constraint in constraints} == {"separate_products_same_slot"}
     assert all(constraint.action for constraint in constraints)
     assert all(constraint.rationale for constraint in constraints)
 
 
-def test_family_constraints_use_name_selectors_and_exact_form_rule_keeps_ids() -> None:
+def test_authored_advisory_constraints_use_name_selectors() -> None:
     constraints = {constraint.id: constraint for constraint in load_scheduling_constraints(ontology_bundle())}
 
     for constraint_id, source_name, target_name in (
@@ -47,11 +47,11 @@ def test_family_constraints_use_name_selectors_and_exact_form_rule_keeps_ids() -
         assert constraint.source_selector.entity_id is None
         assert constraint.target_selector.entity_id is None
 
-    tocopherol = constraints["sc_tocopherol_tocotrienol_separate_slots"]
-    assert tocopherol.source_selector.entity_id == "sub_844a87d72b"
-    assert tocopherol.target_selector.entity_id == "sub_5723eafac4"
-    assert tocopherol.source_selector.scope == "exact_form"
-    assert tocopherol.target_selector.scope == "exact_form"
+    assert "sc_tocopherol_tocotrienol_separate_slots" not in constraints
+    for constraint in constraints.values():
+        assert not constraint.blocks_slots
+        assert constraint.scores_advisory
+        assert constraint.score_delta == -1
 
 
 @pytest.mark.parametrize(
@@ -147,7 +147,10 @@ def test_execution_selector_uses_authored_category_predicates() -> None:
     assert plan.source_substance_ids == (source.id,)
     assert plan.target_substance_ids == (target.id,)
     assert plan.selector_resolution_outcome == "resolved"
-    assert plan.executable and plan.blocks_slots
+    assert plan.executable
+    assert not plan.blocks_slots
+    assert plan.scores_advisory
+    assert plan.score_delta == -1
 
 
 def test_name_selector_resolves_every_same_name_substance_form() -> None:

@@ -52,7 +52,7 @@ def test_prefer_with_journal_resolves_creatine_citrulline_endpoints(tmp_path: Pa
     assert len(cast(list[object], row["endpoints"])) == 2
 
 
-def test_hard_separation_journal_retains_rationale_after_rejected_candidate(tmp_path: Path) -> None:
+def test_zinc_copper_advisory_journal_retains_rationale(tmp_path: Path) -> None:
     rows = _journal(
         tmp_path,
         PlannerFixtureInput(
@@ -73,9 +73,9 @@ def test_hard_separation_journal_retains_rationale_after_rejected_candidate(tmp_
     )
     row = next(item for item in rows if item["constraint_id"] == "sc_zinc_copper_separate_slots")
     assert row["kind"] == "separate_constraint"
-    assert row["disposition"] == "hard"
-    assert row["state"] == "apart"
-    assert row["satisfied"] is True
+    assert row["disposition"] == "advisory"
+    assert row["state"] in {"apart", "together"}
+    assert isinstance(row["satisfied"], bool)
     assert row["rationale"]
     assert row["action"]
 
@@ -106,7 +106,7 @@ def test_advisory_calcium_iron_journal_is_visible_when_co_located(tmp_path: Path
     assert row["action"]
 
 
-def test_intra_product_conflict_is_journaled_as_unresolvable(tmp_path: Path) -> None:
+def test_intra_product_calcium_zinc_pair_is_not_a_hard_conflict(tmp_path: Path) -> None:
     rows = _journal(
         tmp_path,
         PlannerFixtureInput(
@@ -124,8 +124,4 @@ def test_intra_product_conflict_is_journaled_as_unresolvable(tmp_path: Path) -> 
             },
         ),
     )
-    row = next(item for item in rows if item["kind"] == "intra_product_conflict")
-    assert row["state"] == "unresolvable"
-    assert row["satisfied"] is False
-    assert row["disposition"] == "hard"
-    assert row["constraint_id"] == "sc_calcium_zinc_separate_slots"
+    assert not any(item["kind"] == "intra_product_conflict" for item in rows)
