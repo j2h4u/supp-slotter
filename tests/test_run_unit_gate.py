@@ -140,7 +140,7 @@ def test_runtime_scenarios_selects_exact_modules_and_nodes_in_order(
     assert "-n" not in pytest_command
     assert "--dist" not in pytest_command
     output = capsys.readouterr().out
-    assert "Running runtime-scenarios suite (16 targets)\n" in output
+    assert "Running runtime-scenarios suite (19 targets)\n" in output
     assert output.count("elapsed=") == 2
 
 
