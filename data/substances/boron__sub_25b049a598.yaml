@@ -1,19 +1,30 @@
 id: sub_25b049a598
 name: Boron
-notes: Generic elemental boron contribution. The active Life Extension product supplies 3 mg from a citrate/aspartate/glycinate complex; other registered products use citrate or calcium fructoborate. NIH ODS does not classify boron as an essential human nutrient; limited, form-sensitive bone context remains uncertain and does not establish broad brain, immunity, insulin, energy, estrogen, vitamin-D, or hormone benefits.
+notes: Generic elemental boron contribution. The active Life Extension product supplies 3 mg from a citrate/aspartate/glycinate complex; calcium fructoborate is a distinct inactive source and its evidence does not transfer to generic boron. NIH ODS does not classify boron as an essential human nutrient and does not establish a clear human function. Limited and inconsistent human evidence concerns bone/mineral, hormone, cognition, vitamin-D/calcium, and metabolic outcomes; no form has an established advantage. Keep intake within bounded upper-intake context; no known clinical medication interaction is established.
 knowledge:
   effect:
-  - bone_mineral_metabolism_support
+  - value: bone_mineral_metabolism_support
+    research_state: searched_insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Boron-HealthProfessional/
   kind:
-  - mineral
+  - value: mineral
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Boron-HealthProfessional/
 scheduling_assessment:
   intake:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Boron-HealthProfessional/
-    summary: The cited evidence does not establish an intake preference for boron citrate/aspartate/glycinate; it addresses boron generally without a validated form-specific comparator rule.
+    summary: No evidence establishes a form-specific bioavailability advantage or a fed-versus-fasted preference for boron.
   timing:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Boron-HealthProfessional/
-    summary: No general clock-time scheduling rule was demonstrated.
+    summary: No comparative clock-time evidence establishes a timing rule for boron.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Boron-HealthProfessional/
+    summary: No evidence establishes a workout- or activity-linked timing rule for boron; no activity placement is supported.
