@@ -1,7 +1,7 @@
 id: sub_fhl7c4skmf
 name: Magnesium
 form: citrate
-notes: Magnesium citrate component from the TiM Electrolyte Caps label. Citrate tends to be more bioavailable than oxide or sulfate, but this is not meal or workout evidence. NIH ODS describes magnesium as a cofactor for more
+notes: Magnesium citrate component from the TiM Electrolyte Caps label. Comparative citrate-over-oxide bioavailability is not universal and does not establish a meal, clock-time, sleep, or exercise rule. NIH ODS describes magnesium as a cofactor for more
   than 300 enzyme systems, including energy production, glucose and blood-pressure regulation, muscle/nerve function, calcium/potassium
   ion transport, normal heart rhythm, and bone structure.
 scheduling_assessment:
@@ -20,20 +20,33 @@ scheduling_assessment:
   activity:
     conclusion: insufficient
     sources:
-    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/14596323/
-    summary: The training product context and formulation evidence do not establish pre-, during-, or post-workout placement for magnesium.
+    - https://pubmed.ncbi.nlm.nih.gov/30388775/
+    - https://pubmed.ncbi.nlm.nih.gov/29637897/
+    summary: Exercise studies are confounded and non-form-specific; they do not establish pre-, during-, or post-workout placement for magnesium citrate.
 knowledge:
   context:
-  - workout_performance
+  - value: workout_performance
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/30388775/
+    - https://pubmed.ncbi.nlm.nih.gov/29637897/
   effect:
   - value: bone_mineral_metabolism_support
     research_state: supported
     sources:
     - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
   kind:
-  - mineral
+  - value: mineral
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
   pathway:
-  - vitamin_d_calcium_axis
+  - value: vitamin_d_calcium_axis
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
   quality:
-  - electrolyte
+  - value: electrolyte
+    research_state: supported
+    sources:
+    - https://medlineplus.gov/fluidandelectrolytebalance.html
