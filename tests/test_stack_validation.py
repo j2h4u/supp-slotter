@@ -23,7 +23,9 @@ def test_malformed_stack_entry_reports_schema_error(tmp_path: Path) -> None:
         PlannerFixtureInput(
             stack_items={"prd_aaa0000001": {"stack": "daily"}},
             products={"prd_aaa0000001": [("sub_aaa0000001", ["timing:energy_like"])]},
-            traits={"timing:energy_like": {"label": "Energy-like", "description": "Fixture.", "applies_when": "Fixture."}},
+            traits={
+                "timing:energy_like": {"label": "Energy-like", "description": "Fixture.", "applies_when": "Fixture."}
+            },
         ),
     )
     stacks_path = tmp_path / "data" / "stacks.yaml"

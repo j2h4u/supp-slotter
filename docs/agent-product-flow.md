@@ -374,7 +374,7 @@ For each cluster, capture what the user said, what would make it safer or more m
 
 For stack recommendations, pick axes before products. An axis is a reusable biological/review dimension that substances can cover: `kind:`, `effect:`, `risk:`, `pathway:`, relation types in `data/relations.yaml`, or dashboard projections. For product ingestion, start from the physical label and components first, then add reusable axes only when the label or review task exposes a real fact. Use `context:` only for explicit curated review membership when a cleaner reusable axis would over-include, under-include, or force an artificial trait.
 
-Do not create a new axis just because it sounds product-friendly. Add or refine an axis only when it helps multiple cards, improves review output, or makes planner/audit behavior more accurate.
+Do not create a new axis just because it sounds product-friendly. Add or refine an axis only when it helps multiple cards or improves review output.
 
 ## Knowledge Growth
 

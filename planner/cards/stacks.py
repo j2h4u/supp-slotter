@@ -48,7 +48,6 @@ def check_stack_alignment(
                 "the shelf; if it is depleted/not owned/reference-only, keep it "
                 "outside stacks intentionally."
             )
-            print(msg)
             info.append(msg)
 
     return errors, info
@@ -113,11 +112,7 @@ def validate_stacks(
         }
         inactive_stack_name = bundle.runtime_program.glue_contract.inactive_stack_name
         for stack_name in stacks_data:
-            if (
-                isinstance(stack_name, str)
-                and stack_name != inactive_stack_name
-                and stack_name not in pillbox_stacks
-            ):
+            if isinstance(stack_name, str) and stack_name != inactive_stack_name and stack_name not in pillbox_stacks:
                 alignment_info.append(
                     f"{stacks_path}: stack '{stack_name}' has no pillbox; add a pillbox or remove the stack"
                 )

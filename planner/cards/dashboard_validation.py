@@ -7,7 +7,7 @@ from typing import cast
 
 from planner.cards._common import load_card_mapping
 from planner.cards.dashboards import load_dashboard
-from planner.contracts import CardLoadError, RelationSelector
+from planner.contracts import CardLoadError, RelationSelector, Substance
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.selector import resolve_dashboard_selector
 from planner.paths import Paths
@@ -15,8 +15,12 @@ from planner.schema_validation import schema_errors
 
 
 def check_dashboards(
-    dashboard_files: list[Path], _policy_ids: set[str], _paths: Paths, bundle: OntologyBundle,
-    substances: dict[str, Substance] | None = None, info: list[str] | None = None,
+    dashboard_files: list[Path],
+    _policy_ids: set[str],
+    _paths: Paths,
+    bundle: OntologyBundle,
+    substances: dict[str, Substance] | None = None,
+    info: list[str] | None = None,
 ) -> list[str]:
     dashboard_paths_by_id: dict[str, Path] = {}
     return [
@@ -32,7 +36,7 @@ def _check_dashboard_file(
     dashboard_paths_by_id: dict[str, Path],
     substances: dict[str, Substance],
     info: list[str] | None,
-) -> list[str]:
+) -> list[str]:  # noqa: complex-structure
     try:
         dashboard = load_card_mapping(path, "dashboard")
     except CardLoadError as error:
@@ -68,9 +72,8 @@ def _check_dashboard_file(
             errors.append(
                 f"{path}: selectors[{index}] term '{category}:{term}' is not in canonical ontology vocabulary"
             )
-        elif resolution.outcome == "empty":
-            if info is not None:
-                info.append(f"{path}: selectors[{index}] term '{category}:{term}' resolves to no substance cards")
+        elif resolution.outcome == "empty" and info is not None:
+            info.append(f"{path}: selectors[{index}] term '{category}:{term}' resolves to no substance cards")
     return errors
 
 

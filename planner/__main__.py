@@ -36,7 +36,10 @@ def main(data_root: Path | None = None) -> None:
     )
     sub = parser.add_subparsers(dest="cmd", required=False)
 
-    sub.add_parser("check", help="validate all YAML data files")
+    check_parser = sub.add_parser("check", help="normalize deterministic refs, then validate all YAML data files")
+    check_parser.epilog = (
+        "check first applies deterministic maintenance (IDs, filenames, and refs), then validates data."
+    )
 
     find_parser = sub.add_parser(
         "find",
@@ -49,7 +52,6 @@ def main(data_root: Path | None = None) -> None:
     )
 
     sub.add_parser("groom", help="show the next priority grooming card")
-
 
     if len(sys.argv) == 1:
         _exit_with_result(cmd_show(data_root=data_root))
