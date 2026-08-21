@@ -265,17 +265,28 @@ def _report_tight_feasible_items(
     errors: list[str],
     feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]],
 ) -> None:
-    tight_items = [
+    tight_items = _tight_feasible_items(feasible_slots_by_item)
+    if not tight_items:
+        return
+    header = "plan: items with ≤1 feasible slot (likely cause):"
+    print(header, file=sys.stderr)
+    errors.append(header)
+    for item_id, slot_names in tight_items:
+        _append_tight_item_diagnostic(errors, item_id, slot_names)
+
+
+def _tight_feasible_items(
+    feasible_slots_by_item: dict[str, list[tuple[str, int, list[str]]]],
+) -> list[tuple[str, list[str]]]:
+    return [
         (item_id, [name for name, _score, _reasons in candidates])
         for item_id, candidates in sorted(feasible_slots_by_item.items())
         if len(candidates) <= 1
     ]
-    if tight_items:
-        header = "plan: items with ≤1 feasible slot (likely cause):"
-        print(header, file=sys.stderr)
-        errors.append(header)
-        for item_id, slot_names in tight_items:
-            slot_list = ", ".join(slot_names) if slot_names else "(none)"
-            line = f"  - {item_id}: {slot_list}"
-            print(line, file=sys.stderr)
-            errors.append(line)
+
+
+def _append_tight_item_diagnostic(errors: list[str], item_id: str, slot_names: list[str]) -> None:
+    slot_list = ", ".join(slot_names) if slot_names else "(none)"
+    line = f"  - {item_id}: {slot_list}"
+    print(line, file=sys.stderr)
+    errors.append(line)
