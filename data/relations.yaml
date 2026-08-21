@@ -118,8 +118,7 @@ relations:
   target_selector:
     category: pathway
     term: omega3_eicosanoid
-- reason: Vitamin D3 supports intestinal calcium absorption and bone physiology; this does not establish a calcium supplement
-    requirement. Source: https://ods.od.nih.gov/factsheets/Vitamind-HealthProfessional/.
+- reason: 'Vitamin D3 supports intestinal calcium absorption and bone physiology; this does not establish a calcium supplement requirement. Source: https://ods.od.nih.gov/factsheets/Vitamind-HealthProfessional/.'
   id: rel_supports_007
   relation_type: supports
   assertion_kind: ontology_assertion
