@@ -1,30 +1,55 @@
 id: sub_a3ec9f9c52
 name: Tadalafil
-notes: 'PDE5 inhibitor. The exact active Tadalista source/formulation is absent; the product is retained as an informational interaction/review placeholder. DailyMed tadalafil tablets may be taken with or without food, but that label is not prescribing guidance for this product or its user-reported 1.25 mg amount. Preserve PDE5/NO-cGMP context without off-label endothelial, typical-morning, or synergy claims. Source: DailyMed tadalafil label.'
+notes: 'Generic tadalafil evidence supports PDE5, vasodilator, NO-cGMP, and hypotension-interaction context; the exact Tadalista formulation and user-reported 1.25 mg amount are unverified, and no broad vascular benefit is established.'
 concerns:
 - kind: safety
   text: PDE5 inhibitor context should be reviewed with nitrates, alpha-blockers, antihypertensives, alcohol, and other vasodilators
     because symptomatic hypotension can become the limiting stack risk.
 knowledge:
   context:
-  - vascular_health
+  - value: vascular_health
+    research_state: mechanistic_only
+    sources:
+    - https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=78509a43-a907-4359-9022-f38c4f765880&type=display
   effect:
-  - pde5_inhibition
-  - vasodilator
+  - value: pde5_inhibition
+    research_state: supported
+    sources:
+    - https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=78509a43-a907-4359-9022-f38c4f765880&type=display
+  - value: vasodilator
+    research_state: supported
+    sources:
+    - https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=78509a43-a907-4359-9022-f38c4f765880&type=display
   pathway:
-  - nitric_oxide_cgmp
+  - value: nitric_oxide_cgmp
+    research_state: supported
+    sources:
+    - https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=78509a43-a907-4359-9022-f38c4f765880&type=display
   risk:
-  - hypotension_med_interaction
+  - value: hypotension_med_interaction
+    research_state: supported
+    sources:
+    - https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=78509a43-a907-4359-9022-f38c4f765880&type=display
   role:
-  - pharmaceutical
+  - value: pharmaceutical
+    research_state: supported
+    sources:
+    - https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=78509a43-a907-4359-9022-f38c4f765880&type=display
 scheduling_assessment:
   intake:
     conclusion: supports_no_rule
     sources:
     - https://dailymed.nlm.nih.gov/dailymed/fdaDrugXsl.cfm?setid=78509a43-a907-4359-9022-f38c4f765880&type=display
-    summary: DailyMed tadalafil tablets may be taken with or without food; the exact Tadalista source/formulation is absent, so this informational label conclusion does not prescribe use or create a food preference.
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC1885023/
+    summary: Generic tadalafil has negligible food effect, so no executable food rule is established; the exact Tadalista formulation remains unverified.
   timing:
     conclusion: supports_no_rule
     sources:
-    - https://dailymed.nlm.nih.gov/dailymed/fdaDrugXsl.cfm?setid=78509a43-a907-4359-9022-f38c4f765880&type=display
-    summary: No comparative AM-versus-PM evidence establishes a preferred clock time; half-life and label administration are not morning-superiority evidence.
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC1885023/
+    summary: No morning-versus-evening effect is established; tadalafil half-life does not define a dosing-frequency model.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=78509a43-a907-4359-9022-f38c4f765880&type=display
+    - https://pmc.ncbi.nlm.nih.gov/articles/PMC1885023/
+    summary: Evidence does not compare tadalafil administration relative to exercise, so no activity rule is established.
