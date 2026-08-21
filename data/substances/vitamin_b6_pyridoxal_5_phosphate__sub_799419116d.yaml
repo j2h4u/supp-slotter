@@ -23,9 +23,18 @@ knowledge:
   context:
   - neurocognitive_support
   effect:
-  - amino_acid_metabolism_support
-  - homocysteine_metabolism_support
-  - neurotransmitter_synthesis_support
+  - value: amino_acid_metabolism_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
+  - value: homocysteine_metabolism_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
+  - value: neurotransmitter_synthesis_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
   kind:
   - vitamin
   pathway:
