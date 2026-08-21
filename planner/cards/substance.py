@@ -197,7 +197,25 @@ def _scheduling_assessment_record(
     conclusion = record.get("conclusion")
     if not isinstance(conclusion, str) or conclusion not in conclusion_values:
         raise CardLoadError(path, f"{path}: scheduling_assessment.{axis}.conclusion is not in ontology vocabulary")
-    policy = record.get("policy")
+    policy = _assessment_policy(record.get("policy"), conclusion, axis, path, schedule_values)
+    sources = _assessment_sources(record.get("sources"), axis, path)
+    summary = _assessment_summary(record.get("summary"), axis, path)
+    return SchedulingAssessment(
+        axis=axis,
+        conclusion=conclusion,
+        policy=policy if isinstance(policy, str) else None,
+        sources=sources,
+        summary=summary,
+    )
+
+
+def _assessment_policy(
+    policy: object,
+    conclusion: str,
+    axis: str,
+    path: Path,
+    schedule_values: tuple[str, ...],
+) -> str | None:
     if conclusion == "supports_preference":
         if not isinstance(policy, str) or not policy.strip():
             raise CardLoadError(path, f"{path}: scheduling_assessment.{axis}.policy is required")
@@ -206,25 +224,26 @@ def _scheduling_assessment_record(
                 path,
                 f"{path}: scheduling_assessment.{axis}.policy {policy!r} has no matching schedule assertion",
             )
-    elif policy is not None:
+        return policy
+    if policy is not None:
         raise CardLoadError(path, f"{path}: scheduling_assessment.{axis}.policy is forbidden for {conclusion}")
-    sources = record.get("sources")
+    return None
+
+
+def _assessment_sources(value: object, axis: str, path: Path) -> tuple[str, ...]:
     if (
-        not isinstance(sources, list)
-        or not sources
-        or any(not isinstance(source, str) or not source.strip() for source in sources)
+        not isinstance(value, list)
+        or not value
+        or any(not isinstance(source, str) or not source.strip() for source in value)
     ):
         raise CardLoadError(path, f"{path}: scheduling_assessment.{axis}.sources must be non-empty")
-    summary = record.get("summary")
-    if not isinstance(summary, str) or not summary.strip():
+    return tuple(cast(list[str], value))
+
+
+def _assessment_summary(value: object, axis: str, path: Path) -> str:
+    if not isinstance(value, str) or not value.strip():
         raise CardLoadError(path, f"{path}: scheduling_assessment.{axis}.summary must be non-empty")
-    return SchedulingAssessment(
-        axis=axis,
-        conclusion=conclusion,
-        policy=policy if isinstance(policy, str) else None,
-        sources=tuple(cast(list[str], sources)),
-        summary=summary,
-    )
+    return value
 
 
 def _canonical_terms(

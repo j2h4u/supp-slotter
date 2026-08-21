@@ -17,20 +17,13 @@ def format_substance_candidate(substance_id: str, substance: Substance) -> str:
 
 
 def substance_similarity_terms(substance: Substance) -> list[tuple[str, bool]]:
-    terms: list[tuple[str, bool]] = []
-    if substance.form:
-        terms.append((f"{substance.name} {substance.form}", True))
-    else:
-        terms.append((substance.name, True))
-    terms.extend((alias, False) for alias in substance.aliases)
-
-    normalized_terms: list[tuple[str, bool]] = []
-    for term, is_primary in terms:
-        normalized = normalize_similarity_text(term)
-        normalized_entry = (normalized, is_primary)
-        if normalized and normalized_entry not in normalized_terms:
-            normalized_terms.append(normalized_entry)
-    return normalized_terms
+    primary = f"{substance.name} {substance.form}" if substance.form else substance.name
+    terms = [(primary, True), *((alias, False) for alias in substance.aliases)]
+    return list(
+        dict.fromkeys(
+            (normalized, is_primary) for term, is_primary in terms if (normalized := normalize_similarity_text(term))
+        )
+    )
 
 
 def substance_name_key(substance: Substance) -> str:
@@ -59,29 +52,35 @@ def substance_cluster_label(substances: dict[str, Substance], component: list[st
 
 
 def collect_similar_substances(substances: dict[str, Substance]) -> list[str]:
-    clusters: list[str] = []
     substance_items = sorted(substances.items())
-    terms_by_id = {substance_id: substance_similarity_terms(substance) for substance_id, substance in substance_items}
-    edges: dict[str, set[str]] = {substance_id: set() for substance_id in substances}
+    edges = _similarity_edges(substance_items)
+    return sorted(
+        (_format_similarity_cluster(substances, component) for component in connected_components(edges)),
+        key=lambda cluster: cluster.splitlines()[0].casefold(),
+    )
 
-    for index, (left_id, left_substance) in enumerate(substance_items):
-        for right_id, right_substance in substance_items[index + 1 :]:
-            score = similarity_score(terms_by_id[left_id], terms_by_id[right_id])
-            if score < SIMILAR_SUBSTANCE_THRESHOLD:
+
+def _similarity_edges(items: list[tuple[str, Substance]]) -> dict[str, set[str]]:
+    terms_by_id = {substance_id: substance_similarity_terms(substance) for substance_id, substance in items}
+    edges: dict[str, set[str]] = {substance_id: set() for substance_id, _ in items}
+    for index, (left_id, left_substance) in enumerate(items):
+        for right_id, right_substance in items[index + 1 :]:
+            if similarity_score(terms_by_id[left_id], terms_by_id[right_id]) < SIMILAR_SUBSTANCE_THRESHOLD:
                 continue
             if _is_expected_form_variant_pair(left_substance, right_substance):
                 continue
             edges[left_id].add(right_id)
             edges[right_id].add(left_id)
+    return edges
 
-    for component in connected_components(edges):
-        label = substance_cluster_label(substances, component)
-        entries = [format_substance_candidate(substance_id, substances[substance_id]) for substance_id in component]
-        cluster_lines = [label]
-        cluster_lines.extend(f"    - {entry}" for entry in sorted(entries, key=str.casefold))
-        clusters.append("\n".join(cluster_lines))
 
-    return sorted(clusters, key=lambda cluster: cluster.splitlines()[0].casefold())
+def _format_similarity_cluster(substances: dict[str, Substance], component: list[str]) -> str:
+    label = substance_cluster_label(substances, component)
+    entries = sorted(
+        (format_substance_candidate(substance_id, substances[substance_id]) for substance_id in component),
+        key=str.casefold,
+    )
+    return "\n".join([label, *(f"    - {entry}" for entry in entries)])
 
 
 def _substance_fallback_name(substance: Substance) -> str:

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import cast
 
 from planner.cards.dashboards import load_dashboard
@@ -42,28 +43,20 @@ def stacks_for_read_model(paths: Paths) -> dict[str, list[str]]:
 
 def pillbox_stack_names(paths: Paths) -> set[str]:
     """Authored stack references declared by data/pillboxes.yaml."""
-    raw = cast(dict[str, object], load_yaml_mapping(paths.data / "pillboxes.yaml"))
-    stack_names: set[str] = set()
-    for name, pillbox in raw.items():
-        if not isinstance(name, str) or not name.strip():
-            raise CardLoadError(
-                paths.data / "pillboxes.yaml",
-                f"{paths.data / 'pillboxes.yaml'}: pillbox names must be non-empty strings",
-            )
-        if not isinstance(pillbox, dict):
-            raise CardLoadError(
-                paths.data / "pillboxes.yaml",
-                f"{paths.data / 'pillboxes.yaml'}: pillbox {name!r} must be a mapping",
-            )
-        pillbox_mapping = cast(dict[str, object], pillbox)
-        stack = pillbox_mapping.get("stack")
-        if not isinstance(stack, str) or not stack.strip():
-            raise CardLoadError(
-                paths.data / "pillboxes.yaml",
-                f"{paths.data / 'pillboxes.yaml'}: pillbox {name!r}.stack must be a non-empty string",
-            )
-        stack_names.add(stack)
-    return stack_names
+    path = paths.data / "pillboxes.yaml"
+    raw = cast(dict[str, object], load_yaml_mapping(path))
+    return {_pillbox_stack_name(path, name, pillbox) for name, pillbox in raw.items()}
+
+
+def _pillbox_stack_name(path: Path, name: object, pillbox: object) -> str:
+    if not isinstance(name, str) or not name.strip():
+        raise CardLoadError(path, f"{path}: pillbox names must be non-empty strings")
+    if not isinstance(pillbox, dict):
+        raise CardLoadError(path, f"{path}: pillbox {name!r} must be a mapping")
+    stack = cast(dict[str, object], pillbox).get("stack")
+    if not isinstance(stack, str) or not stack.strip():
+        raise CardLoadError(path, f"{path}: pillbox {name!r}.stack must be a non-empty string")
+    return stack
 
 
 def dashboards_for_read_model(paths: Paths, bundle: OntologyBundle) -> dict[str, Dashboard]:

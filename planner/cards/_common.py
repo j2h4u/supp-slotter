@@ -77,16 +77,21 @@ def similarity_score(
     right_terms: list[tuple[str, bool]],
 ) -> float:
     """Return the max SequenceMatcher ratio across primary-term pairs; returns 1.0 on exact match of any term where at least one side is primary."""
-    scores: list[float] = []
-    for left, left_primary in left_terms:
-        for right, right_primary in right_terms:
-            if left == right:
-                if left_primary or right_primary:
-                    return 1.0
-                continue
-            if left_primary and right_primary:
-                scores.append(SequenceMatcher(None, left, right).ratio())
-    return max(scores) if scores else 0.0
+    if any(
+        left == right and (left_primary or right_primary)
+        for left, left_primary in left_terms
+        for right, right_primary in right_terms
+    ):
+        return 1.0
+    return max(
+        (
+            SequenceMatcher(None, left, right).ratio()
+            for left, left_primary in left_terms
+            for right, right_primary in right_terms
+            if left_primary and right_primary and left != right
+        ),
+        default=0.0,
+    )
 
 
 def connected_components(edges: dict[str, set[str]]) -> list[list[str]]:
@@ -102,17 +107,21 @@ def connected_components(edges: dict[str, set[str]]) -> list[list[str]]:
     for node in sorted(edges):
         if node in seen:
             continue
-        stack = [node]
-        component: list[str] = []
-        seen.add(node)
-        while stack:
-            current = stack.pop()
-            component.append(current)
-            for next_node in sorted(edges[current]):
-                if next_node in seen:
-                    continue
-                seen.add(next_node)
-                stack.append(next_node)
+        component = _walk_component(node, edges, seen)
         if len(component) > 1:
             components.append(sorted(component))
     return components
+
+
+def _walk_component(node: str, edges: dict[str, set[str]], seen: set[str]) -> list[str]:
+    stack = [node]
+    component: list[str] = []
+    seen.add(node)
+    while stack:
+        current = stack.pop()
+        component.append(current)
+        for next_node in sorted(edges[current]):
+            if next_node not in seen:
+                seen.add(next_node)
+                stack.append(next_node)
+    return component
