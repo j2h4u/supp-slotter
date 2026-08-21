@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from typing import cast
 
 from planner.query_model.session import SurrealSession, id_str, string_list
 
@@ -22,19 +23,20 @@ def collect_research_state_assertions(
         if substance_id not in active_substances:
             continue
         name = substance.get("name", substance_id)
-        for assertion in substance.get("knowledge_assertions", []):
+        for assertion in cast(list[object], substance.get("knowledge_assertions", [])):
             if not isinstance(assertion, Mapping):
                 continue
-            if assertion.get("research_state", "unassessed") != research_state:
+            assertion_mapping = cast(Mapping[str, object], assertion)
+            if assertion_mapping.get("research_state", "unassessed") != research_state:
                 continue
             rows.append({
                 "kind": "knowledge",
                 "id": substance_id,
                 "name": name,
-                "category": assertion.get("knowledge_category", ""),
-                "value": assertion.get("knowledge_value", ""),
+                "category": assertion_mapping.get("knowledge_category", ""),
+                "value": assertion_mapping.get("knowledge_value", ""),
                 "research_state": research_state,
-                "sources": string_list(assertion.get("sources")),
+                "sources": string_list(assertion_mapping.get("sources")),
             })
     for relation in db.query(
         "SELECT id, type, src_substances, tgt_substances, src_display, tgt_display, reason, "

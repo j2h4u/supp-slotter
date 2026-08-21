@@ -81,7 +81,9 @@ def cmd_grooming_research(
                     id=str(row["id"]),
                     research_state=research_state,
                     detail=_research_detail(row),
-                    sources=tuple(str(item) for item in row.get("sources", []) if isinstance(item, str)),
+                    sources=tuple(
+                        str(item) for item in cast(list[object], row.get("sources", [])) if isinstance(item, str)
+                    ),
                 )
                 for row in rows
             ]

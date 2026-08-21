@@ -308,7 +308,7 @@ def load_ontology_assertions(bundle: OntologyBundle) -> tuple[OntologyAssertion,
                 action=action if isinstance(action, str) else None,
                 severity=cast(Severity | None, severity),
                 research_state=cast(str, raw.get("research_state", "unassessed")),
-                sources=tuple(item for item in raw.get("sources", []) if isinstance(item, str)),
+                sources=tuple(item for item in cast(list[object], raw.get("sources", [])) if isinstance(item, str)),
             )
         )
     return tuple(assertions)
