@@ -73,11 +73,16 @@ relations:
   target_selector:
     entity:
       name: Calcium
-- reason: 'Magnesium participates as a cofactor in vitamin D hydroxylation and calcium homeostasis; this biochemical relationship does not imply that vitamin D3 supplementation is blocked. Sources: https://pubmed.ncbi.nlm.nih.gov/30541089/; https://pubmed.ncbi.nlm.nih.gov/29480918/.'
+- reason: 'Magnesium participates as a cofactor in vitamin D metabolism; this biochemical relationship does not establish a requirement for magnesium supplementation. Sources: https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/; https://pubmed.ncbi.nlm.nih.gov/24228832/.'
   id: rel_supports_004
   relation_type: supports
   assertion_kind: ontology_assertion
   semantic_family: biochemical_mechanism_assertion
+  research_state: mechanistic_only
+  sources:
+  - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
+  - https://pubmed.ncbi.nlm.nih.gov/24228832/
+  action: No magnesium supplement requirement, co-dose, separation, or timing rule is established by this relationship.
   source_selector:
     entity:
       name: Magnesium
@@ -113,12 +118,16 @@ relations:
   target_selector:
     category: pathway
     term: omega3_eicosanoid
-- reason: Vitamin D3 promotes intestinal calcium absorption via VDR-mediated upregulation of TRPV6 and calbindin; without
-    adequate D3, calcium absorption is significantly reduced.
+- reason: Vitamin D3 supports intestinal calcium absorption and bone physiology; this does not establish a calcium supplement
+    requirement. Source: https://ods.od.nih.gov/factsheets/Vitamind-HealthProfessional/.
   id: rel_supports_007
   relation_type: supports
   assertion_kind: ontology_assertion
   semantic_family: absorption_interaction_claim
+  research_state: supported
+  sources:
+  - https://ods.od.nih.gov/factsheets/Vitamind-HealthProfessional/
+  action: No calcium supplement requirement, co-dose, separation, or timing rule is established by this relationship.
   source_selector:
     entity:
       entity_id: sub_2476bf9d4b
