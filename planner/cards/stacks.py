@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from pathlib import Path
+from typing import cast
 
 from planner.contracts import CardLoadError, StackEntry
 from planner.ontology.artifacts import OntologyBundle
@@ -105,11 +106,10 @@ def validate_stacks(
     pillboxes_path = paths.data / "pillboxes.yaml"
     try:
         pillboxes = load_yaml(pillboxes_path)
-        pillbox_stacks = {
-            str(value["stack"])
-            for value in pillboxes.values()
-            if isinstance(value, dict) and isinstance(value.get("stack"), str)
-        }
+        if not isinstance(pillboxes, dict):
+            pillboxes = {}
+        pillbox_mapping = cast(dict[str, object], pillboxes)
+        pillbox_stacks = _pillbox_stack_names(pillbox_mapping)
         inactive_stack_name = bundle.runtime_program.glue_contract.inactive_stack_name
         for stack_name in stacks_data:
             if isinstance(stack_name, str) and stack_name != inactive_stack_name and stack_name not in pillbox_stacks:
@@ -120,3 +120,15 @@ def validate_stacks(
         pass
     errors.extend(alignment_errors)
     return errors, alignment_info
+
+
+def _pillbox_stack_names(pillboxes: dict[str, object]) -> set[str]:
+    stacks: set[str] = set()
+    for raw_value in pillboxes.values():
+        if not isinstance(raw_value, dict):
+            continue
+        value = cast(dict[str, object], raw_value)
+        stack = value.get("stack")
+        if isinstance(stack, str):
+            stacks.add(stack)
+    return stacks
