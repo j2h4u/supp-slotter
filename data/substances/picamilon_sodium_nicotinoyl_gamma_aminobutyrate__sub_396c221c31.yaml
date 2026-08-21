@@ -2,20 +2,19 @@ id: sub_396c221c31
 name: Picamilon
 form: sodium nicotinoyl gamma-aminobutyrate
 notes: 'Synthetic conjugate of GABA and niacin (nicotinic acid), developed in the
-  USSR. The registered Russian tablet instruction identifies the active substance
-  as the sodium salt of N-nicotinoyl-gamma-aminobutyric acid and states that tablets
-  are taken independently of meals. Classified as a prescription drug in Russia and
-  not a lawful dietary ingredient for US dietary supplements under FDA''s 2015 constituent
-  update. A 2023 broad-panel assay reported no activity for parent picamilon against
-  50 tested biological targets, including GABA receptors (PMID 36668678); this is
-  limited in-vitro evidence under tested conditions and does not establish clinical
-  inefficacy or resolve the contribution of metabolites. Blood-pressure and other
-  pharmacologic context require clinician review. Sources: registered Russian instruction
-  (Medi.ru); Russian medicines registry; FDA constituent update Nov 2015; PubMed 36668678.'
-concerns:
-- kind: safety
-  text: Prescription drug in Russia, banned as supplement in US — regulatory status
-    has no dedicated trait
+  USSR. The registered Russian tablet instruction identifies the active substance as
+  the sodium salt of N-nicotinoyl-gamma-aminobutyric acid and states that tablets are
+  taken independently of meals. The same instruction lists allergic reactions (rash,
+  itching), dizziness, headache, mild nausea, irritability, anxiety, and excitation as
+  adverse effects; contraindications include hypersensitivity, chronic renal failure,
+  pregnancy, lactation, and children under 3 years; it reports shortened barbiturate
+  action and potentiation of opioid analgesics. Classified as a prescription drug in
+  Russia and not a lawful dietary ingredient for US dietary supplements under the FDA''s
+  2015 action. A 2023 broad-panel assay found weak or no binding for parent picamilon
+  against 50 tested biological targets (PMID 36668678); this is limited evidence under
+  tested conditions and does not establish clinical efficacy or inefficacy. Sources:
+  registered Russian instruction (Medi.ru); Russian medicines registry; FDA 2015
+  scientific memorandum and constituent action; PubMed 36668678.'
 scheduling_assessment:
   intake:
     conclusion: supports_no_rule
@@ -28,16 +27,45 @@ scheduling_assessment:
     conclusion: insufficient
     sources:
     - https://medi.ru/instrukciya/pikamilon_22339/
-    summary: The registered instruction provides indication-specific regimens but
-      does not establish a general clock-time preference; timing remains insufficient
-      for this planner.
+    - https://pubmed.ncbi.nlm.nih.gov/20359966/
+    summary: The registered instruction and available clinical evidence do not establish
+      a general clock-time preference; no AM or PM rule is supported for this planner.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://medi.ru/instrukciya/pikamilon_22339/
+    - https://pubmed.ncbi.nlm.nih.gov/20359966/
+    summary: The instruction and available evidence do not establish a workout-linked
+      activity rule; no pre-workout or post-workout assignment is supported.
 knowledge:
   context:
-  - cortisol_reduction
-  - neurocognitive_support
-  - sleep_recovery
-  - vascular_health
+  - value: neurocognitive_support
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/39113452/
+    - https://pubmed.ncbi.nlm.nih.gov/36668678/
+  - value: sleep_recovery
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/39113452/
+    - https://medi.ru/instrukciya/pikamilon_22339/
+  - value: vascular_health
+    research_state: searched_insufficient
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/39113452/
+    - https://www.fda.gov/media/169560/download
+    - https://medi.ru/instrukciya/pikamilon_22339/
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: supported
+    sources:
+    - https://medi.ru/instrukciya/pikamilon_22339/
+    - https://zdravmedinform.ru/grls/reg-lp-013214-rg-ru.html
+    - https://www.fda.gov/media/169560/download
   role:
-  - pharmaceutical
+  - value: pharmaceutical
+    research_state: supported
+    sources:
+    - https://medi.ru/instrukciya/pikamilon_22339/
+    - https://zdravmedinform.ru/grls/reg-lp-013214-rg-ru.html
+    - https://www.fda.gov/food/cfsan-constituent-updates/recent-fda-action-dietary-supplements-labeled-containing-picamilon
