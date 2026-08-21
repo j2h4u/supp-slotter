@@ -71,7 +71,7 @@ def _print_concerns(model: ReviewModel) -> None:
         print(f"{header} ({len(entries)})")
         print(SEPARATOR)
         ordered = sorted(entries, key=_concern_sort_key)
-        shown = ordered[:12]
+        shown = ordered[:3]
         for entry in shown:
             print(f"  {entry.name} ({entry.record.subject_kind}:{entry.record.subject_id})")
             wrapped = textwrap.fill(
@@ -114,9 +114,6 @@ def _print_relations(model: ReviewModel) -> None:
         if entry["reason"]:
             print(f"      {entry['reason']}")
         _print_relation_metadata(entry)
-        action = entry.get("action")
-        if action:
-            print(f"      action: {action}")
 
 
 def _relation_sort_key(entry: RelationReviewRow, relation_type_order: tuple[str, ...]) -> tuple[int, str]:

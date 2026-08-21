@@ -25,7 +25,10 @@ def _write_minimal_data_root(tmp: Path) -> None:
     # One substance carrying knowledge.risk: [manual_review]
     # ID pattern: ^sub_[a-z0-9]{10}$ — 'aabbccdd01' = 10 chars
     (substances_dir / "test_risk__sub_aabbccdd01.yaml").write_text(
-        "id: sub_aabbccdd01\nname: Test Risk Sub\nschedule: {}\nknowledge:\n  risk:\n  - manual_review\n"
+        "id: sub_aabbccdd01\nname: Test Risk Sub\nschedule: {}\nconcerns:\n- kind: safety\n  text: Active concern\nknowledge:\n  risk:\n  - manual_review\n"
+    )
+    (substances_dir / "inactive_concern__sub_aabbccdd03.yaml").write_text(
+        "id: sub_aabbccdd03\nname: Inactive Concern\nconcerns:\n- kind: safety\n  text: Inactive concern\n"
     )
     (substances_dir / "review_with_source__sub_aabbccdd08.yaml").write_text(
         "id: sub_aabbccdd08\nname: L-Citrulline (malate)\nknowledge:\n  effect:\n  - nitric_oxide_support\n"
@@ -123,6 +126,15 @@ def test_cmd_review_does_not_emit_audit_diagnostics(tmp_path: Path) -> None:
     _write_minimal_data_root(tmp_path)
     output = cmd_review(data_root=tmp_path).output
     assert "Audit diagnostics" not in output, f"review should not emit audit diagnostics: {output[:300]}"
+    assert "Active concern" in output
+    assert "Inactive concern" not in output
+
+
+def test_cmd_review_bounds_actionable_sections_and_does_not_duplicate_action(tmp_path: Path) -> None:
+    _write_minimal_data_root(tmp_path)
+    output = cmd_review(data_root=tmp_path).output
+    assert output.count("Active concern") == 1
+    assert len(output.splitlines()) < 80
 
 
 # ---------------------------------------------------------------------------

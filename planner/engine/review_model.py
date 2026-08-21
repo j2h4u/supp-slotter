@@ -95,6 +95,12 @@ def build_review_model(  # noqa: PLR0914
         ontology_bundle=bundle,
     )
     active_substances = read_model.active_substance_ids()
+    inactive_stack_name = bundle.runtime_program.glue_contract.inactive_stack_name
+    active_products = {
+        product_id
+        for product_id, entry in stack_entries.items()
+        if entry["stack"] != inactive_stack_name
+    }
     presentation = load_review_presentation(bundle)
     relation_type_order = load_relation_type_order(bundle)
     concern_kind_order = presentation.concern_kinds
@@ -121,8 +127,8 @@ def build_review_model(  # noqa: PLR0914
         ReviewModel(
             concerns_by_kind=_concerns_by_kind(
                 _ConcernFilterContext(
-                    substances=substances,
-                    products=products,
+                    substances={key: value for key, value in substances.items() if key in active_substances},
+                    products={key: value for key, value in products.items() if key in active_products},
                 ),
                 concern_kind_order,
             ),
