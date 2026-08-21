@@ -16,6 +16,7 @@ from planner.contracts import (
     Substance,
 )
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.schema_enums import schema_enum_values
 from planner.ontology.selector import (
     RelationTypeContract,
     hydrate_selector,
@@ -24,7 +25,6 @@ from planner.ontology.selector import (
     selector_identity_key,
     validate_relation_selector_form,
 )
-from planner.ontology.schema_enums import schema_enum_values
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import YamlValue, load_yaml

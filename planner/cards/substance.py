@@ -102,26 +102,7 @@ def _knowledge_assertions(
         known = canonical_terms.get(predicate, frozenset())
         state_values = frozenset(schema_enum_values(bundle, "ResearchState"))
         for index, raw in enumerate(values):
-            state = "unassessed"
-            sources: tuple[str, ...] = ()
-            if isinstance(raw, str):
-                term = raw
-            elif isinstance(raw, Mapping):
-                record = cast(Mapping[str, object], raw)
-                if set(record) - {"value", "research_state", "sources"} or "value" not in record:
-                    raise CardLoadError(path, f"{path}: {predicate}[{index}] has unsupported fields")
-                term = record["value"]
-                state = record.get("research_state", "unassessed")
-                raw_sources = record.get("sources", [])
-                if not isinstance(raw_sources, list) or any(
-                    not isinstance(source, str) or not source.strip() for source in raw_sources
-                ):
-                    raise CardLoadError(
-                        path, f"{path}: {predicate}[{index}].sources must be a list of non-empty strings"
-                    )
-                sources = tuple(cast(list[str], raw_sources))
-            else:
-                raise CardLoadError(path, f"{path}: {predicate}[{index}] must be a string or mapping")
+            term, state, sources = _knowledge_record(raw, path, f"{predicate}[{index}]")
             if not isinstance(term, str) or term not in known:
                 raise CardLoadError(path, f"{path}: term '{predicate}:{term}' is not in canonical ontology vocabulary")
             if not isinstance(state, str) or state not in state_values:
@@ -132,6 +113,23 @@ def _knowledge_assertions(
                 raise CardLoadError(path, f"{path}: {predicate}[{index}].sources must be non-empty for {state!r}")
             assertions.append(KnowledgeAssertion(category, term, state, sources))
     return tuple(assertions)
+
+
+def _knowledge_record(raw: object, path: Path, label: str) -> tuple[object, object, tuple[str, ...]]:
+    if isinstance(raw, str):
+        return raw, "unassessed", ()
+    if not isinstance(raw, Mapping):
+        raise CardLoadError(path, f"{path}: {label} must be a string or mapping")
+    record = cast(Mapping[str, object], raw)
+    if set(record) - {"value", "research_state", "sources"} or "value" not in record:
+        raise CardLoadError(path, f"{path}: {label} has unsupported fields")
+    state = record.get("research_state", "unassessed")
+    raw_sources = record.get("sources", [])
+    if not isinstance(raw_sources, list) or any(
+        not isinstance(source, str) or not source.strip() for source in raw_sources
+    ):
+        raise CardLoadError(path, f"{path}: {label}.sources must be a list of non-empty strings")
+    return record["value"], state, tuple(cast(list[str], raw_sources))
 
 
 def _schedule_assertions(value: dict[str, object], path: Path, bundle: OntologyBundle) -> tuple[ScheduleAssertion, ...]:

@@ -8,14 +8,12 @@ from shutil import copytree
 from typing import cast
 
 import yaml
-
 from planner.cards.product import format_product_name, load_product_registry
 from planner.engine import cmd_plan
 from planner.paths import Paths
 
 from tests.helpers import ontology_bundle
 from tests.planner_fixture import PlannerFixtureInput, fixture_id, plan_in_temp_dir, write_minimal_planner_fixture
-
 
 ROOT = Path(__file__).resolve().parents[1]
 

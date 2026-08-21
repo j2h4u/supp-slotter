@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from planner.query_model import build_stack_read_model
 
 from tests.helpers import ontology_bundle
