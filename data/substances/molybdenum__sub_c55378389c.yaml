@@ -3,25 +3,39 @@ name: Molybdenum
 notes: Generic elemental molybdenum contribution. Product cards keep the concrete source form in component labels and notes.
   NIH ODS describes molybdenum as a structural constituent of molybdopterin, required for sulfite oxidase, xanthine oxidase,
   aldehyde oxidase, and mitochondrial amidoxime reducing component; these enzymes metabolize sulfur-containing amino acids,
-  purines/pyrimidines, drugs, and toxins.
+  purines/pyrimidines, drugs, and toxins. ODS/NASEM establish essentiality and a sulfur-amino-acid metabolism context,
+  not enhancement, NAC support, or outcome claims in adequately nourished adults. Human absorption varies by source and
+  matrix, and no comparative registered-form study establishes superiority. Ruminant copper interactions do not establish
+  a human spacing interval.
 knowledge:
   effect:
   - value: sulfur_amino_acid_metabolism
     research_state: supported
     sources:
     - https://ods.od.nih.gov/factsheets/molybdenum-HealthProfessional/
+    - https://www.ncbi.nlm.nih.gov/books/NBK222301/
   kind:
-  - mineral
+  - value: mineral
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/molybdenum-HealthProfessional/
 scheduling_assessment:
   intake:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/molybdenum-HealthProfessional/
-    - https://www.ncbi.nlm.nih.gov/books/NBK590363/
-    summary: The cited evidence does not establish an intake preference for generic molybdenum across registered forms; it does not validate a glycinate-specific comparator rule.
+    - https://pubmed.ncbi.nlm.nih.gov/9919682/
+    - https://www.ncbi.nlm.nih.gov/books/NBK222301/
+    summary: Human absorption varies by source and matrix, and no comparative study of registered supplemental forms establishes a general fed-or-fasted preference or form-specific rule.
   timing:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/molybdenum-HealthProfessional/
-    - https://www.ncbi.nlm.nih.gov/books/NBK590363/
+    - https://www.ncbi.nlm.nih.gov/books/NBK222301/
     summary: No general clock-time scheduling rule was demonstrated.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/molybdenum-HealthProfessional/
+    - https://www.ncbi.nlm.nih.gov/books/NBK222301/
+    summary: The cited evidence does not establish a workout benefit or workout-linked placement rule for molybdenum.
