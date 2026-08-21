@@ -1,28 +1,41 @@
 id: sub_3e3b246a6f
 name: Vanadium
-notes: Generic elemental vanadium contribution. The active trace-mineral product supplies 750 mcg elemental vanadium from 3.75 mg vanadyl sulfate; another registered product uses vanadium citrate. Product form and dose bound applicability. No human essentiality or benefit transfers from pharmacologic findings.
-  National Academies DRI review says no biological role in humans has been identified; vanadium can mimic insulin in laboratory
-  animals, while pharmacologic diabetes-study doses greatly exceed usual dietary intakes and the adult UL is 1.8 mg/day elemental
-  vanadium.
+notes: Generic elemental vanadium contribution. The active trace-mineral product supplies 750 mcg elemental vanadium from 3.75 mg vanadyl sulfate; another registered product uses vanadium citrate. Applicability is bounded by product form and dose. NASEM reports that no biological role for vanadium in humans has been identified and no intake requirement is established. Pharmacologic diabetes studies do not establish routine benefit or transfer to this low-dose exposure. The adult 1.8 mg/day UL is animal renal-toxicity-derived and carries uncertainty; GI intolerance is a relevant context.
 concerns:
 - kind: safety
-  text: Review as a glucose/insulin-context trace mineral rather than routine essential support; current product dose is below
-    the adult UL but far above usual dietary intake estimates, and antidiabetes medication context matters.
-knowledge:
-  kind:
-  - mineral
-  risk:
-  - glucose_med_interaction
+  text: Review GI intolerance, renal context, and antidiabetes medication use before treating vanadium as routine support; the 750 mcg elemental exposure is below the 1.8 mg/day adult UL, but the UL is animal renal-toxicity-derived with uncertainty. Glucose/insulin concerns are conditional and mechanistic; no demonstrated interaction, efficacy, contraindication, or timing schedule is established.
 scheduling_assessment:
   intake:
     conclusion: insufficient
     sources:
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC4181337/
-    - https://www.efsa.europa.eu/en/press/news/080226-0
-    summary: The cited evidence does not establish an intake preference for vanadyl sulfate; it addresses vanadium generally or other forms and comparators.
+    - https://www.ncbi.nlm.nih.gov/books/NBK222322/
+    - https://pubmed.ncbi.nlm.nih.gov/18319296/
+    - https://doi.org/10.2903/j.efsa.2008.634
+    summary: No fed-versus-fasted comparison at the active 750 mcg elemental exposure establishes an intake preference; any food direction on a product label is product-level and does not generalize across vanadium forms or doses.
   timing:
     conclusion: insufficient
     sources:
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC4181337/
-    - https://www.efsa.europa.eu/en/press/news/080226-0
-    summary: No general clock-time scheduling rule was demonstrated.
+    - https://www.ncbi.nlm.nih.gov/books/NBK222322/
+    - https://pubmed.ncbi.nlm.nih.gov/18319296/
+    - https://doi.org/10.2903/j.efsa.2008.634
+    summary: No comparative clock-time evidence establishes a timing rule for the active vanadium exposure or across vanadium forms and doses.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://www.ncbi.nlm.nih.gov/books/NBK222322/
+    - https://pubmed.ncbi.nlm.nih.gov/18319296/
+    - https://doi.org/10.2903/j.efsa.2008.634
+    summary: No evidence establishes a workout- or activity-linked timing rule for the active vanadium exposure; no activity placement is supported.
+knowledge:
+  kind:
+  - value: mineral
+    research_state: supported
+    sources:
+    - https://www.ncbi.nlm.nih.gov/books/NBK222322/
+  risk:
+  - value: glucose_med_interaction
+    research_state: mechanistic_only
+    sources:
+    - https://www.ncbi.nlm.nih.gov/books/NBK222322/
+    - https://pubmed.ncbi.nlm.nih.gov/18319296/
+    - https://pubmed.ncbi.nlm.nih.gov/10726921/
