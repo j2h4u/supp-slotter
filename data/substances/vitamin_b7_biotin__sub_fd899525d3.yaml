@@ -1,7 +1,7 @@
 id: sub_fd899525d3
 name: Vitamin B7
 form: biotin
-notes: 'Coenzyme B-Complex component. NIH ODS describes biotin as a cofactor for carboxylases involved in fatty-acid, glucose, and amino-acid metabolism. Lab-interference evidence commonly concerns 5–10 mg/day, versus the active product serving at 0.2 mg; risk remains assay-specific and does not establish a universal withholding interval.'
+notes: 'Coenzyme B-Complex component. NIH ODS describes biotin as a cofactor for carboxylases involved in fatty-acid, glucose, and amino-acid metabolism. Lab-interference evidence commonly concerns 5–10 mg/day, versus the active product serving at 0.2 mg; applicability to the active serving and any withholding duration remain unresolved and do not establish a universal threshold or interval.'
 scheduling_assessment:
   intake:
     conclusion: insufficient
@@ -15,15 +15,38 @@ scheduling_assessment:
     - https://ods.od.nih.gov/factsheets/Biotin-HealthProfessional/
     - https://www.ncbi.nlm.nih.gov/books/NBK114297/
     summary: No general clock-time rule was demonstrated for biotin supplementation.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Biotin-HealthProfessional/
+    - https://www.ncbi.nlm.nih.gov/books/NBK114297/
+    summary: No workout- or activity-linked placement rule was demonstrated for biotin supplementation.
 concerns:
 - kind: safety
-  text: Biotin can interfere with some lab immunoassays; NIH ODS/FDA highlight thyroid-test distortion and falsely low troponin
-    results as clinically important examples. The appropriate action is assay-specific; no universal withholding interval is established.
+  text: Biotin can interfere with some lab immunoassays and produce falsely high or low results; NIH ODS/FDA highlight thyroid-test distortion and falsely low troponin
+    results as clinically important examples. Applicability to the active 200 mcg serving and any withholding duration remain unresolved; the appropriate action is assay-specific, with no universal threshold or interval established.
 knowledge:
   effect:
-  - carboxylase_cofactor
-  - fatty_acid_metabolism_support
+  - value: carboxylase_cofactor
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Biotin-HealthProfessional/
+    - https://www.ncbi.nlm.nih.gov/books/NBK114297/
+  - value: fatty_acid_metabolism_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Biotin-HealthProfessional/
+    - https://www.ncbi.nlm.nih.gov/books/NBK114297/
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Biotin-HealthProfessional/
   risk:
-  - biotin_lab_interference
+  - value: biotin_lab_interference
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Biotin-HealthProfessional/
+    - https://www.fda.gov/medical-devices/in-vitro-diagnostics/biotin-interference-troponin-lab-tests-assays-subject-biotin-interference
+    - https://pubmed.ncbi.nlm.nih.gov/28973622/
+    - https://pubmed.ncbi.nlm.nih.gov/32445355/
