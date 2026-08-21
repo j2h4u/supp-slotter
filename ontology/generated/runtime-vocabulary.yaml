@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: a286c49e0684a0c749e001fbb60245fff6571d2815d6759bae2239efe20670ad
+source_hash: 106a8a621928d2fb33beba8e3c1c05059c8cde3694a46f74644f4e0a3d56853e
 categories:
   kind:
     allowed_predicates: &id005
@@ -1185,8 +1185,9 @@ terms:
   ontoclean_profile: dependent_assertion
 - slug: b6_neuropathy_long_term
   label: B6 neuropathy long-term
-  description: Long-term supplemental pyridoxine exposure can cause sensory peripheral
-    neuropathy; review cumulative B6 intake across products.
+  description: Long-term supplemental vitamin B6 exposure can cause sensory peripheral
+    neuropathy; review cumulative supplemental B6 intake across forms and products
+    and duration.
   semantic_category: risk
   allowed_predicates: *id008
   ontoclean_profile: dependent_assertion
@@ -1465,13 +1466,15 @@ scheduling_policies:
   risk:b6_neuropathy_long_term:
     term: b6_neuropathy_long_term
     label: B6 neuropathy long-term
-    description: Long-term supplemental pyridoxine exposure can cause sensory peripheral
-      neuropathy; review cumulative B6 intake across products.
-    applies_when: Use for pyridoxine HCl/pyridoxine supplement forms when chronic
-      intake should be reviewed separately from active P5P forms.
+    description: Long-term supplemental vitamin B6 exposure can cause sensory peripheral
+      neuropathy; review cumulative supplemental B6 intake across forms and products
+      and duration.
+    applies_when: Use for supplemental vitamin B6 forms when long-term exposure warrants
+      review across forms and products.
     effects: []
     warning: true
-    action: Review cumulative daily pyridoxine HCl/B6 intake across active products.
+    action: Review cumulative supplemental B6 intake across all forms and products,
+      plus duration.
   risk:biotin_lab_interference:
     term: biotin_lab_interference
     label: Biotin lab-test interference
@@ -2634,9 +2637,16 @@ ontology_assertions:
     target_selector:
       entity:
         entity_id: sub_7c38pzz3wa
-    reason: Pyridoxine HCl can reduce levodopa effect when levodopa is used without
-      a peripheral decarboxylase inhibitor.
+    reason: Pyridoxine HCl can reduce levodopa effect by increasing aromatic amino-acid
+      decarboxylation when levodopa is used without carbidopa or another peripheral
+      decarboxylase inhibitor; carbidopa inhibits this peripheral conversion.
+    action: Review the pyridoxine/levodopa pairing and whether carbidopa or another
+      peripheral decarboxylase inhibitor is present; never infer that slot separation
+      resolves this interaction.
     severity: high
+    research_state: supported
+    sources:
+    - https://dailymed.nlm.nih.gov/dailymed/fdaDrugXsl.cfm?setid=a7e669fc-c011-4e51-85e6-b68d4e4738a8&type=display
   rel_review_with_013:
     id: rel_review_with_013
     relation_type: review_with
@@ -2722,17 +2732,18 @@ ontology_assertions:
     target_selector:
       entity:
         name: Zinc
-    reason: High calcium co-ingestion can reduce zinc absorption in controlled human
-      studies, but dose, meal, salt, and long-term clinical relevance are not established
-      for every product form.
-    action: Review calcium and zinc context together; prefer separate slots when feasible
-      without imposing a universal separation interval.
+    reason: Calcium reduced zinc absorption in some high-calcium/co-ingestion studies
+      while ordinary-food studies did not; the signal is dose-, meal-, phytate-, salt-,
+      and endpoint-dependent, and long-term relevance remains unresolved.
+    action: Review calcium and zinc context together; prefer separate slots only when
+      feasible for independently schedulable products, never split a combination or
+      impose a universal interval.
     severity: medium
     research_state: supported
     sources:
     - https://pubmed.ncbi.nlm.nih.gov/8194505/
     - https://pubmed.ncbi.nlm.nih.gov/9174476/
-    - https://ods.od.nih.gov/factsheets/calcium-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/19176739/
   rel_review_with_018:
     id: rel_review_with_018
     relation_type: review_with
@@ -2822,6 +2833,52 @@ ontology_assertions:
     - https://pubmed.ncbi.nlm.nih.gov/22252050/
     - https://pubmed.ncbi.nlm.nih.gov/22528033/
     - https://pubmed.ncbi.nlm.nih.gov/27278668/
+  rel_review_with_022:
+    id: rel_review_with_022
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    source_selector:
+      entity:
+        name: Calcium
+    target_selector:
+      entity:
+        name: Manganese
+    reason: Small human studies show reduced manganese absorption or plasma uptake
+      in human milk or after a 40 mg calcium load; the signal is matrix- and dose-specific
+      and does not establish a universal calcium-manganese scheduling rule.
+    action: Review calcium and manganese as independently schedulable supplements;
+      prefer separate slots when feasible, but never split a fixed multi-mineral product
+      or impose a universal interval.
+    severity: low
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/1957822/
+    - https://pubmed.ncbi.nlm.nih.gov/2010579/
+  rel_review_with_023:
+    id: rel_review_with_023
+    relation_type: review_with
+    assertion_kind: clinical_review_signal
+    semantic_family: clinical_review_signal
+    source_selector:
+      entity:
+        name: Iron
+    target_selector:
+      entity:
+        name: Manganese
+    reason: Iron and manganese absorption can compete or vary in dose-, matrix-, and
+      iron-status-dependent contexts; human evidence supports a bidirectional absorption-review
+      signal rather than proof of harm.
+    action: Review independently schedulable iron and manganese supplements and iron
+      status; prefer separate slots when feasible, but do not infer harm or impose
+      a universal interval.
+    severity: medium
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Iron-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/2058577/
+    - https://pubmed.ncbi.nlm.nih.gov/10393136/
   rel_supports_001:
     id: rel_supports_001
     relation_type: supports
@@ -2846,8 +2903,17 @@ ontology_assertions:
     target_selector:
       entity:
         entity_id: sub_d997f98e03
-    reason: Molybdenum cofactor enzymes metabolize sulfur-containing amino acids;
-      NAC is a cysteine derivative.
+    reason: Molybdenum is a molybdopterin constituent used by sulfite oxidase in sulfur-amino-acid
+      catabolism; NAC is the N-acetyl derivative/prodrug of L-cysteine. A small registered
+      combination study changed the NAC form and added selenium, molybdenum, and glycine,
+      but posted no results, so no molybdenum-attributable outcome is established.
+    action: No co-dose, separation, timing, or outcome rule is established by this
+      relationship.
+    research_state: mechanistic_only
+    sources:
+    - https://ods.od.nih.gov/factsheets/Molybdenum-HealthProfessional/
+    - https://www.cancer.gov/publications/dictionaries/cancer-drug/def/acetylcysteine
+    - https://clinicaltrials.gov/study/NCT06252519
   rel_supports_003:
     id: rel_supports_003
     relation_type: supports
@@ -2876,9 +2942,15 @@ ontology_assertions:
     target_selector:
       entity:
         entity_id: sub_2476bf9d4b
-    reason: 'Magnesium participates as a cofactor in vitamin D hydroxylation and calcium
-      homeostasis; this biochemical relationship does not imply that vitamin D3 supplementation
-      is blocked. Sources: https://pubmed.ncbi.nlm.nih.gov/30541089/; https://pubmed.ncbi.nlm.nih.gov/29480918/.'
+    reason: 'Magnesium participates as a cofactor in vitamin D metabolism; this biochemical
+      relationship does not establish a requirement for magnesium supplementation.
+      Sources: https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/; https://pubmed.ncbi.nlm.nih.gov/24228832/.'
+    action: No magnesium supplement requirement, co-dose, separation, or timing rule
+      is established by this relationship.
+    research_state: mechanistic_only
+    sources:
+    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/24228832/
   rel_supports_005:
     id: rel_supports_005
     relation_type: supports
@@ -2892,32 +2964,6 @@ ontology_assertions:
         name: Vitamin A
     reason: Vitamin E can improve vitamin A bioavailability/absorption in supplement
       context.
-  rel_supports_006:
-    id: rel_supports_006
-    relation_type: supports
-    assertion_kind: ontology_assertion
-    semantic_family: biochemical_mechanism_assertion
-    source_selector:
-      entity:
-        name: Vitamin E
-    target_selector:
-      category: pathway
-      term: omega3_eicosanoid
-    reason: Vitamin E is a lipid-phase chain-breaking antioxidant that protects long-chain
-      PUFA from lipid peroxidation. Human evidence does not establish that ordinary
-      EPA/DHA intake requires extra vitamin E or that supplementation consistently
-      improves oxidative biomarkers; the planner cannot assess total EPA/DHA exposure,
-      dietary vitamin E, deficiency, or malabsorption.
-    action: Do not add supplemental vitamin E by default. Review dietary vitamin E/status
-      only if total EPA/DHA exposure is high or low intake, deficiency, or malabsorption
-      is plausible; if supplementation is considered, review dose and bleeding risk,
-      especially with nattokinase, anticoagulants, or antiplatelets.
-    severity: low
-    research_state: mechanistic_only
-    sources:
-    - https://pubmed.ncbi.nlm.nih.gov/23557727/
-    - https://pubmed.ncbi.nlm.nih.gov/11684381/
-    - https://pubmed.ncbi.nlm.nih.gov/2282693/
   rel_supports_007:
     id: rel_supports_007
     relation_type: supports
@@ -2929,9 +2975,13 @@ ontology_assertions:
     target_selector:
       entity:
         name: Calcium
-    reason: Vitamin D3 promotes intestinal calcium absorption via VDR-mediated upregulation
-      of TRPV6 and calbindin; without adequate D3, calcium absorption is significantly
-      reduced.
+    reason: 'Vitamin D3 supports intestinal calcium absorption and bone physiology;
+      this does not establish a calcium supplement requirement. Source: https://ods.od.nih.gov/factsheets/Vitamind-HealthProfessional/.'
+    action: No calcium supplement requirement, co-dose, separation, or timing rule
+      is established by this relationship.
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Vitamind-HealthProfessional/
   rel_supports_008:
     id: rel_supports_008
     relation_type: supports

@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: a286c49e0684a0c749e001fbb60245fff6571d2815d6759bae2239efe20670ad
+# source-hash: 106a8a621928d2fb33beba8e3c1c05059c8cde3694a46f74644f4e0a3d56853e
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -2410,7 +2410,7 @@
   ss:semantic_category ss:risk ;
   ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
   ss:label "B6 neuropathy long-term" ;
-  ss:description "Long-term supplemental pyridoxine exposure can cause sensory peripheral neuropathy; review cumulative B6 intake across products." .
+  ss:description "Long-term supplemental vitamin B6 exposure can cause sensory peripheral neuropathy; review cumulative supplemental B6 intake across forms and products and duration." .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/biotin_lab_interference> a ss:OntologyTerm ;
   ss:id "risk:biotin_lab_interference" ;
@@ -2748,10 +2748,10 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Ab6_neuropathy_long_term> a ss:SchedulingPolicyRecord ;
   ss:id "risk:b6_neuropathy_long_term" ;
   ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/b6_neuropathy_long_term> ;
-  ss:applies_when "Use for pyridoxine HCl/pyridoxine supplement forms when chronic intake should be reviewed separately from active P5P forms." ;
+  ss:applies_when "Use for supplemental vitamin B6 forms when long-term exposure warrants review across forms and products." ;
   ss:warning true .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Ab6_neuropathy_long_term> ss:action "Review cumulative daily pyridoxine HCl/B6 intake across active products." .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Ab6_neuropathy_long_term> ss:action "Review cumulative supplemental B6 intake across all forms and products, plus duration." .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Abiotin_lab_interference> a ss:SchedulingPolicyRecord ;
   ss:id "risk:biotin_lab_interference" ;
