@@ -90,9 +90,7 @@ class StackReadModel:
     ) -> dict[str, list[dict[str, object]]]:
         return classify_relations(self._db, active_substances, self._ontology_bundle.runtime_program)
 
-    def research_state_assertions(
-        self, active_substances: set[str], research_state: str
-    ) -> list[dict[str, object]]:
+    def research_state_assertions(self, active_substances: set[str], research_state: str) -> list[dict[str, object]]:
         return collect_research_state_assertions(self._db, active_substances, research_state)
 
     def active_fact_index(

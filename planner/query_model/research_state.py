@@ -27,38 +27,32 @@ def collect_research_state_assertions(
                 continue
             if assertion.get("research_state", "unassessed") != research_state:
                 continue
-            rows.append(
-                {
-                    "kind": "knowledge",
-                    "id": substance_id,
-                    "name": name,
-                    "category": assertion.get("knowledge_category", ""),
-                    "value": assertion.get("knowledge_value", ""),
-                    "research_state": research_state,
-                    "sources": string_list(assertion.get("sources")),
-                }
-            )
+            rows.append({
+                "kind": "knowledge",
+                "id": substance_id,
+                "name": name,
+                "category": assertion.get("knowledge_category", ""),
+                "value": assertion.get("knowledge_value", ""),
+                "research_state": research_state,
+                "sources": string_list(assertion.get("sources")),
+            })
     for relation in db.query(
         "SELECT id, type, src_substances, tgt_substances, src_display, tgt_display, reason, "
         "research_state, sources FROM ontology_assertion"
     ):
         if relation.get("research_state", "unassessed") != research_state:
             continue
-        endpoints = set(string_list(relation.get("src_substances"))) | set(
-            string_list(relation.get("tgt_substances"))
-        )
+        endpoints = set(string_list(relation.get("src_substances"))) | set(string_list(relation.get("tgt_substances")))
         if not endpoints & active_substances:
             continue
-        rows.append(
-            {
-                "kind": "relation",
-                "id": id_str(relation.get("id", "")),
-                "type": relation.get("type", ""),
-                "source": relation.get("src_display", ""),
-                "target": relation.get("tgt_display", ""),
-                "reason": relation.get("reason", ""),
-                "research_state": research_state,
-                "sources": string_list(relation.get("sources")),
-            }
-        )
+        rows.append({
+            "kind": "relation",
+            "id": id_str(relation.get("id", "")),
+            "type": relation.get("type", ""),
+            "source": relation.get("src_display", ""),
+            "target": relation.get("tgt_display", ""),
+            "reason": relation.get("reason", ""),
+            "research_state": research_state,
+            "sources": string_list(relation.get("sources")),
+        })
     return sorted(rows, key=lambda row: (str(row["kind"]), str(row["id"]), str(row.get("value", ""))))

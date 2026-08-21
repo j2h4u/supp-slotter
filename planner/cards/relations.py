@@ -93,9 +93,7 @@ def load_global_relations(
     return result
 
 
-def _validated_relation_entry(
-    raw: object, path: Path, label: str, bundle: OntologyBundle
-) -> dict[str, object]:
+def _validated_relation_entry(raw: object, path: Path, label: str, bundle: OntologyBundle) -> dict[str, object]:
     if not isinstance(raw, dict):
         raise CardLoadError(path, f"{label} must be a mapping")
     entry = cast(dict[str, object], raw)
@@ -116,9 +114,7 @@ def _validated_relation_entry(
     if state not in state_values:
         raise CardLoadError(path, f"{label}.research_state is not in ontology ResearchState")
     sources = entry.get("sources", [])
-    if not isinstance(sources, list) or any(
-        not isinstance(source, str) or not source.strip() for source in sources
-    ):
+    if not isinstance(sources, list) or any(not isinstance(source, str) or not source.strip() for source in sources):
         raise CardLoadError(path, f"{label}.sources must be a list of non-empty strings")
     if state != "unassessed" and not sources:
         raise CardLoadError(path, f"{label}.sources must be non-empty for research_state {state!r}")

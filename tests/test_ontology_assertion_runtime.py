@@ -88,9 +88,7 @@ def test_eight_rule_cutover_review_pairs_emit_only_review_warnings(
 
 def test_retired_mineral_fat_soluble_rule_emits_no_relation_warning() -> None:
     mineral = make_substance("sub_mineral", "Zinc", traits=SubstanceTraitOverrides(kind=("mineral",)))
-    fat_soluble = make_substance(
-        "sub_fat_soluble", "Vitamin E", traits=SubstanceTraitOverrides(kind=("fat_soluble",))
-    )
+    fat_soluble = make_substance("sub_fat_soluble", "Vitamin E", traits=SubstanceTraitOverrides(kind=("fat_soluble",)))
     read_model = build_stack_read_model(
         {mineral.id: mineral, fat_soluble.id: fat_soluble},
         [],

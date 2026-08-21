@@ -87,8 +87,14 @@ def cmd_grooming_research(
             ]
             _render_research_candidates(candidates[:resolved_limit], len(candidates), research_state)
             return ResearchStateResult(
-                0, candidates[:resolved_limit], research_state, resolved_limit, len(candidates),
-                min(len(candidates), resolved_limit), stdout_buf.getvalue(), stderr_buf.getvalue()
+                0,
+                candidates[:resolved_limit],
+                research_state,
+                resolved_limit,
+                len(candidates),
+                min(len(candidates), resolved_limit),
+                stdout_buf.getvalue(),
+                stderr_buf.getvalue(),
             )
         except (CardLoadError, OntologyInfrastructureError) as error:
             message = error.message if isinstance(error, CardLoadError) else str(error)

@@ -41,10 +41,7 @@ def test_real_shelf_daily_episodic_and_training_products_are_complete(tmp_path: 
         stack: {format_product_name(products[product_id]) for product_id in stacks[stack]}
         for stack in ("daily", "training")
     }
-    actual_by_stack = {
-        stack: set(_schedule_products(schedule, stack))
-        for stack in ("daily", "training")
-    }
+    actual_by_stack = {stack: set(_schedule_products(schedule, stack)) for stack in ("daily", "training")}
     assert actual_by_stack == expected_by_stack
     assert Counter(_schedule_products(schedule, "daily") + _schedule_products(schedule, "training")) == Counter(
         name for names in expected_by_stack.values() for name in names
@@ -101,8 +98,7 @@ def test_multicomponent_vertical_explanation_preserves_conflicting_votes_and_neu
     schedule = cast(dict[str, object], plan_in_temp_dir(tmp_path))
     explanation = cast(dict[str, object], cast(dict[str, object], schedule["explanations"])["Multi"])
     contributions = {
-        row["policy_id"]: row
-        for row in cast(list[dict[str, object]], explanation["policy_contributions"])
+        row["policy_id"]: row for row in cast(list[dict[str, object]], explanation["policy_contributions"])
     }
 
     assert contributions["intake:food_preferred"]["vote_count"] == 5

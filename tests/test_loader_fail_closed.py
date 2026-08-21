@@ -414,21 +414,19 @@ def test_substance_loader_normalizes_legacy_and_reads_research_state_metadata(tm
 
     structured_path = tmp_path / "structured.yaml"
     structured_path.write_text(
-        yaml.safe_dump(
-            {
-                "id": "sub_zz0000zzzz",
-                "name": "Structured",
-                "knowledge": {
-                    "kind": [
-                        {
-                            "value": "mineral",
-                            "research_state": "supported",
-                            "sources": ["https://example.test/evidence"],
-                        }
-                    ]
-                },
-            }
-        ),
+        yaml.safe_dump({
+            "id": "sub_zz0000zzzz",
+            "name": "Structured",
+            "knowledge": {
+                "kind": [
+                    {
+                        "value": "mineral",
+                        "research_state": "supported",
+                        "sources": ["https://example.test/evidence"],
+                    }
+                ]
+            },
+        }),
         encoding="utf-8",
     )
     structured = load_substance(structured_path, ontology_bundle())
@@ -439,13 +437,11 @@ def test_substance_loader_normalizes_legacy_and_reads_research_state_metadata(tm
 def test_substance_loader_rejects_research_state_without_sources(tmp_path: Path) -> None:
     path = tmp_path / "invalid.yaml"
     path.write_text(
-        yaml.safe_dump(
-            {
-                "id": "sub_zz0000zzzz",
-                "name": "Invalid",
-                "knowledge": {"kind": [{"value": "mineral", "research_state": "supported"}]},
-            }
-        ),
+        yaml.safe_dump({
+            "id": "sub_zz0000zzzz",
+            "name": "Invalid",
+            "knowledge": {"kind": [{"value": "mineral", "research_state": "supported"}]},
+        }),
         encoding="utf-8",
     )
     with pytest.raises(CardLoadError, match="sources"):
