@@ -1,7 +1,7 @@
 # Decision: Minimal provenance and research state for reviewer facts and relations
 
-**Date:** 2026-08-21  
-**Status:** Design decision; not implemented  
+**Date:** 2026-08-21
+**Status:** Implemented in `241f5ad`
 **Scope:** KnowledgeAssertion facts on Substance cards and RelationAssertionRecord records in data/relations.yaml
 
 ## Decision
@@ -199,4 +199,3 @@ Do not infer supported from severity, relation type, vendor identity, or a URL.
 The only remaining implementation choice is whether source syntax is validated
 beyond non-empty strings; the smallest portable choice is non-empty strings plus
 human review.
-
