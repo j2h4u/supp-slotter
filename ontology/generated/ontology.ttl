@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 462412bbc346d001f8448010a3c5480ced52c62f8eaf6b09fffc579218c72e39
+# source-hash: 21597a0ed3d4e96b5b6f49d501204b644203b6f95d5fbd9feff6063a42c9397d
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -129,6 +129,12 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGlueContract> a ss:SchemaClass ;
   ss:name "RuntimeGlueContract" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGroomingPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeGroomingPolicy" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGroomingRankFieldPolicy> a ss:SchemaClass ;
+  ss:name "RuntimeGroomingRankFieldPolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog> a ss:SchemaClass ;
   ss:name "RuntimePolicyCatalog" .
@@ -388,6 +394,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/description> a ss:SchemaSlot ;
   ss:name "description" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/direction> a ss:SchemaSlot ;
+  ss:name "direction" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/directional> a ss:SchemaSlot ;
   ss:name "directional" .
 
@@ -456,6 +465,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/glue_contract> a ss:SchemaSlot ;
   ss:name "glue_contract" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/grooming_policy> a ss:SchemaSlot ;
+  ss:name "grooming_policy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/id> a ss:SchemaSlot ;
   ss:name "id" .
@@ -598,6 +610,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/rank> a ss:SchemaSlot ;
   ss:name "rank" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/rank_fields> a ss:SchemaSlot ;
+  ss:name "rank_fields" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/rationale> a ss:SchemaSlot ;
   ss:name "rationale" .
 
@@ -609,6 +624,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_kind> a ss:SchemaSlot ;
   ss:name "relation_kind" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_owner> a ss:SchemaSlot ;
+  ss:name "relation_owner" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_presence_active_sides> a ss:SchemaSlot ;
   ss:name "relation_presence_active_sides" .
@@ -667,9 +685,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/risk_description> a ss:SchemaSlot ;
   ss:name "risk_description" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/roi_order_desc> a ss:SchemaSlot ;
-  ss:name "roi_order_desc" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/role> a ss:SchemaSlot ;
   ss:name "role" .
 
@@ -723,6 +738,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/scores_advisory> a ss:SchemaSlot ;
   ss:name "scores_advisory" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/selection_count> a ss:SchemaSlot ;
+  ss:name "selection_count" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/selector> a ss:SchemaSlot ;
   ss:name "selector" .
@@ -918,6 +936,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/weight> a ss:SchemaSlot ;
   ss:name "weight" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/work_unit> a ss:SchemaSlot ;
+  ss:name "work_unit" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/zero_effect> a ss:SchemaSlot ;
   ss:name "zero_effect" .

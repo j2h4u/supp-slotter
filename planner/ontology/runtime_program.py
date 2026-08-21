@@ -454,6 +454,23 @@ class RuntimeDashboardStateCatalog:
 
 
 @dataclass(frozen=True, slots=True)
+class RuntimeGroomingRankFieldPolicy:
+    id: str
+    field: str
+    direction: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeGroomingPolicy:
+    id: str
+    work_unit: str
+    eligibility: tuple[str, ...]
+    rank_fields: tuple[RuntimeGroomingRankFieldPolicy, ...]
+    selection_count: int
+    relation_owner: str
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimeProgram:
     format_version: str
     schema_version: str
@@ -475,6 +492,7 @@ class RuntimeProgram:
     relation_presence_statuses: tuple[RuntimeRelationPresenceStatusPolicy, ...]
     selector_form_capabilities: tuple[RuntimeSelectorFormCapability, ...]
     dashboard_state_catalog: RuntimeDashboardStateCatalog
+    grooming_policy: RuntimeGroomingPolicy
 
     @property
     def effect_score_levels(self) -> frozenset[str]:
@@ -545,6 +563,8 @@ _PROJECTION_RECORDS: Mapping[str, type[object]] = {
     "dashboard_state_catalog.product_tracking_states": RuntimeDashboardProductTrackingStateDefinition,
     "dashboard_state_catalog.usage_truth_table": RuntimeDashboardUsageTruthState,
     "dashboard_state_catalog.product_tracking_truth_table": RuntimeDashboardProductTrackingTruthState,
+    "grooming_policy": RuntimeGroomingPolicy,
+    "grooming_policy.rank_fields": RuntimeGroomingRankFieldPolicy,
 }
 _MAPPING_RECORD_PATHS = frozenset({
     "engine_contract",
@@ -552,6 +572,7 @@ _MAPPING_RECORD_PATHS = frozenset({
     "effect_scoring",
     "prefer_with_policy",
     "dashboard_state_catalog",
+    "grooming_policy",
 })
 RUNTIME_PROJECTION_FIELDS: Mapping[str, frozenset[str]] = MappingProxyType({
     "": frozenset(
@@ -772,6 +793,50 @@ def _dashboard_tracking_truth_state(row: Mapping[str, object], label: str) -> Ru
         _str(row["id"], f"{label}.id"),
         _bool(row["tracked_product_presence"], f"{label}.tracked_product_presence"),
         _str(row["state"], f"{label}.state"),
+    )
+
+
+def _grooming_rank_field(row: Mapping[str, object], label: str) -> RuntimeGroomingRankFieldPolicy:
+    field = _str(row["field"], f"{label}.field")
+    direction = _str(row["direction"], f"{label}.direction")
+    if field not in {"active_unique_product_count", "open_owned_item_count", "substance_id"}:
+        raise _error(f"{label}.field", f"is not an implemented grooming rank field: {field!r}")
+    if direction not in {"ascending", "descending"}:
+        raise _error(f"{label}.direction", f"is not an implemented grooming rank direction: {direction!r}")
+    return RuntimeGroomingRankFieldPolicy(
+        _str(row["id"], f"{label}.id"),
+        field,
+        direction,
+    )
+
+
+def _grooming_policy(row: Mapping[str, object], label: str) -> RuntimeGroomingPolicy:
+    eligibility = _strings(row["eligibility"], f"{label}.eligibility")
+    if set(eligibility) != {"active_reachable", "unassessed_owned_item"}:
+        raise _error(f"{label}.eligibility", "must declare exactly active_reachable and unassessed_owned_item")
+    rank_fields = _typed_rows(
+        row["rank_fields"],
+        f"{label}.rank_fields",
+        _grooming_rank_field,
+        semantic_keys=(("field",),),
+        fields=RUNTIME_PROJECTION_ROW_FIELDS["grooming_policy.rank_fields"],
+    )
+    selection_count = _int(row["selection_count"], f"{label}.selection_count")
+    if selection_count != 1:
+        raise _error(f"{label}.selection_count", "must be exactly one")
+    work_unit = _str(row["work_unit"], f"{label}.work_unit")
+    relation_owner = _str(row["relation_owner"], f"{label}.relation_owner")
+    if work_unit != "substance_card":
+        raise _error(f"{label}.work_unit", "must be substance_card")
+    if relation_owner != "lowest_stable_substance_id":
+        raise _error(f"{label}.relation_owner", "must be lowest_stable_substance_id")
+    return RuntimeGroomingPolicy(
+        _str(row["id"], f"{label}.id"),
+        work_unit,
+        eligibility,
+        cast(tuple[RuntimeGroomingRankFieldPolicy, ...], rank_fields),
+        selection_count,
+        relation_owner,
     )
 
 
@@ -1109,6 +1174,10 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         ),
     )
     _validate_dashboard_state_catalog(dashboard_state_catalog)
+    grooming_policy = _grooming_policy(
+        _exact_map(projection.get("grooming_policy"), "grooming_policy", RUNTIME_PROJECTION_FIELDS["grooming_policy"]),
+        "grooming_policy",
+    )
     return RuntimeProgram(
         _str(root["format_version"], "format_version"),
         _str(root["schema_version"], "schema_version"),
@@ -1130,6 +1199,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         relation_presence_statuses,
         selector_form_capabilities,
         dashboard_state_catalog,
+        grooming_policy,
     )
 
 

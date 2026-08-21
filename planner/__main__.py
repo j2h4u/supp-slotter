@@ -11,11 +11,11 @@ from typing import cast
 from planner.engine import (
     cmd_check,
     cmd_find,
-    cmd_grooming_next,
+    cmd_groom,
     cmd_review,
     cmd_show,
 )
-from planner.engine.results import ResearchStateResult, ReviewResult, ShowResult
+from planner.engine.results import GroomResult, ReviewResult, ShowResult
 
 CommandHandler = Callable[[argparse.Namespace, Path | None], int]
 
@@ -82,7 +82,7 @@ def _run_find(args: argparse.Namespace, data_root: Path | None) -> int:
 
 def _run_grooming(args: argparse.Namespace, data_root: Path | None) -> int:
     del args
-    return _print_result(cmd_grooming_next(data_root=data_root))
+    return _print_result(cmd_groom(data_root=data_root))
 
 
 def _run_review(_args: argparse.Namespace, data_root: Path | None) -> int:
@@ -93,10 +93,10 @@ def _exit_with_result(result: ReviewResult | ShowResult) -> None:
     sys.exit(_print_result(result))
 
 
-def _print_result(result: ReviewResult | ShowResult | ResearchStateResult) -> int:
+def _print_result(result: ReviewResult | ShowResult | GroomResult) -> int:
     if result.output:
         print(result.output, end="")
-    if isinstance(result, (ReviewResult, ResearchStateResult)) and result.stderr:
+    if isinstance(result, (ReviewResult, GroomResult)) and result.stderr:
         print(result.stderr, end="", file=sys.stderr)
     return result.exit_code
 

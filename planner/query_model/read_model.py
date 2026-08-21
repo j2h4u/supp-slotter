@@ -22,7 +22,6 @@ from planner.query_model.relation_warnings import (
 from planner.query_model.relations import (
     classify_relations,
 )
-from planner.query_model.research_state import collect_research_state_assertions
 from planner.query_model.session import SurrealSession
 from planner.query_model.surreal import SurrealLoadContext, build_surreal_session
 from planner.schedule_types import ActiveFactIndexEntry
@@ -87,9 +86,6 @@ class StackReadModel:
         active_substances: set[str],
     ) -> dict[str, list[dict[str, object]]]:
         return classify_relations(self._db, active_substances, self._ontology_bundle.runtime_program)
-
-    def research_state_assertions(self, active_substances: set[str], research_state: str) -> list[dict[str, object]]:
-        return collect_research_state_assertions(self._db, active_substances, research_state)
 
     def active_fact_index(
         self,

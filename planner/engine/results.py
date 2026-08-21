@@ -49,52 +49,93 @@ class ReviewResult:
     stderr: str = ""
 
 
-@dataclass(frozen=True)
-class ResearchStateCandidate:
-    kind: str
+@dataclass(frozen=True, slots=True)
+class GroomProduct:
     id: str
-    research_state: str
-    detail: str
-    sources: tuple[str, ...] = ()
-    subject_ids: tuple[str, ...] = ()
+    name: str
+    brand: str | None
+    notes: str | None
+    use_pattern: str | None
+    components: tuple[tuple[str, str | None, str | None, str | None], ...]
 
 
 @dataclass(frozen=True, slots=True)
-class ResearchStateCard:
-    """Card-oriented grooming unit with assertion provenance retained."""
+class GroomKnowledge:
+    category: str
+    value: str
+    research_state: str
+    sources: tuple[str, ...]
 
+    @property
+    def open(self) -> bool:
+        return self.research_state == "unassessed"
+
+
+@dataclass(frozen=True, slots=True)
+class GroomRelation:
     id: str
+    relation_type: str
+    source: str
+    target: str
+    reason: str
+    research_state: str
+    sources: tuple[str, ...]
+    active_endpoint_ids: tuple[str, ...]
+
+    @property
+    def open(self) -> bool:
+        return self.research_state == "unassessed"
+
+
+@dataclass(frozen=True, slots=True)
+class GroomSchedule:
+    axis: str
+    value: str
+
+
+@dataclass(frozen=True, slots=True)
+class GroomAssessment:
+    axis: str
+    conclusion: str
+    policy: str | None
+    sources: tuple[str, ...]
+    summary: str
+
+    @property
+    def open(self) -> bool:
+        return self.conclusion == "unassessed"
+
+
+@dataclass(frozen=True, slots=True)
+class GroomWorkItem:
+    """One immutable, complete substance-card grooming dossier."""
+
+    substance_id: str
     name: str
     path: Path
-    total_product_count: int
-    active_product_count: int
-    active_product_names: tuple[str, ...]
-    assertions: tuple[ResearchStateCandidate, ...]
-    related_relations: tuple[ResearchStateCandidate, ...] = ()
-    assessment_status: str = "wholly_unassessed"
+    aliases: tuple[str, ...]
+    form: str | None
+    notes: str | None
+    active_unique_product_count: int
+    open_owned_item_count: int
+    active_products: tuple[GroomProduct, ...]
+    knowledge: tuple[GroomKnowledge, ...]
+    open_relations: tuple[GroomRelation, ...]
+    schedule_assertions: tuple[GroomSchedule, ...]
+    scheduling_assessments: tuple[GroomAssessment, ...]
 
     @property
-    def unresolved_item_count(self) -> int:
-        """Facts plus distinct relation leads shown for this card."""
-        return len(self.assertions) + len({relation.id for relation in self.related_relations})
+    def id(self) -> str:
+        return self.substance_id
 
 
-@dataclass(frozen=True)
-class ResearchStateResult:
+@dataclass(frozen=True, slots=True)
+class GroomResult:
     exit_code: int
-    cards: list[ResearchStateCard]
-    research_state: str
-    limit: int
-    total_matching: int
-    shown: int
-    assertion_count: int = 0
+    work_item: GroomWorkItem | None
+    eligible_count: int
     output: str = ""
     stderr: str = ""
-
-    @property
-    def candidates(self) -> list[ResearchStateCandidate]:
-        """Flattened provenance view retained for callers of the old API."""
-        return [assertion for card in self.cards for assertion in (*card.assertions, *card.related_relations)]
 
 
 @dataclass(frozen=True)

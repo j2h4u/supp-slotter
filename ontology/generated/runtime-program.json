@@ -395,6 +395,33 @@
         "trait_review_assignment"
       ]
     },
+    "grooming_policy": {
+      "eligibility": [
+        "active_reachable",
+        "unassessed_owned_item"
+      ],
+      "id": "grooming_policy",
+      "rank_fields": [
+        {
+          "direction": "descending",
+          "field": "active_unique_product_count",
+          "id": "grooming_rank_active_products"
+        },
+        {
+          "direction": "descending",
+          "field": "open_owned_item_count",
+          "id": "grooming_rank_open_items"
+        },
+        {
+          "direction": "ascending",
+          "field": "substance_id",
+          "id": "grooming_rank_substance_id"
+        }
+      ],
+      "relation_owner": "lowest_stable_substance_id",
+      "selection_count": 1,
+      "work_unit": "substance_card"
+    },
     "prefer_with_policy": {
       "id": "prefer_with_policy",
       "pair_mode": "undirected_same_slot_bonus",
@@ -592,8 +619,8 @@
     "compiler_sha256": "c9c6cb4980bf7914a3d21901e1eee78b403c804898b834c74888b22e0228ce4e",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "63113630d2257c7ff7bfce7a38045c5f965a3158559b5e2ce8f06653075321aa"
+    "source_sha256": "f2f0fe0d1f2f670356039cdab6bed1f194b4ee1ab6af1f87eca12eca3bedba01"
   },
   "schema_version": "2",
-  "source_hash": "462412bbc346d001f8448010a3c5480ced52c62f8eaf6b09fffc579218c72e39"
+  "source_hash": "21597a0ed3d4e96b5b6f49d501204b644203b6f95d5fbd9feff6063a42c9397d"
 }

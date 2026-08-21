@@ -1,109 +1,97 @@
-"""Read-only semantic/evidence enrichment grooming queue."""
+"""Policy-driven, read-only substance-card grooming selection."""
 
 from __future__ import annotations
 
 import contextlib
 import io
 import sys
+from collections.abc import Mapping
 from pathlib import Path
-from typing import NamedTuple, cast
+from typing import cast
 
 from planner.cards.product import load_product_registry
 from planner.cards.relations import check_global_relations, load_global_relations
 from planner.cards.substance import load_substance_registry
-from planner.contracts import CardLoadError, Product, Substance
+from planner.contracts import CardLoadError, Product, Relation, Substance
 from planner.engine.results import (
-    ResearchStateCandidate,
-    ResearchStateCard,
-    ResearchStateResult,
+    GroomAssessment,
+    GroomKnowledge,
+    GroomProduct,
+    GroomRelation,
+    GroomResult,
+    GroomSchedule,
+    GroomWorkItem,
 )
 from planner.ontology.artifacts import OntologyBundle, load_ontology
 from planner.ontology.errors import OntologyInfrastructureError
-from planner.ontology.policies import load_scheduling_policies
-from planner.ontology.schema_enums import schema_enum_values
+from planner.ontology.runtime_program import RuntimeGroomingRankFieldPolicy
+from planner.ontology.selector import resolve_selector
 from planner.paths import ROOT, Paths
-from planner.query_model import build_stack_read_model
-from planner.query_model.read_model import StackReadModel
-from planner.query_model.surreal import SurrealLoadContext
 from planner.schema_validation import validate_schemas
 from planner.yaml_io import load_yaml, load_yaml_mapping
 
 
-class _ResearchRenderStats(NamedTuple):
-    total_cards: int
-    assertion_count: int
-    whole: int
-    partial: int
-
-
-def cmd_grooming_next(limit: int | None = None, data_root: Path | None = None) -> ResearchStateResult:
-    """Return the priority card-oriented unassessed grooming queue."""
-    return cmd_grooming_research("unassessed", limit, data_root)
-
-
-def cmd_grooming_research(
-    research_state: str, limit: int | None = None, data_root: Path | None = None
-) -> ResearchStateResult:
-    """List active-reachable cards, retaining assertion-level provenance."""
-    resolved_limit = limit if limit is not None else 1
-    if resolved_limit <= 0:
-        message = "grooming research: --limit must be a positive integer"
-        return ResearchStateResult(1, [], research_state, resolved_limit, 0, 0, stderr=message + "\n")
+def cmd_groom(data_root: Path | None = None) -> GroomResult:
+    """Select exactly one policy-ranked substance-card dossier, or none."""
     bundle = load_ontology(ROOT / "ontology")
-    if research_state not in schema_enum_values(bundle, "ResearchState"):
-        message = f"grooming research: invalid --state {research_state!r}"
-        return ResearchStateResult(1, [], research_state, resolved_limit, 0, 0, stderr=message + "\n")
-    paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
     stdout_buf, stderr_buf = io.StringIO(), io.StringIO()
     with contextlib.redirect_stdout(stdout_buf), contextlib.redirect_stderr(stderr_buf):
         try:
+            paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
             schema_result = validate_schemas(paths, bundle)
             if schema_result != 0:
-                return ResearchStateResult(
-                    schema_result, [], research_state, resolved_limit, 0, 0, stderr=stderr_buf.getvalue()
-                )
-            inputs = _load_research_inputs(paths, bundle)
-            if inputs is None:
-                return ResearchStateResult(1, [], research_state, resolved_limit, 0, 0, stderr=stderr_buf.getvalue())
-            substances, products, read_model = inputs
-            rows = read_model.research_state_assertions(read_model.active_substance_ids(), research_state)
-            candidates = [
-                ResearchStateCandidate(
-                    kind=str(row["kind"]),
-                    id=str(row["id"]),
-                    research_state=research_state,
-                    detail=_research_detail(row),
-                    sources=tuple(
-                        str(item) for item in cast(list[object], row.get("sources", [])) if isinstance(item, str)
-                    ),
-                    subject_ids=tuple(
-                        str(item) for item in cast(list[object], row.get("substance_ids", [])) if isinstance(item, str)
-                    ),
-                )
-                for row in rows
-            ]
-            cards = _group_research_cards(candidates, substances, products, paths, research_state)
-            stats = _research_render_stats(cards, candidates)
-            _render_research_cards(cards[:resolved_limit], research_state, stats)
-            return ResearchStateResult(
-                0,
-                cards[:resolved_limit],
-                research_state,
-                resolved_limit,
-                len(cards),
-                min(len(cards), resolved_limit),
-                len(candidates),
-                stdout_buf.getvalue(),
-                stderr_buf.getvalue(),
-            )
+                return GroomResult(schema_result, None, 0, stderr=stderr_buf.getvalue())
+            work_item, eligible_count = _select_work_item(paths, bundle)
+            _render(work_item, eligible_count, bundle.runtime_program.grooming_policy.selection_count)
+            return GroomResult(0, work_item, eligible_count, stdout_buf.getvalue(), stderr_buf.getvalue())
         except (CardLoadError, OntologyInfrastructureError) as error:
             message = error.message if isinstance(error, CardLoadError) else str(error)
-            return ResearchStateResult(1, [], research_state, resolved_limit, 0, 0, stderr=message + "\n")
+            return GroomResult(1, None, 0, stderr=message + "\n")
 
 
-def _load_research_inputs(
+def _select_work_item(paths: Paths, bundle: OntologyBundle) -> tuple[GroomWorkItem | None, int]:
+    loaded = _load_inputs(paths, bundle)
+    if loaded is None:
+        raise CardLoadError(paths.relations_file, "relation validation failed")
+    substances, products, relations, stacks = loaded
+    active_products = _active_products(products, stacks, bundle)
+    active_ids = {
+        component.substance
+        for product in active_products
+        for component in product.components
+        if component.substance in substances
+    }
+    owned_relations = _owned_open_relations(relations, substances, active_ids, bundle)
+    candidates = [
+        (substance, active_products, owned_relations.get(substance.id, ()))
+        for substance in substances.values()
+        if substance.id in active_ids
+        and _open_knowledge_count(substance) + len(owned_relations.get(substance.id, ())) > 0
+    ]
+    policy = bundle.runtime_program.grooming_policy
+    metrics: dict[str, dict[str, object]] = {
+        substance.id: {
+            "active_unique_product_count": len(
+                {product.id for product in active_products if _has_substance(product, substance.id)}
+            ),
+            "open_owned_item_count": _open_knowledge_count(substance) + len(owned_relations.get(substance.id, ())),
+            "substance_id": substance.id,
+        }
+        for substance, active_products, _ in candidates
+    }
+    ordered = sorted(candidates, key=lambda row: _rank_key(metrics[row[0].id], policy.rank_fields))
+    selected = ordered[: policy.selection_count]
+    work_item = (
+        _build_work_item(selected[0][0], selected[0][1], selected[0][2], paths, bundle)
+        if selected
+        else None
+    )
+    return work_item, len(ordered)
+
+
+def _load_inputs(
     paths: Paths, bundle: OntologyBundle
-) -> tuple[dict[str, Substance], dict[str, Product], StackReadModel] | None:
+) -> tuple[dict[str, Substance], dict[str, Product], list[Relation], dict[str, list[str]]] | None:
     substances = load_substance_registry(paths, bundle)
     products = load_product_registry(paths, bundle)
     relations_data = load_yaml(paths.relations_file)
@@ -112,140 +100,146 @@ def _load_research_inputs(
         _print_errors(relation_errors)
         return None
     relations = load_global_relations(paths, bundle, substances)
-    read_model = build_stack_read_model(
-        substances,
-        relations,
-        products,
-        context=SurrealLoadContext(
-            policies=load_scheduling_policies(bundle),
-            stacks_data=_stacks_for_grooming_read_model(paths),
-            pillbox_stack_names=None,
-            dashboards=None,
-        ),
-        ontology_bundle=bundle,
-    )
-    return substances, products, read_model
+    return substances, products, relations, _stacks(paths)
 
 
-def _research_detail(row: dict[str, object]) -> str:
-    if row["kind"] == "knowledge":
-        return f"{row.get('name', row['id'])}: {row.get('category', '')}={row.get('value', '')}"
-    return f"{row.get('type', '')}: {row.get('source', '')} -> {row.get('target', '')}"
-
-
-def _group_research_cards(
-    candidates: list[ResearchStateCandidate],
-    substances: dict[str, Substance],
-    products: dict[str, Product],
-    paths: Paths,
-    research_state: str,
-) -> list[ResearchStateCard]:
-    by_card: dict[str, list[ResearchStateCandidate]] = {}
-    relations: list[ResearchStateCandidate] = []
-    for candidate in candidates:
-        if candidate.kind == "knowledge":
-            by_card.setdefault(candidate.id, []).append(candidate)
-        else:
-            relations.append(candidate)
-            for substance_id in candidate.subject_ids:
-                by_card.setdefault(substance_id, [])
-    product_ids = _product_ids_by_substance(products)
-    active_products = _active_product_ids(load_ontology(ROOT / "ontology"), _stacks_for_grooming_read_model(paths))
-    cards: list[ResearchStateCard] = []
-    for substance_id, assertions in by_card.items():
-        substance = substances[substance_id]
-        product_names = tuple(
-            sorted(products[product_id].name for product_id in product_ids.get(substance_id, set()) & active_products)
-        )
-        related = tuple(relation for relation in relations if substance_id in relation.subject_ids)
-        # Relation endpoint IDs are carried by the query row but are not part of
-        # the public provenance candidate. Attach them before rendering below.
-        cards.append(
-            ResearchStateCard(
-                id=substance_id,
-                name=substance.name,
-                path=_substance_path(paths, substance),
-                total_product_count=len(product_ids.get(substance_id, set())),
-                active_product_count=len(product_names),
-                active_product_names=product_names,
-                assertions=tuple(assertions),
-                related_relations=related,
-                assessment_status=(
-                    "no_matching_knowledge"
-                    if not assertions
-                    else (
-                        "wholly_unassessed"
-                        if all(item.research_state == research_state for item in substance.knowledge_assertions)
-                        else "partially_assessed"
-                    )
-                ),
-            )
-        )
-    cards.sort(
-        key=lambda card: (-card.active_product_count, -card.unresolved_item_count, card.name.casefold(), card.id)
-    )
-    return cards
-
-
-def _research_render_stats(
-    cards: list[ResearchStateCard], candidates: list[ResearchStateCandidate]
-) -> _ResearchRenderStats:
-    return _ResearchRenderStats(
-        total_cards=len(cards),
-        assertion_count=len(candidates),
-        whole=sum(card.assessment_status == "wholly_unassessed" for card in cards),
-        partial=sum(card.assessment_status == "partially_assessed" for card in cards),
-    )
-
-
-def _render_research_cards(cards: list[ResearchStateCard], research_state: str, stats: _ResearchRenderStats) -> None:
-    print(
-        f"Research-state card queue ({research_state}): {stats.total_cards} cards, "
-        f"showing {len(cards)} (whole={stats.whole}, partial={stats.partial}; "
-        f"{stats.assertion_count} assertions)"
-    )
-    if not cards:
-        print("  none")
-        return
-    for card in cards:
-        products = ", ".join(card.active_product_names) or "no active products"
-        print(
-            f"  card {card.id} — {card.name} [{card.assessment_status}; "
-            f"active_products={card.active_product_count}; total_products={card.total_product_count}; "
-            f"unresolved={card.unresolved_item_count}; products={products}]"
-        )
-        for assertion in card.assertions:
-            print(f"    {assertion.kind} {assertion.detail}")
-        for relation in card.related_relations:
-            print(f"    relation {relation.detail}")
-
-
-def _product_ids_by_substance(products: dict[str, Product]) -> dict[str, set[str]]:
-    product_ids_by_substance: dict[str, set[str]] = {}
-    for product in products.values():
-        for component in product.components:
-            product_ids_by_substance.setdefault(component.substance, set()).add(product.id)
-    return product_ids_by_substance
-
-
-def _active_product_ids(bundle: OntologyBundle, stacks_data: dict[str, list[str]]) -> set[str]:
-    inactive_stack_name = bundle.runtime_program.glue_contract.inactive_stack_name
-    return {
-        product_id
-        for stack_name, product_ids in stacks_data.items()
-        if stack_name != inactive_stack_name
-        for product_id in product_ids
-    }
-
-
-def _stacks_for_grooming_read_model(paths: Paths) -> dict[str, list[str]]:
-    """Load schema-validated stacks without collapsing repeated memberships."""
+def _stacks(paths: Paths) -> dict[str, list[str]]:
     raw = load_yaml_mapping(paths.stacks_file)
     return {
-        name: [item for item in cast(list[object], items) if isinstance(item, str)]
-        for name, items in raw.items()
-        if isinstance(items, list)
+        name: [item for item in cast(list[object], values) if isinstance(item, str)]
+        for name, values in raw.items()
+        if isinstance(values, list)
     }
+
+
+def _active_products(
+    products: Mapping[str, Product], stacks: Mapping[str, list[str]], bundle: OntologyBundle
+) -> tuple[Product, ...]:
+    inactive = bundle.runtime_program.glue_contract.inactive_stack_name
+    active_ids = {
+        product_id
+        for stack_name, product_ids in stacks.items()
+        if stack_name != inactive
+        for product_id in product_ids
+    }
+    return tuple(product for product in products.values() if product.id in active_ids)
+
+
+def _has_substance(product: Product, substance_id: str) -> bool:
+    return any(component.substance == substance_id for component in product.components)
+
+
+def _open_knowledge_count(substance: Substance) -> int:
+    return sum(assertion.research_state == "unassessed" for assertion in substance.knowledge_assertions)
+
+
+def _owned_open_relations(
+    relations: tuple[Relation, ...] | list[Relation],
+    substances: Mapping[str, Substance],
+    active_ids: set[str],
+    bundle: OntologyBundle,
+) -> dict[str, tuple[GroomRelation, ...]]:
+    owned: dict[str, list[GroomRelation]] = {}
+    for relation in relations:
+        if relation.research_state != "unassessed":
+            continue
+        source_ids = set(resolve_selector(relation.source_selector, substances, bundle).substance_ids)
+        target_ids = set(resolve_selector(relation.target_selector, substances, bundle).substance_ids)
+        endpoint_ids = tuple(sorted((source_ids | target_ids) & active_ids))
+        if not endpoint_ids:
+            continue
+        owner = endpoint_ids[0]
+        owned.setdefault(owner, []).append(
+            GroomRelation(
+                id=relation.id,
+                relation_type=relation.type,
+                source=_selector_label(relation.source_selector),
+                target=_selector_label(relation.target_selector),
+                reason=relation.reason,
+                research_state=relation.research_state,
+                sources=relation.sources,
+                active_endpoint_ids=endpoint_ids,
+            )
+        )
+    return {key: tuple(sorted(rows, key=lambda row: row.id)) for key, rows in owned.items()}
+
+
+def _selector_label(selector: object) -> str:
+    if isinstance(selector, Mapping):
+        mapping = cast(Mapping[str, object], selector)
+        return str(mapping.get("entity_id") or mapping.get("entity_name") or mapping.get("term") or "")
+    return str(
+        getattr(selector, "entity_id", None)
+        or getattr(selector, "entity_name", None)
+        or getattr(selector, "term", None)
+        or ""
+    )
+
+
+def _rank_key(
+    metrics: Mapping[str, object], fields: tuple[RuntimeGroomingRankFieldPolicy, ...]
+) -> tuple[object, ...]:
+    key: list[object] = []
+    for field in fields:
+        name = field.field
+        value = metrics[name]
+        key.append(-value if field.direction == "descending" and isinstance(value, int) else value)
+    return tuple(key)
+
+
+def _build_work_item(
+    substance: Substance,
+    active_products: tuple[Product, ...],
+    open_relations: tuple[GroomRelation, ...],
+    paths: Paths,
+    bundle: OntologyBundle,
+) -> GroomWorkItem:
+    products = tuple(
+        GroomProduct(
+            id=product.id,
+            name=product.name,
+            brand=product.brand,
+            notes=product.notes,
+            use_pattern=product.use_pattern,
+            components=tuple(
+                (component.substance, component.label, component.amount, component.notes)
+                for component in product.components
+            ),
+        )
+        for product in sorted(active_products, key=lambda item: item.id)
+        if _has_substance(product, substance.id)
+    )
+    knowledge = tuple(
+        GroomKnowledge(row.category, row.value, row.research_state, row.sources)
+        for row in substance.knowledge_assertions
+    )
+    schedule = tuple(GroomSchedule(row.axis, row.value) for row in substance.schedule_assertions)
+    authored_assessments = {row.axis: row for row in substance.scheduling_assessments}
+    assessments = tuple(
+        GroomAssessment(
+            axis=axis.axis,
+            conclusion=(authored_assessments[axis.axis].conclusion if axis.axis in authored_assessments else "unassessed"),
+            policy=(authored_assessments[axis.axis].policy if axis.axis in authored_assessments else None),
+            sources=(authored_assessments[axis.axis].sources if axis.axis in authored_assessments else ()),
+            summary=(authored_assessments[axis.axis].summary if axis.axis in authored_assessments else "Open: no authored scheduling assessment."),
+        )
+        for axis in sorted(bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
+    )
+    return GroomWorkItem(
+        substance_id=substance.id,
+        name=substance.name,
+        path=_substance_path(paths, substance),
+        aliases=substance.aliases,
+        form=substance.form,
+        notes=substance.notes,
+        active_unique_product_count=len(products),
+        open_owned_item_count=_open_knowledge_count(substance) + len(open_relations),
+        active_products=products,
+        knowledge=knowledge,
+        open_relations=open_relations,
+        schedule_assertions=schedule,
+        scheduling_assessments=assessments,
+    )
 
 
 def _substance_path(paths: Paths, substance: Substance) -> Path:
@@ -253,6 +247,40 @@ def _substance_path(paths: Paths, substance: Substance) -> Path:
     return matches[0] if matches else paths.substances
 
 
+def _render(item: GroomWorkItem | None, eligible_count: int, selection_count: int) -> None:
+    print(f"Grooming queue: {eligible_count} eligible, showing {1 if item else 0} (selection_count={selection_count})")
+    if item is None:
+        print("  none")
+        return
+    print(f"  card {item.substance_id} — {item.name}")
+    print(f"    path: {item.path}")
+    print(f"    form: {item.form or '—'}")
+    print(f"    aliases: {', '.join(item.aliases) or '—'}")
+    print(f"    notes: {item.notes or '—'}")
+    print(f"    active_unique_product_count: {item.active_unique_product_count}")
+    print(f"    open_owned_item_count: {item.open_owned_item_count}")
+    print("    active products:")
+    for product in item.active_products:
+        print(f"      - {product.id}: {product.brand + ' - ' if product.brand else ''}{product.name}")
+        for substance, label, amount, notes in product.components:
+            context = ", ".join(value for value in (label, amount, notes) if value) or "—"
+            print(f"        component {substance}: {context}")
+    print("    knowledge assertions:")
+    for row in item.knowledge:
+        marker = "OPEN" if row.open else row.research_state
+        print(f"      - {marker} {row.category}={row.value} sources={', '.join(row.sources) or '—'}")
+    print("    owned open relation leads:")
+    for row in item.open_relations:
+        print(f"      - OPEN {row.id} {row.relation_type}: {row.source} -> {row.target} ({row.reason})")
+    if not item.open_relations:
+        print("      - none")
+    print("    schedule assertions:")
+    for row in item.schedule_assertions:
+        print(f"      - {row.axis}={row.value}")
+    print("    scheduling assessments:")
+    for row in item.scheduling_assessments:
+        marker = "OPEN" if row.open else row.conclusion
+        print(f"      - {marker} {row.axis}: {row.summary} sources={', '.join(row.sources) or '—'}")
 
 
 def _print_errors(errors: list[str]) -> None:

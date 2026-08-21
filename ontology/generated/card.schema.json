@@ -626,6 +626,50 @@
       "title": "EntitySelector",
       "type": "object"
     },
+    "GroomingEligibility": {
+      "description": "",
+      "enum": [
+        "active_reachable",
+        "unassessed_owned_item"
+      ],
+      "title": "GroomingEligibility",
+      "type": "string"
+    },
+    "GroomingRankDirection": {
+      "description": "",
+      "enum": [
+        "ascending",
+        "descending"
+      ],
+      "title": "GroomingRankDirection",
+      "type": "string"
+    },
+    "GroomingRankField": {
+      "description": "",
+      "enum": [
+        "active_unique_product_count",
+        "open_owned_item_count",
+        "substance_id"
+      ],
+      "title": "GroomingRankField",
+      "type": "string"
+    },
+    "GroomingRelationOwner": {
+      "description": "",
+      "enum": [
+        "lowest_stable_substance_id"
+      ],
+      "title": "GroomingRelationOwner",
+      "type": "string"
+    },
+    "GroomingWorkUnit": {
+      "description": "",
+      "enum": [
+        "substance_card"
+      ],
+      "title": "GroomingWorkUnit",
+      "type": "string"
+    },
     "IdentifiedNode": {
       "additionalProperties": false,
       "description": "",
@@ -1858,6 +1902,68 @@
       "title": "RuntimeGlueContract",
       "type": "object"
     },
+    "RuntimeGroomingPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "eligibility": {
+          "items": {
+            "$ref": "#/$defs/GroomingEligibility"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "rank_fields": {
+          "items": {
+            "$ref": "#/$defs/RuntimeGroomingRankFieldPolicy"
+          },
+          "type": "array"
+        },
+        "relation_owner": {
+          "$ref": "#/$defs/GroomingRelationOwner"
+        },
+        "selection_count": {
+          "type": "integer"
+        },
+        "work_unit": {
+          "$ref": "#/$defs/GroomingWorkUnit"
+        }
+      },
+      "required": [
+        "id",
+        "work_unit",
+        "eligibility",
+        "rank_fields",
+        "selection_count",
+        "relation_owner"
+      ],
+      "title": "RuntimeGroomingPolicy",
+      "type": "object"
+    },
+    "RuntimeGroomingRankFieldPolicy": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "direction": {
+          "$ref": "#/$defs/GroomingRankDirection"
+        },
+        "field": {
+          "$ref": "#/$defs/GroomingRankField"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "field",
+        "direction"
+      ],
+      "title": "RuntimeGroomingRankFieldPolicy",
+      "type": "object"
+    },
     "RuntimePolicyCatalog": {
       "additionalProperties": false,
       "description": "Typed executable policy contract consumed by planner runtime.",
@@ -1897,6 +2003,9 @@
         },
         "glue_contract": {
           "$ref": "#/$defs/RuntimeGlueContract"
+        },
+        "grooming_policy": {
+          "$ref": "#/$defs/RuntimeGroomingPolicy"
         },
         "id": {
           "type": "string"
@@ -1978,6 +2087,7 @@
         "relation_presence_statuses",
         "selector_form_capabilities",
         "dashboard_state_catalog",
+        "grooming_policy",
         "runtime_projection"
       ],
       "title": "RuntimePolicyCatalog",

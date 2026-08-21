@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 462412bbc346d001f8448010a3c5480ced52c62f8eaf6b09fffc579218c72e39
+source_hash: 21597a0ed3d4e96b5b6f49d501204b644203b6f95d5fbd9feff6063a42c9397d
 categories:
   kind:
     allowed_predicates: &id005
@@ -2178,6 +2178,24 @@ runtime_policy:
     selector_form: term
     endpoint_kind: term
     show_match_details: true
+  grooming_policy:
+    id: grooming_policy
+    work_unit: substance_card
+    eligibility:
+    - active_reachable
+    - unassessed_owned_item
+    rank_fields:
+    - id: grooming_rank_active_products
+      field: active_unique_product_count
+      direction: descending
+    - id: grooming_rank_open_items
+      field: open_owned_item_count
+      direction: descending
+    - id: grooming_rank_substance_id
+      field: substance_id
+      direction: ascending
+    selection_count: 1
+    relation_owner: lowest_stable_substance_id
   dashboard_state_catalog:
     usage_states:
     - id: dashboard_usage_current
@@ -2341,6 +2359,27 @@ runtime_policy:
   - id: selector_form_capabilities
     target: selector_form_capabilities
     source: selector_form_capabilities
+  - id: grooming_policy
+    target: grooming_policy
+    children:
+    - id: grooming_policy_id
+      target: id
+      source: grooming_policy.id
+    - id: grooming_policy_work_unit
+      target: work_unit
+      source: grooming_policy.work_unit
+    - id: grooming_policy_eligibility
+      target: eligibility
+      source: grooming_policy.eligibility
+    - id: grooming_policy_rank_fields
+      target: rank_fields
+      source: grooming_policy.rank_fields
+    - id: grooming_policy_selection_count
+      target: selection_count
+      source: grooming_policy.selection_count
+    - id: grooming_policy_relation_owner
+      target: relation_owner
+      source: grooming_policy.relation_owner
 ontology_assertions:
   rel_balance_001:
     id: rel_balance_001

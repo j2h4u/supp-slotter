@@ -245,6 +245,25 @@ selector_form_capabilities:
     endpoint_kind: term
     show_match_details: true
 
+grooming_policy:
+  id: grooming_policy
+  work_unit: substance_card
+  eligibility:
+    - active_reachable
+    - unassessed_owned_item
+  rank_fields:
+    - id: grooming_rank_active_products
+      field: active_unique_product_count
+      direction: descending
+    - id: grooming_rank_open_items
+      field: open_owned_item_count
+      direction: descending
+    - id: grooming_rank_substance_id
+      field: substance_id
+      direction: ascending
+  selection_count: 1
+  relation_owner: lowest_stable_substance_id
+
 # Dashboard review states are a projection of facts, not a second handwritten
 # classification in the renderer.  The tables cover every boolean input
 # combination so an authored mapping edit is observable and fail-closed.
@@ -361,3 +380,24 @@ runtime_projection:
   - id: selector_form_capabilities
     target: selector_form_capabilities
     source: selector_form_capabilities
+  - id: grooming_policy
+    target: grooming_policy
+    children:
+      - id: grooming_policy_id
+        target: id
+        source: grooming_policy.id
+      - id: grooming_policy_work_unit
+        target: work_unit
+        source: grooming_policy.work_unit
+      - id: grooming_policy_eligibility
+        target: eligibility
+        source: grooming_policy.eligibility
+      - id: grooming_policy_rank_fields
+        target: rank_fields
+        source: grooming_policy.rank_fields
+      - id: grooming_policy_selection_count
+        target: selection_count
+        source: grooming_policy.selection_count
+      - id: grooming_policy_relation_owner
+        target: relation_owner
+        source: grooming_policy.relation_owner

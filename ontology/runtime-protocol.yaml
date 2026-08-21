@@ -31,6 +31,25 @@ enums:
       both:
       source:
       target:
+  GroomingWorkUnit:
+    permissible_values:
+      substance_card:
+  GroomingEligibility:
+    permissible_values:
+      active_reachable:
+      unassessed_owned_item:
+  GroomingRankField:
+    permissible_values:
+      active_unique_product_count:
+      open_owned_item_count:
+      substance_id:
+  GroomingRankDirection:
+    permissible_values:
+      ascending:
+      descending:
+  GroomingRelationOwner:
+    permissible_values:
+      lowest_stable_substance_id:
 
 classes:
   Condition:
@@ -44,7 +63,7 @@ classes:
     slots: [operator, field, value, weight, trace_key]
   RuntimePolicyCatalog:
     description: Typed executable policy contract consumed by planner runtime.
-    slots: [id, engine_contract, glue_contract, source_kind_values, effect_match_dimensions, assignment_axes, slot_near_values, constraint_execution_policies, effect_scoring, prefer_with_policy, warning_types, warning_emitters, warning_trait_actions, concern_catalog, relation_warning_rules, relation_presence_statuses, selector_form_capabilities, dashboard_state_catalog, runtime_projection]
+    slots: [id, engine_contract, glue_contract, source_kind_values, effect_match_dimensions, assignment_axes, slot_near_values, constraint_execution_policies, effect_scoring, prefer_with_policy, warning_types, warning_emitters, warning_trait_actions, concern_catalog, relation_warning_rules, relation_presence_statuses, selector_form_capabilities, dashboard_state_catalog, grooming_policy, runtime_projection]
     slot_usage:
       source_kind_values: {required: true, inlined: true, inlined_as_list: true}
       engine_contract: {required: true, inlined: true}
@@ -62,6 +81,7 @@ classes:
       relation_presence_statuses: {required: true, inlined: true, inlined_as_list: true}
       selector_form_capabilities: {required: true, inlined: true, inlined_as_list: true}
       dashboard_state_catalog: {required: true, inlined: true}
+      grooming_policy: {required: true, inlined: true}
       runtime_projection: {required: true, inlined: true, inlined_as_list: true}
       glue_contract: {required: true, inlined: true}
   RuntimeGlueContract:
@@ -241,6 +261,20 @@ classes:
     slot_usage:
       tracked_product_presence: {required: true}
       state: {required: true}
+  RuntimeGroomingRankFieldPolicy:
+    slots: [id, field, direction]
+    slot_usage:
+      field: {required: true, range: GroomingRankField}
+      direction: {required: true, range: GroomingRankDirection}
+  RuntimeGroomingPolicy:
+    slots: [id, work_unit, eligibility, rank_fields, selection_count, relation_owner]
+    slot_usage:
+      id: {required: true}
+      work_unit: {required: true, range: GroomingWorkUnit}
+      eligibility: {required: true, multivalued: true, range: GroomingEligibility}
+      rank_fields: {required: true, multivalued: true, inlined: true, inlined_as_list: true, range: RuntimeGroomingRankFieldPolicy}
+      selection_count: {required: true}
+      relation_owner: {required: true, range: GroomingRelationOwner}
 
 slots:
   id: {identifier: true, required: true}
@@ -314,8 +348,13 @@ slots:
   semantic:
   fixture:
   expected:
-  eligibility: {range: SemanticEnrichmentGroomingEligibility}
-  roi_order_desc: {multivalued: true, range: SemanticEnrichmentGroomingMetric}
+  grooming_policy: {range: RuntimeGroomingPolicy, inlined: true}
+  work_unit: {range: GroomingWorkUnit}
+  eligibility: {multivalued: true, range: GroomingEligibility}
+  rank_fields: {multivalued: true, range: RuntimeGroomingRankFieldPolicy, inlined: true, inlined_as_list: true}
+  relation_owner: {range: GroomingRelationOwner}
+  direction: {range: GroomingRankDirection}
+  selection_count: {range: integer}
   target:
   source:
   children: {multivalued: true, range: RuntimeProjectionDescriptor, inlined: true, inlined_as_list: true}

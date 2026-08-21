@@ -1825,6 +1825,90 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGlueContract"
     },
     {
+      "name": "RuntimeGroomingPolicy",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "eligibility",
+          "range": "GroomingEligibility",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "rank_fields",
+          "range": "RuntimeGroomingRankFieldPolicy",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "relation_owner",
+          "range": "GroomingRelationOwner",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "selection_count",
+          "range": "integer",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "work_unit",
+          "range": "GroomingWorkUnit",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGroomingPolicy"
+    },
+    {
+      "name": "RuntimeGroomingRankFieldPolicy",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "direction",
+          "range": "GroomingRankDirection",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "field",
+          "range": "GroomingRankField",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGroomingRankFieldPolicy"
+    },
+    {
       "name": "RuntimePolicyCatalog",
       "slots": [
         {
@@ -1889,6 +1973,14 @@
           "multivalued": false,
           "name": "glue_contract",
           "range": "RuntimeGlueContract",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "grooming_policy",
+          "range": "RuntimeGroomingPolicy",
           "required": true
         },
         {

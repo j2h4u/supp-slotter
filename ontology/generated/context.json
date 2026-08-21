@@ -124,6 +124,12 @@
     "RuntimeGlueContract": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGlueContract"
     },
+    "RuntimeGroomingPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGroomingPolicy"
+    },
+    "RuntimeGroomingRankFieldPolicy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGroomingRankFieldPolicy"
+    },
     "RuntimePolicyCatalog": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog"
     },
@@ -382,6 +388,9 @@
     "description": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/description"
     },
+    "direction": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/direction"
+    },
     "directional": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/directional"
     },
@@ -450,6 +459,9 @@
     },
     "glue_contract": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/glue_contract"
+    },
+    "grooming_policy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/grooming_policy"
     },
     "id": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/id"
@@ -592,6 +604,9 @@
     "rank": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/rank"
     },
+    "rank_fields": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/rank_fields"
+    },
     "rationale": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/rationale"
     },
@@ -603,6 +618,9 @@
     },
     "relation_kind": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_kind"
+    },
+    "relation_owner": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_owner"
     },
     "relation_presence_active_sides": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_presence_active_sides"
@@ -661,9 +679,6 @@
     "risk_description": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/risk_description"
     },
-    "roi_order_desc": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/roi_order_desc"
-    },
     "role": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/role"
     },
@@ -717,6 +732,9 @@
     },
     "scores_advisory": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/scores_advisory"
+    },
+    "selection_count": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/selection_count"
     },
     "selector": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/selector"
@@ -914,6 +932,9 @@
     },
     "weight": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/weight"
+    },
+    "work_unit": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/work_unit"
     },
     "zero_effect": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/zero_effect"
