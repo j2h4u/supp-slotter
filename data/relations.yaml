@@ -57,11 +57,15 @@ relations:
   target_selector:
     entity:
       entity_id: sub_d997f98e03
-- reason: Magnesium supports calcium homeostasis through PTH and vitamin D signaling.
+- reason: Magnesium participates in generic calcium-ion transport and bone physiology; this biochemical relationship is not a form-specific clinical claim.
   id: rel_supports_003
   relation_type: supports
   assertion_kind: ontology_assertion
   semantic_family: biochemical_mechanism_assertion
+  research_state: mechanistic_only
+  sources:
+  - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
+  action: No co-dose, separation, or timing rule is established by this relationship.
   source_selector:
     entity:
       name: Magnesium

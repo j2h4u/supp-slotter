@@ -4,31 +4,53 @@ form: glycinate
 aliases:
 - Magnesium bisglycinate
 - Albion magnesium bisglycinate
-notes: 'Magnesium glycinate component. Formulation and tolerability are product- and dose-dependent; the bounded evidence does not establish categorical high bioavailability, low-laxative, glycine-synergy, or evening-timing claims. Sleep-recovery context is bounded to the cited trial and is not a general timing rule. NIH ODS describes magnesium as a cofactor for energy production, glucose and blood-pressure regulation, muscle/nerve function, calcium/potassium ion transport, normal heart rhythm, and bone structure.'
+notes: 'Magnesium glycinate component. Formulation and tolerability are product- and dose-dependent; the bounded evidence does not establish categorical high bioavailability, low-laxative, glycine-synergy, or evening-timing claims. Sleep-recovery context is bounded to self-reported poor sleepers in the cited trial and is not a bedtime rule. The active Vitamir product identity, source, and amount remain unresolved pending label verification. NIH ODS describes magnesium as a cofactor for energy production, glucose and blood-pressure regulation, muscle/nerve function, calcium/potassium ion transport, normal heart rhythm, and bone structure.'
 scheduling_assessment:
   intake:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/40918053/
-    summary: No direct controlled evidence establishes a fed-versus-fasted preference for magnesium glycinate; tolerability and practical meal choice are dose- and product-dependent, with no universal requirement.
+    - https://pubmed.ncbi.nlm.nih.gov/34111673/
+    - https://pubmed.ncbi.nlm.nih.gov/39770988/
+    summary: Formulation and absorption findings do not establish a fed-versus-fasted preference or superiority rule for magnesium glycinate; product, dose, and formulation differences prevent a universal intake rule.
   timing:
     conclusion: insufficient
     sources:
     - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
     - https://pubmed.ncbi.nlm.nih.gov/40918053/
     summary: No comparative evening or clock-time rule was demonstrated; a bounded sleep-recovery trial does not establish a general timing rule.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/34111673/
+    - https://pubmed.ncbi.nlm.nih.gov/39770988/
+    summary: Magnesium form and absorption papers do not establish pre-, during-, or post-workout placement for magnesium glycinate.
 knowledge:
   context:
-  - sleep_recovery
+  - value: sleep_recovery
+    research_state: supported
+    sources:
+    - https://pubmed.ncbi.nlm.nih.gov/40918053/
   effect:
   - value: bone_mineral_metabolism_support
     research_state: supported
     sources:
     - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
   kind:
-  - mineral
+  - value: mineral
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
   pathway:
-  - vitamin_d_calcium_axis
+  - value: vitamin_d_calcium_axis
+    research_state: mechanistic_only
+    sources:
+    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
+    - https://pubmed.ncbi.nlm.nih.gov/30541089/
+    - https://pubmed.ncbi.nlm.nih.gov/29480918/
   quality:
-  - electrolyte
+  - value: electrolyte
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
