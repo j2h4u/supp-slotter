@@ -31,13 +31,6 @@ enums:
       both:
       source:
       target:
-  GroomingWorkUnit:
-    permissible_values:
-      substance_card:
-  GroomingEligibility:
-    permissible_values:
-      active_reachable:
-      unassessed_owned_item:
   GroomingRankField:
     permissible_values:
       active_unique_product_count:
@@ -47,10 +40,6 @@ enums:
     permissible_values:
       ascending:
       descending:
-  GroomingRelationOwner:
-    permissible_values:
-      lowest_stable_substance_id:
-
 classes:
   Condition:
     slots: [operator, field, value, values, conditions, selector, left, right]
@@ -267,14 +256,15 @@ classes:
       field: {required: true, range: GroomingRankField}
       direction: {required: true, range: GroomingRankDirection}
   RuntimeGroomingPolicy:
-    slots: [id, work_unit, eligibility, rank_fields, selection_count, relation_owner]
+    slots: [id, require_active_reachable, open_research_state, rank_fields, selection_count, relation_owner_field, relation_owner_direction]
     slot_usage:
       id: {required: true}
-      work_unit: {required: true, range: GroomingWorkUnit}
-      eligibility: {required: true, multivalued: true, range: GroomingEligibility}
+      require_active_reachable: {required: true}
+      open_research_state: {required: true, range: ResearchState}
       rank_fields: {required: true, multivalued: true, inlined: true, inlined_as_list: true, range: RuntimeGroomingRankFieldPolicy}
       selection_count: {required: true}
-      relation_owner: {required: true, range: GroomingRelationOwner}
+      relation_owner_field: {required: true, range: GroomingRankField}
+      relation_owner_direction: {required: true, range: GroomingRankDirection}
 
 slots:
   id: {identifier: true, required: true}
@@ -349,10 +339,11 @@ slots:
   fixture:
   expected:
   grooming_policy: {range: RuntimeGroomingPolicy, inlined: true}
-  work_unit: {range: GroomingWorkUnit}
-  eligibility: {multivalued: true, range: GroomingEligibility}
+  require_active_reachable: {range: boolean}
+  open_research_state: {range: ResearchState}
   rank_fields: {multivalued: true, range: RuntimeGroomingRankFieldPolicy, inlined: true, inlined_as_list: true}
-  relation_owner: {range: GroomingRelationOwner}
+  relation_owner_field: {range: GroomingRankField}
+  relation_owner_direction: {range: GroomingRankDirection}
   direction: {range: GroomingRankDirection}
   selection_count: {range: integer}
   target:

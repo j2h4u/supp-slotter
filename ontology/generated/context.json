@@ -406,9 +406,6 @@
     "effects": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/effects"
     },
-    "eligibility": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/eligibility"
-    },
     "emitter": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/emitter"
     },
@@ -547,6 +544,9 @@
     "ontoclean_profiles": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/ontoclean_profiles"
     },
+    "open_research_state": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/open_research_state"
+    },
     "operation": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/operation"
     },
@@ -619,8 +619,11 @@
     "relation_kind": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_kind"
     },
-    "relation_owner": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_owner"
+    "relation_owner_direction": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_owner_direction"
+    },
+    "relation_owner_field": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_owner_field"
     },
     "relation_presence_active_sides": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relation_presence_active_sides"
@@ -651,6 +654,9 @@
     },
     "relations": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/relations"
+    },
+    "require_active_reachable": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/require_active_reachable"
     },
     "research_state": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/research_state"
@@ -932,9 +938,6 @@
     },
     "weight": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/weight"
-    },
-    "work_unit": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/work_unit"
     },
     "zero_effect": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/zero_effect"

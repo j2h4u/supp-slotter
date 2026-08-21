@@ -81,6 +81,7 @@ class GroomRelation:
     research_state: str
     sources: tuple[str, ...]
     active_endpoint_ids: tuple[str, ...]
+    owner_id: str
 
     @property
     def open(self) -> bool:

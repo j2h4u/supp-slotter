@@ -247,10 +247,8 @@ selector_form_capabilities:
 
 grooming_policy:
   id: grooming_policy
-  work_unit: substance_card
-  eligibility:
-    - active_reachable
-    - unassessed_owned_item
+  require_active_reachable: true
+  open_research_state: unassessed
   rank_fields:
     - id: grooming_rank_active_products
       field: active_unique_product_count
@@ -262,7 +260,8 @@ grooming_policy:
       field: substance_id
       direction: ascending
   selection_count: 1
-  relation_owner: lowest_stable_substance_id
+  relation_owner_field: substance_id
+  relation_owner_direction: ascending
 
 # Dashboard review states are a projection of facts, not a second handwritten
 # classification in the renderer.  The tables cover every boolean input
@@ -386,18 +385,21 @@ runtime_projection:
       - id: grooming_policy_id
         target: id
         source: grooming_policy.id
-      - id: grooming_policy_work_unit
-        target: work_unit
-        source: grooming_policy.work_unit
-      - id: grooming_policy_eligibility
-        target: eligibility
-        source: grooming_policy.eligibility
+      - id: grooming_policy_require_active_reachable
+        target: require_active_reachable
+        source: grooming_policy.require_active_reachable
+      - id: grooming_policy_open_research_state
+        target: open_research_state
+        source: grooming_policy.open_research_state
       - id: grooming_policy_rank_fields
         target: rank_fields
         source: grooming_policy.rank_fields
       - id: grooming_policy_selection_count
         target: selection_count
         source: grooming_policy.selection_count
-      - id: grooming_policy_relation_owner
-        target: relation_owner
-        source: grooming_policy.relation_owner
+      - id: grooming_policy_relation_owner_field
+        target: relation_owner_field
+        source: grooming_policy.relation_owner_field
+      - id: grooming_policy_relation_owner_direction
+        target: relation_owner_direction
+        source: grooming_policy.relation_owner_direction

@@ -463,11 +463,12 @@ class RuntimeGroomingRankFieldPolicy:
 @dataclass(frozen=True, slots=True)
 class RuntimeGroomingPolicy:
     id: str
-    work_unit: str
-    eligibility: tuple[str, ...]
+    require_active_reachable: bool
+    open_research_state: str
     rank_fields: tuple[RuntimeGroomingRankFieldPolicy, ...]
     selection_count: int
-    relation_owner: str
+    relation_owner_field: str
+    relation_owner_direction: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -811,9 +812,10 @@ def _grooming_rank_field(row: Mapping[str, object], label: str) -> RuntimeGroomi
 
 
 def _grooming_policy(row: Mapping[str, object], label: str) -> RuntimeGroomingPolicy:
-    eligibility = _strings(row["eligibility"], f"{label}.eligibility")
-    if set(eligibility) != {"active_reachable", "unassessed_owned_item"}:
-        raise _error(f"{label}.eligibility", "must declare exactly active_reachable and unassessed_owned_item")
+    require_active_reachable = _bool(row["require_active_reachable"], f"{label}.require_active_reachable")
+    open_research_state = _str(row["open_research_state"], f"{label}.open_research_state")
+    if open_research_state not in {"unassessed", "anecdotal", "searched_insufficient", "mechanistic_only", "supported"}:
+        raise _error(f"{label}.open_research_state", "is not a declared ResearchState")
     rank_fields = _typed_rows(
         row["rank_fields"],
         f"{label}.rank_fields",
@@ -824,19 +826,20 @@ def _grooming_policy(row: Mapping[str, object], label: str) -> RuntimeGroomingPo
     selection_count = _int(row["selection_count"], f"{label}.selection_count")
     if selection_count != 1:
         raise _error(f"{label}.selection_count", "must be exactly one")
-    work_unit = _str(row["work_unit"], f"{label}.work_unit")
-    relation_owner = _str(row["relation_owner"], f"{label}.relation_owner")
-    if work_unit != "substance_card":
-        raise _error(f"{label}.work_unit", "must be substance_card")
-    if relation_owner != "lowest_stable_substance_id":
-        raise _error(f"{label}.relation_owner", "must be lowest_stable_substance_id")
+    relation_owner_field = _str(row["relation_owner_field"], f"{label}.relation_owner_field")
+    relation_owner_direction = _str(row["relation_owner_direction"], f"{label}.relation_owner_direction")
+    if relation_owner_field != "substance_id":
+        raise _error(f"{label}.relation_owner_field", "must be substance_id")
+    if relation_owner_direction not in {"ascending", "descending"}:
+        raise _error(f"{label}.relation_owner_direction", "must be ascending or descending")
     return RuntimeGroomingPolicy(
         _str(row["id"], f"{label}.id"),
-        work_unit,
-        eligibility,
+        require_active_reachable,
+        open_research_state,
         cast(tuple[RuntimeGroomingRankFieldPolicy, ...], rank_fields),
         selection_count,
-        relation_owner,
+        relation_owner_field,
+        relation_owner_direction,
     )
 
 

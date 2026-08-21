@@ -1830,17 +1830,17 @@
         {
           "inlined": false,
           "inlined_as_list": false,
-          "multivalued": true,
-          "name": "eligibility",
-          "range": "GroomingEligibility",
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
           "required": true
         },
         {
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "id",
-          "range": "string",
+          "name": "open_research_state",
+          "range": "ResearchState",
           "required": true
         },
         {
@@ -1855,8 +1855,24 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "relation_owner",
-          "range": "GroomingRelationOwner",
+          "name": "relation_owner_direction",
+          "range": "GroomingRankDirection",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "relation_owner_field",
+          "range": "GroomingRankField",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "require_active_reachable",
+          "range": "boolean",
           "required": true
         },
         {
@@ -1865,14 +1881,6 @@
           "multivalued": false,
           "name": "selection_count",
           "range": "integer",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "work_unit",
-          "range": "GroomingWorkUnit",
           "required": true
         }
       ],

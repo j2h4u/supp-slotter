@@ -626,15 +626,6 @@
       "title": "EntitySelector",
       "type": "object"
     },
-    "GroomingEligibility": {
-      "description": "",
-      "enum": [
-        "active_reachable",
-        "unassessed_owned_item"
-      ],
-      "title": "GroomingEligibility",
-      "type": "string"
-    },
     "GroomingRankDirection": {
       "description": "",
       "enum": [
@@ -652,22 +643,6 @@
         "substance_id"
       ],
       "title": "GroomingRankField",
-      "type": "string"
-    },
-    "GroomingRelationOwner": {
-      "description": "",
-      "enum": [
-        "lowest_stable_substance_id"
-      ],
-      "title": "GroomingRelationOwner",
-      "type": "string"
-    },
-    "GroomingWorkUnit": {
-      "description": "",
-      "enum": [
-        "substance_card"
-      ],
-      "title": "GroomingWorkUnit",
       "type": "string"
     },
     "IdentifiedNode": {
@@ -1906,14 +1881,11 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
-        "eligibility": {
-          "items": {
-            "$ref": "#/$defs/GroomingEligibility"
-          },
-          "type": "array"
-        },
         "id": {
           "type": "string"
+        },
+        "open_research_state": {
+          "$ref": "#/$defs/ResearchState"
         },
         "rank_fields": {
           "items": {
@@ -1921,23 +1893,27 @@
           },
           "type": "array"
         },
-        "relation_owner": {
-          "$ref": "#/$defs/GroomingRelationOwner"
+        "relation_owner_direction": {
+          "$ref": "#/$defs/GroomingRankDirection"
+        },
+        "relation_owner_field": {
+          "$ref": "#/$defs/GroomingRankField"
+        },
+        "require_active_reachable": {
+          "type": "boolean"
         },
         "selection_count": {
           "type": "integer"
-        },
-        "work_unit": {
-          "$ref": "#/$defs/GroomingWorkUnit"
         }
       },
       "required": [
         "id",
-        "work_unit",
-        "eligibility",
+        "require_active_reachable",
+        "open_research_state",
         "rank_fields",
         "selection_count",
-        "relation_owner"
+        "relation_owner_field",
+        "relation_owner_direction"
       ],
       "title": "RuntimeGroomingPolicy",
       "type": "object"

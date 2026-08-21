@@ -396,11 +396,8 @@
       ]
     },
     "grooming_policy": {
-      "eligibility": [
-        "active_reachable",
-        "unassessed_owned_item"
-      ],
       "id": "grooming_policy",
+      "open_research_state": "unassessed",
       "rank_fields": [
         {
           "direction": "descending",
@@ -418,9 +415,10 @@
           "id": "grooming_rank_substance_id"
         }
       ],
-      "relation_owner": "lowest_stable_substance_id",
-      "selection_count": 1,
-      "work_unit": "substance_card"
+      "relation_owner_direction": "ascending",
+      "relation_owner_field": "substance_id",
+      "require_active_reachable": true,
+      "selection_count": 1
     },
     "prefer_with_policy": {
       "id": "prefer_with_policy",
@@ -619,8 +617,8 @@
     "compiler_sha256": "c9c6cb4980bf7914a3d21901e1eee78b403c804898b834c74888b22e0228ce4e",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "f2f0fe0d1f2f670356039cdab6bed1f194b4ee1ab6af1f87eca12eca3bedba01"
+    "source_sha256": "fccd7bad0afe9187620e724a4eabe9242b391a54e6c0af9f8e4ba99de76c6816"
   },
   "schema_version": "2",
-  "source_hash": "21597a0ed3d4e96b5b6f49d501204b644203b6f95d5fbd9feff6063a42c9397d"
+  "source_hash": "266a72cccbd1e91ac01c6d8a67655dfd7443f92a0d0a0780726bd77654e3d26c"
 }

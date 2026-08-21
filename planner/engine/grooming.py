@@ -61,20 +61,32 @@ def _select_work_item(paths: Paths, bundle: OntologyBundle) -> tuple[GroomWorkIt
         for component in product.components
         if component.substance in substances
     }
-    owned_relations = _owned_open_relations(relations, substances, active_ids, bundle)
+    policy = bundle.runtime_program.grooming_policy
+    reachable_ids = active_ids if policy.require_active_reachable else set(substances)
+    owned_relations = _owned_open_relations(
+        relations,
+        substances,
+        active_ids,
+        bundle,
+        research_state=policy.open_research_state,
+        owner_field=policy.relation_owner_field,
+        owner_direction=policy.relation_owner_direction,
+    )
     candidates = [
         (substance, active_products, owned_relations.get(substance.id, ()))
         for substance in substances.values()
-        if substance.id in active_ids
-        and _open_knowledge_count(substance) + len(owned_relations.get(substance.id, ())) > 0
+        if substance.id in reachable_ids
+        and _open_knowledge_count(substance, policy.open_research_state)
+        + len(owned_relations.get(substance.id, ()))
+        > 0
     ]
-    policy = bundle.runtime_program.grooming_policy
     metrics: dict[str, dict[str, object]] = {
         substance.id: {
             "active_unique_product_count": len(
                 {product.id for product in active_products if _has_substance(product, substance.id)}
             ),
-            "open_owned_item_count": _open_knowledge_count(substance) + len(owned_relations.get(substance.id, ())),
+            "open_owned_item_count": _open_knowledge_count(substance, policy.open_research_state)
+            + len(owned_relations.get(substance.id, ())),
             "substance_id": substance.id,
         }
         for substance, active_products, _ in candidates
@@ -129,23 +141,27 @@ def _has_substance(product: Product, substance_id: str) -> bool:
     return any(component.substance == substance_id for component in product.components)
 
 
-def _open_knowledge_count(substance: Substance) -> int:
-    return sum(assertion.research_state == "unassessed" for assertion in substance.knowledge_assertions)
+def _open_knowledge_count(substance: Substance, research_state: str) -> int:
+    return sum(assertion.research_state == research_state for assertion in substance.knowledge_assertions)
 
 
-def _owned_open_relations(
+def _owned_open_relations(  # noqa: PLR0913
     relations: tuple[Relation, ...] | list[Relation],
     substances: Mapping[str, Substance],
     active_ids: set[str],
     bundle: OntologyBundle,
+    *,
+    research_state: str,
+    owner_field: str,
+    owner_direction: str,
 ) -> dict[str, tuple[GroomRelation, ...]]:
     owned: dict[str, list[GroomRelation]] = {}
     for relation in relations:
-        if relation.research_state != "unassessed":
+        if relation.research_state != research_state:
             continue
         source_ids = set(resolve_selector(relation.source_selector, substances, bundle).substance_ids)
         target_ids = set(resolve_selector(relation.target_selector, substances, bundle).substance_ids)
-        endpoint_ids = tuple(sorted((source_ids | target_ids) & active_ids))
+        endpoint_ids = tuple(sorted((source_ids | target_ids) & active_ids, reverse=owner_direction == "descending"))
         if not endpoint_ids:
             continue
         owner = endpoint_ids[0]
@@ -159,6 +175,7 @@ def _owned_open_relations(
                 research_state=relation.research_state,
                 sources=relation.sources,
                 active_endpoint_ids=endpoint_ids,
+                owner_id=endpoint_ids[0] if owner_field == "substance_id" else "",
             )
         )
     return {key: tuple(sorted(rows, key=lambda row: row.id)) for key, rows in owned.items()}
@@ -233,7 +250,8 @@ def _build_work_item(
         form=substance.form,
         notes=substance.notes,
         active_unique_product_count=len(products),
-        open_owned_item_count=_open_knowledge_count(substance) + len(open_relations),
+        open_owned_item_count=_open_knowledge_count(substance, bundle.runtime_program.grooming_policy.open_research_state)
+        + len(open_relations),
         active_products=products,
         knowledge=knowledge,
         open_relations=open_relations,
@@ -262,6 +280,7 @@ def _render(item: GroomWorkItem | None, eligible_count: int, selection_count: in
     print("    active products:")
     for product in item.active_products:
         print(f"      - {product.id}: {product.brand + ' - ' if product.brand else ''}{product.name}")
+        print(f"        notes: {product.notes or '—'}; use_pattern: {product.use_pattern or '—'}")
         for substance, label, amount, notes in product.components:
             context = ", ".join(value for value in (label, amount, notes) if value) or "—"
             print(f"        component {substance}: {context}")
@@ -271,7 +290,10 @@ def _render(item: GroomWorkItem | None, eligible_count: int, selection_count: in
         print(f"      - {marker} {row.category}={row.value} sources={', '.join(row.sources) or '—'}")
     print("    owned open relation leads:")
     for row in item.open_relations:
-        print(f"      - OPEN {row.id} {row.relation_type}: {row.source} -> {row.target} ({row.reason})")
+        print(
+            f"      - OPEN {row.id} {row.relation_type}: {row.source} -> {row.target} "
+            f"({row.reason}); endpoints={','.join(row.active_endpoint_ids)}; owner={row.owner_id}"
+        )
     if not item.open_relations:
         print("      - none")
     print("    schedule assertions:")
