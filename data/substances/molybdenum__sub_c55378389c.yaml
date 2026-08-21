@@ -7,7 +7,10 @@ notes: Generic elemental molybdenum contribution. Product cards keep the concret
   purines/pyrimidines, drugs, and toxins.
 knowledge:
   effect:
-  - sulfur_amino_acid_metabolism
+  - value: sulfur_amino_acid_metabolism
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/molybdenum-HealthProfessional/
   kind:
   - mineral
 scheduling_assessment:

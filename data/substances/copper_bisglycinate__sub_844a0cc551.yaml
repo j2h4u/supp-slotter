@@ -12,9 +12,18 @@ knowledge:
   context:
   - connective_tissue_support
   effect:
-  - antioxidant_enzyme_cofactor
-  - connective_tissue_synthesis_support
-  - iron_metabolism_support
+  - value: antioxidant_enzyme_cofactor
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
+  - value: connective_tissue_synthesis_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
+  - value: iron_metabolism_support
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
   kind:
   - mineral
   risk:
