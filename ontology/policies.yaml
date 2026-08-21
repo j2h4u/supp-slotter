@@ -104,11 +104,10 @@ scheduling_policies:
     warning: false
   risk:b6_neuropathy_long_term:
     term: b6_neuropathy_long_term
-    applies_when: Use for pyridoxine HCl/pyridoxine supplement forms when chronic
-      intake should be reviewed separately from active P5P forms.
+    applies_when: Use for supplemental vitamin B6 forms when long-term exposure warrants review across forms and products.
     effects: []
     warning: true
-    action: Review cumulative daily pyridoxine HCl/B6 intake across active products.
+    action: Review cumulative supplemental B6 intake across all forms and products, plus duration.
   risk:biotin_lab_interference:
     term: biotin_lab_interference
     applies_when: Use for supplemental biotin/B7 forms where lab-test interpretation

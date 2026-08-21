@@ -783,8 +783,8 @@ terms:
   semantic_category: pathway
 - slug: b6_neuropathy_long_term
   label: B6 neuropathy long-term
-  description: Long-term supplemental pyridoxine exposure can cause sensory peripheral neuropathy; review cumulative B6 intake
-    across products.
+  description: Long-term supplemental vitamin B6 exposure can cause sensory peripheral neuropathy; review cumulative supplemental
+    B6 intake across forms and products and duration.
   semantic_category: risk
 - slug: biotin_lab_interference
   label: Biotin lab-test interference

@@ -17,9 +17,7 @@ scheduling_assessment:
     summary: No general clock-time rule was demonstrated for pyridoxine HCl supplementation.
 concerns:
 - kind: safety
-  text: 'Long-term high-dose pyridoxine HCl intake causes sensory neuropathy (vitamin B6 toxicity); HCl form can accumulate
-    as a pseudo-antagonist unlike the active P5P form. Review cumulative daily B6 intake across all products. Source: StatPearls
-    Vitamin B6/Pyridoxine; NIH ODS Vitamin B6.'
+  text: 'Long-term supplemental vitamin B6 exposure can cause sensory peripheral neuropathy; review cumulative supplemental B6 intake across all forms and products and duration. Sources: NIH ODS Vitamin B6 (https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/) and EFSA 2023 guidance (https://doi.org/10.2903/j.efsa.2023.8006).'
 knowledge:
   context:
   - neurocognitive_support

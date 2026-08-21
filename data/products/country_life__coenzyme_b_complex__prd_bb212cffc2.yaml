@@ -19,7 +19,11 @@ components:
   amount: 50 mg per 2 capsules
 - substance: sub_799419116d
   label: Vitamin B6 (as pyridoxal-5-phosphate / P-5-P)
-  amount: 50 mg per 2 capsules
+  notes: Country Life lists 50 mg total vitamin B6 per 2 capsules across pyridoxine HCl, pyridoxal-5-phosphate (P5P), and pyridoxine alpha-ketoglutarate hydrochloride; the split between forms is not disclosed.
+- substance: sub_a873e428ee
+  label: Vitamin B6 (as pyridoxine hydrochloride)
+- substance: sub_meuw89u4ie
+  label: Vitamin B6 (as pyridoxine alpha-ketoglutarate hydrochloride)
 - substance: sub_fd899525d3
   label: Biotin as d-biotin
   amount: 200 mcg per 2 capsules
@@ -32,5 +36,8 @@ components:
 notes: Official Country Life label lists active/coenzymated B-vitamin forms with
   a 2-capsule serving. The B12 line totals 500 mcg per 2 capsules across dibencozide
   and methylcobalamin; the label does not disclose the split between those forms.
+  The B6 line totals 50 mg per 2 capsules across pyridoxine HCl, pyridoxal-5-phosphate
+  (P5P), and pyridoxine alpha-ketoglutarate hydrochloride; the label does not disclose
+  the split between those forms.
   Current stack package is the 240-capsule bottle; per-capsule values are half of
   the Supplement Facts serving.

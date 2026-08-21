@@ -1,10 +1,10 @@
 id: sub_799419116d
 name: Vitamin B6
 form: pyridoxal 5 phosphate
-notes: 'Active/coenzymated B6 form used by the Coenzyme B-Complex product. ODS does not establish a categorical P5P absorption or neuropathy-safety advantage over other supplemental forms. Review context: B6 coenzyme forms participate in amino-acid/protein metabolism, neurotransmitter biosynthesis, and homocysteine handling.'
+notes: 'Active/coenzymated B6 form used by the Coenzyme B-Complex product. Country Life lists 50 mg total vitamin B6 per 2 capsules across pyridoxine HCl, pyridoxal-5-phosphate (P5P), and pyridoxine alpha-ketoglutarate hydrochloride; the split between forms is not disclosed. B6 coenzyme biology supports amino-acid/protein metabolism, neurotransmitter biosynthesis, and homocysteine handling, but no clinical cognition or homocysteine benefit, or categorical safety superiority over other supplemental forms, is established.'
 concerns:
 - kind: safety
-  text: Active B-complex provides 50 mg P5P per two-capsule serving; total use and duration are unresolved. P5P lacks a proven categorical neuropathy-safety advantage; review total B6 exposure and duration using NIH ODS B6 (https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/) and EFSA 2023 guidance (https://doi.org/10.2903/j.efsa.2023.8006).
+  text: Country Life provides 50 mg total vitamin B6 per two-capsule serving across three B6 forms; the per-form split, total use, and duration are unresolved. Review cumulative supplemental B6 exposure across forms and products and duration using NIH ODS B6 (https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/) and EFSA 2023 guidance (https://doi.org/10.2903/j.efsa.2023.8006).
 scheduling_assessment:
   intake:
     conclusion: insufficient
@@ -18,9 +18,17 @@ scheduling_assessment:
     - https://www.ncbi.nlm.nih.gov/books/NBK114313/
     - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
     summary: No general clock-time rule was demonstrated for P5P supplementation.
+  activity:
+    conclusion: insufficient
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
+    summary: No workout- or activity-linked placement rule was demonstrated for P5P supplementation.
 knowledge:
   context:
-  - neurocognitive_support
+  - value: neurocognitive_support
+    research_state: mechanistic_only
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
   effect:
   - value: amino_acid_metabolism_support
     research_state: supported
@@ -35,6 +43,18 @@ knowledge:
     sources:
     - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
   pathway:
-  - methylation_cycle
+  - value: methylation_cycle
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
+  risk:
+  - value: b6_neuropathy_long_term
+    research_state: supported
+    sources:
+    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
+    - https://doi.org/10.2903/j.efsa.2023.8006
