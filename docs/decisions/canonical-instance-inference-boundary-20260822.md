@@ -4,33 +4,38 @@
 
 **Accepted target; migration required.** The repository is currently
 non-conforming. Stored schedule traits, `prefer_with`, authored constraints and
-weights, actions, semantic explanation prose, runtime context, and regression
-tests still protect the previous model. This decision does not claim that the
-target has been implemented.
+weights, actions, semantic explanation prose, the legacy runtime-context
+representation, and regression tests still protect the previous model. Scenario
+facts themselves are valid target inputs; the non-conformance is their coupling
+to stored answers. This decision does not claim that the target has been
+implemented.
 
 ## Decision
 
-The canonical authored instance model stores only:
+Canonical input has two ownership layers:
 
-- world entities and stable identities;
-- observed and explicit operator state;
-- evidence-backed facts and relations;
-- applicability conditions; and
-- provenance.
+1. **Reusable ontology/world facts** store cross-scenario entities, stable
+   identities, observations, evidence-backed facts and relations,
+   applicability, and provenance.
+2. **Scenario-scoped operator/runtime facts** store the current active shelf,
+   possession, stack and pillbox selection, available slots, capacity, and
+   other facts owned by the current operator/scenario. They change or expire
+   with the scenario and are not reusable ontology facts.
 
-It stores no desired placement, pair preference, optimizer weight, prescribed
-action, semantic UI prose, or inferred result. In particular, `prefer_with`,
-`prefer_same`, and `prefer_apart` are not authored instance facts. Pair-specific
-decisions and scores are forbidden.
+Both layers pass the same facts-only gate. Neither stores a desired placement,
+pair preference, optimizer score or weight, prescribed action, semantic UI
+prose, pressure, schedule, proof trace, or other derived answer. In particular,
+`prefer_with`, `prefer_same`, and `prefer_apart` are not authored instance facts.
+Pair-specific decisions and scores are forbidden.
 
 Concrete behavior is produced dynamically:
 
 ```text
-canonical facts and relations
-  -> small universal declarative inference laws
-  -> ephemeral pressures and proof trace
-  -> generic optimizer
-  -> generated layout and explanation
+reusable ontology/world facts -----------\
+                                          -> small universal declarative inference laws
+scenario-scoped operator/runtime facts --/     -> ephemeral pressures and proof trace
+                                                -> generic optimizer
+                                                -> generated layout and explanation
 ```
 
 Universal laws contain no supplement or concrete-pair identity. Python is
@@ -38,8 +43,8 @@ limited to generic loading, validation, compilation, rule execution,
 optimization, proof-trace handling, and rendering. Derived output never feeds
 canonical input.
 
-The field gate is: **world fact/relation or stored answer?** Only the first is
-admissible canonical instance data.
+The field gate in both layers is: **world or scenario fact/relation, or stored
+answer?** Only a fact or relation is admissible canonical input.
 
 ## Rationale
 
@@ -128,8 +133,9 @@ non-conforming surfaces include:
 - `prefer_with` and stored same/apart pair decisions;
 - authored scheduling constraints, operations, weights, bonuses, and penalties;
 - `reason`, `action`, `rationale`, and other semantic prose in working data;
-- runtime context and Python paths coupled to the previous authored answers;
-  and
+- the legacy runtime-context representation and Python paths coupled to the
+  previous authored answers; scenario facts themselves remain required target
+  inputs; and
 - tests and generated artifacts that assert the previous model.
 
 These surfaces require inventory and V-model migration. Passing current tests

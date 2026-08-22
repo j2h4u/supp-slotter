@@ -8,11 +8,12 @@ not a precomputed scheduling answer. The governing decision is
 ## Status
 
 **Accepted target; migration required.** The repository does not yet conform.
-The current ontology, data, runtime context, and regression tests still protect
-stored schedule traits, `prefer_with`, pair constraints, numeric weights,
-actions, explanation prose, and other parts of the previous model. Existing
-green tests demonstrate the current implementation, not acceptance of this
-contract.
+The current ontology, data, legacy runtime-context representation, and
+regression tests still protect stored schedule traits, `prefer_with`, pair
+constraints, numeric weights, actions, explanation prose, and other parts of
+the previous model. Scenario facts are valid target inputs; the problem is the
+legacy representation that couples them to stored answers. Existing green tests
+demonstrate the current implementation, not acceptance of this contract.
 
 Until migration is complete, every change must distinguish:
 
@@ -25,10 +26,10 @@ passes.
 
 ## Product Invariant
 
-Given the same canonical facts, universal laws, operator state, and runtime
-configuration, the system must produce a deterministic schedule and a proof
-trace without relying on an authored desired placement, pair decision, score,
-action, or explanation.
+Given the same reusable ontology/world facts, scenario-scoped operator/runtime
+facts, and universal laws, the system must produce a deterministic schedule and
+a proof trace without relying on an authored desired placement, pair decision,
+score, action, or explanation.
 
 Changing a supplement, pair, or schedule must be possible by changing facts or
 a genuinely universal law. It must not require supplement-specific or
@@ -36,16 +37,17 @@ pair-specific Python.
 
 ## Canonical Instance Boundary
 
-The canonical authored instance model may contain only:
+Canonical input has two ownership layers:
 
-- world entities and stable identifiers;
-- observed state and explicit operator state;
-- evidence-backed facts about entities;
-- evidence-backed relations among entities;
-- applicability conditions for facts and relations; and
-- provenance, including source locators and bounded evidence state.
+1. **Reusable ontology/world facts** are cross-scenario entities, observations,
+   evidence-backed facts and relations, applicability conditions, stable
+   identifiers, and provenance.
+2. **Scenario-scoped operator/runtime facts** describe the current scenario,
+   including active shelf state, possession, stack and pillbox selection,
+   available slots, and capacity. They are owned by the operator/scenario and
+   expire or change with it; they are not promoted into reusable ontology facts.
 
-The canonical instance model must not contain:
+Both layers pass the same facts-only gate. Neither layer may contain:
 
 - desired placements or slot assignments;
 - pair preferences, including `prefer_with`, `prefer_same`, or `prefer_apart`;
@@ -55,10 +57,12 @@ The canonical instance model must not contain:
 - prescribed actions;
 - semantic UI prose such as explanations, reasons, recommendations, or warning
   text; or
-- any inferred result, pressure, ranking, schedule, or proof trace.
+- any inferred result, pressure, ranking, schedule, proof trace, or other
+  derived answer.
 
-The gate for every proposed field is: **world fact/relation or stored answer?**
-If it is a stored answer, it does not belong in canonical instance data.
+The gate for every proposed field in either layer is: **world or scenario
+fact/relation, or stored answer?** If it is a stored answer, it does not belong
+in canonical input.
 
 Identifiers, source locators, quotations or raw immutable source material, and
 operator-entered labels are not semantic UI prose. They still require an
@@ -120,20 +124,20 @@ Scheduling behavior emerges from a small set of declarative laws. A law:
   examples.
 
 `prefer_same` and `prefer_apart` are examples of derived pressures, never
-authored instance relations. A law may infer one of those pressures from
-canonical facts and relations, with the contributing assertions recorded in
-the proof trace.
+authored instance relations. A law may infer one of those pressures from facts
+and relations in the two canonical input layers, with the contributing
+assertions recorded in the proof trace.
 
 ## Runtime Boundary
 
-The runtime flow is one-way:
+The runtime flow keeps the two inputs separate and is one-way:
 
 ```text
-canonical facts and relations
-  -> universal declarative inference laws
-  -> ephemeral pressures and proof trace
-  -> generic optimizer
-  -> generated layout and explanation
+reusable ontology/world facts -----------\
+                                          -> universal declarative inference laws
+scenario-scoped operator/runtime facts --/     -> ephemeral pressures and proof trace
+                                                -> generic optimizer
+                                                -> generated layout and explanation
 ```
 
 Derived pressures, proof steps, candidate scores, layouts, and explanations are
@@ -155,9 +159,10 @@ particular supplement or pair violates the boundary.
 
 ## Scheduling Semantics
 
-The schedulable unit and available slots come from canonical entity and
-operator-state facts. Feasibility and desirability are inferred at runtime.
-The optimizer receives only the available units, capacity, deterministic
+The schedulable unit comes from reusable entity facts plus scenario-scoped
+active-shelf and possession facts. Stack/pillbox selection, available slots,
+and capacity are scenario-scoped facts. Feasibility and desirability are
+inferred at runtime. The optimizer receives only those inputs, deterministic
 tie-breaking rules, and ephemeral pressures produced by the law executor.
 
 The optimizer is generic. It may choose any implementation that satisfies the
@@ -232,8 +237,15 @@ forbidden authored answer.
 
 ## Ownership Rules
 
-- Canonical authored instances own only facts, relations, applicability,
-  provenance, and observed/operator state.
+- Reusable ontology/world sources own cross-scenario entities, facts,
+  relations, applicability, and provenance. Their lifecycle is evidence- and
+  model-driven, independent of one schedule run.
+- The current operator/scenario owns active shelf state, possession,
+  stack/pillbox selection, available slots, capacity, and other scenario facts.
+  This layer is created, updated, and retired with the scenario and must not be
+  promoted into reusable ontology facts or populated from derived output.
+- Both canonical input layers own facts only and pass the same stored-answer
+  prohibition.
 - Universal law sources own reusable inference semantics.
 - Python owns generic execution and rendering mechanics only.
 - Generated projections own nothing and may be rebuilt.

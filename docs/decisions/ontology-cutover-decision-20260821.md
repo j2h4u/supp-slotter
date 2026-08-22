@@ -5,6 +5,11 @@
 > now governs semantic ownership. This document's observations, commands, test
 > results, and release evidence remain historical records; it is not evidence
 > that the new target is implemented.
+>
+> The header records the spike-closure decision date, 2026-08-22. The
+> `20260821` filename is retained solely as the historical path; it is not the
+> decision date. The ownership clauses were superseded by the canonical-instance
+> ADR dated 2026-08-22.
 
 ## Verdict
 
