@@ -1,260 +1,309 @@
 # Domain Model
 
-This is the living semantic contract for `supp-slotter`. The accepted target is
-a canonical authored instance model that records the world and operator state,
-not a precomputed scheduling answer. The governing decision is
-[Canonical Instance and Inference Boundary](decisions/canonical-instance-inference-boundary-20260822.md).
+This is the living semantic contract for `supp-slotter`. The governing decision
+is [Canonical Instance and Inference Boundary](decisions/canonical-instance-inference-boundary-20260822.md).
 
 ## Status
 
-**Accepted target; migration required.** The repository does not yet conform.
-The current ontology, data, legacy runtime-context representation, and
-regression tests still protect stored schedule traits, `prefer_with`, pair
-constraints, numeric weights, actions, explanation prose, and other parts of
-the previous model. Scenario facts are valid target inputs; the problem is the
-legacy representation that couples them to stored answers. Existing green tests
-demonstrate the current implementation, not acceptance of this contract.
+**Accepted target; NON-CONFORMING implementation.** The repository does not yet
+implement this contract. Current ontology, data, runtime paths, generated
+artifacts, and regression tests still encode legacy schedule aliases, authored
+preferences, scores, actions, prose, and other stored answers. A green current
+test suite proves only the current implementation. It is not acceptance evidence
+for this target.
 
-Until migration is complete, every change must distinguish:
-
-- the target contract in this document;
-- legacy behavior retained temporarily for migration; and
-- derived runtime output, which is never canonical input.
-
-Do not describe the target as shipped until the full V-model acceptance matrix
-passes.
+This document fixes the V-left contract. No implementation cluster may describe
+the migration as complete until all V-right evidence in this document passes.
 
 ## Product Invariant
 
-Given the same reusable ontology/world facts, scenario-scoped operator/runtime
-facts, and universal laws, the system must produce a deterministic schedule and
-a proof trace without relying on an authored desired placement, pair decision,
-score, action, or explanation.
+Given the same typed evidence facts, explicit applicability and provenance,
+scenario-selected items, logical slot topology, and universal laws, the system
+must either:
 
-Changing a supplement, pair, or schedule must be possible by changing facts or
-a genuinely universal law. It must not require supplement-specific or
-pair-specific Python.
+- return the one deterministically selected **globally Optimal** layout with a
+  proof trace; or
+- return **Indeterminate** and no layout when the facts conflict or global
+  optimality cannot be proved.
 
-## Canonical Instance Boundary
+The result must not depend on an authored desired placement, pair preference,
+weight, magnitude, action, explanation, label, or domain rule hidden in Python.
+Adding an item must require facts in the closed vocabulary, not item-specific or
+pair-specific scheduler code.
 
-Canonical input has two ownership layers:
+## Canonical Boundary
 
-1. **Reusable ontology/world facts** are cross-scenario entities, observations,
-   evidence-backed facts and relations, applicability conditions, stable
-   identifiers, and provenance.
-2. **Scenario-scoped operator/runtime facts** describe the current scenario,
-   including active shelf state, possession, stack and pillbox selection,
-   available slots, and capacity. They are owned by the operator/scenario and
-   expire or change with it; they are not promoted into reusable ontology facts.
+Canonical input has three separately owned parts:
 
-Both layers pass the same facts-only gate. Neither layer may contain:
+1. **Reusable evidence** owns stable item, substance, component, and source
+   identities; explicit composition roles; the five closed fact families below;
+   applicability; and provenance.
+2. **Scenario selection** owns which items participate in which scheduling
+   domain. `data/stacks.yaml` is the current scenario-selection surface.
+3. **Logical slot topology** owns the available logical intake groups and their
+   anchors. `data/pillboxes.yaml` is the current topology surface.
 
-- desired placements or slot assignments;
-- pair preferences, including `prefer_with`, `prefer_same`, or `prefer_apart`;
-- pair-specific decisions, operations, or scores;
-- weights, bonuses, penalties, or optimizer objectives attached to domain
-  instances;
-- prescribed actions;
-- semantic UI prose such as explanations, reasons, recommendations, or warning
-  text; or
-- any inferred result, pressure, ranking, schedule, proof trace, or other
-  derived answer.
+Scenario selection and topology are separate inputs. Membership in a stack does
+not assert a placement, and a topology does not select an item. Neither may be
+promoted into reusable evidence or populated from generated output.
 
-The gate for every proposed field in either layer is: **world or scenario
-fact/relation, or stored answer?** If it is a stored answer, it does not belong
-in canonical input.
+The gate for every authored field is: **world/scenario fact or stored answer?**
+Only a fact admitted by this contract is canonical. The following are forbidden
+canonical inputs:
 
-Identifiers, source locators, quotations or raw immutable source material, and
-operator-entered labels are not semantic UI prose. They still require an
-explicit owning object and provenance.
+- `schedule.*` aliases or any desired slot/placement;
+- `prefer_with`, `prefer_same`, `prefer_apart`, assessments, pair constraints,
+  pair scores, or pair-specific operations;
+- weights, magnitudes, bonuses, penalties, float objectives, or epsilon policy;
+- prescribed actions, recommendations, reasons, rationales, semantic UI prose,
+  or a sentence intended to appear in an explanation;
+- dose, frequency, recurrence, disease, diagnosis, or patient-state semantics;
+- inferred pressures, rankings, layouts, proof traces, or other generated
+  answers; and
+- a generic EAV predicate/value escape hatch or an authorable scheduling DSL.
 
-## Core Objects
+Stable IDs, explicit type tags, source locators, and raw quotations are not
+semantic prose, but a quotation is evidence material rather than an executable
+fact. It cannot create a pressure until it has been adjudicated into one of the
+closed families.
 
-The exact schemas will be settled during migration, but their ownership is
-already fixed:
+## Closed Scheduling Fact Vocabulary
 
-- **Entity** represents a real product, substance or form, physical organizer,
-  slot, source, or other in-scope thing with stable identity.
-- **Observed state** records label-backed composition and other measurements or
-  observations attributable to a source.
-- **Operator state** records facts the operator controls or reports, such as
-  possession, active/inactive tracking, available organizers, and declared
-  scenario context. It does not prescribe a placement.
-- **Fact** is an evidence-backed proposition about one entity.
-- **Relation** is an evidence-backed proposition connecting entities. A
-  relation states what is true; it does not encode what the optimizer should do
-  with a named pair.
-- **Applicability** states when a fact or relation applies. It is factual scope,
-  not an authored scheduling action.
-- **Provenance** links an assertion to source material and its bounded evidence
-  state.
+The executable scheduling vocabulary contains exactly five fact families. Each
+assertion has a typed subject role, one of the enumerated values, explicit
+applicability, and provenance. There is no `name/value` extension mechanism.
 
-Products and substances remain separate identities: the product records the
-physical label-backed item, while substances and forms carry reusable facts.
-Stable authored IDs are identity; filenames and generated IRIs are transport or
-source-path details.
-
-## Trait Ontology
-
-The target vocabulary expresses reusable factual predicates, not planner
-commands. A term is admissible only when its meaning can be stated and tested
-without naming a desired slot, preferred partner, action, or score.
-
-Before adding or retaining a term:
-
-1. State the world proposition it represents.
-2. Identify its subject, value or object, applicability, and provenance.
-3. Show that it is reusable beyond one product pair or one generated schedule.
-4. Define how universal inference laws may consume it without embedding the
-   expected result in the instance.
-
-Current scheduling traits and context-shaped fields are migration inputs, not
-automatically valid target facts. Each must be retained as a factual assertion,
-re-expressed through reusable facts and applicability, or removed.
-
-## Universal Inference Laws
-
-Scheduling behavior emerges from a small set of declarative laws. A law:
-
-- is universal over typed facts and relations;
-- contains no supplement, product, or concrete pair identity;
-- derives ephemeral pressures and a proof step, not a canonical assertion;
-- has explicit applicability and conflict behavior; and
-- is independently testable with finite positive, negative, and boundary
-  examples.
-
-`prefer_same` and `prefer_apart` are examples of derived pressures, never
-authored instance relations. A law may infer one of those pressures from facts
-and relations in the two canonical input layers, with the contributing
-assertions recorded in the proof trace.
-
-## Runtime Boundary
-
-The runtime flow keeps the two inputs separate and is one-way:
-
-```text
-reusable ontology/world facts -----------\
-                                          -> universal declarative inference laws
-scenario-scoped operator/runtime facts --/     -> ephemeral pressures and proof trace
-                                                -> generic optimizer
-                                                -> generated layout and explanation
-```
-
-Derived pressures, proof steps, candidate scores, layouts, and explanations are
-ephemeral or generated output. They must never feed back into canonical input,
-directly or through a generated artifact treated as authority.
-
-Python may implement only generic mechanics:
-
-- loading and validating canonical instances and laws;
-- compiling and executing the declarative laws;
-- resolving typed identities and joins;
-- optimizing over derived pressures and operator-provided capacity;
-- rendering a generated layout, warnings, proof trace, and explanation; and
-- serializing derived output.
-
-Python must not contain supplement- or pair-specific semantics. A Python
-branch, constant, handler, or renderer rule that names or recognizes a
-particular supplement or pair violates the boundary.
-
-## Scheduling Semantics
-
-The schedulable unit comes from reusable entity facts plus scenario-scoped
-active-shelf and possession facts. Stack/pillbox selection, available slots,
-and capacity are scenario-scoped facts. Feasibility and desirability are
-inferred at runtime. The optimizer receives only those inputs, deterministic
-tie-breaking rules, and ephemeral pressures produced by the law executor.
-
-The optimizer is generic. It may choose any implementation that satisfies the
-declared objective and deterministic observable contract. It cannot invent
-domain meaning, and it cannot read legacy placement traits or pair preferences
-as hidden answers.
-
-The renderer explains the selected layout from the proof trace. Explanation
-text is generated from typed facts, law identifiers, and outcomes; it is not
-authored per supplement, pair, constraint, or warning.
-
-Generated `schedule.yaml` and any future read model are disposable projections.
-They are not edited directly and are not evidence for a new canonical fact.
-
-## Evidence and Prose Migration
-
-Legacy `reason`, `action`, `rationale`, and `notes` content must not be bulk
-deleted. Before removal, inventory every entry, atomize its claims, and record a
-disposition for each atom:
-
-- retain as a reusable fact or relation with provenance;
-- retain only as source locator, quotation, or immutable raw material;
-- send to a Sol-only expert panel when it is important but cannot be expressed
-  faithfully; or
-- exclude it from the working model when it is not an in-scope reusable fact.
-
-Extend the model only when the missing concept is a reusable, in-scope fact or
-relation. Do not add a field merely to preserve prose, a one-off pair decision,
-or an expected UI sentence.
-
-The target working ontology contains zero authored semantic prose. Historical
-decision documents and immutable source material may preserve prose as
-evidence; they are not executable instance data.
-
-## V-Model Delivery Contract
-
-Every feature, panel, and refactor follows the same V. The left side is written
-top-down before implementation:
-
-1. product invariant;
-2. canonical boundary;
-3. required facts and relations;
-4. universal inference laws; and
-5. runtime design.
-
-Each level must define its paired evidence before work proceeds lower. After
-implementation, verification ascends in this order:
-
-1. unit checks for the runtime design and fact contracts;
-2. inference-law checks with finite truth tables and proof traces;
-3. architecture conformance showing no stored answers, domain-specific Python,
-   or derived-to-canonical feedback;
-4. real-schedule checks over accepted scenarios; and
-5. product-invariant acceptance.
-
-No lower implementation begins while an upper contract or its paired evidence
-is missing. Expert adjudication and model changes use Sol-only panels. Luna is
-limited to evidence collection, mechanical implementation, and checks.
-
-## Acceptance Matrix
-
-| Left-side contract | Evidence defined before implementation | Right-side acceptance |
+| Fact family | Admitted value | Meaning |
 | --- | --- | --- |
-| Product invariant | Real scenarios and deterministic expected properties | Real schedules, then final product-invariant acceptance |
-| Canonical boundary | Allowed/forbidden field inventory and feedback-path audit | Architecture conformance |
-| Facts and relations | Schema fixtures, provenance cases, and migration dispositions | Unit checks for fact contracts |
-| Universal laws | Positive, negative, conflict, and boundary truth tables | Inference-law checks and proof traces |
-| Runtime design | Generic component contracts and deterministic observables | Runtime unit checks |
+| `FoodEffect` | `bioavailability_increases` | With food, bioavailability increases relative to without food. |
+| `FoodEffect` | `bioavailability_decreases` | With food, bioavailability decreases relative to without food. |
+| `FoodEffect` | `tolerability_improves` | With food, tolerability improves relative to without food. |
+| `FoodEffect` | `tolerability_worsens` | With food, tolerability worsens relative to without food. |
+| `AcuteAlertnessEffect` | `acute_alertness_increases` | A proven acute increase in alertness occurs in the stated applicability. |
+| `AcuteSleepEffect` | `onset_latency_decreases` | Sleep-onset latency decreases in the stated applicability. |
+| `AcuteSleepEffect` | `continuity_improves` | Sleep continuity improves in the stated applicability. |
+| `PreExercisePerformanceEffect` | `performance_improves` | Pre-exercise use improves performance in the stated applicability. |
+| `PostExerciseRecoveryEffect` | `recovery_improves` | Post-exercise use improves recovery in the stated applicability. |
 
-Migration is complete only when every row passes and no legacy test protects a
-forbidden authored answer.
+“Proven” here means accepted evidence after the repository's evidence and Sol
+adjudication process; it is not inferred from a marketing category, product
+name, or legacy placement. Strength, probability, dose dependence, and effect
+magnitude are deliberately not represented.
 
-## Ownership Rules
+An assertion may be made about a typed substance/component and apply to a
+schedulable item only through explicit composition roles and applicability.
+Product, substance, and component identities stay distinct. Source and witness
+records preserve evidence lineage; they do not duplicate the resulting fact.
+No other trait, assessment, free-form relation, or pair relation is a scheduler
+input under this contract.
 
-- Reusable ontology/world sources own cross-scenario entities, facts,
-  relations, applicability, and provenance. Their lifecycle is evidence- and
-  model-driven, independent of one schedule run.
-- The current operator/scenario owns active shelf state, possession,
-  stack/pillbox selection, available slots, capacity, and other scenario facts.
-  This layer is created, updated, and retired with the scenario and must not be
-  promoted into reusable ontology facts or populated from derived output.
-- Both canonical input layers own facts only and pass the same stored-answer
-  prohibition.
-- Universal law sources own reusable inference semantics.
-- Python owns generic execution and rendering mechanics only.
-- Generated projections own nothing and may be rebuilt.
-- Historical documents preserve evidence but do not override this living
-  contract.
+## Logical Slots and Anchors
+
+A slot is an **unbounded logical intake group**, not a compartment or physical
+capacity model. It has stable identity and display order plus zero or one value
+on each independent anchor dimension:
+
+| Dimension | Closed values |
+| --- | --- |
+| `meal_context` | `with_food`, `without_food` |
+| `circadian_anchor` | `wake`, `sleep` |
+| `exercise_anchor` | `before`, `after` |
+
+The dimensions are independent. For example, an exercise slot may also have a
+meal context; no value on one axis implies a value on another. Missing means
+unspecified, not a default. Slot labels, IDs, and order carry no biological
+meaning. Labels are presentation only; IDs identify; order participates only in
+the final deterministic tie-break.
+
+There is no slot capacity and no tablet, capsule, milligram, serving, liquid
+volume, package, or physical-fit model. Any future introduction of such a model
+requires a new V-left decision; it must not be smuggled in through a label,
+count, weight, or optimizer bound.
+
+Current `near`/`food` fields and physical-container wording are legacy
+representations to migrate, not alternative authority for these anchors.
+
+## Universal Laws and Normalized Pressures
+
+The universal laws are exhaustive and identity-free:
+
+| Evidence fact | Derived pressure |
+| --- | --- |
+| `FoodEffect.bioavailability_increases` | `(item_id, meal_context, with_food)` |
+| `FoodEffect.bioavailability_decreases` | `(item_id, meal_context, without_food)` |
+| `FoodEffect.tolerability_improves` | `(item_id, meal_context, with_food)` |
+| `FoodEffect.tolerability_worsens` | `(item_id, meal_context, without_food)` |
+| `AcuteAlertnessEffect.acute_alertness_increases` | `(item_id, circadian_anchor, wake)` |
+| `AcuteSleepEffect.onset_latency_decreases` | `(item_id, circadian_anchor, sleep)` |
+| `AcuteSleepEffect.continuity_improves` | `(item_id, circadian_anchor, sleep)` |
+| `PreExercisePerformanceEffect.performance_improves` | `(item_id, exercise_anchor, before)` |
+| `PostExerciseRecoveryEffect.recovery_improves` | `(item_id, exercise_anchor, after)` |
+
+A normalized unary pressure has identity
+`(item_id, dimension, value)`. The runtime takes the set of these identities.
+Multiple witnesses, sources, quotations, applicable components, inference paths,
+or repeated assertions producing the same identity add provenance to one proof
+node; they never add votes or objective value.
+
+If one item derives different values for the same dimension, the input is
+conflicted. The only valid result is `Indeterminate`, with the conflicting facts
+and provenance in diagnostics and no layout. Pressures on different dimensions
+are not conflicts. They remain independent optimizer inputs and may create a
+cross-dimension tradeoff when the topology has no slot satisfying all of them.
+
+These mappings are the complete domain inference laws. Their typed form, roles,
+applicability, and provenance must be inspectable and portable. They must not be
+implemented as item-name checks, special pairs, or otherwise hidden Python
+semantics. This decision does not select a generic rule DSL.
+
+## Exact Optimization Contract
+
+A feasible layout assigns every scenario-selected item to exactly one logical
+slot in its selected scheduling domain. Slots are unbounded, so feasibility has
+no capacity constraint. A pressure is satisfied exactly when the assigned slot
+has the matching value on that pressure's dimension; an unspecified slot anchor
+does not satisfy it.
+
+Over **all** feasible layouts, selection is lexicographic:
+
+1. maximize the number of satisfied unique normalized pressures;
+2. subject to step 1, minimize the exact integer sum of squared slot loads,
+   `sum(load(slot)^2)`, within every independent scheduling domain (equivalently
+   their sum because items cannot move between domains); and
+3. subject to steps 1 and 2, choose the lexicographically smallest assignment
+   tuple obtained by sorting items by stable `item_id` and recording each
+   assigned slot as `(slot.order, slot_id)`.
+
+`load(slot)` is the integer count of assigned items. It is a balance objective,
+not a physical-capacity claim. All comparisons are exact integers. Floats,
+epsilon comparisons, authored weights, weighted witnesses, and approximate
+score equality are forbidden.
+
+The observable solver status is closed:
+
+- `Optimal`: global optimality and the deterministic tie-break are proved; a
+  layout and proof trace may be published.
+- `Indeterminate`: facts conflict, input is invalid, search is interrupted,
+  times out, exhausts a resource bound, or otherwise cannot prove the global
+  optimum; no layout is published.
+
+No `Feasible`, local optimum, incumbent, best-so-far, or timeout layout may cross
+the publication boundary. Production pruning is permitted only when it is sound:
+it must preserve the selected result and proof of optimality under the full
+objective. Each production implementation must be accepted against a bounded,
+independent exhaustive oracle that enumerates all layouts and applies the same
+objective without sharing production pruning or search code.
+
+## Generated Output
+
+Generated `schedule.yaml`, explanations, diagnostics, proof traces, and future
+read models are disposable projections. They never feed canonical input and are
+not evidence for a new fact. Explanations are rendered only from typed facts,
+law identities, anchor matches, conflict diagnostics, and optimization outcomes.
+
+Exact reproduction of a legacy layout is not an acceptance requirement.
+Meaningful with-food/without-food, wake/sleep, and before/after semantics are.
+When no accepted fact distinguishes breakfast from another daytime meal, those
+slots may tie and the exact deterministic objective decides; legacy
+breakfast/day placement is not authority.
+
+## Evidence Migration
+
+Legacy aliases and authored answers do not migrate merely because current code
+or tests consume them. This includes `schedule.*`, `prefer_with`, assessments,
+pair constraints, pair scores, actions, reasons, rationales, notes, and semantic
+explanation prose.
+
+Before deleting any legacy evidence-bearing entry, atomize it and record exactly
+one explicit disposition for every evidence atom:
+
+1. typed fact in one of the five families, with roles, applicability, and
+   provenance;
+2. raw quotation linked to its source, non-executable;
+3. source/locator metadata, non-executable;
+4. Sol-only adjudication required; or
+5. explicit exclusion with a reason.
+
+Nothing is silently translated into a placement, preference, score, or generated
+sentence. Immutable raw evidence and historical decisions are preserved. The
+number of quotations, sources, witnesses, or applicable components never
+multiplies a normalized pressure.
+
+## Runtime and Portability Boundary
+
+TypeDB runtime selection, import design, and deployment are outside the current
+cluster. Portability in this contract means that another conforming runtime can
+observe explicit fact-family types, subject/component roles, applicability,
+provenance, slot anchors, derived pressure identities, and objective values and
+obtain the same status and selected layout.
+
+Python may provide generic loading, validation, inference execution, exact
+optimization, proof handling, and rendering. It may not be the only place where
+a domain mapping, enum meaning, applicability rule, conflict rule, or objective
+stage exists. No item or pair name may select domain behavior.
+
+## Three Implementation Clusters and V-Right Acceptance
+
+Implementation follows three downstream clusters. They may be developed in
+parallel only after this V-left contract is accepted, and each must preserve the
+NON-CONFORMING status until its acceptance evidence passes.
+
+### Cluster 1: canonical facts and migration
+
+Own the five explicit fact-family schemas, typed roles, applicability,
+provenance, the independent slot-anchor schema, scenario/topology separation,
+and the atom-by-atom migration ledger. It does not own inference or layout
+choice.
+
+V-right acceptance:
+
+- positive and negative schema fixtures prove the vocabulary is closed and has
+  no EAV/DSL, stored answer, capacity, dose/frequency/disease, or semantic-prose
+  escape hatch;
+- every migrated atom has one allowed disposition and raw evidence is retained;
+- architecture checks prove `stacks.yaml` selection and `pillboxes.yaml`
+  topology remain separate; and
+- a hidden-semantics audit finds no domain meaning recoverable only from Python,
+  names, labels, IDs, or order.
+
+### Cluster 2: inference and pressure normalization
+
+Own the exhaustive universal mappings, applicability traversal, provenance-rich
+proof nodes, pressure set normalization, and same-dimension conflict result. It
+does not own solver heuristics or migration adjudication.
+
+V-right acceptance:
+
+- finite positive, negative, boundary, and conflict truth tables pass for every
+  admitted fact value;
+- duplicate witnesses, sources, inference paths, and components produce one
+  pressure identity and one vote;
+- same-dimension opposing values return `Indeterminate` with no layout while
+  cross-dimension pressures remain optimizer inputs; and
+- proof traces identify every contributing typed assertion and law.
+
+### Cluster 3: exact optimizer and publication boundary
+
+Own feasibility, the three-stage exact objective, deterministic tie-breaking,
+sound production pruning, closed statuses, and generated-output publication. It
+does not infer biological meaning.
+
+V-right acceptance:
+
+- exact unit cases cover pressure maximization, per-domain squared-load
+  minimization, stable-ID/`(order, slot ID)` tie-breaking, and unbounded slots;
+- bounded randomized and exhaustive cases match an independently implemented
+  exhaustive oracle in status, objective values, and assignment;
+- forced conflict, timeout, interruption, and resource-bound scenarios publish
+  `Indeterminate` and no incumbent layout;
+- real schedules demonstrate meaningful meal, circadian, and exercise anchors
+  without requiring exact legacy placement; and
+- final architecture and product-invariant acceptance proves deterministic
+  `Optimal` or layout-free `Indeterminate` end to end.
 
 ## Non-Goals
 
-This contract does not add medical recommendation authority, dosage or
-recurrence semantics, an external database, or a second scheduler. It does not
-authorize deletion of raw evidence or historical decisions. It defines the
-boundary and acceptance path for the required migration.
+This contract does not add medical recommendation authority, dose or recurrence
+semantics, a physical pillbox model, TypeDB runtime/import, a generic authoring
+language, or a second scheduler. It does not authorize deletion of raw evidence
+or historical decisions.

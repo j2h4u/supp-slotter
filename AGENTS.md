@@ -33,3 +33,11 @@
 - Treat [docs/domain-model.md](docs/domain-model.md) as the living contract and
   [the canonical-instance ADR](docs/decisions/canonical-instance-inference-boundary-20260822.md)
   as the governing decision.
+- Treat every slot as an unbounded logical intake group. Do not introduce
+  capacity, tablet/capsule count, mass, volume, or physical-fit semantics
+  without a new accepted V-left contract.
+- A publishable layout must be the proved global optimum under the exact
+  lexicographic contract: unique pressure satisfaction, integer squared-load
+  balance, then stable assignment tie-break. Never publish an incumbent, local
+  optimum, timeout result, float/epsilon score, or weighted evidence count;
+  return layout-free `Indeterminate` instead.
