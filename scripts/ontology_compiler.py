@@ -2336,7 +2336,7 @@ def _generated_json_schema_document(schema_view: SchemaView) -> dict[str, object
             )
             if forbidden:
                 branch["not"] = {"anyOf": [{"required": [slot_name]} for slot_name in forbidden]}
-    _tighten_relation_selector_schema(definitions)
+    _tighten_exactly_one_of_schema(definitions, schema_view)
     return document
 
 
@@ -2363,15 +2363,57 @@ def _apply_relation_type_enum(
     relation_type["enum"] = values
 
 
-def _tighten_relation_selector_schema(definitions: Mapping[str, object]) -> None:
-    """Make authored relation selector scalar branches strict and non-null.
+def _tighten_exactly_one_of_schema(
+    definitions: Mapping[str, object], schema_view: SchemaView
+) -> None:
+    """Make required scalar branches of exactly-one unions non-null.
 
     LinkML represents optional scalar slots as ``string | null`` in JSON
-    Schema.  The relation selector union already provides the optionality at
-    the branch level, so accepting null here would create a third state that
-    the compiler and runtime deliberately reject.  Keep this invariant in
-    the generated artifact rather than relying on each loader to compensate.
+    Schema.  A slot marked required by an ``exactly_one_of`` branch must not
+    accept that null value.  Restrict the repair to scalar schema types and
+    to the required slots in those branches so unrelated optional/union
+    behavior remains unchanged.
     """
+    for class_name, class_definition in schema_view.all_classes().items():
+        expressions = cast(list[AnonymousClassExpression], class_definition.exactly_one_of or [])
+        if not expressions:
+            continue
+        generated_class = definitions.get(class_name)
+        if not isinstance(generated_class, dict):
+            raise OntologyInfrastructureError(f"Generated LinkML JSON Schema has no class {class_name}")
+        properties = generated_class.get("properties")
+        if not isinstance(properties, dict):
+            raise OntologyInfrastructureError(f"Generated {class_name} has no properties")
+        for expression in expressions:
+            raw_conditions = expression.slot_conditions or {}
+            if not isinstance(raw_conditions, dict):
+                raise OntologyInfrastructureError(f"LinkML {class_name} slot conditions must be a mapping")
+            conditions = cast(dict[object, SlotDefinition], raw_conditions)
+            for slot_name, condition in conditions.items():
+                if condition.required is not True:
+                    continue
+                property_schema = properties.get(str(slot_name))
+                if not isinstance(property_schema, dict):
+                    raise OntologyInfrastructureError(
+                        f"Generated {class_name} required branch field {slot_name!r} is missing"
+                    )
+                scalar_types = property_schema.get("type")
+                if not isinstance(scalar_types, list) or "null" not in scalar_types:
+                    continue
+                if "array" in scalar_types:
+                    continue
+                non_null_types = [value for value in scalar_types if value != "null"]
+                if len(non_null_types) == 1:
+                    property_schema["type"] = non_null_types[0]
+                else:
+                    property_schema["type"] = non_null_types
+
+    _tighten_relation_selector_fields(definitions)
+
+
+def _tighten_relation_selector_fields(definitions: Mapping[str, object]) -> None:
+    """Keep relation selector scalar fields strict and non-empty."""
+
     fields_by_class = {
         "RelationAssertionEntitySelector": ("entity_id", "name"),
         "RelationAssertionSelector": ("category", "term"),

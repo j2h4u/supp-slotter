@@ -21,6 +21,113 @@ enums:
       exact_form:
 
 classes:
+  CanonicalFactCatalog:
+    description: Shadow catalog of scheduler-consumable canonical evidence facts.
+    annotations:
+      canonical_shadow: true
+      source_reference_resolution: runtime_validation_required
+      composition_role_reference_resolution: runtime_validation_required
+    slots: [composition_roles, evidence_sources, food_effects, acute_alertness_effects, acute_sleep_effects, pre_exercise_performance_effects, post_exercise_recovery_effects]
+    slot_usage:
+      composition_roles: {required: false, multivalued: true, range: CompositionRole, inlined: true, inlined_as_list: true}
+      evidence_sources: {required: false, multivalued: true, range: EvidenceSource, inlined: true, inlined_as_list: true}
+      food_effects: {required: false, multivalued: true, range: FoodEffect, inlined: true, inlined_as_list: true}
+      acute_alertness_effects: {required: false, multivalued: true, range: AcuteAlertnessEffect, inlined: true, inlined_as_list: true}
+      acute_sleep_effects: {required: false, multivalued: true, range: AcuteSleepEffect, inlined: true, inlined_as_list: true}
+      pre_exercise_performance_effects: {required: false, multivalued: true, range: PreExercisePerformanceEffect, inlined: true, inlined_as_list: true}
+      post_exercise_recovery_effects: {required: false, multivalued: true, range: PostExerciseRecoveryEffect, inlined: true, inlined_as_list: true}
+
+  CanonicalSchedulingFact:
+    abstract: true
+    description: >-
+      Shared evidence boundary for one typed, admitted scheduling fact.  The
+      concrete subclasses below are the only scheduler fact families.
+    annotations:
+      canonical_shadow: true
+      typed_subject_role: fact_subject
+      typed_applicability_role: fact_applicability
+      typed_provenance_role: evidence_provenance
+      admission_mode: by_construction
+      subject_applicability_invariant: 'runtime_required: subject.substance == applicability.substance OR subject.composition_role == applicability'
+    slots: [id, subject, applicability, provenance]
+    slot_usage:
+      id: {required: true, pattern: '^[a-z][a-z0-9_:-]*$'}
+      subject: {required: true, range: FactSubject, inlined: true, multivalued: false}
+      applicability: {required: true, range: CompositionRole, inlined: false, multivalued: false}
+      provenance: {required: true, minimum_cardinality: 1, multivalued: true, range: EvidenceProvenance, inlined: true, inlined_as_list: true}
+
+  FoodEffect:
+    is_a: CanonicalSchedulingFact
+    description: Closed food-context effect fact family.
+    slots: [value]
+    slot_usage:
+      value: {required: true, range: FoodEffectValue, multivalued: false}
+
+  AcuteAlertnessEffect:
+    is_a: CanonicalSchedulingFact
+    description: Closed acute alertness effect fact family.
+    slots: [value]
+    slot_usage:
+      value: {required: true, range: AcuteAlertnessEffectValue, multivalued: false}
+
+  AcuteSleepEffect:
+    is_a: CanonicalSchedulingFact
+    description: Closed acute sleep effect fact family.
+    slots: [value]
+    slot_usage:
+      value: {required: true, range: AcuteSleepEffectValue, multivalued: false}
+
+  PreExercisePerformanceEffect:
+    is_a: CanonicalSchedulingFact
+    description: Closed pre-exercise performance effect fact family.
+    slots: [value]
+    slot_usage:
+      value: {required: true, range: PreExercisePerformanceEffectValue, multivalued: false}
+
+  PostExerciseRecoveryEffect:
+    is_a: CanonicalSchedulingFact
+    description: Closed post-exercise recovery effect fact family.
+    slots: [value]
+    slot_usage:
+      value: {required: true, range: PostExerciseRecoveryEffectValue, multivalued: false}
+
+  FactSubject:
+    description: >-
+      Typed subject role for a canonical fact. The role points to the stable
+      composition identity; no inline component payload or free EAV subject exists.
+    slots: [substance, composition_role]
+    exactly_one_of:
+      - slot_conditions:
+          substance: {required: true}
+          composition_role: {maximum_cardinality: 0}
+      - slot_conditions:
+          substance: {maximum_cardinality: 0}
+          composition_role: {required: true}
+    slot_usage:
+      substance: {required: false, range: Substance, inlined: false, multivalued: false}
+      composition_role: {required: false, range: CompositionRole, inlined: false, multivalued: false}
+
+  EvidenceSource:
+    description: Stable source identity; witness locators do not live here.
+    slots: [id]
+    annotations:
+      source_identity_only: true
+    slot_usage:
+      id: {required: true, pattern: '^src_[a-z0-9][a-z0-9_:-]*$', multivalued: false}
+
+  EvidenceProvenance:
+    description: >-
+      Admitted evidence witness for one fact. Source identity is referenced
+      separately from this witness's locator and optional raw quotation.
+    annotations:
+      quotation_is_evidence_material: true
+      quotation_is_not_executable: true
+    slots: [source, locator, quotation]
+    slot_usage:
+      source: {required: true, range: EvidenceSource, inlined: false, multivalued: false}
+      locator: {required: true, pattern: '^\S+$', multivalued: false}
+      quotation: {required: false, multivalued: false}
+
   SchedulingConstraint:
     slots: [id, key, effect, condition, action, rationale]
     slot_usage:
@@ -162,6 +269,18 @@ classes:
       name: {required: false, pattern: '\S'}
 
 slots:
+  composition_roles: {multivalued: true, range: CompositionRole, inlined: true, inlined_as_list: true}
+  evidence_sources: {multivalued: true, range: EvidenceSource, inlined: true, inlined_as_list: true}
+  food_effects: {multivalued: true, range: FoodEffect, inlined: true, inlined_as_list: true}
+  acute_alertness_effects: {multivalued: true, range: AcuteAlertnessEffect, inlined: true, inlined_as_list: true}
+  acute_sleep_effects: {multivalued: true, range: AcuteSleepEffect, inlined: true, inlined_as_list: true}
+  pre_exercise_performance_effects: {multivalued: true, range: PreExercisePerformanceEffect, inlined: true, inlined_as_list: true}
+  post_exercise_recovery_effects: {multivalued: true, range: PostExerciseRecoveryEffect, inlined: true, inlined_as_list: true}
+  applicability: {range: CompositionRole, inlined: false, multivalued: false}
+  provenance: {multivalued: true, range: EvidenceProvenance, inlined: true, inlined_as_list: true}
+  composition_role: {range: CompositionRole, inlined: false, multivalued: false}
+  locator: {multivalued: false}
+  quotation: {multivalued: false}
   id: {identifier: true, required: true}
   key:
   effect:

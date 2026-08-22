@@ -28,6 +28,45 @@ enums:
   ProductUsePattern:
     permissible_values:
       not_every_day:
+  MealContext:
+    description: Independent logical meal-context anchor for a canonical slot.
+    permissible_values:
+      with_food:
+      without_food:
+  CircadianAnchor:
+    description: Independent logical circadian anchor for a canonical slot.
+    permissible_values:
+      wake:
+      sleep:
+  ExerciseAnchor:
+    description: Independent logical exercise anchor for a canonical slot.
+    permissible_values:
+      before:
+      after:
+  FoodEffectValue:
+    description: Closed values admitted by the FoodEffect fact family.
+    permissible_values:
+      bioavailability_increases:
+      bioavailability_decreases:
+      tolerability_improves:
+      tolerability_worsens:
+  AcuteAlertnessEffectValue:
+    description: Closed values admitted by the AcuteAlertnessEffect fact family.
+    permissible_values:
+      acute_alertness_increases:
+  AcuteSleepEffectValue:
+    description: Closed values admitted by the AcuteSleepEffect fact family.
+    permissible_values:
+      onset_latency_decreases:
+      continuity_improves:
+  PreExercisePerformanceEffectValue:
+    description: Closed values admitted by the PreExercisePerformanceEffect fact family.
+    permissible_values:
+      performance_improves:
+  PostExerciseRecoveryEffectValue:
+    description: Closed values admitted by the PostExerciseRecoveryEffect fact family.
+    permissible_values:
+      recovery_improves:
 classes:
   Ontology:
     description: Root metadata for a compiled ontology release.
@@ -48,6 +87,17 @@ classes:
     slots: [brand, components, urls, notes, concerns, use_pattern]
   ProductComponent:
     slots: [substance, label, amount, notes]
+  CompositionRole:
+    description: Stable composition identity joining one product to one substance.
+    annotations:
+      canonical_shadow: true
+      identity_scope: global
+      identity_uniqueness: required
+    slots: [id, product, substance]
+    slot_usage:
+      id: {required: true, pattern: '^cmp_[a-z0-9][a-z0-9_:-]*$'}
+      product: {required: true, range: Product, inlined: false, multivalued: false}
+      substance: {required: true, range: Substance, inlined: false, multivalued: false}
   Concern:
     slots: [concern_kind, concern_text]
   KnowledgeAssertion:
@@ -90,6 +140,33 @@ classes:
       order: {required: true, minimum_value: 1, multivalued: false}
       near: {required: true, multivalued: false}
       food: {required: true, multivalued: false}
+  LogicalSlot:
+    description: Shadow canonical logical intake group with independent optional anchors.
+    annotations:
+      identity_scope: global
+      identity_uniqueness: required
+      order_scope: topology
+      order_uniqueness: required
+      unbounded_group: true
+      canonical_shadow: true
+    slots: [id, label, order, meal_context, circadian_anchor, exercise_anchor]
+    slot_usage:
+      id: {required: true, pattern: '^[a-z][a-z0-9_:-]*$'}
+      label: {required: false, multivalued: false}
+      order: {required: true, minimum_value: 1, multivalued: false}
+      meal_context: {range: MealContext, multivalued: false}
+      circadian_anchor: {range: CircadianAnchor, multivalued: false}
+      exercise_anchor: {range: ExerciseAnchor, multivalued: false}
+  LogicalSlotTopology:
+    description: Shadow canonical topology containing unbounded logical intake groups.
+    annotations:
+      canonical_shadow: true
+      no_capacity_model: true
+    slots: [id, label, slots]
+    slot_usage:
+      id: {required: true, pattern: '^[a-z][a-z0-9_:-]*$'}
+      label: {required: false, multivalued: false}
+      slots: {required: true, minimum_cardinality: 1, multivalued: true, range: LogicalSlot, inlined: true, inlined_as_list: true}
   Stack:
     is_a: IdentifiedNode
     annotations:
@@ -219,6 +296,9 @@ slots:
   order: {range: integer}
   near: {}
   food: {range: boolean}
+  meal_context: {range: MealContext, multivalued: false}
+  circadian_anchor: {range: CircadianAnchor, multivalued: false}
+  exercise_anchor: {range: ExerciseAnchor, multivalued: false}
   entries: {multivalued: true, range: StackEntry, inlined: true, inlined_as_list: true}
   product: {required: true, range: Product, inlined: false}
   stack: {required: true, range: Stack}
