@@ -1,5 +1,11 @@
 # Ontology-first versus Python-first spike closure — 2026-08-22
 
+> **Status: historical evidence; ownership clauses superseded.**
+> [Canonical Instance and Inference Boundary](canonical-instance-inference-boundary-20260822.md)
+> now governs semantic ownership. This document's observations, commands, test
+> results, and release evidence remain historical records; it is not evidence
+> that the new target is implemented.
+
 ## Verdict
 
 **STOP THE SPIKE.** Confidence: **high**.

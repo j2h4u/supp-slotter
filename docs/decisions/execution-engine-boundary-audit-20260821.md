@@ -1,5 +1,11 @@
 # Execution-Engine Boundary Audit — 2026-08-21
 
+> **Status: historical current-state audit.**
+> [Canonical Instance and Inference Boundary](canonical-instance-inference-boundary-20260822.md)
+> governs the target architecture. This audit remains evidence of the previous
+> runtime and its migration liabilities; its protocol remedy is not the target
+> where the new decision differs.
+
 ## Scope and authority model
 
 This audit covers the executable ontology/runtime tree on

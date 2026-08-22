@@ -11,12 +11,15 @@ Use this page as the map. The README is the product front door; these docs are t
 ## Agents And Operators
 
 - [SKILL.md](../SKILL.md) — quick operating guide for agents.
-- [Domain Model](domain-model.md) — source-of-truth rules for products, substances, traits, relations, stacks, dashboards, and generated schedules.
+- [Domain Model](domain-model.md) — living contract for canonical facts,
+  universal inference laws, runtime ownership, and V-model acceptance.
 - [Templates](../schema/templates/) — copy-ready product and substance card skeletons.
 
 ## Maintainers
 
-- [Ontology Cutover Decision And Completion Plan](decisions/ontology-cutover-decision-20260821.md) — expert-panel record, bounded completion cluster, and final branch acceptance criteria.
+- [Canonical Instance and Inference Boundary](decisions/canonical-instance-inference-boundary-20260822.md) — governing target, migration boundary, and V-model acceptance matrix.
+- [Ontology Cutover Decision And Completion Plan](decisions/ontology-cutover-decision-20260821.md) — historical evidence for the previous cutover; its ownership clauses are superseded.
+- [Execution-Engine Boundary Audit](decisions/execution-engine-boundary-audit-20260821.md) — historical audit of the pre-migration runtime boundary.
 - [Ontology Facts](ontology-facts.md) — current unresolved ontology pressure points only.
 - [Evidence Coverage Grooming](evidence-coverage-grooming.md) — current card-level grooming contract and evidence-state boundaries.
 - [MCP Position](mcp-position.md) — why an MCP server is deferred until the product surface is clearer.
