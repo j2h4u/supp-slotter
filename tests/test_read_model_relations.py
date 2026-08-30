@@ -37,10 +37,18 @@ def representative_query_fixture() -> _RepresentativeQueryFixture:
     unassigned = Substance("sub_unassigned", "Unassigned", knowledge_assertions=fact)
     substances = {item.id: item for item in (active_alpha, active_zeta, inactive, support, unassigned)}
     products = {
-        "prd_active_alpha": Product("prd_active_alpha", "Alpha", (ProductComponent(active_alpha.id, "cmp_prd_active_alpha__sub_active_alpha"),)),
-        "prd_active_zeta": Product("prd_active_zeta", "Zeta", (ProductComponent(active_zeta.id, "cmp_prd_active_zeta__sub_active_zeta"),)),
-        "prd_inactive": Product("prd_inactive", "Inactive", (ProductComponent(inactive.id, "cmp_prd_inactive__sub_inactive"),)),
-        "prd_unassigned": Product("prd_unassigned", "Unassigned", (ProductComponent(unassigned.id, "cmp_prd_unassigned__sub_unassigned"),)),
+        "prd_active_alpha": Product(
+            "prd_active_alpha", "Alpha", (ProductComponent(active_alpha.id, "cmp_prd_active_alpha__sub_active_alpha"),)
+        ),
+        "prd_active_zeta": Product(
+            "prd_active_zeta", "Zeta", (ProductComponent(active_zeta.id, "cmp_prd_active_zeta__sub_active_zeta"),)
+        ),
+        "prd_inactive": Product(
+            "prd_inactive", "Inactive", (ProductComponent(inactive.id, "cmp_prd_inactive__sub_inactive"),)
+        ),
+        "prd_unassigned": Product(
+            "prd_unassigned", "Unassigned", (ProductComponent(unassigned.id, "cmp_prd_unassigned__sub_unassigned"),)
+        ),
     }
     relations = [
         Relation(
@@ -191,7 +199,9 @@ def test_typed_read_model_rejects_every_incomplete_reference(
         )
     elif mutation == "component_substance":
         products = dict(fixture.products)
-        products["prd_active_alpha"] = Product("prd_active_alpha", "Alpha", (ProductComponent("sub_missing", "cmp_prd_active_alpha__sub_missing"),))
+        products["prd_active_alpha"] = Product(
+            "prd_active_alpha", "Alpha", (ProductComponent("sub_missing", "cmp_prd_active_alpha__sub_missing"),)
+        )
         fixture = _RepresentativeQueryFixture(fixture.substances, products, fixture.stacks, fixture.relations)
     elif mutation in {"relation_reference", "relation_endpoint"}:
         relations = list(fixture.relations)
