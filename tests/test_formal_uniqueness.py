@@ -14,7 +14,7 @@ from planner.cards.substance import load_substance
 from planner.contracts import CardLoadError, Relation, RelationSelector, Substance
 from planner.paths import Paths
 from planner.query_model import build_stack_read_model
-from planner.query_model.surreal_records import relation_record
+from planner.query_model.projections import relation_record
 from planner.schema_validation import schema_errors
 
 from tests.helpers import ontology_bundle

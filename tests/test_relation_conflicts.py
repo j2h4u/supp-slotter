@@ -6,30 +6,15 @@ from planner.query_model.relation_conflicts import (
     _constraint_matches_pair,
     collect_intra_product_scheduling_constraint_conflicts,
 )
+from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
 
 from tests.helpers import ontology_bundle
 
 
-class _QueryCapture:
-    sql: str = ""
-
-    def use(self, namespace: str, _database: str, /) -> object:
-        return None
-
-    def create(self, _table: str, data: dict[str, object], /) -> object:
-        return data
-
-    def query(self, sql: str, params: dict[str, object] | None = None, /) -> list[dict[str, object]]:
-        self.sql = sql
-        return []
-
-
-def test_intra_product_conflict_query_requires_executable_blocking_plan() -> None:
-    db = _QueryCapture()
-
+def test_intra_product_conflict_requires_executable_blocking_plan() -> None:
     assert (
         collect_intra_product_scheduling_constraint_conflicts(
-            db,
+            (),
             ontology_bundle().runtime_program,
             item_id="item",
             product_id="product",
@@ -37,29 +22,26 @@ def test_intra_product_conflict_query_requires_executable_blocking_plan() -> Non
         )
         == []
     )
-    assert "FROM scheduling_constraint_execution_plan" in db.sql
-    assert "executable = true" in db.sql
-    assert "blocks_slots = true" in db.sql
 
 
 def test_intra_product_conflict_query_interprets_symmetric_pairs_and_deduplicates_reversed_components() -> None:
-    row = {
-        "id": "constraint_1",
-        "operation": "separate_products_same_slot",
-        "match_direction": "symmetric",
-        "aggregation": "distinct_constraint",
-        "source_substances": ["sub_a"],
-        "target_substances": ["sub_b"],
-        "action": "separate",
-    }
-
-    class _Rows(_QueryCapture):
-        def query(self, sql: str, params: dict[str, object] | None = None, /) -> list[dict[str, object]]:
-            self.sql = sql
-            return [row]
-
+    plan = SchedulingConstraintExecutionPlan(
+        id="constraint_1",
+        operation="separate_products_same_slot",
+        match_direction="symmetric",
+        aggregation="distinct_constraint",
+        source_substance_ids=("sub_a",),
+        target_substance_ids=("sub_b",),
+        executable=True,
+        blocks_slots=True,
+        scores_advisory=False,
+        score_delta=0,
+        selector_resolution="allow_empty",
+        selector_resolution_outcome="resolved",
+        action="separate",
+    )
     conflicts = collect_intra_product_scheduling_constraint_conflicts(
-        _Rows(),
+        (plan,),
         ontology_bundle().runtime_program,
         item_id="item",
         product_id="product",

@@ -5,37 +5,38 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import cast
 
+from planner.cards.product import format_product_name
+from planner.contracts import Product, Substance
 from planner.ontology.artifacts import OntologyBundle, _is_verified_bundle
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.presentation import load_review_presentation, load_term_labels
-from planner.query_model.session import SurrealSession, id_str, string_list
+from planner.query_model.data import ReadModelData
 from planner.schedule_types import ActiveFactIndexEntry
 
 
-def _stack_partition_substance_ids(db: SurrealSession, *, inactive: bool, inactive_stack_name: str) -> set[str]:
+def _stack_partition_substance_ids(data: ReadModelData, *, inactive: bool, inactive_stack_name: str) -> set[str]:
     """Substance IDs referenced by products in stacks matching the partition."""
-    op = "==" if inactive else "!="
     target_product_ids: set[str] = set()
-    for row in db.query(
-        f"SELECT products FROM stack WHERE name {op} $inactive_stack_name", {"inactive_stack_name": inactive_stack_name}
-    ):
-        target_product_ids.update(string_list(row.get("products")))
+    for name, product_ids in data.stacks.items():
+        if (name == inactive_stack_name) is inactive:
+            target_product_ids.update(product_ids)
 
     result: set[str] = set()
-    for row in db.query("SELECT id, components FROM product"):
-        if id_str(row["id"]) in target_product_ids:
-            result.update(string_list(row.get("components")))
+    for product_id in target_product_ids:
+        product = data.products.get(product_id)
+        if product is not None:
+            result.update(component.substance for component in product.components)
     return result
 
 
-def active_substance_ids(db: SurrealSession, inactive_stack_name: str) -> set[str]:
+def active_substance_ids(data: ReadModelData, inactive_stack_name: str) -> set[str]:
     """Substance IDs referenced by any product in a non-inactive stack."""
-    return _stack_partition_substance_ids(db, inactive=False, inactive_stack_name=inactive_stack_name)
+    return _stack_partition_substance_ids(data, inactive=False, inactive_stack_name=inactive_stack_name)
 
 
-def inactive_substance_ids(db: SurrealSession, inactive_stack_name: str) -> set[str]:
+def inactive_substance_ids(data: ReadModelData, inactive_stack_name: str) -> set[str]:
     """Substance IDs referenced by products in the authored inactive stack."""
-    return _stack_partition_substance_ids(db, inactive=True, inactive_stack_name=inactive_stack_name)
+    return _stack_partition_substance_ids(data, inactive=True, inactive_stack_name=inactive_stack_name)
 
 
 def _knowledge_namespaces(ontology_bundle: OntologyBundle) -> tuple[str, ...]:
@@ -43,7 +44,7 @@ def _knowledge_namespaces(ontology_bundle: OntologyBundle) -> tuple[str, ...]:
 
 
 def active_fact_index(
-    db: SurrealSession,
+    data: ReadModelData,
     ontology_bundle: OntologyBundle,
     *,
     item_id_sequence: list[str],
@@ -54,9 +55,11 @@ def active_fact_index(
     if not active_product_ids:
         return []
 
-    products_by_id = _active_products_by_id(db, active_product_ids)
+    products_by_id = {
+        product_id: data.products[product_id] for product_id in active_product_ids if product_id in data.products
+    }
     knowledge_namespaces = _knowledge_namespaces(ontology_bundle)
-    substances_by_id = _active_substances_by_id(db, products_by_id)
+    substances_by_id = _active_substances_by_id(data.substances, products_by_id)
     facts = _facts_by_namespace_slug(products_by_id, substances_by_id, knowledge_namespaces)
     labels = _FactLabels.from_bundle(ontology_bundle)
 
@@ -81,47 +84,35 @@ def active_fact_index(
     return index
 
 
-def _active_products_by_id(db: SurrealSession, active_product_ids: set[str]) -> dict[str, dict[str, object]]:
-    products_by_id: dict[str, dict[str, object]] = {}
-    for row in db.query("SELECT id, display_name, components FROM product"):
-        product_id = id_str(row["id"])
-        if product_id in active_product_ids:
-            products_by_id[product_id] = row
-    return products_by_id
-
-
 def _active_substances_by_id(
-    db: SurrealSession,
-    products_by_id: dict[str, dict[str, object]],
-) -> dict[str, dict[str, object]]:
+    substances: dict[str, Substance],
+    products_by_id: dict[str, Product],
+) -> dict[str, Substance]:
     active_component_ids: set[str] = set()
-    for row in products_by_id.values():
-        active_component_ids.update(string_list(row.get("components")))
+    for product in products_by_id.values():
+        active_component_ids.update(component.substance for component in product.components)
     if not active_component_ids:
         return {}
 
-    substances_by_id: dict[str, dict[str, object]] = {}
-    for row in db.query("SELECT * FROM substance"):
-        substance_id = id_str(row["id"])
-        if substance_id in active_component_ids:
-            substances_by_id[substance_id] = row
-    return substances_by_id
+    return {
+        substance_id: substances[substance_id] for substance_id in active_component_ids if substance_id in substances
+    }
 
 
 def _facts_by_namespace_slug(
-    products_by_id: dict[str, dict[str, object]],
-    substances_by_id: dict[str, dict[str, object]],
+    products_by_id: dict[str, Product],
+    substances_by_id: dict[str, Substance],
     knowledge_namespaces: tuple[str, ...],
 ) -> dict[tuple[str, str], dict[str, str]]:
     facts: dict[tuple[str, str], dict[str, str]] = {}
-    for product_id, product_row in products_by_id.items():
-        product_name = cast(str, product_row["display_name"])
-        for component_id in string_list(product_row.get("components")):
+    for product_id, product in products_by_id.items():
+        product_name = format_product_name(product)
+        for component in product.components:
             _add_substance_facts(
                 facts,
                 product_id,
                 product_name,
-                substances_by_id.get(component_id),
+                substances_by_id.get(component.substance),
                 knowledge_namespaces,
             )
     return facts
@@ -131,28 +122,19 @@ def _add_substance_facts(
     facts: dict[tuple[str, str], dict[str, str]],
     product_id: str,
     product_name: str,
-    substance_row: dict[str, object] | None,
+    substance: Substance | None,
     knowledge_namespaces: tuple[str, ...],
 ) -> None:
-    if substance_row is None:
+    if substance is None:
         return
-    substance_id = substance_row.get("id", "<unknown>")
-    for assertion in _assertions(
-        substance_row.get("knowledge_assertions"),
-        field="knowledge_assertions",
-        substance_id=str(substance_id),
-    ):
-        namespace = cast(str, assertion["knowledge_category"])
-        slug = cast(str, assertion["knowledge_value"])
+    for assertion in substance.knowledge_assertions:
+        namespace = assertion.category
+        slug = assertion.value
         if namespace in knowledge_namespaces:
             facts.setdefault((namespace, slug), {})[product_id] = product_name
-    for assertion in _assertions(
-        substance_row.get("schedule_assertions"),
-        field="schedule_assertions",
-        substance_id=str(substance_id),
-    ):
-        namespace = cast(str, assertion["schedule_axis"])
-        slug = cast(str, assertion["schedule_value"])
+    for assertion in substance.schedule_assertions:
+        namespace = assertion.axis
+        slug = assertion.value
         if namespace in knowledge_namespaces:
             facts.setdefault((namespace, slug), {})[product_id] = product_name
 

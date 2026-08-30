@@ -4,20 +4,14 @@ from __future__ import annotations
 
 from typing import cast
 
-from planner.query_model.session import SurrealSession
-
 
 def collect_substance_relation_matches(
-    db: SurrealSession,
+    assertions: tuple[dict[str, object], ...],
     substance_id: str,
     substance_name: str,
 ) -> list[tuple[dict[str, object], list[str]]]:
-    rows = db.query(
-        "SELECT id, type, assertion_kind, semantic_family, src_display, tgt_display, reason, action, "
-        "src_substances, tgt_substances, src_selector, tgt_selector FROM ontology_assertion",
-    )
     matches: list[tuple[dict[str, object], list[str]]] = []
-    for row in rows:
+    for row in assertions:
         labels = _row_match_labels(row, substance_id, substance_name)
         if labels:
             matches.append((row, labels))

@@ -1,7 +1,7 @@
 """Read-model boundary for graph-style planner queries.
 
-YAML cards remain the source of truth. The query model is rebuilt in memory for
-each command and owns SurrealDB/SurrealQL details.
+YAML cards remain the source of truth. The query model is rebuilt from plain
+domain data for each command.
 """
 
 from __future__ import annotations

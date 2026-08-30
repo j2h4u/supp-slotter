@@ -12,7 +12,6 @@ from planner.ontology.runtime_program import (
     RuntimeRelationWarningRule,
     relation_presence_policy_for_active_side,
 )
-from planner.query_model.session import SurrealSession
 
 _RELATION_WARNING_PROJECTION = "src_key, tgt_key, src_display, tgt_display, reason, action, severity"
 
@@ -40,7 +39,7 @@ class RelationWarningQueryRow(TypedDict):
 
 
 def collect_relation_warnings(
-    db: SurrealSession,
+    assertions: tuple[dict[str, object], ...],
     active_substances: set[str],
     runtime: RuntimeProgram,
 ) -> list[RelationWarningRow]:
@@ -48,12 +47,14 @@ def collect_relation_warnings(
     pairs = sorted({(row.relation_kind, row.warning_type) for row in runtime.relation_warning_rules})
     warnings: list[RelationWarningRow] = []
     for relation_type, warning_type in pairs:
-        warnings.extend(_collect_relation_warning_rules(db, active_substances, runtime, relation_type, warning_type))
+        warnings.extend(
+            _collect_relation_warning_rules(assertions, active_substances, runtime, relation_type, warning_type)
+        )
     return warnings
 
 
 def _collect_relation_warning_rules(
-    db: SurrealSession,
+    assertions: tuple[dict[str, object], ...],
     active_substances: set[str],
     runtime: RuntimeProgram,
     relation_type: str,
@@ -67,61 +68,46 @@ def _collect_relation_warning_rules(
     if not rules:
         raise ValueError(f"ontology relation_warning_rules does not declare {relation_type!r}/{warning_type!r}")
     return _collect_relation_warnings(
-        db,
+        assertions,
         relation_type=relation_type,
         warning_type=warning_type,
-        queries=[
-            _query_for_rule(rule, active_substances, runtime.relation_presence_statuses_by_active_side)
-            for rule in rules
+        rules=[
+            _rule_matcher(rule, active_substances, runtime.relation_presence_statuses_by_active_side) for rule in rules
         ],
     )
 
 
-def _query_for_rule(
+def _rule_matcher(
     rule: RuntimeRelationWarningRule,
     active_substances: set[str],
     relation_presence_by_active_side: Mapping[str, RuntimeRelationPresenceStatusPolicy],
-) -> tuple[str, dict[str, object]]:
-    projection = _RELATION_WARNING_PROJECTION
-    if rule.reverse_output:
-        projection = (
-            "tgt_key AS src_key, src_key AS tgt_key, "
-            "tgt_display AS src_display, src_display AS tgt_display, reason, action, severity"
-        )
+) -> tuple[RuntimeRelationWarningRule, set[str], bool, bool, str]:
     presence = relation_presence_policy_for_active_side(rule.active_side, relation_presence_by_active_side)
-    source_match = _presence_operator(presence.source_active)
-    target_match = _presence_operator(presence.target_active)
     column = ONTOLOGY_ASSERTION_FILTER_COLUMNS.get(rule.filter_field)
     if column is None:
         raise ValueError(f"ontology relation_warning_rules has unsupported filter_field {rule.filter_field!r}")
-    sql = (
-        f"SELECT {projection} FROM ontology_assertion "
-        f"WHERE type = $relation_type "
-        f"  AND {column} = $filter_value "
-        f"  AND src_substances {source_match} $active "
-        f"  AND tgt_substances {target_match} $active"
-    )
-    return sql, {
-        "active": list(active_substances),
-        "filter_value": rule.filter_value,
-        "relation_type": rule.relation_kind,
-    }
-
-
-def _presence_operator(is_active: bool) -> str:
-    return "ANYINSIDE" if is_active else "NONEINSIDE"
+    return rule, active_substances, presence.source_active, presence.target_active, column
 
 
 def _collect_relation_warnings(
-    db: SurrealSession,
+    assertions: tuple[dict[str, object], ...],
     *,
     relation_type: str,
     warning_type: str,
-    queries: list[tuple[str, dict[str, object]]],
+    rules: list[tuple[RuntimeRelationWarningRule, set[str], bool, bool, str]],
 ) -> list[RelationWarningRow]:
     rows: list[dict[str, object]] = []
-    for sql, params in queries:
-        rows.extend(db.query(sql, params))
+    for rule, active, source_active, target_active, column in rules:
+        for assertion in assertions:
+            src_matches = bool(set(cast(list[str], assertion.get("src_substances") or [])) & active)
+            tgt_matches = bool(set(cast(list[str], assertion.get("tgt_substances") or [])) & active)
+            if (
+                assertion.get("type") == rule.relation_kind
+                and assertion.get(column) == rule.filter_value
+                and src_matches is source_active
+                and tgt_matches is target_active
+            ):
+                rows.append(_warning_projection(assertion, reverse=rule.reverse_output))
 
     seen: set[tuple[str, str, str]] = set()
     warnings: list[RelationWarningRow] = []
@@ -133,6 +119,19 @@ def _collect_relation_warnings(
         seen.add(key)
         warnings.append(_warning_from_row(typed_row, warning_type, relation_type))
     return warnings
+
+
+def _warning_projection(row: dict[str, object], *, reverse: bool) -> dict[str, object]:
+    source, target = ("tgt", "src") if reverse else ("src", "tgt")
+    return {
+        "src_key": row.get(f"{source}_key", ""),
+        "tgt_key": row.get(f"{target}_key", ""),
+        "src_display": row.get(f"{source}_display", ""),
+        "tgt_display": row.get(f"{target}_display", ""),
+        "reason": row.get("reason", ""),
+        "action": row.get("action", ""),
+        **({"severity": row["severity"]} if "severity" in row else {}),
+    }
 
 
 def _warning_from_row(row: RelationWarningQueryRow, warning_type: str, relation_type: str) -> RelationWarningRow:

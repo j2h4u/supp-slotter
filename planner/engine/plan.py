@@ -22,7 +22,7 @@ from planner.ontology.artifacts import OntologyBundle, load_ontology
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.paths import ROOT, Paths
 from planner.query_model import StackReadModel, build_stack_read_model, dashboards_for_read_model
-from planner.query_model.surreal import SurrealLoadContext
+from planner.query_model.data import ReadModelContext
 from planner.schedule_types import ScheduleWarning
 from planner.schedule_writer import schedule_slot_loads, write_schedule_file
 
@@ -95,7 +95,7 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
         inputs.substances,
         inputs.global_relations,
         inputs.products,
-        context=SurrealLoadContext(
+        context=ReadModelContext(
             policies=inputs.policies,
             stacks_data=None,
             pillbox_stack_names=None,

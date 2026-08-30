@@ -9,8 +9,10 @@ from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import WARNING_EMITTER_INTRA_PRODUCT_CONSTRAINT_CONFLICT
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.warning_policy import warning_policy_for_emitter
-from planner.query_model.session import SurrealSession, id_str
-from planner.scheduling_constraint_execution import interpret_execution_component_pair
+from planner.scheduling_constraint_execution import (
+    SchedulingConstraintExecutionPlan,
+    interpret_execution_component_pair,
+)
 
 
 class RelationConflictWarningRow(TypedDict):
@@ -34,7 +36,7 @@ class _ConflictContext:
 
 
 def collect_intra_product_scheduling_constraint_conflicts(
-    db: SurrealSession,
+    plans: tuple[SchedulingConstraintExecutionPlan, ...],
     runtime_program: RuntimeProgram,
     *,
     item_id: str,
@@ -43,14 +45,15 @@ def collect_intra_product_scheduling_constraint_conflicts(
 ) -> list[RelationConflictWarningRow]:
     warning_policy = warning_policy_for_emitter(runtime_program, WARNING_EMITTER_INTRA_PRODUCT_CONSTRAINT_CONFLICT)
     warning_type = warning_policy.warning_type
-    rows = db.query(
-        "SELECT id, operation, match_direction, aggregation, source_substances, target_substances, action "
-        "FROM scheduling_constraint_execution_plan "
-        "WHERE executable = true AND blocks_slots = true "
-        "  AND source_substances ANYINSIDE $components "
-        "  AND target_substances ANYINSIDE $components",
-        {"components": component_ids},
-    )
+    component_set = set(component_ids)
+    rows = [
+        _execution_plan_row(plan)
+        for plan in plans
+        if plan.executable
+        and plan.blocks_slots
+        and component_set.intersection(plan.source_substance_ids)
+        and component_set.intersection(plan.target_substance_ids)
+    ]
 
     conflicts: list[RelationConflictWarningRow] = []
     seen_pairs: set[tuple[str, frozenset[str]]] = set()
@@ -88,7 +91,7 @@ def _conflict_warning(
     target_id: str,
 ) -> RelationConflictWarningRow:
     raw_constraint_id = row.get("id")
-    constraint_id = id_str(raw_constraint_id) if raw_constraint_id is not None else ""
+    constraint_id = raw_constraint_id if isinstance(raw_constraint_id, str) else ""
     if not constraint_id.strip():
         raise OntologyInfrastructureError(
             f"scheduling constraint execution row has invalid id: {constraint_id!r}", code=MALFORMED
@@ -150,7 +153,7 @@ def _constraint_matches_pair(
 
 def _validated_execution_row(row: dict[str, object]) -> dict[str, object]:
     raw_constraint_id = row.get("id")
-    constraint_id = id_str(raw_constraint_id) if raw_constraint_id is not None else ""
+    constraint_id = raw_constraint_id if isinstance(raw_constraint_id, str) else ""
     if not constraint_id.strip():
         raise OntologyInfrastructureError(
             f"scheduling constraint execution row has invalid id: {constraint_id!r}", code=MALFORMED
@@ -184,3 +187,15 @@ def _execution_substances(value: object, constraint_id: str, field: str) -> list
     if values is None or not all(isinstance(item, str) for item in values):
         raise OntologyInfrastructureError(f"scheduling constraint {constraint_id}: malformed {field}", code=MALFORMED)
     return cast(list[str], values)
+
+
+def _execution_plan_row(plan: SchedulingConstraintExecutionPlan) -> dict[str, object]:
+    return {
+        "id": plan.id,
+        "operation": plan.operation,
+        "match_direction": plan.match_direction,
+        "aggregation": plan.aggregation,
+        "source_substances": list(plan.source_substance_ids),
+        "target_substances": list(plan.target_substance_ids),
+        "action": plan.action or "",
+    }

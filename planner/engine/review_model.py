@@ -19,7 +19,7 @@ from planner.ontology.runtime_program import RuntimeDashboardStateCatalog
 from planner.ontology.warning_policy import authored_relation_label, authored_term_label
 from planner.paths import Paths
 from planner.query_model import build_stack_read_model, stacks_for_read_model
-from planner.query_model.surreal import SurrealLoadContext
+from planner.query_model.data import ReadModelContext
 from planner.schedule_types import DashboardReviewEntryWithMembers, DashboardReviewResult
 from planner.yaml_io import load_yaml
 
@@ -86,7 +86,7 @@ def build_review_model(  # noqa: PLR0914
         substances,
         global_relations,
         products,
-        context=SurrealLoadContext(
+        context=ReadModelContext(
             policies=policies,
             stacks_data=stacks_data,
             pillbox_stack_names=None,

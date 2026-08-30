@@ -1,4 +1,4 @@
-"""Canonical ontology projections for the in-memory SurrealDB read model."""
+"""Small presentation projections used by the command read model."""
 
 from __future__ import annotations
 

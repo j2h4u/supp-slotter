@@ -14,7 +14,6 @@ from planner.ontology.runtime_program import (
     RuntimeSelectorFormCapability,
     relation_presence_policy_for_active_side,
 )
-from planner.query_model.session import SurrealSession
 
 
 @dataclass(frozen=True, slots=True)
@@ -34,7 +33,7 @@ class _RelationSemantics:
 
 
 def classify_relations(
-    db: SurrealSession,
+    assertions: tuple[dict[str, object], ...],
     active_substances: set[str],
     runtime: RuntimeProgram,
 ) -> dict[str, list[dict[str, object]]]:
@@ -47,8 +46,8 @@ def classify_relations(
         runtime.relation_presence_statuses_by_active_side,
         runtime.selector_form_capabilities_by_form,
     )
-    rows = db.query(_relation_status_projection(runtime), {"active": list(active_substances)})
-    for row in rows:
+    for assertion in assertions:
+        row = _relation_status_row(assertion, active_substances, runtime)
         relation_type = _row_str(row, "type")
         presence_status = _row_str(row, "status")
         warning_type = _warning_type_for_relation(
@@ -211,30 +210,17 @@ def _row_str(row: dict[str, object], key: str) -> str:
     return value if isinstance(value, str) else ""
 
 
-def _relation_status_projection(runtime: RuntimeProgram) -> str:
-    source_and_target_status = _surreal_string_literal(
-        _presence_status_for(runtime, source_active=True, target_active=True)
-    )
-    source_only_status = _surreal_string_literal(_presence_status_for(runtime, source_active=True, target_active=False))
-    target_only_status = _surreal_string_literal(_presence_status_for(runtime, source_active=False, target_active=True))
-    neither_endpoint_status = _surreal_string_literal(
-        _presence_status_for(runtime, source_active=False, target_active=False)
-    )
-    return (
-        "SELECT type, assertion_kind, semantic_family, src_display AS source, tgt_display AS target, reason, "
-        "  action, severity, "
-        "  src_substances, tgt_substances, src_member_names, tgt_member_names, "
-        "  src_selector, tgt_selector, "
-        "  IF src_substances ANYINSIDE $active AND tgt_substances ANYINSIDE $active "
-        f"    THEN {source_and_target_status} "
-        "  ELSE IF src_substances ANYINSIDE $active "
-        f"    THEN {source_only_status} "
-        "  ELSE IF tgt_substances ANYINSIDE $active "
-        f"    THEN {target_only_status} "
-        f"  ELSE {neither_endpoint_status} "
-        "  END AS status "
-        "FROM ontology_assertion"
-    )
+def _relation_status_row(
+    assertion: dict[str, object], active_substances: set[str], runtime: RuntimeProgram
+) -> dict[str, object]:
+    source_active = bool(set(_string_list(assertion.get("src_substances"))) & active_substances)
+    target_active = bool(set(_string_list(assertion.get("tgt_substances"))) & active_substances)
+    return {
+        **assertion,
+        "source": assertion.get("src_display", ""),
+        "target": assertion.get("tgt_display", ""),
+        "status": _presence_status_for(runtime, source_active=source_active, target_active=target_active),
+    }
 
 
 def _presence_status_for(runtime: RuntimeProgram, *, source_active: bool, target_active: bool) -> str:
@@ -245,7 +231,3 @@ def _presence_status_for(runtime: RuntimeProgram, *, source_active: bool, target
         "ontology relation_presence_statuses does not cover "
         f"source_active={source_active!r}/target_active={target_active!r}"
     )
-
-
-def _surreal_string_literal(value: str) -> str:
-    return "'" + value.replace("\\", "\\\\").replace("'", "\\'") + "'"

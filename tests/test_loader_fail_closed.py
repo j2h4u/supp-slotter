@@ -15,7 +15,7 @@ from planner.contracts import CardLoadError, Substance
 from planner.ontology.selector import load_relation_type_contracts
 from planner.paths import Paths
 from planner.query_model.loaders import dashboards_for_read_model
-from planner.query_model.surreal_records import dashboard_record
+from planner.query_model.projections import dashboard_record
 
 from tests.helpers import ontology_bundle
 
