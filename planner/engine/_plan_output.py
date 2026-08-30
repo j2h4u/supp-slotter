@@ -298,6 +298,7 @@ def _canonical_placement_explanation(
     return {
         "item_id": item_id,
         "slot_id": slot_id,
+        "placement_basis": "pressure_evidence" if pressure_matches else "balance_and_tie_break_only",
         "slot_anchors": {
             "meal_context": slot.meal_context,
             "circadian_anchor": slot.circadian_anchor,

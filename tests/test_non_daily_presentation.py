@@ -86,5 +86,6 @@ def test_marked_daily_product_is_an_episodic_current_plan_placement(tmp_path: Pa
     assert "Current plan:" in shown.stdout
     assert "Episodic placements" in shown.stdout
     assert "Marked" in shown.stdout
+    assert "[balance-only]" in shown.stdout
     assert "today" not in shown.stdout.casefold()
     assert "take" not in shown.stdout.casefold()

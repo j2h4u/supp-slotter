@@ -108,6 +108,7 @@ This checklist never substitutes a summary for that source.
     17 passed; final-head `just release` -> exit 0, smoke 23 and runtime 71.
     Witnesses: `tests/test_canonical_publication.py::test_publication_boundary_refuses_indeterminate_and_legacy_documents`,
     `tests/test_canonical_publication.py::test_successful_publication_replaces_lease_with_complete_optimal_document`,
+    `tests/test_canonical_publication.py::test_canonical_document_contains_typed_proofs_and_no_legacy_explanations`,
     `tests/test_canonical_optimizer.py::test_deadline_interruption_and_state_bound_never_publish_incumbents`,
     `planner/schedule_writer.py`, `planner/canonical_optimizer_result.py`.
 
@@ -121,7 +122,8 @@ This checklist never substitutes a summary for that source.
     exit 0, ontology B 34 and runtime 71. Witnesses:
     `tests/test_canonical_scheduling_migration.py::test_no_runtime_consumer_reads_the_removed_card_fields`,
     `tests/test_runtime_contract_v2.py::test_retired_objective_and_pair_fields_are_rejected`,
-    `docs/migrations/legacy-atom-ledger.yaml`, `planner/engine/_canonical_optimizer.py`.
+    `docs/migrations/legacy-atom-ledger.yaml`, `planner/engine/_canonical_optimizer.py`,
+    `tests/test_scheduler_reviewer_authority.py::test_review_only_relation_cannot_change_command_level_schedule`.
 
 - [x] **Remove component vote aggregation and legacy policy scoring.** Delete
   old runtime-policy weights, score magnitudes, balance weight, epsilon policy,
@@ -220,6 +222,7 @@ This checklist never substitutes a summary for that source.
     exit 0, ontology A/B/C 50/34/60 and corpus projection conforms true.
     Witnesses: `tests/test_ontology_runtime_loader.py::test_runtime_bundle_retains_no_formal_projection_artifacts_or_reads`,
     `tests/test_architecture_contracts.py::test_runtime_planner_has_no_linkml_compiler_symbols`,
+    `tests/test_scheduler_reviewer_authority.py::test_runtime_commands_read_only_declared_runtime_outputs_and_command_data`,
     `justfile`, `planner/ontology/runtime_program.py`.
 
 - [x] **Make validation read-only.** `planner check`, plan, show, and review
@@ -229,6 +232,7 @@ This checklist never substitutes a summary for that source.
     `just release` -> exit 0, smoke 23 and CRAP 237. Witnesses:
     `tests/test_maintenance.py::test_check_succeeds_without_mutating_canonical_inputs`,
     `tests/test_maintenance.py::test_plan_succeeds_without_mutating_canonical_inputs`,
+    `tests/test_maintenance.py::test_show_and_review_do_not_mutate_authored_inputs`,
     `tests/test_maintenance.py::test_run_maintenance_rolls_back_on_partial_stage_failure`,
     `planner/maintenance.py`.
 
@@ -264,7 +268,8 @@ This checklist never substitutes a summary for that source.
     `tests/test_non_daily_presentation.py::test_marked_daily_product_is_an_episodic_current_plan_placement`,
     `tests/test_canonical_publication.py::test_not_every_day_is_a_presentation_group_for_the_proved_assignment`,
     `tests/test_cutover_vertical_scenarios.py::test_real_shelf_daily_episodic_and_training_products_are_complete`,
-    `planner/ontology/presentation.py`.
+    `planner/ontology/presentation.py`. The generated `placement_basis` marker
+    distinguishes pressure evidence from balance/tie-break-only placements.
 
 - [x] **Align grooming with canonical migration work.** Missing required axes,
   unresolved applicability, and outstanding Sol adjudication must remain
@@ -347,7 +352,9 @@ This checklist never substitutes a summary for that source.
     1 passed on the committed ancestor/equivalent runtime; final-head `just
     release` -> exit 0, smoke 23 and runtime 71. Witnesses:
     `tests/test_cutover_authored_vertical_scenarios.py::test_authored_vertical_fixture_compiles_loads_and_routes_all_runtime_anchors`,
-    `tests/test_cutover_vertical_scenarios.py::test_real_shelf_daily_episodic_and_training_products_are_complete`.
+    `tests/test_cutover_vertical_scenarios.py::test_real_shelf_daily_episodic_and_training_products_are_complete`
+    (current-shelf exact witness: four satisfied pressures and fourteen
+    balance-and-tie-break-only explanations).
 - [x] Meaningful food, wake/sleep, and before/after behavior is preserved or
   improved without requiring byte-for-byte legacy placement.
   - Evidence: `cdc33c5f7a013b151516a9e58beff4b0a21715e3` through

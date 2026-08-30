@@ -51,6 +51,7 @@ def _show_inner(schedule_path: Path) -> int:
         return 1
 
     pillboxes = schedule["pillboxes"]
+    balance_only_slots = _balance_only_slots(schedule)
 
     print()
     print("Current plan:")
@@ -62,7 +63,7 @@ def _show_inner(schedule_path: Path) -> int:
             continue
         non_empty = _non_empty_slots(pillbox)
         if non_empty:
-            _print_pillbox(pillbox_key, pillbox, non_empty)
+            _print_pillbox(pillbox_key, pillbox, non_empty, balance_only_slots)
 
     _print_footer(schedule)
     return 0
@@ -77,7 +78,7 @@ def _print_current_plan_groups(schedule: CanonicalScheduleData) -> None:
         names = _active_group_names(groups.get(group_key, []), daily_products)
         if not names:
             continue
-        _print_usage_group(label, names, pillboxes)
+        _print_usage_group(label, names, pillboxes, _balance_only_slots(schedule))
 
 
 def _placement_groups(schedule: CanonicalScheduleData) -> dict[str, list[str]]:
@@ -104,6 +105,7 @@ def _print_usage_group(
     label: str,
     names: list[str],
     pillboxes: dict[str, SchedulePillbox],
+    balance_only_slots: set[str],
 ) -> None:
     print(label)
     print(SEPARATOR)
@@ -113,7 +115,7 @@ def _print_usage_group(
             continue
         filtered = _group_slots(pillbox, wanted)
         if filtered:
-            _print_pillbox_slots(pillbox, filtered, wanted)
+            _print_pillbox_slots(pillbox, filtered, wanted, balance_only_slots)
     print()
 
 
@@ -154,6 +156,7 @@ def _print_pillbox(
     pillbox_key: str,
     pillbox: SchedulePillbox,
     non_empty: list[tuple[str, ScheduleSlotEntry]],
+    balance_only_slots: set[str],
 ) -> None:
     pillbox_label = _str_field(pillbox, "label", pillbox_key)
     print(pillbox_label)
@@ -163,7 +166,7 @@ def _print_pillbox(
         slot_label = _str_field(slot, "label", slot_key)
         products = slot["products"]
         print()
-        print(slot_label)
+        print(_slot_heading(slot_key, slot_label, balance_only_slots))
         for product in products:
             print(f"  • {product}")
 
@@ -174,21 +177,41 @@ def _print_pillbox_slots(
     pillbox: SchedulePillbox,
     non_empty: list[tuple[str, ScheduleSlotEntry]],
     wanted: set[str],
+    balance_only_slots: set[str],
 ) -> None:
     """Render filtered slots for one daily presentation group."""
     del pillbox
     for slot_key, slot in non_empty:
-        _print_filtered_slot(slot_key, slot, wanted)
+        _print_filtered_slot(slot_key, slot, wanted, balance_only_slots)
 
 
-def _print_filtered_slot(slot_key: str, slot: ScheduleSlotEntry, wanted: set[str]) -> None:
+def _print_filtered_slot(
+    slot_key: str, slot: ScheduleSlotEntry, wanted: set[str], balance_only_slots: set[str]
+) -> None:
     products = [product for product in slot["products"] if product in wanted]
     if not products:
         return
     print()
-    print(_str_field(slot, "label", slot_key))
+    print(_slot_heading(slot_key, _str_field(slot, "label", slot_key), balance_only_slots))
     for product in products:
         print(f"  • {product}")
+
+
+def _balance_only_slots(schedule: CanonicalScheduleData) -> set[str]:
+    explanations = schedule.get("canonical_explanations", {})
+    if not isinstance(explanations, dict):
+        return set()
+    return {
+        str(explanation["slot_id"])
+        for explanation in explanations.values()
+        if isinstance(explanation, dict)
+        and explanation.get("placement_basis") == "balance_and_tie_break_only"
+        and isinstance(explanation.get("slot_id"), str)
+    }
+
+
+def _slot_heading(slot_key: str, label: str, balance_only_slots: set[str]) -> str:
+    return f"{label} [balance-only]" if slot_key in balance_only_slots else label
 
 
 def _print_footer(schedule: CanonicalScheduleData) -> None:

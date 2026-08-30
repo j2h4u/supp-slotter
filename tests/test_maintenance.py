@@ -16,7 +16,7 @@ from typing import TypedDict, cast
 import pytest
 import yaml
 from planner.contracts import CardLoadError
-from planner.engine import cmd_plan
+from planner.engine import cmd_plan, cmd_review, cmd_show
 from planner.maintenance import (
     maintenance_needed,
     run_maintenance,
@@ -29,7 +29,7 @@ from planner.maintenance_substance_resolution import (
     rewrite_references,
 )
 from planner.ontology.errors import OntologyInfrastructureError
-from planner.paths import Paths
+from planner.paths import ROOT, Paths
 
 from tests.helpers import formal_ontology_bundle, ontology_bundle
 from tests.planner_fixture import (
@@ -67,8 +67,13 @@ def _write_yaml(path: Path, data: object) -> None:
 
 
 def _canonical_input_snapshot(root: Path) -> dict[Path, bytes]:
-    data_root = root / "data"
-    return {path.relative_to(root): path.read_bytes() for path in sorted(data_root.rglob("*")) if path.is_file()}
+    """Snapshot fixture cards plus every live authored ontology source."""
+    snapshots: dict[Path, bytes] = {}
+    for label, source_root in (("data", root / "data"), ("ontology", ROOT / "ontology")):
+        for path in sorted(source_root.rglob("*")):
+            if path.is_file() and not path.is_relative_to(ROOT / "ontology" / "generated"):
+                snapshots[Path(label) / path.relative_to(source_root)] = path.read_bytes()
+    return snapshots
 
 
 def _write_valid_planner_fixture(root: Path) -> None:
@@ -248,6 +253,24 @@ def test_plan_succeeds_without_mutating_canonical_inputs(tmp_path: Path) -> None
 
     assert result.exit_code == 0, "\n".join(result.errors)
     assert (tmp_path / "schedule.yaml").exists()
+    assert _canonical_input_snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize("command", ("show", "review"))
+def test_show_and_review_do_not_mutate_authored_inputs(tmp_path: Path, command: str) -> None:
+    """Only successful show may replace its ignored derived schedule lease."""
+    _write_valid_planner_fixture(tmp_path)
+    before = _canonical_input_snapshot(tmp_path)
+
+    if command == "show":
+        result = cmd_show(data_root=tmp_path)
+        assert result.exit_code == 0
+        assert (tmp_path / "schedule.yaml").exists()
+    else:
+        result = cmd_review(data_root=tmp_path)
+        assert result.exit_code == 0, result.stderr
+        assert not (tmp_path / "schedule.yaml").exists()
+
     assert _canonical_input_snapshot(tmp_path) == before
 
 

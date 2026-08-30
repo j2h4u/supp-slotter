@@ -81,6 +81,11 @@ authored sources and verifies the full artifact set separately. A current
 and `show` suppresses it after a failed plan. It is never an input to inference
 or optimization.
 
+Each generated placement explanation declares whether it is grounded in one or
+more normalized pressures (`pressure_evidence`) or resulted only from the exact
+balance and stable tie-break stages (`balance_and_tie_break_only`). This is
+derived publication metadata, never an authored product, relation, or law.
+
 Acceptance ascends from closed schema and ledger checks, through inference-law
 and exhaustive-oracle checks, to real-schedule and product-invariant evidence.
 Generated schedules, diagnostics, and proof traces are projections; they never

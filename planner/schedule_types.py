@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 
 ProductTrackingState = str
 UsageState = str
+type PlacementBasis = Literal["pressure_evidence", "balance_and_tie_break_only"]
 
 
 class DashboardMatchedTrait(TypedDict):
@@ -161,6 +162,7 @@ class CanonicalPlacementExplanation(TypedDict):
 
     item_id: str
     slot_id: str
+    placement_basis: PlacementBasis
     slot_anchors: dict[str, str | None]
     pressure_matches: list[CanonicalPressureMatch]
     optimizer_proof: list[str]
@@ -512,6 +514,9 @@ def _validate_explanation_proofs(
     expected_item_matches = [
         match for identity, match in expectations.pressure_matches.items() if identity[0] == item_id
     ]
+    expected_basis: PlacementBasis = "pressure_evidence" if expected_item_matches else "balance_and_tie_break_only"
+    if explanation["placement_basis"] != expected_basis:
+        raise ValueError("canonical placement explanation has an invalid placement basis")
     if explanation["pressure_matches"] != expected_item_matches or explanation["optimizer_proof"] != _domain_proof(
         slot.stack, expectations.result
     ):

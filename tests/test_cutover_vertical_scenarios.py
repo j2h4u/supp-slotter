@@ -24,6 +24,35 @@ def _schedule_products(schedule: dict[str, object], pillbox: str) -> list[str]:
     return [product for entry in entries.values() for product in cast(list[str], entry["products"])]
 
 
+def _assert_current_shelf_proof(schedule: dict[str, object], stacks: dict[str, list[str]]) -> None:
+    assignments = cast(dict[str, str], schedule["assignments"])
+    pressure_matches = cast(list[dict[str, object]], schedule["pressure_matches"])
+    expected_pressures = {
+        ("prd_bb212cffc2", "meal_context", "with_food"),
+        ("prd_cfce0b36b6", "exercise_anchor", "before"),
+        ("prd_eb6337a6dc", "meal_context", "with_food"),
+        ("prd_htuhz2s2gt", "meal_context", "with_food"),
+    }
+    assert {
+        (cast(str, match["item_id"]), cast(str, match["dimension"]), cast(str, match["value"]))
+        for match in pressure_matches
+    } == expected_pressures
+    assert len(pressure_matches) == 4
+    assert all(match["satisfied"] is True and match["slot_anchor"] == match["value"] for match in pressure_matches)
+    assert all(
+        bool(match["fact_ids"]) and bool(match["law_ids"]) and bool(match["applicability_role_ids"])
+        for match in pressure_matches
+    )
+    objective = cast(dict[str, object], schedule["objective"])
+    assert objective["satisfied_pressures"] == 4
+    explanations = cast(dict[str, dict[str, object]], schedule["canonical_explanations"])
+    assert (
+        sum(explanation["placement_basis"] == "balance_and_tie_break_only" for explanation in explanations.values())
+        == 14
+    )
+    assert set(assignments) == {product_id for stack in ("daily", "training") for product_id in stacks[stack]}
+
+
 def test_real_shelf_daily_episodic_and_training_products_are_complete(monkeypatch, tmp_path: Path) -> None:
     """The real shelf is complete without asserting a particular balanced slot."""
     copytree(ROOT / "data", tmp_path / "data")
@@ -66,13 +95,4 @@ def test_real_shelf_daily_episodic_and_training_products_are_complete(monkeypatc
     assert set(placement_groups["episodic"]) == episodic
     assert episodic <= actual_by_stack["daily"]
 
-    assignments = cast(dict[str, str], schedule["assignments"])
-    pressure_matches = cast(list[dict[str, object]], schedule["pressure_matches"])
-    assert all(match["satisfied"] is True for match in pressure_matches)
-    assert all(
-        bool(match["fact_ids"]) and bool(match["law_ids"]) and bool(match["applicability_role_ids"])
-        for match in pressure_matches
-    )
-    objective = cast(dict[str, object], schedule["objective"])
-    assert objective["satisfied_pressures"] == len(pressure_matches)
-    assert set(assignments) == {product_id for stack in ("daily", "training") for product_id in stacks[stack]}
+    _assert_current_shelf_proof(schedule, stacks)

@@ -105,6 +105,8 @@ def test_canonical_document_contains_typed_proofs_and_no_legacy_explanations() -
     assert match["law_ids"] == ["law_food"]
     assert match["applicability_role_ids"] == ["cmp_prd_demo__sub_demo"]
     assert match["provenance_refs"] == [{"source": "src_demo", "locator": "paper#demo", "quotation": "quote"}]
+    explanation = cast(dict[str, object], document["canonical_explanations"])["item_demo"]
+    assert explanation["placement_basis"] == "pressure_evidence"
     assert "pairwise_journal" not in document
     assert "explanations" not in document
     assert "policy_contributions" not in document
@@ -221,6 +223,12 @@ def test_writer_revalidation_failure_invalidates_current_document(tmp_path: Path
                 "meal_context", None
             ),
             "placement explanation is missing slot anchors",
+        ),
+        (
+            lambda publication: publication.document["canonical_explanations"]["item_demo"].__setitem__(
+                "placement_basis", "balance_and_tie_break_only"
+            ),
+            "invalid placement basis",
         ),
     ],
 )
