@@ -41,7 +41,7 @@ def _runtime_payload() -> dict[str, object]:
     return payload
 
 
-def test_compiler_emits_authoritative_empty_catalog(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_compiler_emits_authoritative_catalog(monkeypatch: pytest.MonkeyPatch) -> None:
     # Product component identity migration is maintained by another wave.  A
     # compiler projection test should isolate canonical catalog emission from
     # that repository-wide projection gate.
@@ -59,7 +59,17 @@ def test_compiler_emits_authoritative_empty_catalog(monkeypatch: pytest.MonkeyPa
         "pre_exercise_performance_effects",
         "post_exercise_recovery_effects",
     }
-    assert all(value == [] for value in catalog.values())
+    assert [fact["id"] for fact in cast(list[dict[str, object]], catalog["food_effects"])] == [
+        "fact_food_prd_eb6337a6dc_sub_2476bf9d4b",
+        "fact_food_prd_bb212cffc2_sub_67fc2be8aa",
+        "fact_food_prd_htuhz2s2gt_sub_sunkcr05vl",
+    ]
+    assert [fact["id"] for fact in cast(list[dict[str, object]], catalog["pre_exercise_performance_effects"])] == [
+        "fact_pre_exercise_performance_prd_cfce0b36b6_sub_3918fe347e",
+    ]
+    assert catalog["acute_alertness_effects"] == []
+    assert catalog["acute_sleep_effects"] == []
+    assert catalog["post_exercise_recovery_effects"] == []
     lock = cast(dict[str, object], json.loads(artifacts[Path("artifact-lock.json")]))
     sources = cast(list[dict[str, object]], lock["sources"])
     assert any(source["path"] == "ontology/canonical-facts.yaml" for source in sources)

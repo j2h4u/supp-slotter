@@ -33,11 +33,145 @@
     "canonical_fact_catalog": {
       "acute_alertness_effects": [],
       "acute_sleep_effects": [],
-      "composition_roles": [],
-      "evidence_sources": [],
-      "food_effects": [],
+      "composition_roles": [
+        {
+          "id": "cmp_prd_eb6337a6dc__sub_2476bf9d4b",
+          "product": "prd_eb6337a6dc",
+          "substance": "sub_2476bf9d4b"
+        },
+        {
+          "id": "cmp_prd_bb212cffc2__sub_67fc2be8aa",
+          "product": "prd_bb212cffc2",
+          "substance": "sub_67fc2be8aa"
+        },
+        {
+          "id": "cmp_prd_htuhz2s2gt__sub_sunkcr05vl",
+          "product": "prd_htuhz2s2gt",
+          "substance": "sub_sunkcr05vl"
+        },
+        {
+          "id": "cmp_prd_cfce0b36b6__sub_3918fe347e",
+          "product": "prd_cfce0b36b6",
+          "substance": "sub_3918fe347e"
+        }
+      ],
+      "evidence_sources": [
+        {
+          "id": "src_pubmed_25441954"
+        },
+        {
+          "id": "src_pubmed_20200983"
+        },
+        {
+          "id": "src_doi_10_1002_jps_2600550305"
+        },
+        {
+          "id": "src_doi_10_1002_jps_2600560112"
+        },
+        {
+          "id": "src_solgar_triple_strength_omega3"
+        },
+        {
+          "id": "src_pubmed_2847723"
+        },
+        {
+          "id": "src_pubmed_30799231"
+        },
+        {
+          "id": "src_pubmed_17953788"
+        },
+        {
+          "id": "src_pubmed_39662304"
+        },
+        {
+          "id": "src_pmc_13304508"
+        }
+      ],
+      "food_effects": [
+        {
+          "applicability": "cmp_prd_eb6337a6dc__sub_2476bf9d4b",
+          "id": "fact_food_prd_eb6337a6dc_sub_2476bf9d4b",
+          "provenance": [
+            {
+              "locator": "https://pubmed.ncbi.nlm.nih.gov/25441954/",
+              "source": "src_pubmed_25441954"
+            },
+            {
+              "locator": "https://pubmed.ncbi.nlm.nih.gov/20200983/",
+              "source": "src_pubmed_20200983"
+            }
+          ],
+          "subject": {
+            "substance": "sub_2476bf9d4b"
+          },
+          "value": "bioavailability_increases"
+        },
+        {
+          "applicability": "cmp_prd_bb212cffc2__sub_67fc2be8aa",
+          "id": "fact_food_prd_bb212cffc2_sub_67fc2be8aa",
+          "provenance": [
+            {
+              "locator": "https://doi.org/10.1002/jps.2600550305",
+              "source": "src_doi_10_1002_jps_2600550305"
+            },
+            {
+              "locator": "https://doi.org/10.1002/jps.2600560112",
+              "source": "src_doi_10_1002_jps_2600560112"
+            }
+          ],
+          "subject": {
+            "substance": "sub_67fc2be8aa"
+          },
+          "value": "bioavailability_increases"
+        },
+        {
+          "applicability": "cmp_prd_htuhz2s2gt__sub_sunkcr05vl",
+          "id": "fact_food_prd_htuhz2s2gt_sub_sunkcr05vl",
+          "provenance": [
+            {
+              "locator": "https://www.solgar.com/products/solgar-triple-strength-omega-3-950-mg-softgels",
+              "source": "src_solgar_triple_strength_omega3"
+            },
+            {
+              "locator": "https://pubmed.ncbi.nlm.nih.gov/2847723/",
+              "source": "src_pubmed_2847723"
+            },
+            {
+              "locator": "https://pubmed.ncbi.nlm.nih.gov/30799231/",
+              "source": "src_pubmed_30799231"
+            }
+          ],
+          "subject": {
+            "composition_role": "cmp_prd_htuhz2s2gt__sub_sunkcr05vl"
+          },
+          "value": "bioavailability_increases"
+        }
+      ],
       "post_exercise_recovery_effects": [],
-      "pre_exercise_performance_effects": []
+      "pre_exercise_performance_effects": [
+        {
+          "applicability": "cmp_prd_cfce0b36b6__sub_3918fe347e",
+          "id": "fact_pre_exercise_performance_prd_cfce0b36b6_sub_3918fe347e",
+          "provenance": [
+            {
+              "locator": "https://pubmed.ncbi.nlm.nih.gov/17953788/",
+              "source": "src_pubmed_17953788"
+            },
+            {
+              "locator": "https://pubmed.ncbi.nlm.nih.gov/39662304/",
+              "source": "src_pubmed_39662304"
+            },
+            {
+              "locator": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13304508/",
+              "source": "src_pmc_13304508"
+            }
+          ],
+          "subject": {
+            "composition_role": "cmp_prd_cfce0b36b6__sub_3918fe347e"
+          },
+          "value": "performance_improves"
+        }
+      ]
     },
     "canonical_laws": [
       {
@@ -694,5 +828,5 @@
     "source_sha256": "fccd7bad0afe9187620e724a4eabe9242b391a54e6c0af9f8e4ba99de76c6816"
   },
   "schema_version": "2",
-  "source_hash": "4e5decef4f19516e3b3ebb135a772c057de273545e828d92de6845d079b665c7"
+  "source_hash": "decdbd58055a1dca99c5016af9c6b4deab06d0c266d86af4cdb2c3d9aa828803"
 }
