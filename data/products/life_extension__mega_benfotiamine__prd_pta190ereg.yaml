@@ -6,9 +6,11 @@ urls:
 - https://www.lifeextension.com/vitamins-supplements/item00925/mega-benfotiamine
 components:
 - substance: sub_wnyygv7y7l
+  id: cmp_prd_pta190ereg__sub_wnyygv7y7l
   label: Thiamine / Vitamin B1 as thiamine HCl
   amount: 10 mg
 - substance: sub_40cd4f33lo
+  id: cmp_prd_pta190ereg__sub_40cd4f33lo
   label: Benfotiamine
   amount: 250 mg
 notes: 'Serving size: 1 vegetarian capsule. Package: 120 vegetarian capsules. Suggested

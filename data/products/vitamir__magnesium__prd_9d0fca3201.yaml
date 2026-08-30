@@ -3,6 +3,7 @@ name: Magnesium
 brand: Vitamir
 components:
 - substance: sub_7e02eab0d1
+  id: cmp_prd_9d0fca3201__sub_7e02eab0d1
   notes: Product identity is captured as magnesium glycinate/bisglycinate, but the
     package amount was not captured; keep amount unset until the actual label is
     verified.

@@ -472,6 +472,83 @@ class RuntimeGroomingPolicy:
 
 
 @dataclass(frozen=True, slots=True)
+class RuntimeCompositionRole:
+    """Stable product/substance composition identity used by canonical facts."""
+
+    id: str
+    product: str
+    substance: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeEvidenceSource:
+    """Stable identity for an evidence source."""
+
+    id: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeFactSubject:
+    """Exactly one typed subject selector for a canonical fact."""
+
+    substance: str | None
+    composition_role: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeEvidenceProvenance:
+    source: str
+    locator: str
+    quotation: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeCanonicalSchedulingFact:
+    id: str
+    subject: RuntimeFactSubject
+    applicability: str
+    provenance: tuple[RuntimeEvidenceProvenance, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeFoodEffect(RuntimeCanonicalSchedulingFact):
+    value: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeAcuteAlertnessEffect(RuntimeCanonicalSchedulingFact):
+    value: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeAcuteSleepEffect(RuntimeCanonicalSchedulingFact):
+    value: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimePreExercisePerformanceEffect(RuntimeCanonicalSchedulingFact):
+    value: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimePostExerciseRecoveryEffect(RuntimeCanonicalSchedulingFact):
+    value: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeCanonicalFactCatalog:
+    """Strict typed view of the authoritative canonical evidence catalog."""
+
+    composition_roles: tuple[RuntimeCompositionRole, ...]
+    evidence_sources: tuple[RuntimeEvidenceSource, ...]
+    food_effects: tuple[RuntimeFoodEffect, ...]
+    acute_alertness_effects: tuple[RuntimeAcuteAlertnessEffect, ...]
+    acute_sleep_effects: tuple[RuntimeAcuteSleepEffect, ...]
+    pre_exercise_performance_effects: tuple[RuntimePreExercisePerformanceEffect, ...]
+    post_exercise_recovery_effects: tuple[RuntimePostExerciseRecoveryEffect, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimeProgram:
     format_version: str
     schema_version: str
@@ -494,6 +571,7 @@ class RuntimeProgram:
     selector_form_capabilities: tuple[RuntimeSelectorFormCapability, ...]
     dashboard_state_catalog: RuntimeDashboardStateCatalog
     grooming_policy: RuntimeGroomingPolicy
+    canonical_fact_catalog: RuntimeCanonicalFactCatalog
 
     @property
     def effect_score_levels(self) -> frozenset[str]:
@@ -566,6 +644,14 @@ _PROJECTION_RECORDS: Mapping[str, type[object]] = {
     "dashboard_state_catalog.product_tracking_truth_table": RuntimeDashboardProductTrackingTruthState,
     "grooming_policy": RuntimeGroomingPolicy,
     "grooming_policy.rank_fields": RuntimeGroomingRankFieldPolicy,
+    "canonical_fact_catalog": RuntimeCanonicalFactCatalog,
+    "canonical_fact_catalog.composition_roles": RuntimeCompositionRole,
+    "canonical_fact_catalog.evidence_sources": RuntimeEvidenceSource,
+    "canonical_fact_catalog.food_effects": RuntimeFoodEffect,
+    "canonical_fact_catalog.acute_alertness_effects": RuntimeAcuteAlertnessEffect,
+    "canonical_fact_catalog.acute_sleep_effects": RuntimeAcuteSleepEffect,
+    "canonical_fact_catalog.pre_exercise_performance_effects": RuntimePreExercisePerformanceEffect,
+    "canonical_fact_catalog.post_exercise_recovery_effects": RuntimePostExerciseRecoveryEffect,
 }
 _MAPPING_RECORD_PATHS = frozenset({
     "engine_contract",
@@ -574,6 +660,7 @@ _MAPPING_RECORD_PATHS = frozenset({
     "prefer_with_policy",
     "dashboard_state_catalog",
     "grooming_policy",
+    "canonical_fact_catalog",
 })
 RUNTIME_PROJECTION_FIELDS: Mapping[str, frozenset[str]] = MappingProxyType({
     "": frozenset(
@@ -840,6 +927,200 @@ def _grooming_policy(row: Mapping[str, object], label: str) -> RuntimeGroomingPo
         selection_count,
         relation_owner_field,
         relation_owner_direction,
+    )
+
+
+def _closed_value(value: object, label: str, allowed: frozenset[str]) -> str:
+    result = _str(value, label)
+    if result not in allowed:
+        raise _error(label, f"is not an admitted value: {result!r}")
+    return result
+
+
+def _composition_role(row: Mapping[str, object], label: str) -> RuntimeCompositionRole:
+    return RuntimeCompositionRole(
+        _str(row["id"], f"{label}.id"),
+        _str(row["product"], f"{label}.product"),
+        _str(row["substance"], f"{label}.substance"),
+    )
+
+
+def _evidence_source(row: Mapping[str, object], label: str) -> RuntimeEvidenceSource:
+    return RuntimeEvidenceSource(_str(row["id"], f"{label}.id"))
+
+
+def _fact_subject(value: object, label: str) -> RuntimeFactSubject:
+    raw = _map(value, label)
+    allowed = {"substance", "composition_role"}
+    unknown = set(raw) - allowed
+    if unknown:
+        raise _error(label, "has an invalid closed shape (unknown " + ", ".join(sorted(unknown)) + ")")
+    has_substance = "substance" in raw
+    has_role = "composition_role" in raw
+    if has_substance == has_role:
+        raise _error(label, "must contain exactly one of substance or composition_role")
+    substance = _str(raw["substance"], f"{label}.substance") if has_substance else None
+    composition_role = _str(raw["composition_role"], f"{label}.composition_role") if has_role else None
+    return RuntimeFactSubject(substance, composition_role)
+
+
+def _fact_provenance(value: object, label: str) -> tuple[RuntimeEvidenceProvenance, ...]:
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        raise _error(label, "must be a list")
+    result: list[RuntimeEvidenceProvenance] = []
+    for index, item in enumerate(cast(Sequence[object], value)):
+        row = _map(item, f"{label}[{index}]")
+        unknown = set(row) - {"source", "locator", "quotation"}
+        if unknown:
+            raise _error(
+                f"{label}[{index}]",
+                "has an invalid closed shape (unknown " + ", ".join(sorted(unknown)) + ")",
+            )
+        quotation = row.get("quotation")
+        if quotation is not None and not isinstance(quotation, str):
+            raise _error(f"{label}[{index}].quotation", "must be a string")
+        locator = _str(row.get("locator"), f"{label}[{index}].locator")
+        if not locator.strip():
+            raise _error(f"{label}[{index}].locator", "must contain a non-whitespace character")
+        result.append(
+            RuntimeEvidenceProvenance(
+                _str(row.get("source"), f"{label}[{index}].source"),
+                locator,
+                quotation,
+            )
+        )
+    if not result:
+        raise _error(label, "must contain at least one provenance witness")
+    return tuple(result)
+
+
+_FOOD_EFFECT_VALUES = frozenset({
+    "bioavailability_increases",
+    "bioavailability_decreases",
+    "tolerability_improves",
+    "tolerability_worsens",
+})
+_ACUTE_ALERTNESS_EFFECT_VALUES = frozenset({"acute_alertness_increases"})
+_ACUTE_SLEEP_EFFECT_VALUES = frozenset({"onset_latency_decreases", "continuity_improves"})
+_PRE_EXERCISE_PERFORMANCE_EFFECT_VALUES = frozenset({"performance_improves"})
+_POST_EXERCISE_RECOVERY_EFFECT_VALUES = frozenset({"recovery_improves"})
+
+
+def _canonical_fact(
+    row: Mapping[str, object],
+    label: str,
+    factory: Callable[[str, RuntimeFactSubject, str, tuple[RuntimeEvidenceProvenance, ...], str], object],
+    values: frozenset[str],
+) -> object:
+    return factory(
+        _str(row["id"], f"{label}.id"),
+        _fact_subject(row["subject"], f"{label}.subject"),
+        _str(row["applicability"], f"{label}.applicability"),
+        _fact_provenance(row["provenance"], f"{label}.provenance"),
+        _closed_value(row["value"], f"{label}.value", values),
+    )
+
+
+def _food_effect(row: Mapping[str, object], label: str) -> RuntimeFoodEffect:
+    return cast(RuntimeFoodEffect, _canonical_fact(row, label, RuntimeFoodEffect, _FOOD_EFFECT_VALUES))
+
+
+def _acute_alertness_effect(row: Mapping[str, object], label: str) -> RuntimeAcuteAlertnessEffect:
+    return cast(
+        RuntimeAcuteAlertnessEffect,
+        _canonical_fact(row, label, RuntimeAcuteAlertnessEffect, _ACUTE_ALERTNESS_EFFECT_VALUES),
+    )
+
+
+def _acute_sleep_effect(row: Mapping[str, object], label: str) -> RuntimeAcuteSleepEffect:
+    return cast(
+        RuntimeAcuteSleepEffect, _canonical_fact(row, label, RuntimeAcuteSleepEffect, _ACUTE_SLEEP_EFFECT_VALUES)
+    )
+
+
+def _pre_exercise_performance_effect(row: Mapping[str, object], label: str) -> RuntimePreExercisePerformanceEffect:
+    return cast(
+        RuntimePreExercisePerformanceEffect,
+        _canonical_fact(row, label, RuntimePreExercisePerformanceEffect, _PRE_EXERCISE_PERFORMANCE_EFFECT_VALUES),
+    )
+
+
+def _post_exercise_recovery_effect(row: Mapping[str, object], label: str) -> RuntimePostExerciseRecoveryEffect:
+    return cast(
+        RuntimePostExerciseRecoveryEffect,
+        _canonical_fact(row, label, RuntimePostExerciseRecoveryEffect, _POST_EXERCISE_RECOVERY_EFFECT_VALUES),
+    )
+
+
+def _canonical_fact_catalog(value: object, label: str = "canonical_fact_catalog") -> RuntimeCanonicalFactCatalog:
+    catalog = _exact_map(value, label, RUNTIME_PROJECTION_FIELDS[label])
+    composition_roles = _typed_rows(
+        catalog["composition_roles"],
+        f"{label}.composition_roles",
+        _composition_role,
+        semantic_keys=(("id",),),
+        fields=RUNTIME_PROJECTION_ROW_FIELDS[f"{label}.composition_roles"],
+    )
+    evidence_sources = _typed_rows(
+        catalog["evidence_sources"],
+        f"{label}.evidence_sources",
+        _evidence_source,
+        semantic_keys=(("id",),),
+        fields=RUNTIME_PROJECTION_ROW_FIELDS[f"{label}.evidence_sources"],
+    )
+    food_effects = _typed_rows(
+        catalog["food_effects"],
+        f"{label}.food_effects",
+        _food_effect,
+        semantic_keys=(("id",),),
+        fields=RUNTIME_PROJECTION_ROW_FIELDS[f"{label}.food_effects"],
+    )
+    acute_alertness_effects = _typed_rows(
+        catalog["acute_alertness_effects"],
+        f"{label}.acute_alertness_effects",
+        _acute_alertness_effect,
+        semantic_keys=(("id",),),
+        fields=RUNTIME_PROJECTION_ROW_FIELDS[f"{label}.acute_alertness_effects"],
+    )
+    acute_sleep_effects = _typed_rows(
+        catalog["acute_sleep_effects"],
+        f"{label}.acute_sleep_effects",
+        _acute_sleep_effect,
+        semantic_keys=(("id",),),
+        fields=RUNTIME_PROJECTION_ROW_FIELDS[f"{label}.acute_sleep_effects"],
+    )
+    pre_exercise_performance_effects = _typed_rows(
+        catalog["pre_exercise_performance_effects"],
+        f"{label}.pre_exercise_performance_effects",
+        _pre_exercise_performance_effect,
+        semantic_keys=(("id",),),
+        fields=RUNTIME_PROJECTION_ROW_FIELDS[f"{label}.pre_exercise_performance_effects"],
+    )
+    post_exercise_recovery_effects = _typed_rows(
+        catalog["post_exercise_recovery_effects"],
+        f"{label}.post_exercise_recovery_effects",
+        _post_exercise_recovery_effect,
+        semantic_keys=(("id",),),
+        fields=RUNTIME_PROJECTION_ROW_FIELDS[f"{label}.post_exercise_recovery_effects"],
+    )
+    families = (
+        food_effects,
+        acute_alertness_effects,
+        acute_sleep_effects,
+        pre_exercise_performance_effects,
+        post_exercise_recovery_effects,
+    )
+    fact_ids = [fact.id for family in families for fact in family]
+    if len(fact_ids) != len(set(fact_ids)):
+        raise _error(label, "has duplicate fact IDs across effect families")
+    return RuntimeCanonicalFactCatalog(
+        cast(tuple[RuntimeCompositionRole, ...], composition_roles),
+        cast(tuple[RuntimeEvidenceSource, ...], evidence_sources),
+        cast(tuple[RuntimeFoodEffect, ...], food_effects),
+        cast(tuple[RuntimeAcuteAlertnessEffect, ...], acute_alertness_effects),
+        cast(tuple[RuntimeAcuteSleepEffect, ...], acute_sleep_effects),
+        cast(tuple[RuntimePreExercisePerformanceEffect, ...], pre_exercise_performance_effects),
+        cast(tuple[RuntimePostExerciseRecoveryEffect, ...], post_exercise_recovery_effects),
     )
 
 
@@ -1195,6 +1476,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         _exact_map(projection.get("grooming_policy"), "grooming_policy", RUNTIME_PROJECTION_FIELDS["grooming_policy"]),
         "grooming_policy",
     )
+    canonical_fact_catalog = _canonical_fact_catalog(projection.get("canonical_fact_catalog"))
     return RuntimeProgram(
         _str(root["format_version"], "format_version"),
         _str(root["schema_version"], "schema_version"),
@@ -1217,6 +1499,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         selector_form_capabilities,
         dashboard_state_catalog,
         grooming_policy,
+        canonical_fact_catalog,
     )
 
 

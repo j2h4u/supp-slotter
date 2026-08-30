@@ -6,15 +6,19 @@ urls:
 - https://naturestruthproducts.ca/products/100-pure-red-krill-oil-1000-mg/
 components:
 - substance: sub_646e568f61
+  id: cmp_prd_7f04daf970__sub_646e568f61
   label: Krill Oil
   amount: 1000 mg per softgel; 2000 mg per 2-softgel serving
 - substance: sub_66b783576c
+  id: cmp_prd_7f04daf970__sub_66b783576c
   label: EPA (Eicosapentaenoic Acid)
   amount: 80 mg per 2-softgel serving
 - substance: sub_xsqvv2fop0
+  id: cmp_prd_7f04daf970__sub_xsqvv2fop0
   label: DHA (Docosahexaenoic Acid)
   amount: 40 mg per 2-softgel serving
 - substance: sub_249199f726
+  id: cmp_prd_7f04daf970__sub_249199f726
   label: Astaxanthin
   amount: 600 mcg per 2-softgel serving
 notes: '60 quick release softgels, 1000 mg krill oil per softgel. Serving size is

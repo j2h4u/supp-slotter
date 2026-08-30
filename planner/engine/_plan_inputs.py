@@ -19,13 +19,14 @@ from planner.cards.substance import load_substance_registry
 from planner.contracts import CardLoadError, Slot
 from planner.engine._plan_types import PlanInputs
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.canonical_facts import validate_canonical_fact_catalog
 from planner.ontology.policies import load_scheduling_constraints, load_scheduling_policies
 from planner.paths import Paths
 from planner.scheduling_constraint_execution import compile_scheduling_constraint_execution_plans
 from planner.yaml_io import load_yaml
 
 
-def load_plan_inputs(
+def load_plan_inputs(  # noqa: PLR0911
     paths: Paths,
     bundle: OntologyBundle,
 ) -> PlanInputs | None:
@@ -69,6 +70,11 @@ def load_plan_inputs(
 
     substances = load_substance_registry(paths, bundle)
     products = load_product_registry(paths, bundle)
+    try:
+        validate_canonical_fact_catalog(bundle.runtime_program.canonical_fact_catalog, substances, products)
+    except CardLoadError as e:
+        print(f"plan: {e.message}", file=sys.stderr)
+        return None
     global_relations = load_global_relations(paths, bundle, substances)
     dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
     try:
@@ -88,6 +94,7 @@ def load_plan_inputs(
     return PlanInputs(
         ontology_bundle=bundle,
         runtime_program=bundle.runtime_program,
+        canonical_fact_catalog=bundle.runtime_program.canonical_fact_catalog,
         effect_scoring=bundle.runtime_program.effect_scoring,
         slots=slots,
         policies=policies,

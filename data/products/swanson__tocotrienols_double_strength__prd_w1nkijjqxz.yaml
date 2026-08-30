@@ -6,6 +6,7 @@ urls:
 - https://www.swansonvitamins.com/p/swanson-ultra-double-strength-tocotrienols-100-mg-60-liq-caps
 components:
 - substance: sub_5723eafac4
+  id: cmp_prd_w1nkijjqxz__sub_5723eafac4
   label: Tocotrienol from DeltaGOLD tocotrienol
   amount: 100 mg
   notes: Label specifies minimum 84% delta-tocotrienol and minimum 8% gamma-tocotrienol.

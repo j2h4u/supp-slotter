@@ -868,6 +868,8 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
             _load_yaml_mapping(_catalog_path(ontology_root, manifest, "ontoclean")),
         ),
     )
+    canonical_fact_catalog = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "canonical_facts"))
+    _validate_linkml_instance(schema_view, "CanonicalFactCatalog", canonical_fact_catalog)
     ontoclean_profiles = _load_ontoclean_profiles(ontology_root, manifest, schema_view)
     categories = _required_mapping(vocabulary, "semantic_categories")
     _validate_semantic_categories(categories, ontoclean_profiles)
@@ -931,7 +933,13 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     _validate_repository_projection_coverage(ontology_root, manifest)
     projection_map = _projection_map(schema_view, manifest, base_iri)
     context = _jsonld_context(schema_view, base_iri)
-    runtime_program = _runtime_program(ontology_root, manifest, runtime.authored, source_hash)
+    runtime_program = _runtime_program(
+        ontology_root,
+        manifest,
+        runtime.authored,
+        canonical_fact_catalog,
+        source_hash,
+    )
     artifacts: dict[Path, bytes] = {
         Path("card.schema.json"): _json_bytes_no_header(card_schema),
         Path("dashboard.schema.json"): _json_bytes_no_header(dashboard_schema),
@@ -2645,6 +2653,7 @@ def _runtime_program(
     ontology_root: Path,
     manifest: Mapping[str, object],
     policy: Mapping[str, object],
+    canonical_fact_catalog: Mapping[str, object],
     source_hash: str,
 ) -> dict[str, object]:
     """Render a deterministic, provenance-bearing executable runtime program."""
@@ -2654,7 +2663,24 @@ def _runtime_program(
         relative_source = policy_path.relative_to(ontology_root.parent).as_posix()
     except ValueError as error:
         raise OntologyInfrastructureError("Manifest runtime policy path must be repository-relative") from error
-    projected = _runtime_projection_tree(policy, policy.get("runtime_projection"))
+    # Canonical facts are an independent manifest catalog, but the runtime
+    # program remains the single verified online contract.  Inject the catalog
+    # into the local projection namespace so the existing closed descriptor
+    # machinery emits it without making it policy-authored.
+    projection_policy = dict(policy)
+    projection_policy["canonical_fact_catalog"] = canonical_fact_catalog
+    descriptors = policy.get("runtime_projection")
+    if not isinstance(descriptors, list):
+        raise OntologyInfrastructureError("Runtime policy requires runtime_projection descriptors")
+    projection_descriptors = [
+        *descriptors,
+        {
+            "id": "canonical_fact_catalog",
+            "target": "canonical_fact_catalog",
+            "source": "canonical_fact_catalog",
+        },
+    ]
+    projected = _runtime_projection_tree(projection_policy, projection_descriptors)
     program = {
         "format_version": _RUNTIME_PROGRAM_FORMAT,
         "schema_version": str(manifest["schema_version"]),

@@ -178,6 +178,10 @@ class ProductComponent:
     label: str | None = None
     amount: str | None = None
     notes: str | None = None
+    # Authored stable CompositionRole identity.  YAML/schema validation makes
+    # this required; the optional default preserves construction of legacy
+    # synthetic fixtures until their callers migrate to authored cards.
+    id: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

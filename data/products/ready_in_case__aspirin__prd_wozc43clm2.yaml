@@ -6,6 +6,7 @@ urls:
 - https://dailymed.nlm.nih.gov/
 components:
 - substance: sub_vmbmbov12d
+  id: cmp_prd_wozc43clm2__sub_vmbmbov12d
   label: Aspirin / acetylsalicylic acid
   amount: 81 mg
 notes: 'Serving/unit: 1 enteric-coated tablet. Package: 300 enteric-coated tablets.

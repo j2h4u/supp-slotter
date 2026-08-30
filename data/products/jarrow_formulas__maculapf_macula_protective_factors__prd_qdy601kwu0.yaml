@@ -7,18 +7,23 @@ urls:
 - https://www.pasioonline.com/macula-protective-factors-60-softgels-lutein-astaxanthin-and-zeaxanthin-jarrow-formulas/
 components:
 - substance: sub_p62urjkldd
+  id: cmp_prd_qdy601kwu0__sub_p62urjkldd
   label: Choline from sunflower lecithin
   amount: 10 mg
 - substance: sub_s7tlhuvbd0
+  id: cmp_prd_qdy601kwu0__sub_s7tlhuvbd0
   label: Lutein from marigold petal extract / Tagetes erecta
   amount: 20 mg
 - substance: sub_6n5okijhqz
+  id: cmp_prd_qdy601kwu0__sub_6n5okijhqz
   label: Meso-zeaxanthin
   amount: 9 mg
 - substance: sub_rewtd3ei25
+  id: cmp_prd_qdy601kwu0__sub_rewtd3ei25
   label: RR-zeaxanthin
   amount: 4 mg
 - substance: sub_249199f726
+  id: cmp_prd_qdy601kwu0__sub_249199f726
   label: Astaxanthin from Haematococcus pluvialis
   amount: 4 mg
 notes: 'Serving size: 1 softgel. Package: 60 softgels. Suggested use: 1 softgel

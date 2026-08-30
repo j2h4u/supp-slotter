@@ -5,15 +5,19 @@ urls:
 - https://www.lifeextension.com/vitamins-supplements/item01630c/adrenal-energy-formula-c
 components:
 - substance: sub_5pttmwvfql
+  id: cmp_prd_sbhmi6szff__sub_5pttmwvfql
   label: Sensoril Ashwagandha extract 5:1, root and leaves, standardized to 32% oligosaccharides
     and 10% withanolide glycoside conjugates
 - substance: sub_kzmof56wwf
+  id: cmp_prd_sbhmi6szff__sub_kzmof56wwf
   label: BaCognize Ultra Bacopa extract 25:1, whole herb, standardized to 25% bacopa
     glycosides
 - substance: sub_f46rohug4v
+  id: cmp_prd_sbhmi6szff__sub_f46rohug4v
   label: Cordyceps / Paecilomyces hepiali extract 8:1, mycelia, standardized to 7%
     cordycepic acid
 - substance: sub_dxmcmi4hsk
+  id: cmp_prd_sbhmi6szff__sub_dxmcmi4hsk
   label: OciBest Holy Basil extract 10:1, whole plant, standardized to 2.5% triterpene
     acids
   amount: 600 mg

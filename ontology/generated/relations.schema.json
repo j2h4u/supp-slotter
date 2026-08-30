@@ -1578,6 +1578,10 @@
             "null"
           ]
         },
+        "id": {
+          "pattern": "^cmp_[a-z0-9][a-z0-9_:-]*$",
+          "type": "string"
+        },
         "label": {
           "type": [
             "string",
@@ -1595,6 +1599,7 @@
         }
       },
       "required": [
+        "id",
         "substance"
       ],
       "title": "ProductComponent",

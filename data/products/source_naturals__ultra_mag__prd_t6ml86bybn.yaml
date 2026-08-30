@@ -7,21 +7,27 @@ urls:
 - https://us.fullscript.com/catalog/products/ultra-mag-120tabs/U3ByZWU6OlZhcmlhbnQtNjk4MDM=
 components:
 - substance: sub_fhl7c4skmf
+  id: cmp_prd_t6ml86bybn__sub_fhl7c4skmf
   label: Magnesium citrate
   amount: Part of 400 mg total magnesium per 2 tablets
 - substance: sub_238kn93qok
+  id: cmp_prd_t6ml86bybn__sub_238kn93qok
   label: Magnesium succinate
   amount: Part of 400 mg total magnesium per 2 tablets
 - substance: sub_7e02eab0d1
+  id: cmp_prd_t6ml86bybn__sub_7e02eab0d1
   label: Magnesium glycinate
   amount: Part of 400 mg total magnesium per 2 tablets
 - substance: sub_32ixdoncs3
+  id: cmp_prd_t6ml86bybn__sub_32ixdoncs3
   label: Magnesium malate
   amount: Part of 400 mg total magnesium per 2 tablets
 - substance: sub_3k09vfu199
+  id: cmp_prd_t6ml86bybn__sub_3k09vfu199
   label: Magnesium taurinate
   amount: Part of 400 mg total magnesium per 2 tablets
 - substance: sub_a873e428ee
+  id: cmp_prd_t6ml86bybn__sub_a873e428ee
   label: Vitamin B6 as pyridoxine HCl
   amount: 30 mg
 notes: 'Serving size: 2 tablets. Package: 120 tablets. Suggested use: 1 or 2 tablets

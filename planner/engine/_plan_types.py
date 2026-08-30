@@ -17,7 +17,7 @@ from planner.contracts import (
     Substance,
 )
 from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.runtime_program import RuntimeEffectScoring, RuntimeProgram
+from planner.ontology.runtime_program import RuntimeCanonicalFactCatalog, RuntimeEffectScoring, RuntimeProgram
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
 from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
 
@@ -25,6 +25,7 @@ from planner.scheduling_constraint_execution import SchedulingConstraintExecutio
 class PlanInputs(NamedTuple):
     ontology_bundle: OntologyBundle
     runtime_program: RuntimeProgram
+    canonical_fact_catalog: RuntimeCanonicalFactCatalog
     effect_scoring: RuntimeEffectScoring
     slots: dict[str, Slot]
     policies: dict[str, SchedulingPolicy]

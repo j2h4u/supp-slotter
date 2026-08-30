@@ -21,6 +21,10 @@ catalogs:
     role: runtime_policy
     path: ontology/runtime-policy.yaml
     root_class: RuntimePolicyCatalog
+  - id: canonical_facts
+    role: canonical_facts
+    path: ontology/canonical-facts.yaml
+    root_class: CanonicalFactCatalog
   - id: policies
     role: policies
     path: ontology/policies.yaml
@@ -125,6 +129,7 @@ repository_projection:
         - {kind: slot, source: use_pattern, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/use_pattern}
         - {kind: sequence, source: "urls[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/urls}
         - {kind: inlined-node, source: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/components, target: ProductComponent}
+        - {kind: slot, source: "components[].id", subject: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
         - {kind: reference, source: "components[].substance", subject: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/substance, target: Substance}
         - {kind: slot, source: "components[].amount", subject: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/amount}
         - {kind: slot, source: "components[].label", subject: "components[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/label}

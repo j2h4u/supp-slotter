@@ -5,24 +5,31 @@ urls:
 - https://www.lifeextension.com/vitamins-supplements/item01328/only-trace-minerals
 components:
 - substance: sub_8ppxce3s17
+  id: cmp_prd_932319251f__sub_8ppxce3s17
   label: Zinc as OptiZinc zinc monomethionine
   amount: 20 mg
 - substance: sub_844a0cc551
+  id: cmp_prd_932319251f__sub_844a0cc551
   label: Copper as copper bisglycinate chelate
   amount: 2 mg
 - substance: sub_7938ea248e
+  id: cmp_prd_932319251f__sub_7938ea248e
   label: Manganese as manganese sulfate
   amount: 2 mg
 - substance: sub_ddf8d310d2
+  id: cmp_prd_932319251f__sub_ddf8d310d2
   label: Chromium as chromium nicotinate glycinate chelate
   amount: 400 mcg
 - substance: sub_c55378389c
+  id: cmp_prd_932319251f__sub_c55378389c
   label: Molybdenum as molybdenum glycinate chelate
   amount: 250 mcg
 - substance: sub_25b049a598
+  id: cmp_prd_932319251f__sub_25b049a598
   label: Boron as boron citrate/aspartate/glycinate complex
   amount: 3 mg
 - substance: sub_3e3b246a6f
+  id: cmp_prd_932319251f__sub_3e3b246a6f
   label: Vanadium from vanadyl sulfate
   amount: 750 mcg vanadium from 3.75 mg vanadyl sulfate
 notes: Multi-trace-mineral complex; current Life Extension Supplement Facts list

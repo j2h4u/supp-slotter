@@ -86,7 +86,9 @@ classes:
     is_a: IdentifiedNode
     slots: [brand, components, urls, notes, concerns, use_pattern]
   ProductComponent:
-    slots: [substance, label, amount, notes]
+    slots: [id, substance, label, amount, notes]
+    slot_usage:
+      id: {required: true, pattern: '^cmp_[a-z0-9][a-z0-9_:-]*$'}
   CompositionRole:
     description: Stable composition identity joining one product to one substance.
     annotations:

@@ -7,15 +7,19 @@ urls:
 - https://supplements.market/product/source-naturals-advanced-ferrochel-180-tablets/
 components:
 - substance: sub_49c7531eaf
+  id: cmp_prd_h9obp71966__sub_49c7531eaf
   label: Vitamin C as ascorbic acid
   amount: 60 mg
 - substance: sub_mgr8d35crc
+  id: cmp_prd_h9obp71966__sub_mgr8d35crc
   label: Folate as folic acid
   amount: 340 mcg DFE / 200 mcg folic acid
 - substance: sub_zob4tacm2r
+  id: cmp_prd_h9obp71966__sub_zob4tacm2r
   label: Vitamin B12
   amount: 25 mcg
 - substance: sub_ses5czfzi1
+  id: cmp_prd_h9obp71966__sub_ses5czfzi1
   label: Iron as Ferrochel ferrous bisglycinate chelate
   amount: 27 mg
 notes: 'Serving size: 1 tablet. Package: 180 tablets. Suggested use: 1 tablet daily.

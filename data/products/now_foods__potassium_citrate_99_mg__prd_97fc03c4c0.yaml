@@ -6,6 +6,7 @@ urls:
 - https://www.nowfoods.com/products/supplements/potassium-citrate-99-mg-veg-capsules
 components:
 - substance: sub_f7780f899b
+  id: cmp_prd_97fc03c4c0__sub_f7780f899b
   label: Potassium from potassium citrate
   amount: 99 mg elemental potassium from 310 mg potassium citrate
 notes: 'Serving size: 1 veg capsule. Package: 180 veg capsules. Suggested use:

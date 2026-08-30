@@ -1,0 +1,12 @@
+# Authoritative reusable canonical evidence catalog.
+#
+# The seven collections are intentionally explicit.  This empty initial
+# catalog is a valid runtime input; populated facts must use the typed classes
+# declared in scheduling-model.yaml.
+composition_roles: []
+evidence_sources: []
+food_effects: []
+acute_alertness_effects: []
+acute_sleep_effects: []
+pre_exercise_performance_effects: []
+post_exercise_recovery_effects: []

@@ -7,9 +7,11 @@ urls:
 - https://www.professionalsupplementcenter.com/products/super-seed-beyond-fiber-by-garden-of-life
 components:
 - substance: sub_giy6ioeiyv
+  id: cmp_prd_h9zp0td8gh__sub_giy6ioeiyv
   label: Perfect Fiber Blend / seed blend
   amount: 18 g fiber blend; 6 g dietary fiber per serving
 - substance: sub_knwnyl1a9i
+  id: cmp_prd_h9zp0td8gh__sub_knwnyl1a9i
   label: Proprietary probiotic blend
   amount: 2 mg
 notes: 'Serving size: 1 scoop / about 20 g. Package: 21 oz / 600 g powder. Nutrition

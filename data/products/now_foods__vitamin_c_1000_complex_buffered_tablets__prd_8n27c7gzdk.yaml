@@ -6,18 +6,23 @@ urls:
 - https://www.nowfoods.com/products/supplements/vitamin-c-1000-complex-buffered-tablets
 components:
 - substance: sub_z88pld4hbv
+  id: cmp_prd_8n27c7gzdk__sub_z88pld4hbv
   label: Vitamin C from calcium ascorbate
   amount: 1,000 mg
 - substance: sub_vvmld46dbz
+  id: cmp_prd_8n27c7gzdk__sub_vvmld46dbz
   label: Calcium from calcium ascorbate
   amount: 100 mg
 - substance: sub_8gbrj2ymy8
+  id: cmp_prd_8n27c7gzdk__sub_8gbrj2ymy8
   label: Citrus bioflavonoid complex
   amount: 250 mg
 - substance: sub_pxayn2v7wu
+  id: cmp_prd_8n27c7gzdk__sub_pxayn2v7wu
   label: Acerola powder
   amount: 50 mg
 - substance: sub_z7izesznp0
+  id: cmp_prd_8n27c7gzdk__sub_z7izesznp0
   label: Rutin powder from Sophora japonica flower bud
   amount: 50 mg
 notes: 'Serving size: 1 tablet. Package: 90 tablets. Suggested use from secondary

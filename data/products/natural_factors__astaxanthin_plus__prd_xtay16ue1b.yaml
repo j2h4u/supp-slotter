@@ -6,12 +6,15 @@ urls:
 - https://naturalfactors.com/products/astaxanthin-plus
 components:
 - substance: sub_249199f726
+  id: cmp_prd_xtay16ue1b__sub_249199f726
   label: Astaxanthin from Haematococcus pluvialis whole
   amount: 4 mg
 - substance: sub_s7tlhuvbd0
+  id: cmp_prd_xtay16ue1b__sub_s7tlhuvbd0
   label: Lutein from Tagetes erecta / marigold flower
   amount: 1 mg
 - substance: sub_262gmd1vf1
+  id: cmp_prd_xtay16ue1b__sub_262gmd1vf1
   label: Zeaxanthin from Tagetes erecta / marigold flower
   amount: 170 mcg
 notes: 'Serving size: 1 softgel. Package: 60 softgels. Suggested use: 1 softgel

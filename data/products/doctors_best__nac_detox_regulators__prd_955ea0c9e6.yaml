@@ -3,12 +3,15 @@ name: NAC Detox Regulators
 brand: Doctor's Best
 components:
 - substance: sub_59bza5s7h0
+  id: cmp_prd_955ea0c9e6__sub_59bza5s7h0
   label: Selenium (from SelenoExcell High Selenium Yeast)
   amount: 50 mcg
 - substance: sub_c55378389c
+  id: cmp_prd_955ea0c9e6__sub_c55378389c
   label: Molybdenum (from molybdenum glycinate chelate)
   amount: 50 mcg
 - substance: sub_d997f98e03
+  id: cmp_prd_955ea0c9e6__sub_d997f98e03
   label: N-Acetylcysteine (NAC)
   amount: 600 mg
 urls:

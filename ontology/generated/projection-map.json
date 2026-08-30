@@ -7,6 +7,12 @@
       "root_class": "RelationAssertionCatalog"
     },
     {
+      "id": "canonical_facts",
+      "path": "ontology/canonical-facts.yaml",
+      "role": "canonical_facts",
+      "root_class": "CanonicalFactCatalog"
+    },
+    {
       "id": "constraints",
       "path": "ontology/scheduling-constraints.yaml",
       "role": "constraints",
@@ -1402,6 +1408,14 @@
           "name": "amount",
           "range": "string",
           "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
         },
         {
           "inlined": false,
@@ -4309,6 +4323,12 @@
               "kind": "slot",
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/amount",
               "source": "components[].amount",
+              "subject": "components[]"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/id",
+              "source": "components[].id",
               "subject": "components[]"
             },
             {

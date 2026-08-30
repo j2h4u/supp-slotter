@@ -52,6 +52,7 @@ name: ""     # Required. Concise bottle-facing/commercial product title.
 
 components:
 - substance: sub_XXXXXXXXXX  # Required. Use sub_* or an exact draft name resolved by check.
+  id: cmp_<product_id>__<substance_id>  # Required stable composition-role identity; unchanged by reorder or notes edits.
   # label: ""      # Optional display label if the product uses a different name
                    # for this ingredient (e.g. "Vitamin B6 as pyridoxine HCl").
   # amount: ""     # Dose as printed on the label, e.g. "500 mg", "1000 IU", "10 mcg".

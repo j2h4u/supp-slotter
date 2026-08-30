@@ -29,6 +29,10 @@ _fmt-check:
 ontology-check:
     uv run python scripts/generate_ontology.py --check
 
+# Regenerate checked-in ontology artifacts from canonical sources.
+ontology-generate:
+    scripts/run_bounded.sh -- uv run python scripts/generate_ontology.py
+
 # Check repository RDF projection against generated SHACL shapes.
 ontology-projection-check:
     scripts/run_bounded.sh -- uv run python scripts/ontology_check_benchmark.py --check-only

@@ -7,24 +7,31 @@ urls:
 - https://api.ods.od.nih.gov/dsld/s3/pdf/273360.pdf
 components:
 - substance: sub_2476bf9d4b
+  id: cmp_prd_3at95d1ser__sub_2476bf9d4b
   label: Vitamin D3 as cholecalciferol
   amount: 100 mcg
 - substance: sub_dvp6ce6jh4
+  id: cmp_prd_3at95d1ser__sub_dvp6ce6jh4
   label: Calcium from Aquamin calcified red algae / Lithothamnion
   amount: 1,300 mg
 - substance: sub_uy3dkx8n8f
+  id: cmp_prd_3at95d1ser__sub_uy3dkx8n8f
   label: Magnesium from Aquamin
   amount: Part of 273 mg total magnesium
 - substance: sub_fhl7c4skmf
+  id: cmp_prd_3at95d1ser__sub_fhl7c4skmf
   label: Magnesium citrate
   amount: Part of 273 mg total magnesium
 - substance: sub_1n5gnpnuxb
+  id: cmp_prd_3at95d1ser__sub_1n5gnpnuxb
   label: Magnesium oxide
   amount: Part of 273 mg total magnesium
 - substance: sub_t9ltyoy1yp
+  id: cmp_prd_3at95d1ser__sub_t9ltyoy1yp
   label: Strontium from Aquamin
   amount: 9 mg
 - substance: sub_shib6nr9jc
+  id: cmp_prd_3at95d1ser__sub_shib6nr9jc
   label: Vitamin K2 as menaquinone-7 from natto / fermented soybean extract
   amount: 150 mcg
 notes: 'Serving size: 4 tablets. Package: 120 tablets. Label also lists sodium 30

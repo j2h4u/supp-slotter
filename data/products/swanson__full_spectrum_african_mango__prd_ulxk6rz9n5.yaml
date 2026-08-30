@@ -6,6 +6,7 @@ urls:
 - https://www.swansonvitamins.com/p/swanson-premium-full-spectrum-african-mango-400-mg-60-caps
 components:
 - substance: sub_reiybxa1p9
+  id: cmp_prd_ulxk6rz9n5__sub_reiybxa1p9
   label: African Mango / Irvingia gabonensis seed
   amount: 400 mg
 notes: 'Serving size: 1 capsule. Package: 60 capsules. Suggested use: 1 capsule

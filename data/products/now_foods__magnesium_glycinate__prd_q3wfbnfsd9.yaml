@@ -6,6 +6,7 @@ urls:
 - https://www.nowfoods.com/products/supplements/magnesium-glycinate-tablets
 components:
 - substance: sub_7e02eab0d1
+  id: cmp_prd_q3wfbnfsd9__sub_7e02eab0d1
   label: Magnesium elemental from magnesium bisglycinate / Albion
   amount: 200 mg per 2 tablets; 100 mg per tablet
 notes: 'Serving size: 2 tablets. Package: 180 tablets. Suggested use from secondary

@@ -7,6 +7,7 @@ from pathlib import Path
 
 from planner.cards.dashboard_validation import check_dashboards
 from planner.cards.pillboxes import load_pillboxes
+from planner.cards.product import load_product_registry
 from planner.cards.product_validation import check_product_formulas
 from planner.cards.relations import check_global_relations
 from planner.cards.stacks import validate_stacks
@@ -17,6 +18,7 @@ from planner.contracts import CardLoadError
 from planner.engine.results import CheckResult
 from planner.maintenance import run_auto_maintenance
 from planner.ontology.artifacts import OntologyBundle, load_ontology
+from planner.ontology.canonical_facts import validate_canonical_fact_catalog
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.policies import check_scheduling_policies, load_scheduling_policies
 from planner.ontology.warning_policy import check_warning_type_references
@@ -121,7 +123,7 @@ def _load_domain_validators(paths: Paths, info: list[str], bundle: OntologyBundl
     return CheckResult(exit_code=0, errors=errors, info=info)
 
 
-def _extend_card_validation_errors(
+def _extend_card_validation_errors(  # noqa: PLR0914
     paths: Paths,
     errors: list[str],
     info: list[str],
@@ -145,6 +147,11 @@ def _extend_card_validation_errors(
     p_errors, p_info, product_ids = check_product_formulas(all_product_files, substance_ids, bundle)
     errors.extend(p_errors)
     info.extend(p_info)
+    try:
+        products = load_product_registry(paths, bundle)
+        validate_canonical_fact_catalog(bundle.runtime_program.canonical_fact_catalog, substances, products)
+    except CardLoadError as e:
+        errors.append(e.message)
 
     stacks_errors, stacks_info = validate_stacks(paths, product_ids, bundle)
     errors.extend(stacks_errors)

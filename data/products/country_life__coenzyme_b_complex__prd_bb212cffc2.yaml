@@ -6,31 +6,41 @@ urls:
 - https://countrylifevitamins.com/products/coenzyme-b-complex-caps
 components:
 - substance: sub_230c5c820e
+  id: cmp_prd_bb212cffc2__sub_230c5c820e
   label: Thiamin (vitamin B1) as thiamine hydrochloride and thiamine cocarboxylase chloride
   amount: 50 mg per 2 capsules
 - substance: sub_67fc2be8aa
+  id: cmp_prd_bb212cffc2__sub_67fc2be8aa
   label: Riboflavin (vitamin B2) as riboflavin and riboflavin 5'-phosphate
   amount: 50 mg per 2 capsules
 - substance: sub_6yp50f6ach
+  id: cmp_prd_bb212cffc2__sub_6yp50f6ach
   label: Niacin as inositol hexaniacinate
   amount: 100 mg per 2 capsules
 - substance: sub_7628e4f478
+  id: cmp_prd_bb212cffc2__sub_7628e4f478
   label: Pantothenic acid as calcium d-pantothenate and pantethine
   amount: 50 mg per 2 capsules
 - substance: sub_799419116d
+  id: cmp_prd_bb212cffc2__sub_799419116d
   label: Vitamin B6 (as pyridoxal-5-phosphate / P-5-P)
   notes: Country Life lists 50 mg total vitamin B6 per 2 capsules across pyridoxine HCl, pyridoxal-5-phosphate (P5P), and pyridoxine alpha-ketoglutarate hydrochloride; the split between forms is not disclosed.
 - substance: sub_a873e428ee
+  id: cmp_prd_bb212cffc2__sub_a873e428ee
   label: Vitamin B6 (as pyridoxine hydrochloride)
 - substance: sub_meuw89u4ie
+  id: cmp_prd_bb212cffc2__sub_meuw89u4ie
   label: Vitamin B6 (as pyridoxine alpha-ketoglutarate hydrochloride)
 - substance: sub_fd899525d3
+  id: cmp_prd_bb212cffc2__sub_fd899525d3
   label: Biotin as d-biotin
   amount: 200 mcg per 2 capsules
 - substance: sub_d0034bd130
+  id: cmp_prd_bb212cffc2__sub_d0034bd130
   label: Folate as L-5-methyltetrahydrofolate calcium salt
   amount: 667 mcg DFE per 2 capsules
 - substance: sub_157418854b
+  id: cmp_prd_bb212cffc2__sub_157418854b
   label: Vitamin B12 as dibencozide and methylcobalamin
   amount: 500 mcg per 2 capsules
 notes: Official Country Life label lists active/coenzymated B-vitamin forms with

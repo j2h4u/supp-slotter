@@ -4,11 +4,13 @@ urls:
 - https://gls.store/catalog/dlya_mozga/98878/
 components:
 - substance: sub_e3af6f78d9
+  id: cmp_prd_d0u8k66ypy__sub_e3af6f78d9
   label: Lion's Mane extract
   amount: 500 mg extract per capsule
   notes: No fruiting-body or mycelium source, extract ratio, or further extract identity
     disclosed on the label.
 - substance: sub_kwudyhex2o
+  id: cmp_prd_d0u8k66ypy__sub_kwudyhex2o
   label: Choline bitartrate
   amount: 160 mg per capsule
   notes: Amount is choline bitartrate; it is not an elemental choline amount.

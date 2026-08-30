@@ -5,6 +5,7 @@ urls:
 - https://www.iherb.com/pr/natural-factors-benfotiamine-30-vegetarian-capsules-165-mg-per-capsule/85656
 components:
 - substance: sub_40cd4f33lo
+  id: cmp_prd_x8fcq31tgr__sub_40cd4f33lo
   label: Benfotiamine
   amount: 330 mg per 2 capsules; 165 mg per capsule
 notes: 'Serving size: 2 capsules. Package: 30 vegetarian capsules. Suggested use:

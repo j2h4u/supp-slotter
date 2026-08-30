@@ -21,6 +21,11 @@ from planner.paths import Paths
 from planner.schema_validation import schema_errors
 
 
+def composition_role_id(product_id: str, substance_id: str) -> str:
+    """Return the portable authored identity for one product/substance role."""
+    return f"cmp_{product_id}__{substance_id}"
+
+
 def load_product(path: Path, bundle: OntologyBundle) -> Product:
     """Load a product card into a Product dataclass.
 
@@ -63,6 +68,7 @@ def _product_components(value: object) -> list[ProductComponent]:
                 label=cast(str | None, component_dict.get("label")),
                 amount=cast(str | None, component_dict.get("amount")),
                 notes=cast(str | None, component_dict.get("notes")),
+                id=cast(str | None, component_dict.get("id")),
             )
         )
     return components

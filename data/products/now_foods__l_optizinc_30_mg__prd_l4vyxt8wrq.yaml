@@ -6,9 +6,11 @@ urls:
 - https://www.nowfoods.com/products/supplements/l-optizinc-30-mg-veg-capsules
 components:
 - substance: sub_8ppxce3s17
+  id: cmp_prd_l4vyxt8wrq__sub_8ppxce3s17
   label: Zinc elemental from L-OptiZinc monomethionine
   amount: 30 mg elemental zinc from 167 mg L-OptiZinc monomethionine
 - substance: sub_844a0cc551
+  id: cmp_prd_l4vyxt8wrq__sub_844a0cc551
   label: Copper elemental from copper bisglycinate
   amount: 0.3 mg elemental copper from 3 mg copper bisglycinate
 notes: 'Serving size: 1 veg capsule. Package: 100 veg capsules. Other ingredients

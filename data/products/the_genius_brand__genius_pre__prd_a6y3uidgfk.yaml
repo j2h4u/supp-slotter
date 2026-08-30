@@ -5,36 +5,47 @@ urls:
 - https://www.iherb.com/pr/the-genius-brand-pre-caffeine-free-blue-raspberry-10-5-oz-298-g/115936
 components:
 - substance: sub_3918fe347e
+  id: cmp_prd_a6y3uidgfk__sub_3918fe347e
   label: L-Citrulline Malate 2:1
   amount: 6 g
 - substance: sub_abb9604e58
+  id: cmp_prd_a6y3uidgfk__sub_abb9604e58
   label: Beta-alanine
   amount: 2 g
 - substance: sub_fmuptat7pw
+  id: cmp_prd_a6y3uidgfk__sub_fmuptat7pw
   label: Betaine nitrate as NO3-T
   amount: 2 g
 - substance: sub_h3ko8001ym
+  id: cmp_prd_a6y3uidgfk__sub_h3ko8001ym
   label: L-Tyrosine
   amount: 1 g
 - substance: sub_edcaca3af0
+  id: cmp_prd_a6y3uidgfk__sub_edcaca3af0
   label: Taurine
   amount: 1 g
 - substance: sub_b7vnosy4h8
+  id: cmp_prd_a6y3uidgfk__sub_b7vnosy4h8
   label: HICA / alpha-hydroxyisocaproic acid
   amount: 500 mg
 - substance: sub_tzg5glskrd
+  id: cmp_prd_a6y3uidgfk__sub_tzg5glskrd
   label: Alpha-GPC 50%
   amount: 300 mg
 - substance: sub_vkp4f3tqf0
+  id: cmp_prd_a6y3uidgfk__sub_vkp4f3tqf0
   label: L-Theanine
   amount: 200 mg
 - substance: sub_voxdkhm3ao
+  id: cmp_prd_a6y3uidgfk__sub_voxdkhm3ao
   label: Rhodiola rosea root extract standardized to 3% salidrosides
   amount: 100 mg
 - substance: sub_j9dhho47sz
+  id: cmp_prd_a6y3uidgfk__sub_j9dhho47sz
   label: Theobromine
   amount: 30 mg
 - substance: sub_963hw8lx1a
+  id: cmp_prd_a6y3uidgfk__sub_963hw8lx1a
   label: Huperzia serrata whole plant extract standardized to 1% huperzine A
   amount: 10 mg
 notes: 'Flavor/package: Blue Raspberry, 10.5 oz / 298 g. Serving size: 1 scoop /

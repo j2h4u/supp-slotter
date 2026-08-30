@@ -30,6 +30,15 @@
         "order": 2
       }
     ],
+    "canonical_fact_catalog": {
+      "acute_alertness_effects": [],
+      "acute_sleep_effects": [],
+      "composition_roles": [],
+      "evidence_sources": [],
+      "food_effects": [],
+      "post_exercise_recovery_effects": [],
+      "pre_exercise_performance_effects": []
+    },
     "concern_catalog": [
       {
         "concern_kind": "safety",
@@ -614,11 +623,11 @@
     ]
   },
   "provenance": {
-    "compiler_sha256": "fa27f84d5de861bd16afa757113713b78cc1bed12da5a7cfc74bd07b274b592c",
+    "compiler_sha256": "609e3d4dcbf7e94a724e6cb7e6ae14359a8009cd3119feb1ed3126bfccbe2f9f",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
     "source_sha256": "fccd7bad0afe9187620e724a4eabe9242b391a54e6c0af9f8e4ba99de76c6816"
   },
   "schema_version": "2",
-  "source_hash": "e068f2e555c4df5d7dbc3d056c2725b6dd34e8b0ff1d817e9879a3cf8168de32"
+  "source_hash": "0d0a05f8f28332673b5d2ec8f871285a8b55d1084c6bd5d3eea7cab48bbcd5f6"
 }
