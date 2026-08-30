@@ -393,60 +393,122 @@ class RuntimeCanonicalScheduling:
 
 def _validate_runtime_canonical_scheduling(catalog: RuntimeCanonicalScheduling) -> None:
     """Keep the compiled canonical graph internally complete at its owner."""
-    if not all(isinstance(row, RuntimePressureDimension) for row in catalog.dimensions):
-        raise _error("canonical_scheduling.dimensions", "must contain runtime pressure dimensions")
-    if not all(isinstance(row, RuntimeCanonicalFactFamily) for row in catalog.families):
-        raise _error("canonical_scheduling.families", "must contain runtime fact families")
-    if not all(isinstance(row, RuntimeEvidenceSource) for row in catalog.evidence_sources):
-        raise _error("canonical_scheduling.evidence_sources", "must contain runtime evidence sources")
-    if not all(isinstance(row, RuntimeCanonicalSchedulingFact) for row in catalog.facts):
-        raise _error("canonical_scheduling.facts", "must contain runtime canonical facts")
-    if not all(isinstance(row, RuntimeCanonicalLaw) for row in catalog.laws):
-        raise _error("canonical_scheduling.laws", "must contain runtime canonical laws")
-    dimensions = {row.id: set(row.pressure_values) for row in catalog.dimensions}
-    families = {row.id: row for row in catalog.families}
-    sources = {row.id for row in catalog.evidence_sources}
-    if len(dimensions) != len(catalog.dimensions) or len(families) != len(catalog.families):
+    _validate_canonical_row_types(catalog)
+    dimensions = _canonical_pressure_dimensions(catalog.dimensions)
+    families = _canonical_fact_families(catalog.families, dimensions)
+    _validate_canonical_graph_shape(dimensions, families)
+    sources = _canonical_evidence_sources(catalog.evidence_sources)
+    _validate_canonical_facts(catalog.facts, families, sources)
+    _validate_canonical_laws(catalog.laws, catalog.families, families, dimensions)
+
+
+def _validate_canonical_row_types(catalog: RuntimeCanonicalScheduling) -> None:
+    _require_canonical_row_type(
+        catalog.dimensions, "dimensions", RuntimePressureDimension, "runtime pressure dimensions"
+    )
+    _require_canonical_row_type(catalog.families, "families", RuntimeCanonicalFactFamily, "runtime fact families")
+    _require_canonical_row_type(
+        catalog.evidence_sources, "evidence_sources", RuntimeEvidenceSource, "runtime evidence sources"
+    )
+    _require_canonical_row_type(catalog.facts, "facts", RuntimeCanonicalSchedulingFact, "runtime canonical facts")
+    _require_canonical_row_type(catalog.laws, "laws", RuntimeCanonicalLaw, "runtime canonical laws")
+
+
+def _require_canonical_row_type(rows: tuple[object, ...], label: str, row_type: type[object], description: str) -> None:
+    if not all(isinstance(row, row_type) for row in rows):
+        raise _error(f"canonical_scheduling.{label}", f"must contain {description}")
+
+
+def _canonical_pressure_dimensions(
+    rows: tuple[RuntimePressureDimension, ...],
+) -> dict[str, set[str]]:
+    dimensions = {row.id: set(row.pressure_values) for row in rows}
+    if len(dimensions) != len(rows):
         raise _error("canonical_scheduling", "has duplicate dimensions or families")
-    if bool(dimensions) != bool(families):
-        raise _error("canonical_scheduling", "must contain dimensions and families together")
     if any(
         not row.id or not row.pressure_values or len(set(row.pressure_values)) != len(row.pressure_values)
-        for row in catalog.dimensions
+        for row in rows
     ):
         raise _error("canonical_scheduling.dimensions", "has empty or duplicate values")
+    return dimensions
+
+
+def _canonical_fact_families(
+    rows: tuple[RuntimeCanonicalFactFamily, ...], dimensions: Mapping[str, set[str]]
+) -> dict[str, RuntimeCanonicalFactFamily]:
+    families = {row.id: row for row in rows}
+    if len(families) != len(rows):
+        raise _error("canonical_scheduling", "has duplicate dimensions or families")
     if any(
         not row.id
         or not row.fact_values
         or len(set(row.fact_values)) != len(row.fact_values)
         or row.dimension not in dimensions
-        for row in catalog.families
+        for row in rows
     ):
         raise _error("canonical_scheduling.families", "has an incomplete dimension or fact-value graph")
-    if any(not row.id for row in catalog.evidence_sources) or len(sources) != len(catalog.evidence_sources):
+    return families
+
+
+def _validate_canonical_graph_shape(
+    dimensions_by_id: Mapping[str, set[str]],
+    families_by_id: Mapping[str, RuntimeCanonicalFactFamily],
+) -> None:
+    if bool(dimensions_by_id) != bool(families_by_id):
+        raise _error("canonical_scheduling", "must contain dimensions and families together")
+
+
+def _canonical_evidence_sources(rows: tuple[RuntimeEvidenceSource, ...]) -> set[str]:
+    sources = {row.id for row in rows}
+    if any(not row.id for row in rows) or len(sources) != len(rows):
         raise _error("canonical_scheduling.evidence_sources", "has duplicate or empty identities")
-    if any(
-        fact.family not in families
-        or fact.value not in families[fact.family].fact_values
-        or any(provenance.source not in sources for provenance in fact.provenance)
-        for fact in catalog.facts
-    ):
-        raise _error("canonical_scheduling.facts", "references an unknown family, value, or evidence source")
-    expected = {(family.id, value) for family in catalog.families for value in family.fact_values}
-    actual = {(law.family, law.fact_value) for law in catalog.laws}
+    return sources
+
+
+def _validate_canonical_facts(
+    facts: tuple[RuntimeCanonicalSchedulingFact, ...],
+    families: Mapping[str, RuntimeCanonicalFactFamily],
+    sources: set[str],
+) -> None:
+    for fact in facts:
+        family = families.get(fact.family)
+        if (
+            family is None
+            or fact.value not in family.fact_values
+            or any(provenance.source not in sources for provenance in fact.provenance)
+        ):
+            raise _error("canonical_scheduling.facts", "references an unknown family, value, or evidence source")
+
+
+def _validate_canonical_laws(
+    laws: tuple[RuntimeCanonicalLaw, ...],
+    families: tuple[RuntimeCanonicalFactFamily, ...],
+    families_by_id: Mapping[str, RuntimeCanonicalFactFamily],
+    dimensions: Mapping[str, set[str]],
+) -> None:
+    expected = {(family.id, value) for family in families for value in family.fact_values}
+    actual = {(law.family, law.fact_value) for law in laws}
     if (
         actual != expected
-        or len(actual) != len(catalog.laws)
-        or any(
-            not law.id
-            or law.dimension not in dimensions
-            or law.family not in families
-            or law.dimension != families[law.family].dimension
-            or law.pressure_value not in dimensions[law.dimension]
-            for law in catalog.laws
-        )
+        or len(actual) != len(laws)
+        or any(not _is_admissible_canonical_law(law, families_by_id, dimensions) for law in laws)
     ):
         raise _error("canonical_scheduling.laws", "does not have exact admissible coverage")
+
+
+def _is_admissible_canonical_law(
+    law: RuntimeCanonicalLaw,
+    families: Mapping[str, RuntimeCanonicalFactFamily],
+    dimensions: Mapping[str, set[str]],
+) -> bool:
+    family = families.get(law.family)
+    return (
+        bool(law.id)
+        and family is not None
+        and law.dimension in dimensions
+        and law.dimension == family.dimension
+        and law.pressure_value in dimensions[law.dimension]
+    )
 
 
 @dataclass(frozen=True, slots=True)

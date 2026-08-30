@@ -11,6 +11,7 @@ from planner.cards.product import load_product
 from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance
 from planner.contracts import CardLoadError, Relation, RelationSelector, Substance
+from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.selector import hydrate_selector, resolve_selector
 from planner.paths import Paths
 from planner.query_model import build_stack_read_model
@@ -183,7 +184,7 @@ def _relation_entry(identifier: str, *, reason: str = "relation identity probe")
         "id": identifier,
         "relation_type": "supports",
         "assertion_kind": "ontology_assertion",
-        "semantic_family": "test",
+        "semantic_family": "biochemical_mechanism_assertion",
         "research_state": "unassessed",
         "sources": [],
         "reason": reason,
@@ -270,7 +271,7 @@ def test_name_selector_resolves_new_same_name_form_in_runtime_record(tmp_path: P
                         "id": "rel_name_family",
                         "relation_type": "supports",
                         "assertion_kind": "ontology_assertion",
-                        "semantic_family": "test",
+                        "semantic_family": "biochemical_mechanism_assertion",
                         "research_state": "unassessed",
                         "sources": [],
                         "reason": "name family runtime probe",
@@ -316,29 +317,11 @@ def test_selector_form_capabilities_are_semantic_not_cardinality(
     assert capability.show_match_details is expected_details
 
 
-@pytest.mark.parametrize(
-    ("substances", "expected_matches"),
-    [
-        (
-            {
-                "sub_known000": Substance(id="sub_known000", name="Known"),
-                "sub_other000": Substance(id="sub_other000", name="Other"),
-            },
-            ["Known"],
-        ),
-        (
-            {
-                "sub_known000": Substance(id="sub_known000", name="Known"),
-                "sub_knownform": Substance(id="sub_knownform", name="Known", form="second form"),
-                "sub_other000": Substance(id="sub_other000", name="Other"),
-            },
-            ["Known", "Known (second form)"],
-        ),
-    ],
-)
-def test_name_family_review_always_shows_match_details(
-    substances: dict[str, Substance], expected_matches: list[str]
-) -> None:
+def test_read_model_rejects_handcrafted_relation_absent_from_generated_catalog() -> None:
+    substances = {
+        "sub_known000": Substance(id="sub_known000", name="Known"),
+        "sub_other000": Substance(id="sub_other000", name="Other"),
+    }
     relation = Relation(
         id="rel_name_family_review",
         type="supports",
@@ -349,11 +332,8 @@ def test_name_family_review_always_shows_match_details(
         target_selector=RelationSelector(entity_id="sub_other000"),
     )
     bundle = ontology_bundle()
-    model = build_stack_read_model(substances, [relation], {}, {}, ontology_bundle=bundle)
-    rows = model.classify_relations(set(substances))
-    row = next(row for entries in rows.values() for row in entries)
-    assert row["show_matches"] is True
-    assert row["source_matches"] == expected_matches
+    with pytest.raises(OntologyInfrastructureError, match="absent from the generated catalog"):
+        build_stack_read_model(substances, [relation], {}, {}, ontology_bundle=bundle)
 
 
 def test_relation_schema_rejects_unknown_top_level_field() -> None:

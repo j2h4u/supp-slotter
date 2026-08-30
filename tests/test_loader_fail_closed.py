@@ -176,7 +176,7 @@ def test_relation_loader_requires_explicit_research_state_metadata(tmp_path: Pat
         "target_selector": {"entity": {"name": "Target"}},
         "reason": "research-state loader probe",
         "assertion_kind": "ontology_assertion",
-        "semantic_family": "research_state_probe",
+        "semantic_family": "biochemical_mechanism_assertion",
     }
     path.write_text(yaml.safe_dump({"relations": [relation]}), encoding="utf-8")
     substances = {
