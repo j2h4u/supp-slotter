@@ -997,13 +997,35 @@ def _validate_tracking_truth_table(catalog: RuntimeDashboardStateCatalog) -> Non
         )
 
 
-def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
-    """Decode a compiler-verified runtime snapshot."""
+def _decode_program_payload(payload: Mapping[str, object]) -> tuple[str, str, str, Mapping[str, object]]:
+    """Decode the closed envelope around the executable projection."""
     root = _map(payload, "")
     expected_root = {"format_version", "schema_version", "source_hash", "provenance", "projection"}
     if set(root) != expected_root:
         raise _error("", "has an invalid top-level shape")
     projection = _exact_map(root.get("projection"), "projection", RUNTIME_PROJECTION_FIELDS[""])
+    return (
+        _str(root["format_version"], "format_version"),
+        _str(root["schema_version"], "schema_version"),
+        _str(root["source_hash"], "source_hash"),
+        projection,
+    )
+
+
+def _validate_engine_scenario_coverage(
+    semantic_ids: set[str], scenarios: Sequence[RuntimeEngineConformanceScenario]
+) -> None:
+    scenario_semantics = {row.semantic for row in scenarios}
+    missing_scenario_semantics = sorted(semantic_ids - scenario_semantics)
+    if missing_scenario_semantics:
+        raise _error(
+            "engine_contract.conformance_scenarios",
+            "missing semantic coverage: " + ", ".join(missing_scenario_semantics),
+        )
+
+
+def _decode_engine_contract(projection: Mapping[str, object]) -> RuntimeEngineContract:
+    """Decode and verify the closed exact-optimizer protocol section."""
     engine_raw = _exact_map(
         projection.get("engine_contract"),
         "engine_contract",
@@ -1073,13 +1095,14 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
             "engine_contract.publication_statuses",
             "must exactly be the closed Optimal/Indeterminate statuses",
         )
-    scenario_semantics = {row.semantic for row in engine_scenarios}
-    missing_scenario_semantics = sorted(semantic_ids - scenario_semantics)
-    if missing_scenario_semantics:
-        raise _error(
-            "engine_contract.conformance_scenarios",
-            "missing semantic coverage: " + ", ".join(missing_scenario_semantics),
-        )
+    _validate_engine_scenario_coverage(semantic_ids, engine_scenarios)
+    return engine_contract
+
+
+def _decode_glue_contract(
+    projection: Mapping[str, object],
+) -> tuple[RuntimeGlueContract, tuple[tuple[bool, bool], ...]]:
+    """Decode the executable integration capability and partition section."""
     glue_raw = _exact_map(projection.get("glue_contract"), "glue_contract", RUNTIME_PROJECTION_FIELDS["glue_contract"])
     truth = _truth_table(
         glue_raw.get("relation_presence_truth_table"),
@@ -1133,6 +1156,19 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         actual = glue_capabilities[field_name]
         if actual != expected:
             raise _error(f"glue_contract.{field_name}", "must exactly match executable capabilities")
+    return glue, truth
+
+
+def _decode_relation_review_catalog(
+    projection: Mapping[str, object], truth: tuple[tuple[bool, bool], ...]
+) -> tuple[
+    tuple[RuntimeWarningTypePolicy, ...],
+    tuple[RuntimeConcernCatalogEntry, ...],
+    tuple[RuntimeRelationWarningRule, ...],
+    tuple[RuntimeRelationPresenceStatusPolicy, ...],
+    tuple[RuntimeSelectorFormCapability, ...],
+]:
+    """Decode review vocabulary that is independent of canonical scheduling facts."""
     warning_types = _typed_rows(
         projection["warning_types"],
         "warning_types",
@@ -1178,6 +1214,17 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     endpoint_kinds = {row.endpoint_kind for row in selector_form_capabilities}
     if endpoint_kinds != set(IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS):
         raise _error("selector_form_capabilities", "must declare exactly the executable endpoint kinds")
+    return (
+        cast(tuple[RuntimeWarningTypePolicy, ...], warning_types),
+        cast(tuple[RuntimeConcernCatalogEntry, ...], concern_catalog),
+        cast(tuple[RuntimeRelationWarningRule, ...], relation_warning_rules),
+        cast(tuple[RuntimeRelationPresenceStatusPolicy, ...], relation_presence_statuses),
+        cast(tuple[RuntimeSelectorFormCapability, ...], selector_form_capabilities),
+    )
+
+
+def _decode_dashboard_state_catalog(projection: Mapping[str, object]) -> RuntimeDashboardStateCatalog:
+    """Decode the complete dashboard state vocabulary and truth tables."""
     dashboard_catalog = _exact_map(
         projection.get("dashboard_state_catalog"),
         "dashboard_state_catalog",
@@ -1222,14 +1269,31 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         ),
     )
     _validate_dashboard_state_catalog(dashboard_state_catalog)
-    canonical_fact_catalog = _canonical_fact_catalog(projection.get("canonical_fact_catalog"))
+    return dashboard_state_catalog
+
+
+def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
+    """Decode a compiler-verified runtime snapshot by its closed sections."""
+
+    format_version, schema_version, source_hash, projection = _decode_program_payload(payload)
+    engine_contract = _decode_engine_contract(projection)
+    glue_contract, presence_truth_table = _decode_glue_contract(projection)
+    (
+        warning_types,
+        concern_catalog,
+        relation_warning_rules,
+        relation_presence_statuses,
+        selector_form_capabilities,
+    ) = _decode_relation_review_catalog(projection, presence_truth_table)
+    dashboard_state_catalog = _decode_dashboard_state_catalog(projection)
+    canonical_fact_catalog = _canonical_fact_catalog(projection["canonical_fact_catalog"])
     canonical_laws = _canonical_laws(projection["canonical_laws"])
     return RuntimeProgram(
-        _str(root["format_version"], "format_version"),
-        _str(root["schema_version"], "schema_version"),
-        _str(root["source_hash"], "source_hash"),
+        format_version,
+        schema_version,
+        source_hash,
         engine_contract,
-        glue,
+        glue_contract,
         warning_types,
         concern_catalog,
         relation_warning_rules,

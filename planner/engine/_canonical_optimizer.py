@@ -192,7 +192,21 @@ def _coerce_input(  # noqa: PLR0913
     )
 
 
-def _prepare(optimizer_input: CanonicalOptimizerInput) -> _PreparedInput:  # noqa: C901, PLR0912
+def _prepare(optimizer_input: CanonicalOptimizerInput) -> _PreparedInput:
+    _validate_run_limits(optimizer_input)
+    domains = _validated_item_domains(optimizer_input.item_domains)
+    slots_by_domain = _validated_slots_by_domain(optimizer_input.slots)
+    pressures = _pressure_identities(optimizer_input.pressures, domains)
+    items = _prepared_items(domains, slots_by_domain, pressures)
+    return _PreparedInput(
+        items,
+        slots_by_domain,
+        sum(item.maximum_pressure_count for item in items),
+        pressures,
+    )
+
+
+def _validate_run_limits(optimizer_input: CanonicalOptimizerInput) -> None:
     if optimizer_input.state_bound is not None and (
         isinstance(optimizer_input.state_bound, bool) or optimizer_input.state_bound < 1
     ):
@@ -208,16 +222,21 @@ def _prepare(optimizer_input: CanonicalOptimizerInput) -> _PreparedInput:  # noq
     if not isinstance(optimizer_input.slots, Mapping):
         raise _IndeterminateError("invalid_input", "slots must be a mapping")
 
+
+def _validated_item_domains(item_domains: Mapping[str, str]) -> dict[str, str]:
     domains: dict[str, str] = {}
-    for item_id, domain in optimizer_input.item_domains.items():
+    for item_id, domain in item_domains.items():
         if not isinstance(item_id, str) or not item_id or not isinstance(domain, str) or not domain:
             raise _IndeterminateError("invalid_input", "item and domain IDs must be non-empty strings")
         if item_id in domains:
             raise _IndeterminateError("invalid_input", f"duplicate item ID {item_id!r}")
         domains[item_id] = domain
+    return domains
 
+
+def _validated_slots_by_domain(slots: Mapping[str, Slot]) -> dict[str, tuple[Slot, ...]]:
     slots_by_domain: dict[str, list[Slot]] = {}
-    for slot_key, slot in optimizer_input.slots.items():
+    for slot_key, slot in slots.items():
         if not isinstance(slot_key, str) or not slot_key or not isinstance(slot, Slot):
             raise _IndeterminateError("invalid_input", "slots must be keyed by non-empty IDs and contain Slot values")
         if slot.slot_id != slot_key or not slot.slot_id or not isinstance(slot.stack, str) or not slot.stack:
@@ -229,19 +248,23 @@ def _prepare(optimizer_input: CanonicalOptimizerInput) -> _PreparedInput:  # noq
             if value is not None and value not in values:
                 raise _IndeterminateError("invalid_input", f"slot {slot_key!r} has invalid {dimension} value")
         slots_by_domain.setdefault(slot.stack, []).append(slot)
-
-    normalized_pressures = _pressure_identities(optimizer_input.pressures, domains)
-    pressure_by_item: dict[str, list[UnaryPressureIdentity]] = {}
-    for pressure in normalized_pressures:
-        pressure_by_item.setdefault(pressure.item_id, []).append(pressure)
-
-    prepared_slots = {
+    return {
         domain: tuple(sorted(rows, key=lambda row: (row.order, row.slot_id)))
         for domain, rows in slots_by_domain.items()
     }
+
+
+def _prepared_items(
+    domains: Mapping[str, str],
+    slots_by_domain: Mapping[str, Sequence[Slot]],
+    pressures: Sequence[UnaryPressureIdentity],
+) -> tuple[_PreparedItem, ...]:
+    pressure_by_item: dict[str, list[UnaryPressureIdentity]] = {}
+    for pressure in pressures:
+        pressure_by_item.setdefault(pressure.item_id, []).append(pressure)
     prepared_items: list[_PreparedItem] = []
     for item_id, domain in sorted(domains.items()):
-        domain_slots = prepared_slots.get(domain)
+        domain_slots = slots_by_domain.get(domain)
         if not domain_slots:
             raise _IndeterminateError("invalid_input", f"item {item_id!r} has no slots in domain {domain!r}")
         item_pressures = pressure_by_item.get(item_id, [])
@@ -255,12 +278,7 @@ def _prepare(optimizer_input: CanonicalOptimizerInput) -> _PreparedInput:  # noq
                 maximum,
             )
         )
-    return _PreparedInput(
-        tuple(prepared_items),
-        prepared_slots,
-        sum(item.maximum_pressure_count for item in prepared_items),
-        normalized_pressures,
-    )
+    return tuple(prepared_items)
 
 
 def _pressure_identities(
@@ -340,37 +358,53 @@ def _verify_solution(
 ) -> None:
     """Independently recompute every published objective component."""
 
+    loads_by_domain = _assignment_loads(optimizer_input, assignment)
+    if (
+        _satisfied_pressure_count(optimizer_input.slots, assignment, prepared.pressures)
+        != objective.satisfied_pressures
+    ):
+        raise _IndeterminateError("proof_failed", "proof_incomplete: pressure count mismatch")
+    if _squared_load(loads_by_domain) != objective.squared_load:
+        raise _IndeterminateError("proof_failed", "proof_incomplete: squared load mismatch")
+    if _published_assignment_key(optimizer_input.slots, assignment) != objective.assignment_key:
+        raise _IndeterminateError("proof_failed", "proof_incomplete: assignment key mismatch")
+
+
+def _assignment_loads(
+    optimizer_input: CanonicalOptimizerInput, assignment: Mapping[str, str]
+) -> dict[str, dict[str, int]]:
     expected_items = set(optimizer_input.item_domains)
     if set(assignment) != expected_items:
         raise _IndeterminateError("proof_failed", "proof_incomplete: assignment item set mismatch")
-
     loads_by_domain: dict[str, dict[str, int]] = {}
-    slots = optimizer_input.slots
     for item_id in sorted(expected_items):
         slot_id = assignment.get(item_id)
         domain = optimizer_input.item_domains[item_id]
-        if not isinstance(slot_id, str) or slot_id not in slots or slots[slot_id].stack != domain:
+        if (
+            not isinstance(slot_id, str)
+            or slot_id not in optimizer_input.slots
+            or optimizer_input.slots[slot_id].stack != domain
+        ):
             raise _IndeterminateError("proof_failed", "proof_incomplete: assignment domain mismatch")
         domain_loads = loads_by_domain.setdefault(domain, {})
         domain_loads[slot_id] = domain_loads.get(slot_id, 0) + 1
+    return loads_by_domain
 
-    satisfied = {
-        identity
-        for identity in prepared.pressures
-        if getattr(slots[assignment[identity.item_id]], identity.dimension) == identity.value
-    }
-    if len(satisfied) != objective.satisfied_pressures:
-        raise _IndeterminateError("proof_failed", "proof_incomplete: pressure count mismatch")
 
-    squared_load = sum(load * load for domain_loads in loads_by_domain.values() for load in domain_loads.values())
-    if squared_load != objective.squared_load:
-        raise _IndeterminateError("proof_failed", "proof_incomplete: squared load mismatch")
-
-    assignment_key = tuple(
-        (slots[assignment[item_id]].order, assignment[item_id]) for item_id in sorted(expected_items)
+def _satisfied_pressure_count(
+    slots: Mapping[str, Slot], assignment: Mapping[str, str], pressures: Sequence[UnaryPressureIdentity]
+) -> int:
+    return sum(
+        getattr(slots[assignment[identity.item_id]], identity.dimension) == identity.value for identity in pressures
     )
-    if assignment_key != objective.assignment_key:
-        raise _IndeterminateError("proof_failed", "proof_incomplete: assignment key mismatch")
+
+
+def _squared_load(loads_by_domain: Mapping[str, Mapping[str, int]]) -> int:
+    return sum(load * load for domain_loads in loads_by_domain.values() for load in domain_loads.values())
+
+
+def _published_assignment_key(slots: Mapping[str, Slot], assignment: Mapping[str, str]) -> tuple[tuple[int, str], ...]:
+    return tuple((slots[assignment[item_id]].order, assignment[item_id]) for item_id in sorted(assignment))
 
 
 def _validate_pressure_identity(identity: UnaryPressureIdentity, item_domains: Mapping[str, str]) -> None:

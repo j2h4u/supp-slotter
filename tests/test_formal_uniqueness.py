@@ -11,12 +11,54 @@ from planner.cards.product import load_product
 from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance
 from planner.contracts import CardLoadError, Relation, RelationSelector, Substance
-from planner.ontology.selector import resolve_selector
+from planner.ontology.selector import hydrate_selector, resolve_selector
 from planner.paths import Paths
 from planner.query_model import build_stack_read_model
 from planner.schema_validation import schema_errors
 
 from tests.helpers import ontology_bundle
+
+
+def test_selector_hydration_enforces_canonical_entity_and_term_forms() -> None:
+    path = Path("selector.yaml")
+
+    assert hydrate_selector(
+        {"entity": {"entity_id": "sub_known000"}}, path=path, label="source", allow_entity_name=False
+    ) == RelationSelector(entity_id="sub_known000")
+    assert hydrate_selector(
+        {"entity": {"name": "Known"}, "scope": "current"},
+        path=path,
+        label="source",
+        allow_entity_name=True,
+        allow_scope=True,
+    ) == RelationSelector(entity_name="Known", scope="current")
+    assert hydrate_selector(
+        {"category": "kind", "term": "mineral"}, path=path, label="source", allow_entity_name=False
+    ) == RelationSelector(category="kind", term="mineral")
+
+
+@pytest.mark.parametrize(
+    ("raw", "allow_entity_name", "allow_scope", "match"),
+    [
+        ([], False, False, "must be a mapping"),
+        ({"entity": []}, False, False, "malformed source entity selector"),
+        ({"entity": {"entity_id": "sub_known000", "name": "Known"}}, True, False, "exactly one"),
+        ({"entity": {"name": "Known"}}, False, False, "requires stable entity_id"),
+        ({"entity": {"entity_id": "sub_known000"}, "scope": "current"}, False, False, "malformed source selector"),
+        ({"category": "kind", "term": ""}, False, False, "must be a non-empty string"),
+    ],
+)
+def test_selector_hydration_rejects_noncanonical_forms(
+    raw: object, allow_entity_name: bool, allow_scope: bool, match: str
+) -> None:
+    with pytest.raises(CardLoadError, match=match):
+        hydrate_selector(
+            raw,
+            path=Path("selector.yaml"),
+            label="source",
+            allow_entity_name=allow_entity_name,
+            allow_scope=allow_scope,
+        )
 
 
 def test_product_components_are_unique_by_substance_reference() -> None:

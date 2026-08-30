@@ -35,10 +35,43 @@ class CanonicalScheduleOutputInput:
     pillboxes: Mapping[str, Pillbox] = field(default_factory=dict)
 
 
+@dataclass(frozen=True, slots=True)
+class _CanonicalScheduleParts:
+    """Completed proof projections required by the closed schedule document."""
+
+    assignments: dict[str, str]
+    pressure_matches: list[CanonicalPressureMatch]
+    domain_loads: dict[str, CanonicalDomainLoadProof]
+    explanations: dict[str, CanonicalPlacementExplanation]
+    pillboxes: dict[str, dict[str, object]]
+
+
 def build_canonical_schedule_output(
     output_input: CanonicalScheduleOutputInput,
 ) -> OptimalPublication:
     """Build an in-memory publication from a proved canonical optimum."""
+    slots, assignments = _validated_output_inputs(output_input)
+    pressure_matches = _pressure_matches(output_input.inference, assignments, slots)
+    _validate_satisfied_pressure_count(pressure_matches, output_input.result)
+    domain_loads = _canonical_domain_loads(assignments, slots, output_input.result)
+    _validate_squared_load(domain_loads, output_input.result)
+    explanations = _canonical_explanations(assignments, slots, pressure_matches, output_input.result)
+    pillboxes = _canonical_pillboxes(output_input.pillboxes, slots)
+    _add_assigned_products(pillboxes, assignments, slots, output_input.item_products, output_input.products)
+    parts = _CanonicalScheduleParts(
+        assignments=assignments,
+        pressure_matches=pressure_matches,
+        domain_loads=domain_loads,
+        explanations=explanations,
+        pillboxes=pillboxes,
+    )
+    document = _canonical_document(output_input, parts)
+    return OptimalPublication(output_input.result, output_input.inference, slots, document)
+
+
+def _validated_output_inputs(
+    output_input: CanonicalScheduleOutputInput,
+) -> tuple[dict[str, Slot], dict[str, str]]:
     if not isinstance(output_input.result, Optimal):
         raise TypeError("canonical output requires an Optimal optimizer result")
     if not isinstance(output_input.inference, Success):
@@ -49,37 +82,87 @@ def build_canonical_schedule_output(
         raise ValueError("canonical optimizer assignment references an unknown slot")
     if any(pressure.item_id not in assignments for pressure in output_input.inference.pressures):
         raise ValueError("canonical pressure references an unassigned item")
+    return slots, assignments
 
-    item_products = dict(output_input.item_products)
-    item_stacks = dict(output_input.item_stacks)
-    products = dict(output_input.products)
-    pressure_matches = [
-        _canonical_pressure_match(pressure, slots[assignments[pressure.item_id]])
-        for pressure in output_input.inference.pressures
+
+def _pressure_matches(
+    inference: Success, assignments: Mapping[str, str], slots: Mapping[str, Slot]
+) -> list[CanonicalPressureMatch]:
+    matches = [
+        _canonical_pressure_match(pressure, slots[assignments[pressure.item_id]]) for pressure in inference.pressures
     ]
-    pressure_matches.sort(key=lambda row: (row["item_id"], row["dimension"], row["value"]))
-    if sum(match["satisfied"] for match in pressure_matches) != output_input.result.objective.satisfied_pressures:
+    matches.sort(key=lambda row: (row["item_id"], row["dimension"], row["value"]))
+    return matches
+
+
+def _validate_satisfied_pressure_count(pressure_matches: list[CanonicalPressureMatch], result: Optimal) -> None:
+    if sum(match["satisfied"] for match in pressure_matches) != result.objective.satisfied_pressures:
         raise ValueError("canonical pressure matches do not match the proved objective")
-    domain_loads = _canonical_domain_loads(assignments, slots, output_input.result)
-    if sum(row["squared_load"] for row in domain_loads.values()) != output_input.result.objective.squared_load:
+
+
+def _validate_squared_load(domain_loads: Mapping[str, CanonicalDomainLoadProof], result: Optimal) -> None:
+    if sum(row["squared_load"] for row in domain_loads.values()) != result.objective.squared_load:
         raise ValueError("canonical domain loads do not match the proved objective")
-    canonical_explanations = {
+
+
+def _canonical_explanations(
+    assignments: Mapping[str, str],
+    slots: Mapping[str, Slot],
+    pressure_matches: list[CanonicalPressureMatch],
+    result: Optimal,
+) -> dict[str, CanonicalPlacementExplanation]:
+    return {
         item_id: _canonical_placement_explanation(
             item_id,
             slot_id,
             slots[slot_id],
             [row for row in pressure_matches if row["item_id"] == item_id],
-            output_input.result,
+            result,
         )
         for item_id, slot_id in assignments.items()
     }
-    pillboxes = _canonical_pillboxes(output_input.pillboxes, slots)
+
+
+def _add_assigned_products(
+    pillboxes: Mapping[str, dict[str, object]],
+    assignments: Mapping[str, str],
+    slots: Mapping[str, Slot],
+    item_products: Mapping[str, str],
+    products: Mapping[str, Product],
+) -> None:
     for item_id, slot_id in assignments.items():
         slot = slots[slot_id]
         slot_map = cast(dict[str, dict[str, object]], pillboxes[slot.pillbox]["slots"])
         cast(list[str], slot_map[slot_id]["products"]).append(_canonical_product_name(item_id, item_products, products))
+    _sort_pillbox_products(pillboxes)
 
-    episodic_items = sorted(
+
+def _sort_pillbox_products(pillboxes: Mapping[str, dict[str, object]]) -> None:
+    for raw_pillbox in pillboxes.values():
+        for raw_slot in cast(dict[str, dict[str, object]], raw_pillbox["slots"]).values():
+            raw_slot["products"] = sorted(cast(list[str], raw_slot["products"]), key=str.casefold)
+
+
+def _presentation_groups(
+    assignments: Mapping[str, str],
+    item_products: Mapping[str, str],
+    item_stacks: Mapping[str, str],
+    products: Mapping[str, Product],
+) -> dict[str, list[str]]:
+    episodic_items = _episodic_items(assignments, item_products, item_stacks, products)
+    return {
+        "routine": _routine_items(assignments, item_products, item_stacks, products, episodic_items),
+        "episodic": [_canonical_product_name(item_id, item_products, products) for item_id in episodic_items],
+    }
+
+
+def _episodic_items(
+    assignments: Mapping[str, str],
+    item_products: Mapping[str, str],
+    item_stacks: Mapping[str, str],
+    products: Mapping[str, Product],
+) -> list[str]:
+    return sorted(
         item_id
         for item_id, product_id in item_products.items()
         if item_id in assignments
@@ -87,49 +170,57 @@ def build_canonical_schedule_output(
         and products.get(product_id) is not None
         and products[product_id].use_pattern == "not_every_day"
     )
-    for raw_pillbox in pillboxes.values():
-        for raw_slot in cast(dict[str, dict[str, object]], raw_pillbox["slots"]).values():
-            raw_slot["products"] = sorted(cast(list[str], raw_slot["products"]), key=str.casefold)
 
+
+def _routine_items(
+    assignments: Mapping[str, str],
+    item_products: Mapping[str, str],
+    item_stacks: Mapping[str, str],
+    products: Mapping[str, Product],
+    episodic_items: list[str],
+) -> list[str]:
+    return [
+        _canonical_product_name(item_id, item_products, products)
+        for item_id, product_id in sorted(item_products.items())
+        if item_stacks.get(item_id) == "daily"
+        and item_id not in episodic_items
+        and products.get(product_id) is not None
+        and products[product_id].use_pattern != "not_every_day"
+    ]
+
+
+def _canonical_document(
+    output_input: CanonicalScheduleOutputInput,
+    parts: _CanonicalScheduleParts,
+) -> CanonicalScheduleData:
     objective = output_input.result.objective
-    document = cast(
-        CanonicalScheduleData,
-        {
-            "status": "Optimal",
-            "objective": {
-                "satisfied_pressures": objective.satisfied_pressures,
-                "squared_load": objective.squared_load,
-                "assignment_key": objective.assignment_key,
-            },
-            "assignments": assignments,
-            "pressure_matches": pressure_matches,
-            "domain_loads": domain_loads,
-            "optimizer_proof": list(output_input.result.proofs),
-            "canonical_explanations": canonical_explanations,
-            "summary": {
-                "placement_groups": {
-                    "routine": [
-                        _canonical_product_name(item_id, item_products, products)
-                        for item_id, product_id in sorted(item_products.items())
-                        if item_stacks.get(item_id) == "daily"
-                        and item_id not in episodic_items
-                        and products.get(product_id) is not None
-                        and products[product_id].use_pattern != "not_every_day"
-                    ],
-                    "episodic": [
-                        _canonical_product_name(item_id, item_products, products) for item_id in episodic_items
-                    ],
-                },
-            },
-            "placement_notes": [],
-            "pillboxes": cast(dict[str, SchedulePillbox], pillboxes),
-            "benefits": [],
-            "risks": [],
-            "warnings": [],
-            "active_fact_index": [],
+    return {
+        "status": "Optimal",
+        "objective": {
+            "satisfied_pressures": objective.satisfied_pressures,
+            "squared_load": objective.squared_load,
+            "assignment_key": objective.assignment_key,
         },
-    )
-    return OptimalPublication(output_input.result, output_input.inference, slots, document)
+        "assignments": parts.assignments,
+        "pressure_matches": parts.pressure_matches,
+        "domain_loads": parts.domain_loads,
+        "optimizer_proof": list(output_input.result.proofs),
+        "canonical_explanations": parts.explanations,
+        "summary": {
+            "placement_groups": _presentation_groups(
+                parts.assignments,
+                output_input.item_products,
+                output_input.item_stacks,
+                output_input.products,
+            ),
+        },
+        "placement_notes": [],
+        "pillboxes": cast(dict[str, SchedulePillbox], parts.pillboxes),
+        "benefits": [],
+        "risks": [],
+        "warnings": [],
+        "active_fact_index": [],
+    }
 
 
 def _canonical_product_name(item_id: str, item_products: Mapping[str, str], products: Mapping[str, Product]) -> str:

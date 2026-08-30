@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any, cast
 
 import pytest
@@ -251,6 +252,17 @@ def test_admitted_fact_without_exact_law_fails_closed() -> None:
             ("prd_demo",),
             laws,
         )
+
+
+def test_runtime_program_input_supplies_its_compiler_emitted_laws() -> None:
+    runtime = SimpleNamespace(
+        canonical_fact_catalog=_catalog(_fact("FoodEffect", "bioavailability_increases")), canonical_laws=_laws()
+    )
+
+    result = execute_canonical_inference(runtime, ("prd_demo",), composition_roles=(ROLE,))
+
+    assert isinstance(result, Success)
+    assert result.pressures[0].identity == UnaryPressureIdentity("prd_demo", "meal_context", "with_food")
 
 
 def test_provenance_sort_is_deterministic_for_optional_quotations() -> None:

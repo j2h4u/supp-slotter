@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import random
 
+import pytest
 from planner.contracts import Slot
 from planner.engine._canonical_optimizer import (
     CanonicalOptimizerInput,
@@ -123,6 +124,29 @@ def test_deadline_interruption_and_state_bound_never_publish_incumbents() -> Non
     assert expired.diagnostic.code == "timeout"
     assert interrupted.diagnostic.code == "interrupted"
     assert bounded.diagnostic.code == "resource_exhausted"
+
+
+@pytest.mark.parametrize(
+    ("state_bound", "deadline_monotonic_ns", "message"),
+    [
+        (True, None, "invalid state bound"),
+        (None, True, "invalid deadline"),
+    ],
+)
+def test_invalid_proof_limits_fail_closed(
+    state_bound: int | None, deadline_monotonic_ns: int | None, message: str
+) -> None:
+    result = optimize_canonical_layout(
+        {"item": "daily"},
+        {"slot": _slot("slot", 1)},
+        (),
+        state_bound=state_bound,
+        deadline_monotonic_ns=deadline_monotonic_ns,
+    )
+
+    assert isinstance(result, Indeterminate)
+    assert result.diagnostic.code == "invalid_input"
+    assert result.diagnostic.message == message
 
 
 def test_abort_during_final_expansion_or_pre_return_cannot_publish() -> None:

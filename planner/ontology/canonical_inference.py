@@ -243,87 +243,118 @@ def _law_for(
     return laws.get((family, value))
 
 
-def execute_canonical_inference(  # noqa: C901, PLR0912, PLR0914, PLR0915
+def _catalog_and_laws(
     catalog: RuntimeCanonicalFactCatalog | object,
-    selected_items: Iterable[object] | Mapping[object, object],
-    laws: Iterable[RuntimeCanonicalLaw] | Mapping[tuple[str, str], RuntimeCanonicalLaw] | None = None,
-    *,
-    composition_roles: Iterable[RuntimeCompositionRole] = (),
-) -> InferenceResult:
-    """Apply compiled laws to selected items and normalize their proofs.
-
-    Facts whose explicit applicability role is unknown, whose subject does not
-    match that role, or whose role product is not selected are ignored.  Such
-    rows cannot produce a pressure.  A malformed catalog is validated by the
-    catalog boundary; this executor remains total for boundary-adjacent rows.
-    """
-    # Accepting a RuntimeProgram here keeps the execution boundary convenient
-    # without coupling the inference module to planner command inputs.
-    runtime = catalog
-    if not isinstance(catalog, RuntimeCanonicalFactCatalog):
-        runtime_catalog = getattr(runtime, "canonical_fact_catalog", None)
-        if not isinstance(runtime_catalog, RuntimeCanonicalFactCatalog):
-            raise TypeError("canonical inference requires RuntimeCanonicalFactCatalog or RuntimeProgram")
-        catalog = runtime_catalog
+    laws: Iterable[RuntimeCanonicalLaw] | Mapping[tuple[str, str], RuntimeCanonicalLaw] | None,
+) -> tuple[
+    RuntimeCanonicalFactCatalog,
+    Iterable[RuntimeCanonicalLaw] | Mapping[tuple[str, str], RuntimeCanonicalLaw],
+]:
+    if isinstance(catalog, RuntimeCanonicalFactCatalog):
         if laws is None:
-            laws = getattr(runtime, "canonical_laws", None)
-    if laws is None:
+            raise OntologyInfrastructureError("canonical inference requires compiler-emitted canonical laws")
+        return catalog, laws
+    runtime_catalog = getattr(catalog, "canonical_fact_catalog", None)
+    if not isinstance(runtime_catalog, RuntimeCanonicalFactCatalog):
+        raise TypeError("canonical inference requires RuntimeCanonicalFactCatalog or RuntimeProgram")
+    runtime_laws = laws if laws is not None else getattr(catalog, "canonical_laws", None)
+    if runtime_laws is None:
         raise OntologyInfrastructureError("canonical inference requires compiler-emitted canonical laws")
-    law_index = (
+    return runtime_catalog, runtime_laws
+
+
+def _indexed_laws(
+    laws: Iterable[RuntimeCanonicalLaw] | Mapping[tuple[str, str], RuntimeCanonicalLaw],
+) -> dict[tuple[str, str], RuntimeCanonicalLaw]:
+    return (
         dict(cast(Mapping[tuple[str, str], RuntimeCanonicalLaw], laws))
         if isinstance(laws, Mapping)
         else _law_index(laws)
     )
-    selected = _selected_items(selected_items)
-    roles = {role.id: role for role in composition_roles}
-    by_identity: dict[UnaryPressureIdentity, list[PressureDerivation]] = {}
 
-    families: tuple[Sequence[RuntimeCanonicalSchedulingFact], ...] = (
+
+def _facts_with_families(
+    catalog: RuntimeCanonicalFactCatalog,
+) -> tuple[Sequence[RuntimeCanonicalSchedulingFact], ...]:
+    return (
         catalog.food_effects,
         catalog.acute_alertness_effects,
         catalog.acute_sleep_effects,
         catalog.pre_exercise_performance_effects,
         catalog.post_exercise_recovery_effects,
     )
-    for family_facts in families:
-        for fact in family_facts:
-            family = _fact_family(fact)
-            if family is None:
-                continue
-            fact_value = getattr(fact, "value", None)
-            if not isinstance(fact_value, str):
-                continue
-            law = _law_for(law_index, family, fact_value)
-            if law is None:
-                raise OntologyInfrastructureError(
-                    f"canonical law missing for family={family!r}, fact_value={fact_value!r}"
-                )
-            target = fact.applicability
-            if target.substance is not None:
-                if fact.subject.substance != target.substance:
-                    continue
-                resolved_roles = tuple(role for role in roles.values() if role.substance == target.substance)
-            else:
-                if fact.subject.composition_role != target.composition_role:
-                    continue
-                role = roles.get(target.composition_role or "")
-                resolved_roles = () if role is None else (role,)
-            for role in resolved_roles:
-                item_ids = sorted(item_id for item_id, product_id in selected.items() if product_id == role.product)
-                for item_id in item_ids:
-                    identity = UnaryPressureIdentity(item_id, law.dimension, law.pressure_value)
-                    derivation = PressureDerivation(
-                        law=law,
-                        family=family,
-                        fact=fact,
-                        value=fact_value,
-                        subject=fact.subject,
-                        path=_path(fact, role),
-                        provenance=_unique_provenance(fact.provenance),
-                    )
-                    by_identity.setdefault(identity, []).append(derivation)
 
-    normalized: dict[UnaryPressureIdentity, NormalizedUnaryPressure] = {}
+
+def _roles_for_fact(
+    fact: RuntimeCanonicalSchedulingFact,
+    roles: Mapping[str, RuntimeCompositionRole],
+) -> tuple[RuntimeCompositionRole, ...]:
+    target = fact.applicability
+    if target.substance is not None:
+        if fact.subject.substance != target.substance:
+            return ()
+        return tuple(role for role in roles.values() if role.substance == target.substance)
+    if fact.subject.composition_role != target.composition_role:
+        return ()
+    role = roles.get(target.composition_role or "")
+    return () if role is None else (role,)
+
+
+def _derivations_for_fact(
+    fact: RuntimeCanonicalSchedulingFact,
+    law_index: Mapping[tuple[str, str], RuntimeCanonicalLaw],
+    roles: Mapping[str, RuntimeCompositionRole],
+    selected_by_product: Mapping[str, tuple[str, ...]],
+) -> tuple[tuple[UnaryPressureIdentity, PressureDerivation], ...]:
+    family = _fact_family(fact)
+    fact_value = getattr(fact, "value", None)
+    if family is None or not isinstance(fact_value, str):
+        return ()
+    law = _law_for(law_index, family, fact_value)
+    if law is None:
+        raise OntologyInfrastructureError(f"canonical law missing for family={family!r}, fact_value={fact_value!r}")
+    derivations: list[tuple[UnaryPressureIdentity, PressureDerivation]] = []
+    for role in _roles_for_fact(fact, roles):
+        for item_id in selected_by_product.get(role.product, ()):
+            identity = UnaryPressureIdentity(item_id, law.dimension, law.pressure_value)
+            derivations.append((
+                identity,
+                PressureDerivation(
+                    law=law,
+                    family=family,
+                    fact=fact,
+                    value=fact_value,
+                    subject=fact.subject,
+                    path=_path(fact, role),
+                    provenance=_unique_provenance(fact.provenance),
+                ),
+            ))
+    return tuple(derivations)
+
+
+def _collect_derivations(
+    catalog: RuntimeCanonicalFactCatalog,
+    laws: Mapping[tuple[str, str], RuntimeCanonicalLaw],
+    roles: Mapping[str, RuntimeCompositionRole],
+    selected: Mapping[str, str],
+) -> dict[UnaryPressureIdentity, list[PressureDerivation]]:
+    selected_by_product: dict[str, tuple[str, ...]] = {}
+    for product_id in set(selected.values()):
+        selected_by_product[product_id] = tuple(
+            sorted(item_id for item_id, product in selected.items() if product == product_id)
+        )
+    by_identity: dict[UnaryPressureIdentity, list[PressureDerivation]] = {}
+    for facts in _facts_with_families(catalog):
+        for fact in facts:
+            for identity, derivation in _derivations_for_fact(fact, laws, roles, selected_by_product):
+                by_identity.setdefault(identity, []).append(derivation)
+    return by_identity
+
+
+def _normalized_pressures(
+    by_identity: Mapping[UnaryPressureIdentity, Sequence[PressureDerivation]],
+) -> tuple[NormalizedUnaryPressure, ...]:
+    normalized: list[NormalizedUnaryPressure] = []
     for identity in sorted(by_identity, key=lambda row: (row.item_id, row.dimension, row.value)):
         unique_derivations = {
             (
@@ -344,24 +375,52 @@ def execute_canonical_inference(  # noqa: C901, PLR0912, PLR0914, PLR0915
                 key=lambda row: (row[0], row[1], row[2], row[3], repr(row[4]), repr(row[5]), repr(row[6])),
             )
         )
-        normalized[identity] = NormalizedUnaryPressure(identity, derivations)
+        normalized.append(NormalizedUnaryPressure(identity, derivations))
+    return tuple(normalized)
 
+
+def _same_dimension_conflicts(
+    pressures: Sequence[NormalizedUnaryPressure],
+) -> tuple[SameDimensionPressureConflict, ...]:
     grouped: dict[tuple[str, str], list[NormalizedUnaryPressure]] = {}
-    for pressure in normalized.values():
+    for pressure in pressures:
         grouped.setdefault((pressure.item_id, pressure.dimension), []).append(pressure)
     conflicts: list[SameDimensionPressureConflict] = []
-    for (item_id, dimension), pressures in sorted(grouped.items()):
-        values = tuple(sorted({pressure.value for pressure in pressures}))
+    for (item_id, dimension), same_dimension in sorted(grouped.items()):
+        values = tuple(sorted({pressure.value for pressure in same_dimension}))
         if len(values) > 1:
             derivations = tuple(
                 derivation
-                for pressure in sorted(pressures, key=lambda row: row.value)
+                for pressure in sorted(same_dimension, key=lambda row: row.value)
                 for derivation in pressure.derivations
             )
             conflicts.append(SameDimensionPressureConflict(item_id, dimension, values, derivations))
+    return tuple(conflicts)
+
+
+def execute_canonical_inference(
+    catalog: RuntimeCanonicalFactCatalog | object,
+    selected_items: Iterable[object] | Mapping[object, object],
+    laws: Iterable[RuntimeCanonicalLaw] | Mapping[tuple[str, str], RuntimeCanonicalLaw] | None = None,
+    *,
+    composition_roles: Iterable[RuntimeCompositionRole] = (),
+) -> InferenceResult:
+    """Apply compiled laws to selected items and normalize their proofs.
+
+    Facts whose explicit applicability role is unknown, whose subject does not
+    match that role, or whose role product is not selected are ignored.  Such
+    rows cannot produce a pressure.  A malformed catalog is validated by the
+    catalog boundary; this executor remains total for boundary-adjacent rows.
+    """
+    catalog, resolved_laws = _catalog_and_laws(catalog, laws)
+    law_index = _indexed_laws(resolved_laws)
+    selected = _selected_items(selected_items)
+    roles = {role.id: role for role in composition_roles}
+    normalized = _normalized_pressures(_collect_derivations(catalog, law_index, roles, selected))
+    conflicts = _same_dimension_conflicts(normalized)
     if conflicts:
-        return Conflict(tuple(conflicts))
-    return Success(tuple(normalized.values()))
+        return Conflict(conflicts)
+    return Success(normalized)
 
 
 def infer_canonical_pressures(

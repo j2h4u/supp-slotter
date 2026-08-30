@@ -143,7 +143,6 @@ _PROFILE_CACHE = _VerifiedBundleCache[Mapping[str, OntoCleanProfile]]()
 _CATEGORY_CACHE = _VerifiedBundleCache[Mapping[str, tuple[str, ...]]]()
 _TERM_CACHE = _VerifiedBundleCache[tuple[Mapping[str, object], ...]]()
 _TERM_LABEL_CACHE = _VerifiedBundleCache[Mapping[tuple[str, str], str]]()
-_RELATION_TYPE_ORDER_CACHE = _VerifiedBundleCache[tuple[str, ...]]()
 
 
 def load_term_labels(bundle: OntologyBundleView) -> Mapping[tuple[str, str], str]:
@@ -333,57 +332,10 @@ def validate_runtime_catalog(bundle: OntologyBundleView) -> None:
     load_term_catalog(bundle)
 
 
-def load_relation_type_order(bundle: OntologyBundleView) -> tuple[str, ...]:
-    """Return relation types in authored runtime presentation order.
-
-    The generated runtime vocabulary is the verified runtime form of the
-    authored relation registry.  Relation IDs are the deterministic tie-break
-    when authors assign the same presentation order.
-    """
-
-    return _RELATION_TYPE_ORDER_CACHE.get(bundle, _decode_relation_type_order)
-
-
-def _decode_relation_type_order(bundle: OntologyBundleView) -> tuple[str, ...]:
-    """Decode relation order without consulting the cache."""
-
-    source = bundle.root / "generated" / "runtime-vocabulary.yaml"
-    raw_relation_types = bundle.runtime_vocabulary.get("relation_types")
-    if not isinstance(raw_relation_types, Mapping) or not raw_relation_types:
-        raise _error("ontology runtime vocabulary relation_types must be a non-empty mapping", source)
-
-    rows: list[tuple[int, str]] = []
-    for relation_id, raw_relation in raw_relation_types.items():
-        if not isinstance(relation_id, str) or not relation_id.strip():
-            raise _error("relation_types contains a non-canonical ID", source)
-        relation = _mapping(cast(Mapping[object, object], raw_relation), f"relation_types.{relation_id}", source)
-        embedded_id = relation.get("id")
-        if embedded_id != relation_id:
-            raise _error(f"relation_types.{relation_id}.id must equal its canonical key", source)
-        order = relation.get("order")
-        if not isinstance(order, int) or isinstance(order, bool):
-            raise _error(f"relation_types.{relation_id}.order must be an integer", source)
-        rows.append((order, relation_id))
-    return tuple(relation_id for _order, relation_id in sorted(rows, key=lambda row: (row[0], row[1])))
-
-
 def _mapping(value: object, path: str, source: object) -> Mapping[str, object]:
     if not isinstance(value, Mapping) or any(not isinstance(key, str) or not key.strip() for key in value):
         raise _error(f"{path} must be a mapping with non-empty string keys", source)
     return cast(Mapping[str, object], value)
-
-
-def _exact_keys(value: Mapping[str, object], expected: set[str], path: str, source: object) -> None:
-    actual = set(value)
-    if actual != expected:
-        missing = sorted(expected - actual)
-        unknown = sorted(actual - expected)
-        details: list[str] = []
-        if missing:
-            details.append("missing " + ", ".join(repr(item) for item in missing))
-        if unknown:
-            details.append("unknown " + ", ".join(repr(item) for item in unknown))
-        raise _error(f"{path} has unsupported fields ({'; '.join(details)})", source)
 
 
 def _error(message: str, source: object) -> OntologyInfrastructureError:

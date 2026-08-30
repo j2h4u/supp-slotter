@@ -67,6 +67,19 @@ def test_canonical_reference_validator_accepts_matching_role_and_fact() -> None:
     validate_canonical_fact_catalog(_catalog(), substances, products)
 
 
+def test_canonical_reference_validator_accepts_matching_composition_role_fact() -> None:
+    substances, products = _cards()
+    catalog = _catalog()
+    role_id = "cmp_prd_demo__sub_demo"
+    fact = replace(
+        catalog.food_effects[0],
+        subject=RuntimeFactSubject(None, role_id),
+        applicability=RuntimeFactApplicability(None, role_id),
+    )
+
+    validate_canonical_fact_catalog(replace(catalog, food_effects=(fact,)), substances, products)
+
+
 @pytest.mark.parametrize(
     "mutation",
     [

@@ -11,6 +11,7 @@ import pytest
 from planner.cards.product import load_product_registry
 from planner.cards.substance import load_substance_registry
 from planner.contracts import CardLoadError, Product, ProductComponent, Substance
+from planner.engine.results import GroomWorkItem
 from planner.ontology.artifacts import load_ontology
 from planner.paths import ROOT, Paths
 from planner.yaml_io import load_yaml
@@ -106,6 +107,36 @@ def test_queue_is_stable_under_receipt_permutation(tmp_path: Path, monkeypatch: 
 
     assert (selected, eligible) == ((), 0)
     assert (selected_reordered, eligible_reordered) == ((), 0)
+
+
+def test_groom_command_returns_the_selected_role_or_schema_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    bundle = _bundle()
+    item = GroomWorkItem(
+        "cmp_prd_aaaaaaaaaa__sub_bbbbbbbbbb",
+        "prd_aaaaaaaaaa",
+        "Active product",
+        "sub_bbbbbbbbbb",
+        "Beta",
+    )
+    monkeypatch.setattr(grooming, "load_ontology", lambda _path: bundle)
+    monkeypatch.setattr(grooming, "validate_schemas", lambda _paths, _bundle: 0)
+    monkeypatch.setattr(grooming, "_select_work_items", lambda _paths, _bundle: ((item,), 1))
+
+    result = grooming.cmd_groom(data_root=tmp_path)
+
+    assert result.exit_code == 0
+    assert result.work_item == item
+    assert result.eligible_count == 1
+    assert "Grooming queue: 1 eligible, showing 1" in result.output
+
+    monkeypatch.setattr(grooming, "validate_schemas", lambda _paths, _bundle: 1)
+    failed = grooming.cmd_groom(data_root=tmp_path)
+
+    assert failed.exit_code == 1
+    assert failed.work_item is None
+    assert failed.eligible_count == 0
 
 
 def test_removing_then_restoring_an_active_receipt_reopens_then_closes_its_role(

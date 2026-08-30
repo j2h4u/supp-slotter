@@ -156,6 +156,26 @@ def test_rewrite_reference_path_is_contract_driven() -> None:
     assert document == {"ingredients": [{"substance": "new"}]}
 
 
+def test_rewrite_reference_path_walks_keyed_lists_and_ignores_non_lists() -> None:
+    contract = load_maintenance_contract(formal_ontology_bundle())
+    nested = replace(contract.product_substance, reference_path="<key>[].substance")
+    document: dict[str, object] = {
+        "daily": [{"substance": "old"}, {"substance": "keep"}],
+        "metadata": {"substance": "old"},
+    }
+
+    assert rewrite_references(document, nested, {"old": "new"})
+    assert document == {
+        "daily": [{"substance": "new"}, {"substance": "keep"}],
+        "metadata": {"substance": "old"},
+    }
+
+    terminal = replace(contract.product_substance, reference_path="<key>[]")
+    keyed_lists: dict[str, object] = {"daily": ["old"], "inactive": ["keep"], "metadata": {"old": "old"}}
+    assert rewrite_references(keyed_lists, terminal, {"old": "new"})
+    assert keyed_lists == {"daily": ["new"], "inactive": ["keep"], "metadata": {"old": "old"}}
+
+
 def test_plan_card_dir_adds_ids_and_plans_canonical_renames(tmp_path: Path) -> None:
     cards_dir = tmp_path / "cards"
     cards_dir.mkdir()

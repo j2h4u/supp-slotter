@@ -195,6 +195,43 @@ def test_writer_revalidation_failure_invalidates_current_document(tmp_path: Path
     assert list(tmp_path.glob("schedule.yaml.tmp.*")) == []
 
 
+@pytest.mark.parametrize(
+    ("mutate", "message"),
+    [
+        (
+            lambda publication: publication.document["pressure_matches"][0].pop("law_ids"),
+            "missing typed proof fields",
+        ),
+        (
+            lambda publication: publication.document["pressure_matches"][0].__setitem__("fact_ids", ["", "fact_food"]),
+            "fact_ids must contain typed IDs",
+        ),
+        (
+            lambda publication: publication.document["pressure_matches"][0]["provenance_refs"][0].__setitem__(
+                "locator", None
+            ),
+            "provenance reference is malformed",
+        ),
+        (
+            lambda publication: publication.document["domain_loads"]["daily"].__setitem__("squared_load", True),
+            "domain squared load is malformed",
+        ),
+        (
+            lambda publication: publication.document["canonical_explanations"]["item_demo"]["slot_anchors"].__setitem__(
+                "meal_context", None
+            ),
+            "placement explanation is missing slot anchors",
+        ),
+    ],
+)
+def test_publication_revalidation_rejects_each_malformed_proof_section(mutate, message: str) -> None:
+    publication = _publication()
+    mutate(publication)
+
+    with pytest.raises(ValueError, match=message):
+        publication.validate()
+
+
 def test_successful_publication_replaces_lease_with_complete_optimal_document(tmp_path: Path) -> None:
     target = tmp_path / "schedule.yaml"
     target.write_text("status: Optimal\nassignments: {stale: stale}\n", encoding="utf-8")
