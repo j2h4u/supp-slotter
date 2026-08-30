@@ -9,14 +9,13 @@ from planner.contracts import Product, StackEntry, Substance
 from planner.engine._plan_types import ActiveIndex
 from planner.ontology.canonical_facts import composition_roles_for_products
 from planner.ontology.canonical_inference import execute_canonical_inference
-from planner.ontology.runtime_program import RuntimeCanonicalScheduling, RuntimeProgram
+from planner.ontology.runtime_program import RuntimeProgram
 
 
 class ActiveIndexInput(NamedTuple):
     runtime_program: RuntimeProgram
     products: Mapping[str, Product]
     substances: Mapping[str, Substance]
-    canonical_scheduling: RuntimeCanonicalScheduling
 
 
 def build_active_index(
@@ -46,10 +45,10 @@ def build_active_index(
     if not item_products:
         raise ValueError("no non-inactive stack items")
     canonical_inference = execute_canonical_inference(
-        index_input.canonical_scheduling,
+        index_input.runtime_program.canonical_scheduling,
         item_products,
-        index_input.canonical_scheduling.laws,
         composition_roles=composition_roles_for_products(index_input.products),
+        known_products=index_input.products,
     )
     return ActiveIndex(
         item_products=item_products,

@@ -10,7 +10,6 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import cast
 
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.runtime_program import (
@@ -152,34 +151,24 @@ class Conflict:
 InferenceResult = Success | Conflict
 
 
-def _stable_id(value: object) -> str | None:
-    if isinstance(value, str):
-        return value
-    candidate = getattr(value, "id", None)
-    return candidate if isinstance(candidate, str) else None
-
-
 def _selected_items(selected_items: Iterable[object] | Mapping[object, object]) -> dict[str, str]:
-    """Return stable item IDs to product IDs from common plan input forms.
-
-    The normal form is an iterable of product IDs.  A mapping is also accepted
-    for callers whose scenario item ID differs from its product ID; its key is
-    the item ID and its string value is the product ID.
-    """
+    """Return the closed string item-to-product selection boundary."""
     if isinstance(selected_items, Mapping):
         result: dict[str, str] = {}
-        mapping = cast(Mapping[object, object], selected_items)
-        for raw_item, raw_product in mapping.items():
-            item_id = _stable_id(raw_item)
-            product_id = _stable_id(raw_product)
-            if item_id is not None and product_id is not None:
-                result[item_id] = product_id
+        for item_id, product_id in selected_items.items():
+            if not isinstance(item_id, str) or not item_id or not isinstance(product_id, str) or not product_id:
+                raise OntologyInfrastructureError(
+                    "canonical inference selected item mapping must contain non-empty strings"
+                )
+            result[item_id] = product_id
         return result
+    if isinstance(selected_items, (str, bytes)):
+        raise OntologyInfrastructureError("canonical inference selected items must be an iterable of non-empty strings")
     result = {}
-    for raw_item in selected_items:
-        item_id = _stable_id(raw_item)
-        if item_id is not None:
-            result[item_id] = item_id
+    for item_id in selected_items:
+        if not isinstance(item_id, str) or not item_id:
+            raise OntologyInfrastructureError("canonical inference selected items must contain non-empty strings")
+        result[item_id] = item_id
     return result
 
 
@@ -204,52 +193,12 @@ def _path(fact: RuntimeCanonicalSchedulingFact, role: RuntimeCompositionRole) ->
     )
 
 
-def _law_index(laws: Iterable[RuntimeCanonicalLaw]) -> dict[tuple[str, str], RuntimeCanonicalLaw]:
-    index: dict[tuple[str, str], RuntimeCanonicalLaw] = {}
-    for law in laws:
-        key = (law.family, law.fact_value)
-        if key in index:
-            raise OntologyInfrastructureError(f"duplicate canonical law key {key!r}")
-        index[key] = law
-    return index
-
-
 def _law_for(
     laws: Mapping[tuple[str, str], RuntimeCanonicalLaw], family: str, value: str
 ) -> RuntimeCanonicalLaw | None:
     # Exact lookup is intentional: there is no open-ended family/value
     # fallback and no item-name-specific inference.
     return laws.get((family, value))
-
-
-def _catalog_and_laws(
-    catalog: RuntimeCanonicalScheduling | object,
-    laws: Iterable[RuntimeCanonicalLaw] | Mapping[tuple[str, str], RuntimeCanonicalLaw] | None,
-) -> tuple[
-    RuntimeCanonicalScheduling,
-    Iterable[RuntimeCanonicalLaw] | Mapping[tuple[str, str], RuntimeCanonicalLaw],
-]:
-    if isinstance(catalog, RuntimeCanonicalScheduling):
-        if laws is None:
-            raise OntologyInfrastructureError("canonical inference requires compiler-emitted canonical laws")
-        return catalog, laws
-    runtime_catalog = getattr(catalog, "canonical_scheduling", None)
-    if not isinstance(runtime_catalog, RuntimeCanonicalScheduling):
-        raise TypeError("canonical inference requires RuntimeCanonicalScheduling or RuntimeProgram")
-    runtime_laws = laws if laws is not None else runtime_catalog.laws
-    if runtime_laws is None:
-        raise OntologyInfrastructureError("canonical inference requires compiler-emitted canonical laws")
-    return runtime_catalog, runtime_laws
-
-
-def _indexed_laws(
-    laws: Iterable[RuntimeCanonicalLaw] | Mapping[tuple[str, str], RuntimeCanonicalLaw],
-) -> dict[tuple[str, str], RuntimeCanonicalLaw]:
-    return (
-        dict(cast(Mapping[tuple[str, str], RuntimeCanonicalLaw], laws))
-        if isinstance(laws, Mapping)
-        else _law_index(laws)
-    )
 
 
 def _roles_for_fact(
@@ -363,11 +312,11 @@ def _same_dimension_conflicts(
 
 
 def execute_canonical_inference(
-    catalog: RuntimeCanonicalScheduling | object,
+    catalog: RuntimeCanonicalScheduling,
     selected_items: Iterable[object] | Mapping[object, object],
-    laws: Iterable[RuntimeCanonicalLaw] | Mapping[tuple[str, str], RuntimeCanonicalLaw] | None = None,
     *,
     composition_roles: Iterable[RuntimeCompositionRole] = (),
+    known_products: Iterable[str] = (),
 ) -> InferenceResult:
     """Apply compiled laws to selected items and normalize their proofs.
 
@@ -376,11 +325,25 @@ def execute_canonical_inference(
     rows cannot produce a pressure.  A malformed catalog is validated by the
     catalog boundary; this executor remains total for boundary-adjacent rows.
     """
-    catalog, resolved_laws = _catalog_and_laws(catalog, laws)
-    law_index = _indexed_laws(resolved_laws)
+    if not isinstance(catalog, RuntimeCanonicalScheduling):
+        raise TypeError("canonical inference requires RuntimeCanonicalScheduling")
     selected = _selected_items(selected_items)
-    roles = {role.id: role for role in composition_roles}
-    normalized = _normalized_pressures(_collect_derivations(catalog, law_index, roles, selected))
+    roles: dict[str, RuntimeCompositionRole] = {}
+    for role in composition_roles:
+        if not isinstance(role, RuntimeCompositionRole) or not role.id or not role.product or not role.substance:
+            raise OntologyInfrastructureError("canonical inference composition roles must be complete runtime roles")
+        if role.id in roles:
+            raise OntologyInfrastructureError(f"canonical inference has duplicate composition role {role.id!r}")
+        roles[role.id] = role
+    admitted_products = set(known_products) | {role.product for role in roles.values()}
+    if any(not isinstance(product, str) or not product for product in admitted_products):
+        raise OntologyInfrastructureError("canonical inference known products must be non-empty strings")
+    unknown = set(selected.values()) - admitted_products
+    if unknown:
+        raise OntologyInfrastructureError(
+            f"canonical inference selected unknown products: {', '.join(sorted(unknown))}"
+        )
+    normalized = _normalized_pressures(_collect_derivations(catalog, catalog.laws_by_key, roles, selected))
     conflicts = _same_dimension_conflicts(normalized)
     if conflicts:
         return Conflict(conflicts)
@@ -388,12 +351,19 @@ def execute_canonical_inference(
 
 
 def infer_canonical_pressures(
-    catalog: RuntimeCanonicalScheduling | object,
+    catalog: RuntimeCanonicalScheduling,
     selected_items: Iterable[object] | Mapping[object, object],
-    laws: Iterable[RuntimeCanonicalLaw] | Mapping[tuple[str, str], RuntimeCanonicalLaw] | None = None,
+    *,
+    composition_roles: Iterable[RuntimeCompositionRole] = (),
+    known_products: Iterable[str] = (),
 ) -> InferenceResult:
     """Descriptive alias for :func:`execute_canonical_inference`."""
-    return execute_canonical_inference(catalog, selected_items, laws)
+    return execute_canonical_inference(
+        catalog,
+        selected_items,
+        composition_roles=composition_roles,
+        known_products=known_products,
+    )
 
 
 infer_pressures = infer_canonical_pressures

@@ -83,7 +83,6 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
                 runtime_program=inputs.runtime_program,
                 products=inputs.products,
                 substances=inputs.substances,
-                canonical_scheduling=inputs.canonical_scheduling,
             ),
         )
     except KeyboardInterrupt, MemoryError:
@@ -140,7 +139,7 @@ def _publish_plan(
             },
             inference=inference,
             products=runtime.inputs.products,
-            pressure_values_by_dimension=runtime.inputs.canonical_scheduling.pressure_values_by_dimension,
+            pressure_values_by_dimension=runtime.inputs.runtime_program.canonical_scheduling.pressure_values_by_dimension,
         )
         published = write_schedule_file(paths.schedule_file, source)
         if isinstance(published, Indeterminate):

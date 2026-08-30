@@ -142,7 +142,7 @@ def test_generated_relation_schema_rejects_nullable_or_blank_selector_scalars(
     assert errors
 
 
-def test_relation_schema_enforces_ontology_relation_type_and_severity_enums() -> None:
+def test_relation_schema_enforces_ontology_relation_type_and_rejects_retired_decision_fields() -> None:
     bundle = ontology_bundle()
     schema = load_schema("relations", bundle)
     defs = cast(dict[str, object], schema["$defs"])
@@ -151,14 +151,15 @@ def test_relation_schema_enforces_ontology_relation_type_and_severity_enums() ->
 
     relation_types = bundle.runtime_vocabulary["relation_types"]
     assert relation_properties["relation_type"] == {"$ref": "#/$defs/RelationType"}
-    assert relation_properties["severity"] == {"$ref": "#/$defs/Severity"}
+    assert "severity" not in relation_properties
+    assert "action" not in relation_properties
     assert set(schema_enum_values(bundle, "RelationType")) == set(cast(dict[str, object], relation_types))
 
     errors = schema_errors(
         {
             "relations": [
                 {
-                    "id": "rel_invalid_type_and_severity",
+                    "id": "rel_invalid_type",
                     "relation_type": "not_authored",
                     "reason": "invalid enum fixture",
                     "source_selector": {"entity": {"entity_id": "sub_aaaaaaaaaa"}},
@@ -167,7 +168,6 @@ def test_relation_schema_enforces_ontology_relation_type_and_severity_enums() ->
                     "semantic_family": "biochemical_mechanism_assertion",
                     "research_state": "unassessed",
                     "sources": [],
-                    "severity": "not_authored",
                 }
             ]
         },
@@ -177,4 +177,30 @@ def test_relation_schema_enforces_ontology_relation_type_and_severity_enums() ->
     )
 
     assert any("relations/0/relation_type" in error and "not_authored" in error for error in errors)
-    assert any("relations/0/severity" in error and "not_authored" in error for error in errors)
+
+    valid = {
+        "id": "rel_retired_field",
+        "relation_type": next(iter(schema_enum_values(bundle, "RelationType"))),
+        "reason": "retired decision-field fixture",
+        "source_selector": {"entity": {"entity_id": "sub_aaaaaaaaaa"}},
+        "target_selector": {"entity": {"entity_id": "sub_bbbbbbbbbb"}},
+        "assertion_kind": "ontology_assertion",
+        "semantic_family": "biochemical_mechanism_assertion",
+        "research_state": "unassessed",
+        "sources": [],
+    }
+    for field, value in {"action": "imperative text", "severity": "medium"}.items():
+        assert schema_errors({"relations": [{**valid, field: value}]}, "relations", Path("relations.yaml"), bundle), (
+            field
+        )
+
+
+def test_substance_schema_rejects_retired_stored_schedule_answers() -> None:
+    for field, value in {
+        "schedule": {"intake": ["food_preferred"]},
+        "prefer_with": ["sub_aaaaaaaaaa"],
+        "scheduling_assessment": {"intake": {"conclusion": "insufficient"}},
+    }.items():
+        assert schema_errors(
+            _make_substance_card(**{field: value}), "substance", Path("substance.yaml"), ontology_bundle()
+        ), field

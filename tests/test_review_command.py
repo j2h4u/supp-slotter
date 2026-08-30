@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import yaml
 from planner.engine import cmd_review
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,15 +26,15 @@ def _write_minimal_data_root(tmp: Path) -> None:
     # One substance carrying knowledge.risk: [manual_review]
     # ID pattern: ^sub_[a-z0-9]{10}$ — 'aabbccdd01' = 10 chars
     (substances_dir / "test_risk__sub_aabbccdd01.yaml").write_text(
-        "id: sub_aabbccdd01\nname: Test Risk Sub\nconcerns:\n- kind: safety\n  text: Active concern\nknowledge:\n  risk:\n  - value: manual_review\n    research_state: unassessed\n    sources: []\n"
+        "id: sub_aabbccdd01\nname: Test Risk Sub\nconcerns:\n- kind: data_quality\n  text: Active data-quality note\nknowledge:\n  risk:\n  - value: manual_review\n    research_state: unassessed\n    sources: []\n"
     )
     (substances_dir / "inactive_concern__sub_aabbccdd03.yaml").write_text(
-        "id: sub_aabbccdd03\nname: Inactive Concern\nconcerns:\n- kind: safety\n  text: Inactive concern\n"
+        "id: sub_aabbccdd03\nname: Inactive Concern\nconcerns:\n- kind: data_quality\n  text: Inactive data-quality note\n"
     )
-    (substances_dir / "review_with_source__sub_aabbccdd08.yaml").write_text(
+    (substances_dir / "co_use_context_source__sub_aabbccdd08.yaml").write_text(
         "id: sub_aabbccdd08\nname: L-Citrulline (malate)\nknowledge:\n  effect:\n  - value: nitric_oxide_support\n    research_state: unassessed\n    sources: []\n"
     )
-    (substances_dir / "review_with_target__sub_aabbccdd09.yaml").write_text(
+    (substances_dir / "co_use_context_target__sub_aabbccdd09.yaml").write_text(
         "id: sub_aabbccdd09\nname: Tadalafil\nknowledge:\n  effect:\n  - value: pde5_inhibition\n    research_state: unassessed\n    sources: []\n"
     )
 
@@ -67,18 +68,14 @@ def _write_minimal_data_root(tmp: Path) -> None:
         "      circadian_anchor: wake\n"
     )
 
-    # Canonical typed selector relation for concrete endpoint matching.
+    # Copy an exact generated assertion so the command has no fixture-only
+    # semantic authority.
+    vocabulary = yaml.safe_load((ROOT / "ontology/generated/runtime-vocabulary.yaml").read_text())
+    assert isinstance(vocabulary, dict)
+    catalog = vocabulary["ontology_assertions"]
+    assert isinstance(catalog, dict)
     (tmp / "data" / "relations.yaml").write_text(
-        "relations:\n"
-        "- id: rel_fixture_review_with\n"
-        "  relation_type: review_with\n"
-        "  assertion_kind: clinical_review_signal\n"
-        "  semantic_family: clinical_review_signal\n"
-        "  source_selector: {category: effect, term: nitric_oxide_support}\n"
-        "  target_selector: {category: effect, term: pde5_inhibition}\n"
-        "  reason: Fixture review_with relation.\n"
-        "  research_state: unassessed\n"
-        "  sources: []\n"
+        yaml.safe_dump({"relations": [catalog["rel_co_use_context_001"]]}, sort_keys=False)
     )
 
 
@@ -94,28 +91,27 @@ def test_cmd_review_accepts_canonical_typed_selector_relation(tmp_path: Path) ->
     output = result.output
 
     assert result.exit_code == 0
-    assert "Actionable relation warnings (" in output
+    assert "Unassessed relation leads (" in output
 
 
 def test_cmd_review_renders_current_active_relation_metadata() -> None:
     result = cmd_review(data_root=ROOT)
 
     assert result.exit_code == 0, result.stderr
-    relation_section = result.output.split("Actionable relation warnings", maxsplit=1)[1]
+    relation_section = result.output.split("Evidence relations involving current stack", maxsplit=1)[1]
     assert (
-        "Calcium -> Zinc [warning: review_with_substance_present]\n"
-        "      Calcium reduced zinc absorption in some high-calcium/co-ingestion studies while ordinary-food studies did not; "
-        "the signal is dose-, meal-, phytate-, salt-, and endpoint-dependent, and long-term relevance remains unresolved.\n"
-        "      severity: medium\n"
-        "      action: Review calcium and zinc context together; prefer separate slots only when feasible for independently "
-        "schedulable products, never split a combination or impose a universal interval."
+        "Calcium <-> Zinc\n"
+        "      Calcium reduced zinc absorption in some high-calcium co-ingestion studies while ordinary-food studies did not; "
+        "the signal is dose-, meal-, phytate-, salt-, and endpoint-dependent, and long-term relevance remains unresolved. "
+        "No universal interval or scheduling conclusion is established.\n"
+        "      state: supported\n"
     ) in relation_section
 
 
-def test_cmd_review_bounds_actionable_sections_and_does_not_duplicate_action(tmp_path: Path) -> None:
+def test_cmd_review_bounds_descriptive_sections_without_duplicate_data_quality_notes(tmp_path: Path) -> None:
     _write_minimal_data_root(tmp_path)
     output = cmd_review(data_root=tmp_path).output
-    assert output.count("Active concern") == 1
+    assert output.count("Active data-quality note") == 1
     assert len(output.splitlines()) < 80
 
 

@@ -300,13 +300,6 @@
         }
       ]
     },
-    "concern_catalog": [
-      {
-        "concern_kind": "safety",
-        "id": "concern_warning_safety",
-        "warning_type": "safety_concern"
-      }
-    ],
     "dashboard_state_catalog": {
       "product_tracking_states": [
         {
@@ -471,12 +464,6 @@
           "id": "publication_boundary",
           "rule": "publish only Optimal results proved globally; conflicts, invalid inputs, interruption, timeout, or resource exhaustion are layout-free Indeterminate results.",
           "source_of_truth": "ontology/runtime-policy.yaml + canonical optimizer"
-        },
-        {
-          "category": "warnings",
-          "id": "relation_warning_truth",
-          "rule": "active endpoint truth is intersection with components of products in non-inactive stacks; classify all four endpoint states; apply authored filters and active sides; preserve reverse output; deduplicate by endpoint/type key.",
-          "source_of_truth": "ontology/runtime-policy.yaml + relation assertion projection"
         }
       ],
       "tie_break": "stable_item_id_then_(slot.order,slot_id)"
@@ -488,43 +475,10 @@
         "entity",
         "term"
       ],
-      "relation_presence_active_sides": [
-        "both",
-        "none",
-        "source",
-        "target"
-      ],
-      "relation_presence_truth_table": [
-        {
-          "source_active": false,
-          "target_active": false
-        },
-        {
-          "source_active": false,
-          "target_active": true
-        },
-        {
-          "source_active": true,
-          "target_active": false
-        },
-        {
-          "source_active": true,
-          "target_active": true
-        }
-      ],
       "relation_selector_forms": [
         "entity_id",
         "name",
         "term"
-      ],
-      "relation_warning_active_sides": [
-        "both",
-        "source",
-        "target"
-      ],
-      "relation_warning_filter_fields": [
-        "assertion_kind",
-        "semantic_family"
       ],
       "stack_partition": {
         "excluded_stack_names": [
@@ -538,74 +492,6 @@
         "tracked_unassigned_partition_name": "tracked_unassigned"
       }
     },
-    "relation_presence_statuses": [
-      {
-        "description": "both endpoints active",
-        "id": "relation_presence_both_active",
-        "source_active": true,
-        "status": "both_active",
-        "target_active": true
-      },
-      {
-        "description": "source active, target absent",
-        "id": "relation_presence_missing_target",
-        "source_active": true,
-        "status": "missing_target",
-        "target_active": false
-      },
-      {
-        "description": "target active, source absent",
-        "id": "relation_presence_missing_source",
-        "source_active": false,
-        "status": "missing_source",
-        "target_active": true
-      },
-      {
-        "description": "both endpoints absent",
-        "id": "relation_presence_neither_active",
-        "source_active": false,
-        "status": "neither_active",
-        "target_active": false
-      }
-    ],
-    "relation_warning_rules": [
-      {
-        "active_side": "both",
-        "filter_field": "assertion_kind",
-        "filter_value": "clinical_review_signal",
-        "id": "relation_warning_review_with_present",
-        "relation_kind": "review_with",
-        "reverse_output": false,
-        "warning_type": "review_with_substance_present"
-      },
-      {
-        "active_side": "source",
-        "filter_field": "semantic_family",
-        "filter_value": "nutrient_balance_review_signal",
-        "id": "relation_warning_missing_balance_forward",
-        "relation_kind": "balance",
-        "reverse_output": false,
-        "warning_type": "missing_balance_substance"
-      },
-      {
-        "active_side": "target",
-        "filter_field": "semantic_family",
-        "filter_value": "nutrient_balance_review_signal",
-        "id": "relation_warning_missing_balance_reverse",
-        "relation_kind": "balance",
-        "reverse_output": true,
-        "warning_type": "missing_balance_substance"
-      },
-      {
-        "active_side": "target",
-        "filter_field": "assertion_kind",
-        "filter_value": "ontology_assertion",
-        "id": "relation_warning_missing_support",
-        "relation_kind": "supports",
-        "reverse_output": false,
-        "warning_type": "missing_support_substance"
-      }
-    ],
     "selector_form_capabilities": [
       {
         "endpoint_kind": "entity",
@@ -625,40 +511,14 @@
         "selector_form": "term",
         "show_match_details": true
       }
-    ],
-    "warning_types": [
-      {
-        "action_text": "Review this safety concern before treating the schedule as final.",
-        "id": "warning_safety_concern",
-        "label": "Safety concern",
-        "warning_type": "safety_concern"
-      },
-      {
-        "action_text": "Review whether the paired balancing substance should be present in the active stack.",
-        "id": "warning_missing_balance_substance",
-        "label": "Missing balancing substance",
-        "warning_type": "missing_balance_substance"
-      },
-      {
-        "action_text": "Review whether this support relationship is applicable in context; absence from the tracked stack alone does not establish a need to add or supplement it.",
-        "id": "warning_missing_support_substance",
-        "label": "Conditional support review",
-        "warning_type": "missing_support_substance"
-      },
-      {
-        "action_text": "Review this active pairing; the planner surfaces it for operator review and does not separate it by slot.",
-        "id": "warning_review_with_substance_present",
-        "label": "Active review pairing",
-        "warning_type": "review_with_substance_present"
-      }
     ]
   },
   "provenance": {
-    "compiler_sha256": "7b81b2331eab3e7ef14304c7e9cda84f28968d9b464bdac326af6d5e8897a44f",
+    "compiler_sha256": "ce8b3ef0a1b698a1e8c037e5b0f3b6c9ab53f1cd8363a196a8f93821c30b0406",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "1dc8f5f09bae0f92c03122ea7e4f5af045e3a544e72a106e4bf09ebc1e4eda7e"
+    "source_sha256": "0c96829eff5ce1f700c316c946c70bf1eb557fc767a0719c4006d0f42ea1a171"
   },
   "schema_version": "2",
-  "source_hash": "7ca48a9e49015ceb90cefe37810bdea8112175cda59ea548f84573a384237f58"
+  "source_hash": "aff7792c60d5ad88cafd48aaa3f4c58659fe59517b8533b326a8fc790f846c73"
 }

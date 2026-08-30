@@ -242,8 +242,8 @@ def test_relation_loader_rejects_reversed_directionless_duplicate(tmp_path: Path
     path = tmp_path / "data" / "relations.yaml"
     path.parent.mkdir()
     common = {
-        "relation_type": "review_with",
-        "assertion_kind": "clinical_review_signal",
+        "relation_type": "co_use_context",
+        "assertion_kind": "co_use_evidence",
         "semantic_family": "test",
         "reason": "direction probe",
         "research_state": "unassessed",
@@ -276,7 +276,7 @@ def test_relation_loader_rejects_reversed_directionless_duplicate(tmp_path: Path
         "sub_known000": Substance("sub_known000", "Known"),
         "sub_other000": Substance("sub_other000", "Other"),
     }
-    with pytest.raises(CardLoadError, match="non-directional relation type 'review_with'"):
+    with pytest.raises(CardLoadError, match="non-directional relation type 'co_use_context'"):
         load_global_relations(Paths.from_root(tmp_path), ontology_bundle(), substances)
 
 

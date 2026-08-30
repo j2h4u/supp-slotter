@@ -12,9 +12,6 @@ notes: Beetroot extract or juice concentrate is usually modeled for dietary nitr
   nitrate dosing than for unspecified beetroot powders or extracts, so label nitrate amount matters. Source refs include PMID
   23580439, PMID 24791915, and PMID 41515267.
 concerns:
-- kind: safety
-  text: Review with PDE5 inhibitors, nitrates, antihypertensives, or symptomatic low blood pressure context because nitrate-rich
-    beetroot products can add nitric-oxide and blood-pressure review load.
 - kind: data_quality
   text: Product labels should disclose nitrate content or standardization before treating beetroot extract as a meaningful
     dietary nitrate intervention.

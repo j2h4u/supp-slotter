@@ -10,9 +10,6 @@ concerns:
 - kind: data_quality
   text: Product cards should record polyphenol standardization and whether the extract is bergamot polyphenol fraction, whole
     fruit extract, or another preparation.
-- kind: safety
-  text: Review medication interactions for citrus-derived concentrated extracts, especially if statins, calcium-channel blockers,
-    or other CYP-sensitive drugs are present.
 knowledge:
   context:
   - value: antioxidant_protection

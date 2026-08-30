@@ -9,9 +9,6 @@ notes: 'Knowledge-only nootropic/anxiolytic/sleep-adjacent safety reference card
   higher safety and regulatory concern than routine supplements. Sources checked: PubChem CID 14113; FDA phenibut dietary-supplement
   constituent update.'
 concerns:
-- kind: safety
-  text: Phenibut is not a lawful dietary ingredient under FDA's current position and has clinically important CNS-depressant,
-    dependence, and withdrawal review context; treat any product exposure as manual safety review.
 - kind: model_gap
   text: The ontology does not yet have dedicated dependence/withdrawal or CNS-depressant interaction traits; manual_review
     is sufficient until several cards need those axes.

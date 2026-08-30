@@ -18,7 +18,6 @@ from planner.engine.results import CheckResult
 from planner.ontology.artifacts import OntologyBundle, load_ontology
 from planner.ontology.canonical_facts import validate_canonical_scheduling
 from planner.ontology.errors import OntologyInfrastructureError
-from planner.ontology.warning_policy import check_warning_type_references
 from planner.paths import ROOT, Paths
 from planner.schema_validation import schema_errors
 from planner.yaml_io import load_yaml
@@ -104,7 +103,6 @@ def _load_domain_validators(paths: Paths, info: list[str], bundle: OntologyBundl
     except CardLoadError as e:
         report([e.message], info)
         return CheckResult(exit_code=1, errors=[e.message], info=info)
-    errors.extend(check_warning_type_references(bundle))
     return CheckResult(exit_code=0, errors=errors, info=info)
 
 

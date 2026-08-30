@@ -6,9 +6,6 @@ notes: Ginkgo component listed on the Minami Healthy Foods nattokinase label. MS
 concerns:
 - kind: data_quality
   text: Minami Nattokinase lists ginkgo biloba extract but does not disclose dose or extract standardization.
-- kind: safety
-  text: Review with anticoagulants/antiplatelets, seizure history, insulin or antidiabetes therapy, efavirenz, midazolam,
-    and other CYP/P-gp-sensitive medications; product dose and extract standardization are not captured on the current label.
 knowledge:
   context:
   - value: neurocognitive_support

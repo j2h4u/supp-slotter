@@ -130,7 +130,7 @@ final-review boxes at the end deliberately remain open.
   - Evidence: `ca8b323561ba667522f6d4e96db77bfbf989e523` through
     `6bc4d9fba7bdb73f31cb6a0add0db460d2a2e59a`; final-head `just release` ->
     exit 0, ontology B 34 and runtime 71. Witnesses:
-    `tests/test_canonical_scheduling_migration.py::test_no_runtime_consumer_reads_the_removed_card_fields`,
+    `tests/test_architecture_contracts.py::test_runtime_has_no_legacy_stored_schedule_answer_consumers`,
     `tests/test_runtime_contract_v2.py::test_retired_objective_and_pair_fields_are_rejected`,
     `docs/migrations/legacy-atom-ledger.yaml`, `planner/canonical_optimizer.py`,
     `tests/test_scheduler_reviewer_authority.py::test_review_only_relation_cannot_change_command_level_schedule`.
@@ -173,22 +173,18 @@ final-review boxes at the end deliberately remain open.
   knowledge.** Resolve all `sol_adjudication` atoms into typed facts, raw
   quotations, source metadata, or explicit exclusions. Never bulk-translate a
   legacy placement into a canonical fact.
-  - Closure receipt: Git-derived reconstruction covers the original 2,161
-    atoms, including 1,786 originally routed to Sol: 1,129 retained unchanged,
-    771 explicit exclusions, 255 source-metadata rows, and six typed facts.
-    The receipt records deterministic crosswalk and classification-ruleset
-    hashes; the complete row crosswalk is generated, verified, and discarded in
-    a temporary directory rather than checked in as a museum.
-  - Acceptance: the receipt reconstructs every original atom and every selected
-    scheduling atom has exactly one permitted final disposition before source
-    deletion; no pending Sol queue is retained as runtime state.
+  - Closure receipt: the immutable record now contains only its format,
+    acceptance state, closure commit, and checked field-shape hash. It is not a
+    historical reconstruction or a generated museum.
+  - Acceptance: the receipt has exactly the immutable four-field shape and its
+    declared hash; no pending Sol queue or migration generator is runtime state.
   - Evidence: `9050ca70ea2eaff6c92dc86612219634a985fb90` and
     `cdc33c5f7a013b151516a9e58beff4b0a21715e3` through
     `6bc4d9fba7bdb73f31cb6a0add0db460d2a2e59a`; final-head `just release` ->
     exit 0, ontology B 34. Witnesses:
-    `tests/test_canonical_scheduling_migration.py::test_compact_receipt_reconstructs_and_closes_every_original_atom`,
-    `tests/test_canonical_scheduling_migration.py::test_card_deletion_has_no_collateral_semantic_change`,
-    `docs/migrations/legacy-atom-ledger.yaml`, `scripts/generate_migration_ledger.py`.
+    `tests/test_schemas.py::test_substance_schema_rejects_retired_stored_schedule_answers`,
+    `tests/test_architecture_contracts.py::test_runtime_has_no_legacy_stored_schedule_answer_consumers`,
+    immutable `docs/migrations/legacy-atom-ledger.yaml` (generator retired).
 
 - [x] **Add a canonical-runtime acceptance gate.** It must cover laws,
   normalization, contradiction, exact objective stages, stable tie-break,
@@ -210,7 +206,7 @@ final-review boxes at the end deliberately remain open.
   - Evidence: `cdc33c5f7a013b151516a9e58beff4b0a21715e3` through
     `6bc4d9fba7bdb73f31cb6a0add0db460d2a2e59a`; final-head `just release` ->
     exit 0, ontology B 34/C 60 and CRAP 237. Witnesses:
-    `tests/test_read_model_relations.py::test_typed_read_model_projects_complete_partition_facts_relations_and_warnings`,
+    `tests/test_read_model_relations.py::test_partition_and_direct_relation_classification`,
     `tests/test_architecture_contracts.py::test_runtime_planner_has_no_linkml_compiler_symbols`,
     `planner/query_model/read_model.py`, `planner/query_model/types.py`.
 
@@ -251,12 +247,12 @@ final-review boxes at the end deliberately remain open.
 - [x] **Make unassigned ownership explicit.** Every tracked product belongs to
   exactly one active domain, inactive, or an explicit `tracked_unassigned`
   state with a reason. Accidental stack omission must not silently remove it
-  from scheduling, warnings, and grooming.
+  from scheduling, relation evidence, and grooming.
   - Evidence: `cdc33c5f7a013b151516a9e58beff4b0a21715e3` through
     `6bc4d9fba7bdb73f31cb6a0add0db460d2a2e59a`; final-head `just release` ->
     exit 0, ontology C 60, runtime 71, and CRAP 237. Witnesses:
     `tests/test_runtime_contract_v2.py::test_authored_stack_partition_is_closed_and_reproduces_active_membership`,
-    `tests/test_read_model_relations.py::test_typed_read_model_projects_complete_partition_facts_relations_and_warnings`,
+    `tests/test_read_model_relations.py::test_partition_and_direct_relation_classification`,
     `tests/test_grooming.py::test_receipt_catalog_closes_the_real_active_queue`, `data/stacks.yaml`.
 
 - [x] **Enforce pillbox/stack topology uniqueness.** A stack cannot silently be
@@ -315,11 +311,11 @@ final-review boxes at the end deliberately remain open.
 ## Medium — verification workflow
 
 - [x] **Add one compact read-model cutover acceptance.** Assert the normalized
-  active/inactive identities, fact index, relation classes, warning identities,
+  active/inactive identities, fact index, relation classes, relation rows,
   matches, ordering, and deduplication over a representative fixture.
   - Evidence: `70b6dc53d49ab7bfa067f26a678045589d8d677e` through
     `6bc4d9fba7bdb73f31cb6a0add0db460d2a2e59a`; final-head `just release` ->
-    exit 0, CRAP 237. Witness: `tests/test_read_model_relations.py::test_typed_read_model_projects_complete_partition_facts_relations_and_warnings`;
+    exit 0, CRAP 237. Witness: `tests/test_read_model_relations.py::test_partition_and_direct_relation_classification`;
     fixture and typed facade: `planner/query_model/read_model.py`.
 
 - [x] **Make release inventory exhaustive.** Exact-node modules must not allow
@@ -342,13 +338,13 @@ final-review boxes at the end deliberately remain open.
     `tests/test_cutover_vertical_scenarios.py::test_real_shelf_daily_episodic_and_training_products_are_complete`,
     `justfile`.
 
-- [x] **Clear the current static release blocker.** Resolve the existing
-  migration-ledger type errors so the final release gate can actually complete.
+- [x] **Clear the current static release blocker.** Remove the retired
+  migration-generator gate and keep the compact receipt outside runtime typing.
   - Evidence: `6bc4d9fba7bdb73f31cb6a0add0db460d2a2e59a`; final-head `just
     release` -> exit 0, static checks clean and release CRAP 237; `just
     crap-check` final release report -> 707 functions, zero at CRAP >=30,
-    coverage 82%. Durable boundary: `scripts/generate_migration_ledger.py`,
-    `docs/migrations/legacy-atom-ledger.yaml`, `justfile`.
+    coverage 82%. Durable boundary: immutable `docs/migrations/legacy-atom-ledger.yaml`
+    (generator retired), `justfile`.
 
 ## Final cutover acceptance
 
@@ -403,7 +399,7 @@ final-review boxes at the end deliberately remain open.
   - Evidence: `ca8b323561ba667522f6d4e96db77bfbf989e523` through
     `6bc4d9fba7bdb73f31cb6a0add0db460d2a2e59a`; final-head `just release` ->
     exit 0, ontology B 34 and runtime 71. Witnesses:
-    `tests/test_canonical_scheduling_migration.py::test_no_runtime_consumer_reads_the_removed_card_fields`,
+    `tests/test_architecture_contracts.py::test_runtime_has_no_legacy_stored_schedule_answer_consumers`,
     `tests/test_runtime_contract_v2.py::test_retired_objective_and_pair_fields_are_rejected`,
     deletion inventory in `git show --stat ca8b323`.
 - [x] Targeted acceptance, runtime scenarios, static checks, and one final
@@ -488,10 +484,10 @@ acceptance bullets:
 | Grooming alignment | Queue fixture surfaces missing canonical coverage and unresolved Sol work; completed cards are not repeatedly selected; Luna output cannot adjudicate facts. |
 | Applicability scope | Product/form-specific fixture affects only its stable composition role; a genuinely substance-wide fixture applies to all roles. |
 | Complete query catalogs | Missing product, substance, component, or assertion reference fails closed; complete catalogs preserve the expected identity sets. |
-| Read-model cutover acceptance | One representative fixture asserts active/inactive IDs, facts, relation classes, warnings, matches, ordering, and deduplication together. |
+| Read-model cutover acceptance | One representative fixture asserts active/inactive IDs, facts, relation classes, rows, matches, ordering, and deduplication together. |
 | Exhaustive release inventory | Collection comparison proves every test node is either selected or explicitly excluded with a reason. |
 | Fast development gate | Measured gate includes one real-shelf runtime path, performs validation once, and leaves ontology/corpus/full checks explicit. |
-| Static release blocker | The canonical static recipe completes with no migration-ledger type errors on the final head. |
+| Static release blocker | The canonical static recipe completes with the retired migration generator absent from every gate. |
 
 The canonical laws row must link to the exact truth-table test cases for every
 value enumerated in the normative domain model; referring only to a broad suite

@@ -5,9 +5,6 @@ aliases:
 - artichoke extract
 notes: Botanical extract sometimes used for lipid and bile-flow support. Meta-analyses of randomized trials suggest modest
   reductions in total cholesterol, LDL-C, and triglycerides, but evidence quality and product standardization vary.
-concerns:
-- kind: safety
-  text: Review gallbladder/bile-duct disease, ragweed-family allergy context, and product standardization before active use.
 knowledge:
   effect:
   - value: lipid_metabolism_support

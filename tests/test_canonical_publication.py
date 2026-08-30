@@ -227,7 +227,6 @@ pillboxes:
       first:
         label: First
         products: [{item_id: item_a, label: Alpha}, {item_id: item_b, label: Beta}]
-        substances: []
 """,
         encoding="utf-8",
     )

@@ -7,8 +7,6 @@ notes: Generic elemental chromium contribution. Product cards keep the concrete 
   NIH ODS describes chromium in an insulin-action / glucose-metabolism context, but routine glycemic benefit is mixed and any
   body-composition effect is trivial. EFSA 2008 is used here for source safety, not efficacy or scheduling.
 concerns:
-- kind: safety
-  text: Review if insulin, metformin, or other antidiabetes medication is present because additive hypoglycemia is possible. NIH ODS reports reduced levothyroxine absorption specifically with chromium picolinate co-administered with levothyroxine (PMID 17499152); this does not establish a fixed interval for generic chromium or chromium nicotinate glycinate.
 - kind: model_gap
   text: This generic elemental card spans multiple supplemental chromium forms; the chromium picolinate/levothyroxine signal (PMID 17499152) cannot become a generic chromium relation or fixed interval.
 knowledge:

@@ -35,8 +35,9 @@ classes:
     slots: [id, fact_value, meal_context]
     annotations:
       canonical_fact_family: FoodEffect
-      canonical_catalog_slot: food_effect_laws
       canonical_pressure_dimension: meal_context
+      canonical_fact_value_slot: fact_value
+      canonical_pressure_value_slot: meal_context
     slot_usage:
       id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
       fact_value: {required: true, range: FoodEffectValue, multivalued: false}
@@ -47,8 +48,9 @@ classes:
     slots: [id, fact_value, circadian_anchor]
     annotations:
       canonical_fact_family: AcuteAlertnessEffect
-      canonical_catalog_slot: acute_alertness_effect_laws
       canonical_pressure_dimension: circadian_anchor
+      canonical_fact_value_slot: fact_value
+      canonical_pressure_value_slot: circadian_anchor
     slot_usage:
       id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
       fact_value: {required: true, range: AcuteAlertnessEffectValue, multivalued: false}
@@ -59,8 +61,9 @@ classes:
     slots: [id, fact_value, circadian_anchor]
     annotations:
       canonical_fact_family: AcuteSleepEffect
-      canonical_catalog_slot: acute_sleep_effect_laws
       canonical_pressure_dimension: circadian_anchor
+      canonical_fact_value_slot: fact_value
+      canonical_pressure_value_slot: circadian_anchor
     slot_usage:
       id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
       fact_value: {required: true, range: AcuteSleepEffectValue, multivalued: false}
@@ -71,8 +74,9 @@ classes:
     slots: [id, fact_value, exercise_anchor]
     annotations:
       canonical_fact_family: PreExercisePerformanceEffect
-      canonical_catalog_slot: pre_exercise_performance_effect_laws
       canonical_pressure_dimension: exercise_anchor
+      canonical_fact_value_slot: fact_value
+      canonical_pressure_value_slot: exercise_anchor
     slot_usage:
       id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
       fact_value: {required: true, range: PreExercisePerformanceEffectValue, multivalued: false}
@@ -83,8 +87,9 @@ classes:
     slots: [id, fact_value, exercise_anchor]
     annotations:
       canonical_fact_family: PostExerciseRecoveryEffect
-      canonical_catalog_slot: post_exercise_recovery_effect_laws
       canonical_pressure_dimension: exercise_anchor
+      canonical_fact_value_slot: fact_value
+      canonical_pressure_value_slot: exercise_anchor
     slot_usage:
       id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
       fact_value: {required: true, range: PostExerciseRecoveryEffectValue, multivalued: false}
@@ -128,7 +133,7 @@ classes:
     slots: [value]
     annotations:
       canonical_fact_family: FoodEffect
-      canonical_catalog_slot: food_effects
+      canonical_fact_value_slot: value
     slot_usage:
       value: {required: true, range: FoodEffectValue, multivalued: false}
 
@@ -138,7 +143,7 @@ classes:
     slots: [value]
     annotations:
       canonical_fact_family: AcuteAlertnessEffect
-      canonical_catalog_slot: acute_alertness_effects
+      canonical_fact_value_slot: value
     slot_usage:
       value: {required: true, range: AcuteAlertnessEffectValue, multivalued: false}
 
@@ -148,7 +153,7 @@ classes:
     slots: [value]
     annotations:
       canonical_fact_family: AcuteSleepEffect
-      canonical_catalog_slot: acute_sleep_effects
+      canonical_fact_value_slot: value
     slot_usage:
       value: {required: true, range: AcuteSleepEffectValue, multivalued: false}
 
@@ -158,7 +163,7 @@ classes:
     slots: [value]
     annotations:
       canonical_fact_family: PreExercisePerformanceEffect
-      canonical_catalog_slot: pre_exercise_performance_effects
+      canonical_fact_value_slot: value
     slot_usage:
       value: {required: true, range: PreExercisePerformanceEffectValue, multivalued: false}
 
@@ -168,7 +173,7 @@ classes:
     slots: [value]
     annotations:
       canonical_fact_family: PostExerciseRecoveryEffect
-      canonical_catalog_slot: post_exercise_recovery_effects
+      canonical_fact_value_slot: value
     slot_usage:
       value: {required: true, range: PostExerciseRecoveryEffectValue, multivalued: false}
 
@@ -210,6 +215,7 @@ classes:
     slots: [id]
     annotations:
       source_identity_only: true
+      canonical_evidence_source_role: true
     slot_usage:
       id: {required: true, pattern: '^src_[a-z0-9][a-z0-9_:-]*$', multivalued: false}
 
@@ -242,6 +248,7 @@ slots:
   applicability: {range: FactApplicability, inlined: true, multivalued: false}
   provenance: {multivalued: true, range: EvidenceProvenance, inlined: true, inlined_as_list: true}
   composition_role: {range: CompositionRole, inlined: false, multivalued: false}
+  source: {range: EvidenceSource, inlined: false, multivalued: false}
   locator: {multivalued: false}
   quotation: {multivalued: false}
   id: {identifier: true, required: true}

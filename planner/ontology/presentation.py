@@ -76,6 +76,15 @@ class OntoCleanProfile:
 
 
 @dataclass(frozen=True, slots=True)
+class RelationPresentation:
+    """Authored display metadata for one canonical relation type."""
+
+    label: str
+    order: int
+    directional: bool
+
+
+@dataclass(frozen=True, slots=True)
 class _TermContext:
     source: object
     categories: Mapping[str, tuple[str, ...]]
@@ -143,6 +152,7 @@ _PROFILE_CACHE = _VerifiedBundleCache[Mapping[str, OntoCleanProfile]]()
 _CATEGORY_CACHE = _VerifiedBundleCache[Mapping[str, tuple[str, ...]]]()
 _TERM_CACHE = _VerifiedBundleCache[tuple[Mapping[str, object], ...]]()
 _TERM_LABEL_CACHE = _VerifiedBundleCache[Mapping[tuple[str, str], str]]()
+_RELATION_PRESENTATION_CACHE = _VerifiedBundleCache[Mapping[str, RelationPresentation]]()
 
 
 def load_term_labels(bundle: OntologyBundleView) -> Mapping[tuple[str, str], str]:
@@ -155,6 +165,63 @@ def load_term_labels(bundle: OntologyBundleView) -> Mapping[tuple[str, str], str
     """
 
     return _TERM_LABEL_CACHE.get(bundle, _decode_term_labels)
+
+
+def authored_term_label(term_id: str, bundle: OntologyBundleView) -> str:
+    """Resolve a ``namespace:slug`` term through its authored label."""
+    namespace, separator, slug = term_id.partition(":")
+    if not separator or not namespace or not slug:
+        raise ValueError(f"ontology term id {term_id!r} is malformed; raw id is diagnostic only")
+    try:
+        return load_term_labels(bundle)[(namespace, slug)]
+    except KeyError as error:
+        raise ValueError(f"ontology term {term_id!r} has no authored label; raw id is diagnostic only") from error
+
+
+def authored_relation_label(relation_type: str, bundle: OntologyBundleView) -> str:
+    """Resolve a relation type through its authored presentation catalog."""
+    return authored_relation_presentation(relation_type, bundle).label
+
+
+def authored_relation_presentation(relation_type: str, bundle: OntologyBundleView) -> RelationPresentation:
+    """Resolve closed relation presentation metadata from the verified catalog."""
+    try:
+        return load_relation_presentations(bundle)[relation_type]
+    except KeyError as error:
+        raise ValueError(f"ontology relation type {relation_type!r} has no authored presentation") from error
+
+
+def load_relation_presentations(bundle: OntologyBundleView) -> Mapping[str, RelationPresentation]:
+    return _RELATION_PRESENTATION_CACHE.get(bundle, _decode_relation_presentations)
+
+
+def _decode_relation_presentations(bundle: OntologyBundleView) -> Mapping[str, RelationPresentation]:
+    source = bundle.root / "generated" / "runtime-vocabulary.yaml"
+    relation_types = bundle.runtime_vocabulary.get("relation_types")
+    if not isinstance(relation_types, Mapping) or not relation_types:
+        raise _error("ontology relation_types presentation catalog is missing", source)
+    decoded: dict[str, RelationPresentation] = {}
+    seen_orders: set[int] = set()
+    for relation_type, raw_relation in relation_types.items():
+        if (
+            not isinstance(relation_type, str)
+            or not _CANONICAL_NAME_PATTERN.fullmatch(relation_type)
+            or not isinstance(raw_relation, Mapping)
+        ):
+            raise _error("ontology relation_types presentation catalog is malformed", source)
+        relation = cast(Mapping[str, object], raw_relation)
+        if set(relation) != {"id", "label", "order", "directional", "source_selector_forms", "target_selector_forms"}:
+            raise _error(f"ontology relation type {relation_type!r} has invalid presentation shape", source)
+        label, order, directional = relation.get("label"), relation.get("order"), relation.get("directional")
+        if relation.get("id") != relation_type or not isinstance(label, str) or not label.strip():
+            raise _error(f"ontology relation type {relation_type!r} has invalid identity or label", source)
+        if isinstance(order, bool) or not isinstance(order, int) or order < 0 or order in seen_orders:
+            raise _error(f"ontology relation type {relation_type!r} has invalid or duplicate order", source)
+        if not isinstance(directional, bool):
+            raise _error(f"ontology relation type {relation_type!r} has invalid directional flag", source)
+        seen_orders.add(order)
+        decoded[relation_type] = RelationPresentation(label, order, directional)
+    return MappingProxyType(decoded)
 
 
 def _decode_term_labels(bundle: OntologyBundleView) -> Mapping[tuple[str, str], str]:

@@ -34,10 +34,8 @@ from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
     IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
     IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS,
-    IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE,
     IMPLEMENTED_RELATION_SELECTOR_FORMS,
 )
-from planner.ontology.runtime_program import RUNTIME_PROJECTION_FIELDS
 from planner.yaml_io import safe_load_yaml
 from rdflib import BNode, Graph, Literal
 from rdflib.namespace import RDF, SH
@@ -75,19 +73,6 @@ _REPOSITORY_LOCATOR_KINDS = {"flat_root", "explicit_path", "explicit_paths", "ca
 
 _ONTOCLEAN_RIGIDITY_VALUES = frozenset({"rigid", "anti_rigid"})
 _ONTOCLEAN_DEPENDENCE_VALUES = frozenset({"independent", "dependent"})
-
-_CONDITION_OPERATORS = frozenset({
-    "equals",
-    "contains",
-    "equals_field",
-    "member_of_field",
-    "is_true",
-    "is_false",
-    "all",
-    "any",
-    "not",
-})
-_CONDITION_VALUE_TYPES = frozenset({"string", "strings", "boolean"})
 
 type _RdfTriple = tuple[Node, Node, Node]
 type _JsonValue = str | int | float | bool | None | list[_JsonValue] | dict[str, _JsonValue]
@@ -834,23 +819,6 @@ def _load_relation_types(
     return dict(sorted(result.items()))
 
 
-def _validate_relation_warning_filter_values(
-    runtime: Mapping[str, object], assertions: Mapping[str, Mapping[str, object]]
-) -> None:
-    rules = runtime.get("relation_warning_rules")
-    if not isinstance(rules, list):
-        return
-    for raw in cast(list[object], rules):
-        if not isinstance(raw, Mapping):
-            continue
-        field = raw.get("filter_field")
-        value = raw.get("filter_value")
-        if field not in {"assertion_kind", "semantic_family"} or not isinstance(value, str):
-            raise OntologyInfrastructureError("relation warning rule filter is invalid")
-        if not any(item.get(field) == value for item in assertions.values()):
-            raise OntologyInfrastructureError(f"relation warning filter value is not authored: {value}")
-
-
 def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> dict[Path, bytes]:
     source_hash = _source_hash(ontology_root, manifest)
     schema_view = _schema_view(ontology_root, manifest)
@@ -873,13 +841,13 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     _validate_linkml_instance(schema_view, "CanonicalFactCatalog", canonical_fact_catalog)
     canonical_law_catalog = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "canonical_laws"))
     _validate_linkml_instance(schema_view, "CanonicalLawCatalog", canonical_law_catalog)
-    canonical_scheduling = _canonical_scheduling(schema_view, canonical_fact_catalog, canonical_law_catalog)
+    canonical_scheduling = _canonical_scheduling(schema_view, manifest, canonical_fact_catalog, canonical_law_catalog)
     ontoclean_profiles = _load_ontoclean_profiles(ontology_root, manifest, schema_view)
     categories = _required_mapping(vocabulary, "semantic_categories")
     _validate_semantic_categories(categories, ontoclean_profiles)
     terms = _normalized_terms(vocabulary, ontoclean_profiles)
     relation_types = _load_relation_types(ontology_root, manifest, schema_view)
-    runtime = _load_runtime_policy(ontology_root, manifest, schema_view, set(relation_types))
+    runtime = _load_runtime_policy(ontology_root, manifest, schema_view)
     ontology_assertions = _load_ontology_assertions(
         ontology_root,
         manifest,
@@ -889,7 +857,6 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         relation_types,
         _load_substance_identity_registry(ontology_root),
     )
-    _validate_relation_warning_filter_values(runtime.authored, ontology_assertions)
     base_iri = _required_string(manifest, _BASE_IRI_KEY)
     _add_authored_card_fields(schema_view, categories, base_iri)
     header = _header(manifest, source_hash)
@@ -1823,84 +1790,6 @@ def _mapping_tokens_compatible(left: str, right: str) -> bool:
     return False
 
 
-def _unique_record_values(records: Sequence[Mapping[str, object]], field: str, label: str) -> set[str]:
-    values: set[str] = set()
-    for record in records:
-        value = record.get(field)
-        if not isinstance(value, str) or not value:
-            raise OntologyInfrastructureError(f"Runtime {label} requires non-empty {field}")
-        if value in values:
-            raise OntologyInfrastructureError(f"Runtime {label} has duplicate {field} {value!r}")
-        values.add(value)
-    return values
-
-
-def _validate_runtime_condition(
-    value: object,
-    label: str,
-    condition_path_types: Mapping[str, str],
-    *,
-    allow_empty: bool = False,
-) -> None:
-    if not isinstance(value, list) or (not value and not allow_empty):
-        qualifier = "a condition list" if allow_empty else "a non-empty condition list"
-        raise OntologyInfrastructureError(f"Runtime {label} must be {qualifier}")
-    for index, raw in enumerate(value):
-        _validate_runtime_condition_node(raw, f"{label}[{index}]", condition_path_types)
-
-
-def _validate_runtime_condition_node(value: object, label: str, condition_path_types: Mapping[str, str]) -> None:
-    if not isinstance(value, dict):
-        raise OntologyInfrastructureError(f"Runtime {label} condition must be a mapping")
-    operator = value.get("operator")
-    if not isinstance(operator, str) or operator not in _CONDITION_OPERATORS:
-        raise OntologyInfrastructureError(f"Runtime {label} has unknown condition operator")
-    if operator in {"equals", "contains", "equals_field", "member_of_field", "is_true", "is_false"}:
-        expected = (
-            {"operator", "field", "value"}
-            if operator in {"equals", "contains", "equals_field", "member_of_field"}
-            else {"operator", "field"}
-        )
-        if set(value) != expected:
-            raise OntologyInfrastructureError(f"Runtime {label} has invalid keys for {operator}")
-        field = value.get("field")
-        field_type = condition_path_types.get(field) if isinstance(field, str) else None
-        if field_type is None:
-            raise OntologyInfrastructureError(f"Runtime {label} references unknown condition path")
-        if operator in {"equals_field", "member_of_field"}:
-            other = value.get("value")
-            other_type = condition_path_types.get(other) if isinstance(other, str) else None
-            compatible = (
-                field_type == other_type
-                if operator == "equals_field"
-                else field_type == "string" and other_type == "strings"
-            )
-            if not compatible:
-                raise OntologyInfrastructureError(f"Runtime {label} cross-field operands are incompatible")
-        elif operator in {"is_true", "is_false"}:
-            if field_type != "boolean":
-                raise OntologyInfrastructureError(f"Runtime {label} boolean operator requires boolean path")
-        elif operator == "contains":
-            if field_type != "string" or not isinstance(value.get("value"), str) or not value["value"]:
-                raise OntologyInfrastructureError(f"Runtime {label} contains operand is incompatible")
-        elif field_type == "string":
-            if not isinstance(value.get("value"), str) or not value["value"]:
-                raise OntologyInfrastructureError(f"Runtime {label} requires a string operand")
-        elif field_type == "boolean" and not isinstance(value.get("value"), bool):
-            raise OntologyInfrastructureError(f"Runtime {label} requires a boolean operand")
-        return
-    if (
-        set(value) != {"operator", "conditions"}
-        or not isinstance(value.get("conditions"), list)
-        or not value["conditions"]
-    ):
-        raise OntologyInfrastructureError(f"Runtime {label} logical condition requires non-empty conditions")
-    if operator == "not" and len(value["conditions"]) != 1:
-        raise OntologyInfrastructureError(f"Runtime {label} not requires one child")
-    for index, child in enumerate(value["conditions"]):
-        _validate_runtime_condition_node(child, f"{label}.conditions[{index}]", condition_path_types)
-
-
 def _runtime_records(source: Mapping[str, object], slot: str) -> list[dict[str, object]]:
     raw = source.get(slot)
     if not isinstance(raw, list) or not raw:
@@ -1926,6 +1815,13 @@ def _annotation_value(definition: object, name: str) -> str | None:
     return extracted if isinstance(extracted, str) and extracted else None
 
 
+def _annotation_flag(definition: object, name: str) -> bool:
+    annotations = getattr(definition, "annotations", None)
+    value = annotations.get(name) if isinstance(annotations, Mapping) else None
+    extracted = getattr(value, "value", value)
+    return extracted is True or extracted == "true"
+
+
 def _class_slot_range(schema_view: SchemaView, class_name: str, slot_name: str) -> str:
     definition = schema_view.get_class(class_name)
     usage = getattr(definition, "slot_usage", {})
@@ -1944,53 +1840,130 @@ def _enum_values(schema_view: SchemaView, enum_name: str) -> tuple[str, ...]:
     return tuple(sorted(cast(Mapping[str, object], values)))
 
 
+def _catalog_root_ranges(schema_view: SchemaView, manifest: Mapping[str, object], role: str) -> dict[str, str]:
+    catalogs = manifest.get("catalogs")
+    if not isinstance(catalogs, list):
+        raise OntologyInfrastructureError("Manifest catalogs must be a list")
+    matches = [entry for entry in catalogs if isinstance(entry, Mapping) and entry.get("role") == role]
+    if len(matches) != 1:
+        raise OntologyInfrastructureError(f"Manifest must declare exactly one {role!r} catalog")
+    root = matches[0].get("root_class")
+    if not isinstance(root, str) or not root:
+        raise OntologyInfrastructureError(f"Manifest {role!r} catalog requires a root_class")
+    definition = schema_view.get_class(root)
+    slots = getattr(definition, "slots", ()) if definition is not None else ()
+    if not isinstance(slots, (list, tuple)):
+        raise OntologyInfrastructureError(f"Catalog root {root!r} has invalid slots")
+    return {slot: _class_slot_range(schema_view, root, slot) for slot in slots if isinstance(slot, str)}
+
+
+def _pillbox_slot_class(schema_view: SchemaView, manifest: Mapping[str, object]) -> str:
+    projection = manifest.get("repository_projection")
+    sources = projection.get("sources") if isinstance(projection, Mapping) else None
+    if not isinstance(sources, list):
+        raise OntologyInfrastructureError("Manifest repository projection requires sources")
+    pillbox_sources = [source for source in sources if isinstance(source, Mapping) and source.get("id") == "pillboxes"]
+    if len(pillbox_sources) != 1:
+        raise OntologyInfrastructureError("Manifest must declare exactly one pillboxes source")
+    root = pillbox_sources[0].get("root_class")
+    if not isinstance(root, str) or not root:
+        raise OntologyInfrastructureError("Pillbox source requires a root_class")
+    return _class_slot_range(schema_view, root, "slots")
+
+
 def _canonical_scheduling(
-    schema_view: SchemaView, fact_catalog: Mapping[str, object], law_catalog: Mapping[str, object]
+    schema_view: SchemaView,
+    manifest: Mapping[str, object],
+    fact_catalog: Mapping[str, object],
+    law_catalog: Mapping[str, object],
 ) -> dict[str, object]:
-    """Derive all scheduling metadata from LinkML annotations and catalog rows."""
-    slot_definition = schema_view.get_class("Slot")
-    slot_names = set(getattr(slot_definition, "slots", ()) if slot_definition is not None else ())
-    dimensions = {
-        dimension: _enum_values(schema_view, enum_name)
-        for enum_name, definition in schema_view.all_enums().items()
-        if (dimension := _annotation_value(definition, "canonical_pressure_dimension")) is not None
-        and dimension in slot_names
-    }
-    if not dimensions or len(dimensions) != len(set(dimensions)):
-        raise OntologyInfrastructureError("Canonical pressure dimensions must be unique and non-empty")
-    families: dict[str, tuple[str, str]] = {}
-    law_families: dict[str, tuple[str, str, str]] = {}
-    for class_name, definition in schema_view.all_classes().items():
-        family = _annotation_value(definition, "canonical_fact_family")
-        collection = _annotation_value(definition, "canonical_catalog_slot")
-        if family is None or collection is None:
+    """Derive closed scheduling data from manifest roots and semantic annotations."""
+    slot_class = _pillbox_slot_class(schema_view, manifest)
+    slot_definition = schema_view.get_class(slot_class)
+    slot_names = cast(Iterable[object], getattr(slot_definition, "slots", ()) if slot_definition is not None else ())
+    dimensions: dict[str, tuple[str, ...]] = {}
+    for slot_name in slot_names:
+        if not isinstance(slot_name, str):
             continue
-        if class_name.endswith("Law"):
-            dimension = _annotation_value(definition, "canonical_pressure_dimension")
-            if dimension not in dimensions:
-                raise OntologyInfrastructureError(f"Canonical law class {class_name} has unknown pressure dimension")
-            if family in law_families:
-                raise OntologyInfrastructureError(f"Canonical law family {family!r} is declared more than once")
-            law_families[family] = (collection, dimension, _class_slot_range(schema_view, class_name, "fact_value"))
-        else:
-            if family in families:
-                raise OntologyInfrastructureError(f"Canonical fact family {family!r} is declared more than once")
-            families[family] = (collection, _class_slot_range(schema_view, class_name, "value"))
-    if not families or set(families) != set(law_families):
-        raise OntologyInfrastructureError("Canonical fact and law annotations must have exact family coverage")
-    if any(families[family][1] != law_families[family][2] for family in families):
+        usage = getattr(slot_definition, "slot_usage", {}).get(slot_name)
+        dimension = _annotation_value(usage, "canonical_pressure_dimension")
+        if dimension is None:
+            continue
+        enum_name = _class_slot_range(schema_view, slot_class, slot_name)
+        enum = schema_view.all_enums().get(enum_name)
+        if _annotation_value(enum, "canonical_pressure_dimension") != dimension:
+            raise OntologyInfrastructureError(
+                f"Canonical topology slot {slot_name!r} has an unannotated dimension enum"
+            )
+        if dimension in dimensions:
+            raise OntologyInfrastructureError(f"Canonical pressure dimension {dimension!r} is declared more than once")
+        dimensions[dimension] = _enum_values(schema_view, enum_name)
+    if not dimensions:
+        raise OntologyInfrastructureError("Canonical pressure dimensions must be non-empty")
+
+    fact_ranges = _catalog_root_ranges(schema_view, manifest, "canonical_facts")
+    law_ranges = _catalog_root_ranges(schema_view, manifest, "canonical_laws")
+    families: dict[str, tuple[str, str, str]] = {}
+    law_families: dict[str, tuple[str, str, str, str, str]] = {}
+    evidence_collection: str | None = None
+    for collection, class_name in fact_ranges.items():
+        definition = schema_view.get_class(class_name)
+        if _annotation_flag(definition, "canonical_evidence_source_role"):
+            if evidence_collection is not None:
+                raise OntologyInfrastructureError("Canonical fact catalog declares evidence-source role more than once")
+            evidence_collection = collection
+            continue
+        family = _annotation_value(definition, "canonical_fact_family")
+        value_slot = _annotation_value(definition, "canonical_fact_value_slot")
+        if family is None and value_slot is None:
+            continue
+        if family is None or value_slot is None:
+            raise OntologyInfrastructureError(
+                f"Canonical fact class {class_name} requires family and value-slot annotations"
+            )
+        if family in families:
+            raise OntologyInfrastructureError(f"Canonical fact family {family!r} is declared more than once")
+        families[family] = (collection, value_slot, _class_slot_range(schema_view, class_name, value_slot))
+    for collection, class_name in law_ranges.items():
+        definition = schema_view.get_class(class_name)
+        family = _annotation_value(definition, "canonical_fact_family")
+        value_slot = _annotation_value(definition, "canonical_fact_value_slot")
+        dimension = _annotation_value(definition, "canonical_pressure_dimension")
+        pressure_slot = _annotation_value(definition, "canonical_pressure_value_slot")
+        annotations = (family, value_slot, dimension, pressure_slot)
+        if not any(annotations):
+            continue
+        if any(annotation is None for annotation in annotations):
+            raise OntologyInfrastructureError(f"Canonical law class {class_name} has incomplete semantic annotations")
+        if dimension not in dimensions:
+            raise OntologyInfrastructureError(f"Canonical law class {class_name} has unknown pressure dimension")
+        if family in law_families:
+            raise OntologyInfrastructureError(f"Canonical law family {family!r} is declared more than once")
+        law_families[family] = (
+            collection,
+            value_slot,
+            dimension,
+            pressure_slot,
+            _class_slot_range(schema_view, class_name, value_slot),
+        )
+    if evidence_collection is None or not families or set(families) != set(law_families):
+        raise OntologyInfrastructureError(
+            "Canonical fact and law annotations must have exact family and source coverage"
+        )
+    if any(families[family][2] != law_families[family][4] for family in families):
         raise OntologyInfrastructureError("Canonical fact and law families must use the same value enum")
     facts: list[dict[str, object]] = []
     fact_ids: set[str] = set()
-    for family, (collection, value_enum) in sorted(families.items()):
+    for family, (collection, value_slot, value_enum) in sorted(families.items()):
         rows = fact_catalog.get(collection, [])
         admitted = set(_enum_values(schema_view, value_enum))
         if not isinstance(rows, list):
             raise OntologyInfrastructureError(f"Canonical fact collection {collection!r} must be a list")
         for index, raw in enumerate(rows):
-            if not isinstance(raw, Mapping) or set(raw) != {"id", "subject", "applicability", "provenance", "value"}:
+            expected = {"id", "subject", "applicability", "provenance", value_slot}
+            if not isinstance(raw, Mapping) or set(raw) != expected:
                 raise OntologyInfrastructureError(f"Canonical fact {collection}[{index}] has an invalid closed shape")
-            identifier, value = raw["id"], raw["value"]
+            identifier, value = raw["id"], raw[value_slot]
             if not isinstance(identifier, str) or not identifier or identifier in fact_ids:
                 raise OntologyInfrastructureError(f"Canonical facts have duplicate or invalid id {identifier!r}")
             if not isinstance(value, str) or value not in admitted:
@@ -1999,20 +1972,22 @@ def _canonical_scheduling(
             facts.append({
                 "id": identifier,
                 "family": family,
-                **{key: raw[key] for key in ("subject", "applicability", "provenance", "value")},
+                **{key: raw[key] for key in ("subject", "applicability", "provenance")},
+                "value": value,
             })
     laws: list[dict[str, object]] = []
     law_ids: set[str] = set()
-    for family, (collection, dimension, value_enum) in sorted(law_families.items()):
+    for family, (collection, value_slot, dimension, pressure_slot, value_enum) in sorted(law_families.items()):
         rows = law_catalog.get(collection)
         admitted = set(_enum_values(schema_view, value_enum))
         observed: set[str] = set()
         if not isinstance(rows, list):
             raise OntologyInfrastructureError(f"Canonical law collection {collection!r} must be a list")
         for index, raw in enumerate(rows):
-            if not isinstance(raw, Mapping) or set(raw) != {"id", "fact_value", dimension}:
+            expected = {"id", value_slot, pressure_slot}
+            if not isinstance(raw, Mapping) or set(raw) != expected:
                 raise OntologyInfrastructureError(f"Canonical law {collection}[{index}] has an invalid closed shape")
-            identifier, value, pressure = raw["id"], raw["fact_value"], raw[dimension]
+            identifier, value, pressure = raw["id"], raw[value_slot], raw[pressure_slot]
             if not isinstance(identifier, str) or not identifier or identifier in law_ids:
                 raise OntologyInfrastructureError(f"Canonical laws have duplicate or invalid id {identifier!r}")
             if not isinstance(value, str) or value not in admitted or value in observed:
@@ -2032,7 +2007,7 @@ def _canonical_scheduling(
             raise OntologyInfrastructureError(f"Canonical law {collection!r} lacks exact fact-value coverage")
     if {law["dimension"] for law in laws} != set(dimensions):
         raise OntologyInfrastructureError("Canonical laws must use every declared pressure dimension")
-    sources = fact_catalog.get("evidence_sources", [])
+    sources = fact_catalog.get(evidence_collection, [])
     if not isinstance(sources, list):
         raise OntologyInfrastructureError("Canonical evidence_sources must be a list")
     return {
@@ -2041,9 +2016,9 @@ def _canonical_scheduling(
             {
                 "id": family,
                 "fact_values": list(_enum_values(schema_view, value_enum)),
-                "dimension": law_families[family][1],
+                "dimension": law_families[family][2],
             }
-            for family, (_, value_enum) in sorted(families.items())
+            for family, (_, _, value_enum) in sorted(families.items())
         ],
         "evidence_sources": sources,
         "facts": facts,
@@ -2056,10 +2031,6 @@ def _canonical_scheduling(
 # uniqueness guard for a catalog whose records can have distinct IDs but the
 # same executable meaning.
 _RUNTIME_SEMANTIC_KEYS: Mapping[str, tuple[tuple[str, ...], ...]] = {
-    "warning_types": (("warning_type",),),
-    "concern_catalog": (("concern_kind",),),
-    "relation_warning_rules": (("relation_kind", "filter_field", "filter_value", "active_side", "reverse_output"),),
-    "relation_presence_statuses": (("status",), ("source_active", "target_active")),
     "selector_form_capabilities": (("selector_form",),),
 }
 
@@ -2094,30 +2065,17 @@ class _PolicyRuntime:
 
 
 def _load_runtime_policy(
-    ontology_root: Path, manifest: Mapping[str, object], schema_view: SchemaView, relation_types: set[str]
+    ontology_root: Path, manifest: Mapping[str, object], schema_view: SchemaView
 ) -> _PolicyRuntime:
     source = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "runtime_policy"))
     _validate_linkml_instance(schema_view, "RuntimePolicyCatalog", source)
     required_mappings = ("glue_contract",)
     if any(not isinstance(source.get(key), dict) for key in required_mappings):
         raise OntologyInfrastructureError("Runtime policy requires glue_contract")
-    records = {
-        key: _runtime_records(source, key)
-        for key in (
-            "warning_types",
-            "concern_catalog",
-            "relation_warning_rules",
-            "relation_presence_statuses",
-            "selector_form_capabilities",
-        )
-    }
+    records = {key: _runtime_records(source, key) for key in ("selector_form_capabilities",)}
     _validate_runtime_glue_contract(cast(Mapping[str, object], source["glue_contract"]))
     _validate_runtime_record_shapes(records)
     _validate_runtime_semantic_keys(records)
-    _validate_runtime_relation_presence_contract(
-        cast(Mapping[str, object], source["glue_contract"]),
-        records["relation_presence_statuses"],
-    )
     selector_forms = tuple(_required_string(row, "selector_form") for row in records["selector_form_capabilities"])
     if selector_forms != IMPLEMENTED_RELATION_SELECTOR_FORMS:
         raise OntologyInfrastructureError(
@@ -2129,9 +2087,6 @@ def _load_runtime_policy(
         raise OntologyInfrastructureError(
             "Runtime selector form capabilities must exactly match executable endpoint kinds"
         )
-    for row in records["relation_warning_rules"]:
-        if _required_string(row, "relation_kind") not in relation_types:
-            raise OntologyInfrastructureError("Runtime relation warning rule references unknown relation type")
     return _PolicyRuntime(
         authored=dict(source),
     )
@@ -2181,32 +2136,6 @@ def _validate_runtime_glue_contract(glue: Mapping[str, object]) -> None:
         raise OntologyInfrastructureError(
             "Runtime glue_contract relation_endpoint_selector_kinds must exactly match executable capabilities"
         )
-    truth = glue.get("relation_presence_truth_table")
-    if not isinstance(truth, list):
-        raise OntologyInfrastructureError("Runtime glue_contract relation presence truth table must be a list")
-    states: list[tuple[bool, bool]] = []
-    for index, raw_state in enumerate(truth):
-        if not isinstance(raw_state, Mapping):
-            raise OntologyInfrastructureError(
-                f"Runtime glue_contract relation presence truth table row {index} must be a mapping"
-            )
-        source_active = raw_state.get("source_active")
-        target_active = raw_state.get("target_active")
-        if not isinstance(source_active, bool) or not isinstance(target_active, bool):
-            raise OntologyInfrastructureError(
-                "Runtime glue_contract relation presence truth table booleans must be strict booleans"
-            )
-        state = (source_active, target_active)
-        if state in states:
-            raise OntologyInfrastructureError(
-                f"Runtime glue_contract relation presence truth table has duplicate state {state!r}"
-            )
-        states.append(state)
-    expected_truth = set(IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE)
-    if set(states) != expected_truth:
-        raise OntologyInfrastructureError(
-            "Runtime glue_contract relation presence truth table must have exact unique four-state coverage"
-        )
 
 
 def _validate_runtime_record_shapes(records: Mapping[str, Sequence[Mapping[str, object]]]) -> None:
@@ -2216,34 +2145,11 @@ def _validate_runtime_record_shapes(records: Mapping[str, Sequence[Mapping[str, 
         ids = [row.get("id") for row in rows]
         if any(not isinstance(identifier, str) or not identifier for identifier in ids) or len(set(ids)) != len(ids):
             raise OntologyInfrastructureError(f"Runtime policy {slot} has invalid or duplicate ids")
-    boolean_fields = {
-        "relation_warning_rules": ("reverse_output",),
-        "relation_presence_statuses": ("source_active", "target_active"),
-        "selector_form_capabilities": ("show_match_details",),
-    }
+    boolean_fields = {"selector_form_capabilities": ("show_match_details",)}
     for slot, fields in boolean_fields.items():
         for row in records[slot]:
             if any(not isinstance(row.get(field), bool) for field in fields):
                 raise OntologyInfrastructureError(f"Runtime {slot} boolean fields are required")
-
-
-def _validate_runtime_relation_presence_contract(
-    glue: Mapping[str, object], statuses: Sequence[Mapping[str, object]]
-) -> None:
-    """Require one executable status for each endpoint-presence truth state."""
-    truth = glue.get("relation_presence_truth_table")
-    if not isinstance(truth, list):
-        raise OntologyInfrastructureError("Runtime relation presence truth table must be a list")
-    expected = {
-        (state.get("source_active"), state.get("target_active"))
-        for state in cast(list[object], truth)
-        if isinstance(state, Mapping)
-    }
-    actual = {(row.get("source_active"), row.get("target_active")) for row in statuses}
-    if actual != expected:
-        raise OntologyInfrastructureError(
-            "Runtime relation_presence_statuses must have exact unique four-state coverage"
-        )
 
 
 def _slot_with_range(schema_view: SchemaView, class_name: str, range_name: str) -> str:
@@ -2517,104 +2423,6 @@ def _jsonld_context(schema_view: SchemaView, base_iri: str) -> dict[str, object]
     return {"@context": context}
 
 
-def _runtime_projection_source(policy: Mapping[str, object], source: object) -> object:
-    if not isinstance(source, str) or not source:
-        raise OntologyInfrastructureError("Runtime projection source must be a non-empty string")
-    current: object = policy
-    for segment in source.split("."):
-        if not segment or not isinstance(current, Mapping) or segment not in current:
-            raise OntologyInfrastructureError(f"Runtime projection source is missing: {source}")
-        current = current[segment]
-    return current
-
-
-def _runtime_projection_tree(
-    policy: Mapping[str, object],
-    descriptors: object,
-    *,
-    seen_targets: set[str] | None = None,
-    seen_descriptor_ids: set[str] | None = None,
-    seen_sources: dict[str, str] | None = None,
-    path: tuple[str, ...] = (),
-) -> dict[str, object]:
-    if not isinstance(descriptors, list) or not descriptors:
-        raise OntologyInfrastructureError("Runtime policy requires non-empty runtime_projection descriptors")
-    projected: dict[str, object] = {}
-    if seen_targets is None:
-        seen_targets = set()
-    if seen_descriptor_ids is None:
-        seen_descriptor_ids = set()
-    if seen_sources is None:
-        seen_sources = {}
-    expected_targets = RUNTIME_PROJECTION_FIELDS.get(".".join(path), frozenset())
-    if not expected_targets:
-        raise OntologyInfrastructureError(
-            f"Runtime projection descriptor path {'.'.join(path) or '<root>'!r} is not executable"
-        )
-    descriptor_targets: set[str] = set()
-    for raw_descriptor in cast(list[object], descriptors):
-        if not isinstance(raw_descriptor, Mapping):
-            raise OntologyInfrastructureError("Runtime projection descriptors must be mappings")
-        descriptor = cast(Mapping[str, object], raw_descriptor)
-        descriptor_id = descriptor.get("id")
-        target = descriptor.get("target")
-        if not isinstance(descriptor_id, str) or not descriptor_id:
-            raise OntologyInfrastructureError("Runtime projection descriptor requires id")
-        if not isinstance(target, str) or not target:
-            raise OntologyInfrastructureError(f"Runtime projection {descriptor_id!r} requires target")
-        if target not in expected_targets:
-            raise OntologyInfrastructureError(
-                f"Runtime projection target {'.'.join((*path, target))!r} is not executable"
-            )
-        descriptor_targets.add(target)
-        if descriptor_id in seen_descriptor_ids:
-            raise OntologyInfrastructureError(f"Runtime projection has duplicate descriptor id {descriptor_id!r}")
-        seen_descriptor_ids.add(descriptor_id)
-        qualified_target = ".".join((*path, target))
-        if qualified_target in seen_targets:
-            raise OntologyInfrastructureError(f"Runtime projection has duplicate output path {qualified_target!r}")
-        seen_targets.add(qualified_target)
-        children = descriptor.get("children")
-        source = descriptor.get("source")
-        if (children is None) == (source is None):
-            raise OntologyInfrastructureError(
-                f"Runtime projection {descriptor_id!r} requires exactly one of source or children"
-            )
-        if children is not None:
-            if ".".join((*path, target)) not in RUNTIME_PROJECTION_FIELDS:
-                raise OntologyInfrastructureError(
-                    f"Runtime projection {descriptor_id!r} target {'.'.join((*path, target))!r} cannot have children"
-                )
-            value = _runtime_projection_tree(
-                policy,
-                children,
-                seen_targets=seen_targets,
-                seen_descriptor_ids=seen_descriptor_ids,
-                seen_sources=seen_sources,
-                path=(*path, target),
-            )
-        else:
-            if not isinstance(source, str) or not source:
-                raise OntologyInfrastructureError(f"Runtime projection {descriptor_id!r} source is invalid")
-            previous_target = seen_sources.get(source)
-            if previous_target == qualified_target:
-                raise OntologyInfrastructureError(
-                    f"Runtime projection source {source!r} is duplicated at {qualified_target!r}"
-                )
-            # Reusing one authored source is explicit and safe only when each
-            # descriptor writes a distinct fully-qualified output path.
-            seen_sources[source] = qualified_target
-            value = _runtime_projection_source(policy, source)
-        projected[target] = value
-    if descriptor_targets != expected_targets:
-        missing = ", ".join(sorted(expected_targets - descriptor_targets))
-        raise OntologyInfrastructureError(
-            f"Runtime projection path {'.'.join(path) or '<root>'!r} has incomplete executable targets"
-            + (f": missing {missing}" if missing else "")
-        )
-    return projected
-
-
 def _runtime_program(
     ontology_root: Path,
     manifest: Mapping[str, object],
@@ -2630,16 +2438,16 @@ def _runtime_program(
         relative_source = policy_path.relative_to(ontology_root.parent).as_posix()
     except ValueError as error:
         raise OntologyInfrastructureError("Manifest runtime policy path must be repository-relative") from error
-    projection_policy = dict(policy)
-    projection_policy["canonical_scheduling"] = dict(canonical_scheduling)
-    descriptors = policy.get("runtime_projection")
-    if not isinstance(descriptors, list):
-        raise OntologyInfrastructureError("Runtime policy requires runtime_projection descriptors")
-    projection_descriptors = [
-        *descriptors,
-        {"id": "canonical_scheduling", "target": "canonical_scheduling", "source": "canonical_scheduling"},
-    ]
-    projected = _runtime_projection_tree(projection_policy, projection_descriptors)
+    required_policy_sections = (
+        "engine_contract",
+        "glue_contract",
+        "selector_form_capabilities",
+        "dashboard_state_catalog",
+    )
+    if any(section not in policy for section in required_policy_sections):
+        raise OntologyInfrastructureError("Runtime policy is missing a required executable section")
+    projected = {section: policy[section] for section in required_policy_sections}
+    projected["canonical_scheduling"] = dict(canonical_scheduling)
     program = {
         "format_version": _RUNTIME_PROGRAM_FORMAT,
         "schema_version": str(manifest["schema_version"]),
@@ -2650,9 +2458,6 @@ def _runtime_program(
             "manifest_schema_version": str(manifest["schema_version"]),
             "compiler_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         },
-        # The descriptor tree is the sole authored topology.  Keep the
-        # compiler output generic so adding a policy branch requires only a
-        # descriptor edit, not another Python section.
         "projection": projected,
     }
     _validate_runtime_program_output(program)
@@ -3079,8 +2884,6 @@ def _load_ontology_assertions(  # noqa: PLR0917
                 "id",
                 "relation_type",
                 "reason",
-                "action",
-                "severity",
                 "source_selector",
                 "target_selector",
                 "assertion_kind",
@@ -3130,9 +2933,6 @@ def _load_ontology_assertions(  # noqa: PLR0917
                         f"{relation_type!r}; endpoints duplicate {previous!r}"
                     )
                 seen_directionless[directionless_key] = identifier
-            for field in ("action", "severity"):
-                if field in row:
-                    normalized[field] = _required_string(row, field)
             if "research_state" in row:
                 normalized["research_state"] = _required_string(row, "research_state")
             if "sources" in row:

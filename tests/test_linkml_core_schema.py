@@ -101,16 +101,12 @@ def test_composed_root_induced_embedding_and_reference_contracts() -> None:
         ("Pillbox", "slots", "Slot"),
         ("Stack", "entries", "StackEntry"),
         ("Dashboard", "selectors", "DashboardSelector"),
-        ("Condition", "conditions", "Condition"),
-        ("Condition", "left", "Condition"),
-        ("Condition", "right", "Condition"),
     ]:
         s = view.induced_slot(slot, cls)
         assert s.range == rng and s.inlined
         if s.multivalued:
             assert s.inlined_as_list
     for cls, slot, rng in [
-        ("Condition", "selector", "Selector"),
         ("TermAssignment", "subject", "Selector"),
         ("ProductComponent", "substance", "Substance"),
         ("StackEntry", "product", "Product"),

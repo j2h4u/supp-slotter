@@ -9,10 +9,6 @@ notes: L-arginine alpha-ketoglutarate is an arginine salt/complex used in pre-wo
   and pump positioning. Human studies show plasma arginine exposure, while acute performance and nitric-oxide outcomes are
   mixed, so treat this as arginine/NO review context rather than a strong ergogenic claim. Source refs are PMID 16928472,
   PMID 21813912, and Wax et al. 2012 JISSN.
-concerns:
-- kind: safety
-  text: Review with PDE5 inhibitors, nitrates, antihypertensives, or other vasodilators; AAKG is an arginine donor used for
-    nitric-oxide/blood-flow positioning and could add to hypotensive stack load.
 knowledge:
   context:
   - value: vascular_health

@@ -45,8 +45,6 @@ def representative_query_fixture() -> _RepresentativeQueryFixture:
             "support reason",
             RelationSelector(entity_id=support.id),
             RelationSelector(entity_id=active_zeta.id),
-            action="support action",
-            severity="low",
             assertion_kind="ontology_assertion",
             semantic_family="biochemical_mechanism_assertion",
             research_state="unassessed",
@@ -54,14 +52,12 @@ def representative_query_fixture() -> _RepresentativeQueryFixture:
         ),
         Relation(
             "rel_review",
-            "review_with",
-            "review reason",
+            "co_use_context",
+            "co-use reason",
             RelationSelector(entity_id=active_alpha.id),
             RelationSelector(entity_id=active_zeta.id),
-            action="review action",
-            severity="medium",
-            assertion_kind="clinical_review_signal",
-            semantic_family="clinical_review_signal",
+            assertion_kind="co_use_evidence",
+            semantic_family="co_use_evidence",
             research_state="unassessed",
             sources=(),
         ),
@@ -84,8 +80,6 @@ def _relation_queries(fixture: _RepresentativeQueryFixture):
             reason=relation.reason,
             source_selector=relation.source_selector,
             target_selector=relation.target_selector,
-            action=relation.action,
-            severity=relation.severity,
             research_state=relation.research_state,
             sources=relation.sources,
         )
@@ -104,15 +98,37 @@ def test_partition_and_direct_relation_classification(
 
     active = read_model.active_substance_ids()
     assert active == {"sub_active_alpha", "sub_active_zeta"}
-    assert read_model.inactive_substance_ids() == {"sub_inactive"}
-
     rows = classify_relations(_relation_queries(fixture), active, ontology_bundle().runtime_program)
     assert [
-        (row["type"], row["source_matches"], row["target_matches"], row["warning_type"]) for row in rows["both_active"]
-    ] == [("review_with", ["Alpha"], ["Zeta"], "review_with_substance_present")]
-    assert [(row["type"], row["reason"], row["action"]) for row in rows["missing_source"]] == [
-        ("supports", "support reason", "support action")
+        (row["type"], row["source_matches"], row["target_matches"], row["research_state"], row["sources"])
+        for row in rows
+    ] == [
+        ("supports", [], ["Zeta"], "unassessed", []),
+        ("co_use_context", ["Alpha"], ["Zeta"], "unassessed", []),
     ]
+
+
+def test_active_active_relation_is_passive_and_membership_only(
+    representative_query_fixture: _RepresentativeQueryFixture,
+) -> None:
+    fixture = representative_query_fixture
+    queries = _relation_queries(fixture)
+    runtime = ontology_bundle().runtime_program
+
+    assert classify_relations(queries, set(), runtime) == []
+    rows = classify_relations(queries, {"sub_active_alpha", "sub_active_zeta"}, runtime)
+    co_use = next(row for row in rows if row["type"] == "co_use_context")
+    assert co_use == {
+        "type": "co_use_context",
+        "source": "Alpha",
+        "target": "Zeta",
+        "reason": "co-use reason",
+        "research_state": "unassessed",
+        "sources": [],
+        "source_matches": ["Alpha"],
+        "target_matches": ["Zeta"],
+        "show_matches": False,
+    }
 
 
 @pytest.mark.parametrize(

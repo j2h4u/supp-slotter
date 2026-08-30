@@ -6,10 +6,6 @@ aliases:
 - flax lignans
 notes: Whole or ground flaxseed/lignan context for lipid review. NCCIH summarizes possible cholesterol benefit for some flaxseed
   preparations, especially whole flaxseed and flaxseed lignans, while flaxseed oil should not inherit this LDL-C role automatically.
-concerns:
-- kind: safety
-  text: Review anticoagulant/antiplatelet context, gastrointestinal tolerance, and timing away from medications when high-fiber
-    flaxseed is used therapeutically.
 knowledge:
   effect:
   - value: lipid_metabolism_support

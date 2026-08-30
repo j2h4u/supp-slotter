@@ -7,9 +7,6 @@ notes: Knowledge-only digestive-comfort botanical reference card. Added because 
   and should be separated from ordinary licorice root safety assumptions. Source checked - NCCIH licorice root usefulness
   and safety page.
 concerns:
-- kind: safety
-  text: Verify that a product is truly deglycyrrhizinated; ordinary licorice root glycyrrhizin can raise blood pressure, lower
-    potassium, interact with corticosteroids, and be unsafe in pregnancy or heart/kidney disease contexts.
 - kind: data_quality
   text: Product cards should distinguish DGL, ordinary licorice root, glycyrrhizin content, chewable versus capsule form,
     and whether it is part of a multi-herb digestive blend.

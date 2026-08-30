@@ -207,7 +207,7 @@ class OntologyBundle:
 
     @property
     def projection(self) -> Mapping[str, object]:
-        """Short alias for callers that use the projection vocabulary."""
+        """Short alias for the verified compiled runtime payload."""
 
         return self.projection_map
 

@@ -1,14 +1,11 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 7ca48a9e49015ceb90cefe37810bdea8112175cda59ea548f84573a384237f58
+# source-hash: aff7792c60d5ad88cafd48aaa3f4c58659fe59517b8533b326a8fc790f846c73
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/> a ss:Ontology ;
   ss:schema_version "2" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/Action> a ss:SchemaClass ;
-  ss:name "Action" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteAlertnessEffect> a ss:SchemaClass ;
   ss:name "AcuteAlertnessEffect" .
@@ -45,9 +42,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/Concern> a ss:SchemaClass ;
   ss:name "Concern" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/Condition> a ss:SchemaClass ;
-  ss:name "Condition" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/Dashboard> a ss:SchemaClass ;
   ss:name "Dashboard" .
@@ -142,9 +136,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RelationCatalog> a ss:SchemaClass ;
   ss:name "RelationCatalog" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConcernCatalogEntry> a ss:SchemaClass ;
-  ss:name "RuntimeConcernCatalogEntry" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDashboardProductTrackingStateDefinition> a ss:SchemaClass ;
   ss:name "RuntimeDashboardProductTrackingStateDefinition" .
 
@@ -172,26 +163,11 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog> a ss:SchemaClass ;
   ss:name "RuntimePolicyCatalog" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProjectionDescriptor> a ss:SchemaClass ;
-  ss:name "RuntimeProjectionDescriptor" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy> a ss:SchemaClass ;
-  ss:name "RuntimeRelationPresenceStatusPolicy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceTruthState> a ss:SchemaClass ;
-  ss:name "RuntimeRelationPresenceTruthState" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationWarningRule> a ss:SchemaClass ;
-  ss:name "RuntimeRelationWarningRule" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSelectorFormCapability> a ss:SchemaClass ;
   ss:name "RuntimeSelectorFormCapability" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeStackPartition> a ss:SchemaClass ;
   ss:name "RuntimeStackPartition" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningTypePolicy> a ss:SchemaClass ;
-  ss:name "RuntimeWarningTypePolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/Selector> a ss:SchemaClass ;
   ss:name "Selector" .
@@ -228,15 +204,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/VocabularyCategoryRecord> a ss:SchemaClass ;
   ss:name "VocabularyCategoryRecord" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/action> a ss:SchemaSlot ;
-  ss:name "action" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/action_text> a ss:SchemaSlot ;
-  ss:name "action_text" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/active_side> a ss:SchemaSlot ;
-  ss:name "active_side" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/active_stack_membership> a ss:SchemaSlot ;
   ss:name "active_stack_membership" .
@@ -286,9 +253,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/category> a ss:SchemaSlot ;
   ss:name "category" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/children> a ss:SchemaSlot ;
-  ss:name "children" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/circadian_anchor> a ss:SchemaSlot ;
   ss:name "circadian_anchor" .
 
@@ -297,9 +261,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/composition_role> a ss:SchemaSlot ;
   ss:name "composition_role" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/concern_catalog> a ss:SchemaSlot ;
-  ss:name "concern_catalog" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/concern_kind> a ss:SchemaSlot ;
   ss:name "concern_kind" .
@@ -310,12 +271,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/concerns> a ss:SchemaSlot ;
   ss:name "concerns" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/condition> a ss:SchemaSlot ;
-  ss:name "condition" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/conditions> a ss:SchemaSlot ;
-  ss:name "conditions" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/context> a ss:SchemaSlot ;
   ss:name "context" .
 
@@ -324,9 +279,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/declares_context> a ss:SchemaSlot ;
   ss:name "declares_context" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/default_message> a ss:SchemaSlot ;
-  ss:name "default_message" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/dependence> a ss:SchemaSlot ;
   ss:name "dependence" .
@@ -342,9 +294,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/effect> a ss:SchemaSlot ;
   ss:name "effect" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/emitter> a ss:SchemaSlot ;
-  ss:name "emitter" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/endpoint_kind> a ss:SchemaSlot ;
   ss:name "endpoint_kind" .
@@ -373,15 +322,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/fact_value> a ss:SchemaSlot ;
   ss:name "fact_value" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/field> a ss:SchemaSlot ;
-  ss:name "field" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/filter_field> a ss:SchemaSlot ;
-  ss:name "filter_field" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/filter_value> a ss:SchemaSlot ;
-  ss:name "filter_value" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/food_effect_laws> a ss:SchemaSlot ;
   ss:name "food_effect_laws" .
 
@@ -403,9 +343,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/inactive_stack_name> a ss:SchemaSlot ;
   ss:name "inactive_stack_name" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/key> a ss:SchemaSlot ;
-  ss:name "key" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/kind> a ss:SchemaSlot ;
   ss:name "kind" .
 
@@ -423,9 +360,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/label> a ss:SchemaSlot ;
   ss:name "label" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/left> a ss:SchemaSlot ;
-  ss:name "left" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/locator> a ss:SchemaSlot ;
   ss:name "locator" .
@@ -456,9 +390,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean_profiles> a ss:SchemaSlot ;
   ss:name "ontoclean_profiles" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/operator> a ss:SchemaSlot ;
-  ss:name "operator" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/order> a ss:SchemaSlot ;
   ss:name "order" .
@@ -508,26 +439,11 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/quotation> a ss:SchemaSlot ;
   ss:name "quotation" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/rank> a ss:SchemaSlot ;
-  ss:name "rank" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/reason> a ss:SchemaSlot ;
   ss:name "reason" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_endpoint_selector_kinds> a ss:SchemaSlot ;
   ss:name "relation_endpoint_selector_kinds" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_kind> a ss:SchemaSlot ;
-  ss:name "relation_kind" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_presence_active_sides> a ss:SchemaSlot ;
-  ss:name "relation_presence_active_sides" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_presence_statuses> a ss:SchemaSlot ;
-  ss:name "relation_presence_statuses" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_presence_truth_table> a ss:SchemaSlot ;
-  ss:name "relation_presence_truth_table" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_selector_forms> a ss:SchemaSlot ;
   ss:name "relation_selector_forms" .
@@ -538,32 +454,14 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_types> a ss:SchemaSlot ;
   ss:name "relation_types" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_warning_active_sides> a ss:SchemaSlot ;
-  ss:name "relation_warning_active_sides" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_warning_filter_fields> a ss:SchemaSlot ;
-  ss:name "relation_warning_filter_fields" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_warning_rules> a ss:SchemaSlot ;
-  ss:name "relation_warning_rules" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relations> a ss:SchemaSlot ;
   ss:name "relations" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/research_state> a ss:SchemaSlot ;
   ss:name "research_state" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/result> a ss:SchemaSlot ;
-  ss:name "result" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/result_mode> a ss:SchemaSlot ;
   ss:name "result_mode" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/reverse_output> a ss:SchemaSlot ;
-  ss:name "reverse_output" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/right> a ss:SchemaSlot ;
-  ss:name "right" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/rigidity> a ss:SchemaSlot ;
   ss:name "rigidity" .
@@ -583,20 +481,11 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/rule> a ss:SchemaSlot ;
   ss:name "rule" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/runtime_projection> a ss:SchemaSlot ;
-  ss:name "runtime_projection" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/runtime_value> a ss:SchemaSlot ;
-  ss:name "runtime_value" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/schema_version> a ss:SchemaSlot ;
   ss:name "schema_version" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/secondary_objective> a ss:SchemaSlot ;
   ss:name "secondary_objective" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/selector> a ss:SchemaSlot ;
-  ss:name "selector" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/selector_form> a ss:SchemaSlot ;
   ss:name "selector_form" .
@@ -628,14 +517,8 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/semantics> a ss:SchemaSlot ;
   ss:name "semantics" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/severity> a ss:SchemaSlot ;
-  ss:name "severity" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/show_match_details> a ss:SchemaSlot ;
   ss:name "show_match_details" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/slot_field> a ss:SchemaSlot ;
-  ss:name "slot_field" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/slots> a ss:SchemaSlot ;
   ss:name "slots" .
@@ -645,9 +528,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/source> a ss:SchemaSlot ;
   ss:name "source" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/source_active> a ss:SchemaSlot ;
-  ss:name "source_active" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/source_of_truth> a ss:SchemaSlot ;
   ss:name "source_of_truth" .
@@ -670,9 +550,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/state> a ss:SchemaSlot ;
   ss:name "state" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/status> a ss:SchemaSlot ;
-  ss:name "status" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/subject> a ss:SchemaSlot ;
   ss:name "subject" .
 
@@ -681,12 +558,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/supplies_identity> a ss:SchemaSlot ;
   ss:name "supplies_identity" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/target> a ss:SchemaSlot ;
-  ss:name "target" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/target_active> a ss:SchemaSlot ;
-  ss:name "target_active" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/target_selector> a ss:SchemaSlot ;
   ss:name "target_selector" .
@@ -706,9 +577,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/tie_break> a ss:SchemaSlot ;
   ss:name "tie_break" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/trace_key> a ss:SchemaSlot ;
-  ss:name "trace_key" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/tracked_entries> a ss:SchemaSlot ;
   ss:name "tracked_entries" .
 
@@ -717,9 +585,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/tracked_unassigned_partition_name> a ss:SchemaSlot ;
   ss:name "tracked_unassigned_partition_name" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/trait_id> a ss:SchemaSlot ;
-  ss:name "trait_id" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/urls> a ss:SchemaSlot ;
   ss:name "urls" .
@@ -735,15 +600,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/value> a ss:SchemaSlot ;
   ss:name "value" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/values> a ss:SchemaSlot ;
-  ss:name "values" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/warning_type> a ss:SchemaSlot ;
-  ss:name "warning_type" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/warning_types> a ss:SchemaSlot ;
-  ss:name "warning_types" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/assertions> a ss:Catalog ;
   ss:catalog_role "assertions" ;
@@ -853,15 +709,15 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/balance> ss:source_selector_forms "entity" .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/balance> ss:target_selector_forms "entity" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/review_with> a ss:OperationalRelationType ;
-  ss:id "review_with" ;
-  ss:label "Review together" ;
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/co_use_context> a ss:OperationalRelationType ;
+  ss:id "co_use_context" ;
+  ss:label "Co-use context" ;
   ss:order 30 ;
   ss:directional false .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/review_with> ss:source_selector_forms "term" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/review_with> ss:source_selector_forms "entity" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/review_with> ss:target_selector_forms "term" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/review_with> ss:target_selector_forms "entity" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/co_use_context> ss:source_selector_forms "term" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/co_use_context> ss:source_selector_forms "entity" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/co_use_context> ss:target_selector_forms "term" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/co_use_context> ss:target_selector_forms "entity" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/supports> a ss:OperationalRelationType ;
   ss:id "supports" ;

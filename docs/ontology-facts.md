@@ -26,22 +26,22 @@ Preferred modeling order:
 
 | Fact | Current fit | Next useful action |
 |---|---|---|
-| Calcium and magnesium separation is dose-dependent. | A slot-blocking scheduling constraint would overstate the rule without a dose model; notes or `review_with` are safer unless typical-dose co-slotting should be blocked. | Keep thresholds in relation `reason` or notes. Add dose modeling only if scheduler decisions need reliable product amounts. |
+| Calcium and magnesium separation is dose-dependent. | A slot-blocking scheduling constraint would overstate the rule without a dose model; notes or `co_use_context` are safer unless typical-dose co-slotting should be blocked. | Keep thresholds in relation `reason` or notes. Add dose modeling only if scheduler decisions need reliable product amounts. |
 | Metformin may matter for lactate/exercise-tolerance review. | The B12-status relation is already modeled; broader medication-performance context is not first-class. | Keep broader context in private user notes or `concerns` until repeated cases need structure. |
 
 ## Current Boundaries
 
-- Dose thresholds may be documented in `reason`, `action`, notes, or
-  `concerns`; the planner does not calculate dose, ratio, or adequacy.
+- Dose thresholds may be documented in `reason` or notes; the planner does not
+  calculate dose, ratio, or adequacy.
 - Use slot-blocking scheduling constraints only when co-slotting should be avoided at typical doses.
-- Use `supports` when absence of the supporter should produce a useful review
-  warning.
-- Use `review_with` for pairings that should produce a schedule warning when
+- Use `supports` for directional biochemical or contextual evidence only; it
+  never creates a decision, recommendation, or scheduling rule.
+- Use `co_use_context` for pairings that should be presented as contextual evidence when
   both endpoints are active: functional opposition, additive pharmacology,
   nutrient-status effects, medication interactions, or practical separation
   advice that is dose-dependent and cannot be computed by the planner.
 - Ubiquitous cofactors should not become noisy `supports` edges. Add them only
-  when the target-specific warning or dashboard explanation is useful.
+  when the target-specific context or dashboard explanation is useful.
 - Encode a dashboard cluster when the fact is a useful review goal, not as a
   generic supplement-knowledge bucket.
 - Treat goal dashboards as candidate-comparison surfaces, not as proof of

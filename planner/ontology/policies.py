@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import cast
 
 from planner.contracts import (
@@ -12,7 +13,6 @@ from planner.contracts import (
     Relation,
     RelationSelector,
     RelationType,
-    Severity,
 )
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
@@ -27,6 +27,13 @@ def _policy_error(bundle: OntologyBundle, message: str) -> OntologyInfrastructur
     return OntologyInfrastructureError(f"{message} [source: {source}]", code=MALFORMED, path=source)
 
 
+@dataclass(frozen=True, slots=True)
+class _AssertionCatalog:
+    relation_types: set[object]
+    assertion_kinds: frozenset[str]
+    semantic_families: frozenset[str]
+
+
 def load_ontology_assertions(bundle: OntologyBundle) -> tuple[OntologyAssertion, ...]:
     """Load non-blocking semantic assertions from generated canonical vocabulary."""
     vocabulary = bundle.runtime_vocabulary
@@ -36,11 +43,14 @@ def load_ontology_assertions(bundle: OntologyBundle) -> tuple[OntologyAssertion,
     raw_relation_types = vocabulary.get("relation_types")
     if not isinstance(raw_relation_types, dict) or not raw_relation_types:
         raise _policy_error(bundle, "canonical runtime vocabulary has no relation_types")
-    relation_types = set(raw_relation_types)
-    severity_values = frozenset(schema_enum_values(bundle, "Severity"))
+    catalog = _AssertionCatalog(
+        set(raw_relation_types),
+        frozenset(schema_enum_values(bundle, "RelationAssertionKind")),
+        frozenset(schema_enum_values(bundle, "RelationSemanticFamily")),
+    )
     assertions_mapping = cast(dict[str, object], raw_assertions)
     return tuple(
-        _load_ontology_assertion(bundle, assertion_id, raw_value, relation_types, severity_values)
+        _load_ontology_assertion(bundle, assertion_id, raw_value, catalog)
         for assertion_id, raw_value in assertions_mapping.items()
     )
 
@@ -49,17 +59,13 @@ def _load_ontology_assertion(
     bundle: OntologyBundle,
     assertion_id: str,
     raw_value: object,
-    relation_types: set[object],
-    severity_values: frozenset[str],
+    catalog: _AssertionCatalog,
 ) -> OntologyAssertion:
     raw = _object_mapping(raw_value)
     if not isinstance(assertion_id, str) or not assertion_id.strip() or raw is None:
         raise _policy_error(bundle, f"malformed ontology assertion {assertion_id!r}")
     source, target = _load_assertion_selectors(bundle, assertion_id, raw)
-    relation_type, assertion_kind, semantic_family, reason = _assertion_semantics(
-        bundle, assertion_id, raw, relation_types
-    )
-    action, severity = _assertion_metadata(bundle, assertion_id, raw, severity_values)
+    relation_type, assertion_kind, semantic_family, reason = _assertion_semantics(bundle, assertion_id, raw, catalog)
     research_state, sources = _assertion_research_metadata(bundle, assertion_id, raw)
     return OntologyAssertion(
         id=assertion_id,
@@ -69,8 +75,6 @@ def _load_ontology_assertion(
         reason=reason,
         source_selector=source,
         target_selector=target,
-        action=action,
-        severity=cast(Severity | None, severity),
         research_state=research_state,
         sources=sources,
     )
@@ -95,31 +99,23 @@ def _assertion_semantics(
     bundle: OntologyBundle,
     assertion_id: str,
     raw: dict[str, object],
-    relation_types: set[object],
+    catalog: _AssertionCatalog,
 ) -> tuple[object, str, str, str]:
     relation_type = raw.get("relation_type")
     assertion_kind = raw.get("assertion_kind")
     semantic_family = raw.get("semantic_family")
     reason = raw.get("reason")
-    if relation_type not in relation_types:
+    if relation_type not in catalog.relation_types:
         raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid relation_type")
-    if not isinstance(assertion_kind, str) or not isinstance(semantic_family, str) or not isinstance(reason, str):
+    if (
+        not isinstance(assertion_kind, str)
+        or assertion_kind not in catalog.assertion_kinds
+        or not isinstance(semantic_family, str)
+        or semantic_family not in catalog.semantic_families
+        or not isinstance(reason, str)
+    ):
         raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid semantics")
     return relation_type, assertion_kind, semantic_family, reason
-
-
-def _assertion_metadata(
-    bundle: OntologyBundle,
-    assertion_id: str,
-    raw: dict[str, object],
-    severity_values: frozenset[str],
-) -> tuple[str | None, object]:
-    action, severity = raw.get("action"), raw.get("severity")
-    if action is not None and (not isinstance(action, str) or not action.strip()):
-        raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid action")
-    if severity is not None and severity not in severity_values:
-        raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid severity")
-    return (action if isinstance(action, str) else None), severity
 
 
 def _assertion_research_metadata(
@@ -143,39 +139,28 @@ def project_ontology_assertions(
     relations: list[Relation],
     bundle: OntologyBundle,
 ) -> tuple[OntologyAssertion, ...]:
-    """Project exactly the loaded relation catalog through verified semantics.
-
-    The generated artifact is the authority for an authored assertion's
-    semantics, but it must not inject the production catalog into an isolated
-    data root. Fixture-only assertions remain valid only when their YAML
-    supplies the explicit semantic fields; no behaviour is inferred from a
-    relation type.
-    """
+    """Project only relation assertions verified in the generated catalog."""
     _validate_relation_ids_before_projection(relations)
     generated_by_id = {assertion.id: assertion for assertion in load_ontology_assertions(bundle)}
     projected: list[OntologyAssertion] = []
     for relation in relations:
         generated = generated_by_id.get(relation.id)
-        if generated is not None:
-            projected.append(generated)
-            continue
-        if relation.assertion_kind is None or relation.semantic_family is None:
-            raise _policy_error(bundle, f"fixture assertion {relation.id!r} lacks explicit semantics")
-        projected.append(
-            OntologyAssertion(
-                id=relation.id,
-                relation_type=relation.type,
-                assertion_kind=relation.assertion_kind,
-                semantic_family=relation.semantic_family,
-                reason=relation.reason,
-                source_selector=relation.source_selector,
-                target_selector=relation.target_selector,
-                action=relation.action,
-                severity=relation.severity,
-                research_state=relation.research_state,
-                sources=relation.sources,
-            )
+        if generated is None:
+            raise _policy_error(bundle, f"relation assertion {relation.id!r} is absent from the generated catalog")
+        authored = OntologyAssertion(
+            id=relation.id,
+            relation_type=relation.type,
+            assertion_kind=relation.assertion_kind or "",
+            semantic_family=relation.semantic_family or "",
+            reason=relation.reason,
+            source_selector=relation.source_selector,
+            target_selector=relation.target_selector,
+            research_state=relation.research_state,
+            sources=relation.sources,
         )
+        if authored != generated:
+            raise _policy_error(bundle, f"relation assertion {relation.id!r} diverges from the generated catalog")
+        projected.append(generated)
     return tuple(projected)
 
 

@@ -134,7 +134,6 @@ ONTOLOGY_CONTRACT_GROUPS: tuple[tuple[str, tuple[Path, ...]], ...] = (
         "B formal source contracts",
         (
             Path("tests/test_architecture_contracts.py"),
-            Path("tests/test_canonical_scheduling_migration.py"),
             Path("tests/test_cluster1_vright_contract.py"),
             Path("tests/test_ontology_formal_runtime_assertions.py"),
             Path("tests/test_ontology_ontoclean_contract.py"),
@@ -145,7 +144,6 @@ ONTOLOGY_CONTRACT_GROUPS: tuple[tuple[str, tuple[Path, ...]], ...] = (
         "C runtime/artifacts/projection/SHACL",
         (
             Path("tests/test_ontology_artifacts.py"),
-            Path("tests/test_ontology_assertion_runtime.py"),
             Path("tests/test_ontology_repository_projection.py"),
             Path("tests/test_ontology_runtime_loader.py"),
             Path("tests/test_ontology_presentation_cache.py"),

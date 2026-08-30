@@ -11,9 +11,7 @@ from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
     IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
     IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS,
-    IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE,
     IMPLEMENTED_RELATION_SELECTOR_FORMS,
-    relation_presence_active_side,
 )
 
 IMPLEMENTED_TIE_BREAK = "stable_item_id_then_(slot.order,slot_id)"
@@ -125,29 +123,6 @@ def _strings(value: object, label: str) -> tuple[str, ...]:
     return result
 
 
-def _truth_table(value: object, label: str) -> tuple[tuple[bool, bool], ...]:
-    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
-        raise _error(label, "must be a list")
-    sequence = cast(Sequence[object], value)
-    states: list[tuple[bool, bool]] = []
-    for index, item in enumerate(sequence):
-        row = _exact_map(
-            item,
-            f"{label}[{index}]",
-            RUNTIME_PROJECTION_ROW_FIELDS["glue_contract.relation_presence_truth_table"],
-        )
-        source_active = _bool(row.get("source_active"), f"{label}[{index}].source_active")
-        target_active = _bool(row.get("target_active"), f"{label}[{index}].target_active")
-        state = (source_active, target_active)
-        if state in states:
-            raise _error(label, f"has duplicate truth-table state {state!r}")
-        states.append(state)
-    expected = set(IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE)
-    if set(states) != expected:
-        raise _error(label, "must have exact unique four-state coverage")
-    return tuple(states)
-
-
 @dataclass(frozen=True, slots=True)
 class RuntimeStackPartition:
     """Authored ownership and routing partition for stack membership."""
@@ -163,10 +138,6 @@ class RuntimeGlueContract:
     id: str
     inactive_stack_name: str
     stack_partition: RuntimeStackPartition
-    relation_warning_filter_fields: tuple[str, ...]
-    relation_warning_active_sides: tuple[str, ...]
-    relation_presence_active_sides: tuple[str, ...]
-    relation_presence_truth_table: tuple[tuple[bool, bool], ...]
     relation_endpoint_selector_kinds: tuple[str, ...]
     relation_selector_forms: tuple[str, ...]
 
@@ -205,46 +176,6 @@ IMPLEMENTED_PRIMARY_OBJECTIVE = "maximize_unique_pressure_satisfaction"
 IMPLEMENTED_SECONDARY_OBJECTIVE = "minimize_integer_squared_load_per_domain"
 IMPLEMENTED_ENGINE_TIE_BREAK = IMPLEMENTED_TIE_BREAK
 IMPLEMENTED_PUBLICATION_STATUSES = ("Optimal", "Indeterminate")
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeWarningTypePolicy:
-    id: str
-    warning_type: str
-    label: str
-    action_text: str
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeConcernCatalogEntry:
-    id: str
-    concern_kind: str
-    warning_type: str
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeRelationWarningRule:
-    id: str
-    relation_kind: str
-    filter_field: str
-    filter_value: str
-    active_side: str
-    warning_type: str
-    reverse_output: bool
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeRelationPresenceStatusPolicy:
-    id: str
-    status: str
-    source_active: bool
-    target_active: bool
-    description: str
-
-    @property
-    def active_side(self) -> str:
-        """Canonical label derived from the strict endpoint truth state."""
-        return relation_presence_active_side(self.source_active, self.target_active)
 
 
 @dataclass(frozen=True, slots=True)
@@ -440,6 +371,9 @@ class RuntimeCanonicalScheduling:
     facts: tuple[RuntimeCanonicalSchedulingFact, ...]
     laws: tuple[RuntimeCanonicalLaw, ...]
 
+    def __post_init__(self) -> None:
+        _validate_runtime_canonical_scheduling(self)
+
     @property
     def dimensions_by_id(self) -> Mapping[str, RuntimePressureDimension]:
         return MappingProxyType({row.id: row for row in self.dimensions})
@@ -457,6 +391,64 @@ class RuntimeCanonicalScheduling:
         return MappingProxyType({row.id: frozenset(row.pressure_values) for row in self.dimensions})
 
 
+def _validate_runtime_canonical_scheduling(catalog: RuntimeCanonicalScheduling) -> None:
+    """Keep the compiled canonical graph internally complete at its owner."""
+    if not all(isinstance(row, RuntimePressureDimension) for row in catalog.dimensions):
+        raise _error("canonical_scheduling.dimensions", "must contain runtime pressure dimensions")
+    if not all(isinstance(row, RuntimeCanonicalFactFamily) for row in catalog.families):
+        raise _error("canonical_scheduling.families", "must contain runtime fact families")
+    if not all(isinstance(row, RuntimeEvidenceSource) for row in catalog.evidence_sources):
+        raise _error("canonical_scheduling.evidence_sources", "must contain runtime evidence sources")
+    if not all(isinstance(row, RuntimeCanonicalSchedulingFact) for row in catalog.facts):
+        raise _error("canonical_scheduling.facts", "must contain runtime canonical facts")
+    if not all(isinstance(row, RuntimeCanonicalLaw) for row in catalog.laws):
+        raise _error("canonical_scheduling.laws", "must contain runtime canonical laws")
+    dimensions = {row.id: set(row.pressure_values) for row in catalog.dimensions}
+    families = {row.id: row for row in catalog.families}
+    sources = {row.id for row in catalog.evidence_sources}
+    if len(dimensions) != len(catalog.dimensions) or len(families) != len(catalog.families):
+        raise _error("canonical_scheduling", "has duplicate dimensions or families")
+    if bool(dimensions) != bool(families):
+        raise _error("canonical_scheduling", "must contain dimensions and families together")
+    if any(
+        not row.id or not row.pressure_values or len(set(row.pressure_values)) != len(row.pressure_values)
+        for row in catalog.dimensions
+    ):
+        raise _error("canonical_scheduling.dimensions", "has empty or duplicate values")
+    if any(
+        not row.id
+        or not row.fact_values
+        or len(set(row.fact_values)) != len(row.fact_values)
+        or row.dimension not in dimensions
+        for row in catalog.families
+    ):
+        raise _error("canonical_scheduling.families", "has an incomplete dimension or fact-value graph")
+    if any(not row.id for row in catalog.evidence_sources) or len(sources) != len(catalog.evidence_sources):
+        raise _error("canonical_scheduling.evidence_sources", "has duplicate or empty identities")
+    if any(
+        fact.family not in families
+        or fact.value not in families[fact.family].fact_values
+        or any(provenance.source not in sources for provenance in fact.provenance)
+        for fact in catalog.facts
+    ):
+        raise _error("canonical_scheduling.facts", "references an unknown family, value, or evidence source")
+    expected = {(family.id, value) for family in catalog.families for value in family.fact_values}
+    actual = {(law.family, law.fact_value) for law in catalog.laws}
+    if (
+        actual != expected
+        or len(actual) != len(catalog.laws)
+        or any(
+            not law.id
+            or law.dimension not in dimensions
+            or law.family not in families
+            or law.dimension != families[law.family].dimension
+            or law.pressure_value not in dimensions[law.dimension]
+            for law in catalog.laws
+        )
+    ):
+        raise _error("canonical_scheduling.laws", "does not have exact admissible coverage")
+
+
 @dataclass(frozen=True, slots=True)
 class RuntimeProgram:
     format_version: str
@@ -464,49 +456,25 @@ class RuntimeProgram:
     source_hash: str
     engine_contract: RuntimeEngineContract
     glue_contract: RuntimeGlueContract
-    warning_types: tuple[RuntimeWarningTypePolicy, ...]
-    concern_catalog: tuple[RuntimeConcernCatalogEntry, ...]
-    relation_warning_rules: tuple[RuntimeRelationWarningRule, ...]
-    relation_presence_statuses: tuple[RuntimeRelationPresenceStatusPolicy, ...]
     selector_form_capabilities: tuple[RuntimeSelectorFormCapability, ...]
     dashboard_state_catalog: RuntimeDashboardStateCatalog
     canonical_scheduling: RuntimeCanonicalScheduling
 
     @property
-    def warning_types_by_type(self) -> Mapping[str, RuntimeWarningTypePolicy]:
-        return MappingProxyType({item.warning_type: item for item in self.warning_types})
-
-    @property
-    def relation_presence_statuses_by_status(self) -> Mapping[str, RuntimeRelationPresenceStatusPolicy]:
-        return MappingProxyType({item.status: item for item in self.relation_presence_statuses})
-
-    @property
-    def relation_presence_statuses_by_active_side(self) -> Mapping[str, RuntimeRelationPresenceStatusPolicy]:
-        return MappingProxyType({item.active_side: item for item in self.relation_presence_statuses})
-
-    @property
     def selector_form_capabilities_by_form(self) -> Mapping[str, RuntimeSelectorFormCapability]:
         return MappingProxyType({item.selector_form: item for item in self.selector_form_capabilities})
 
-    @property
-    def concern_warning_catalog_by_kind(self) -> Mapping[str, str]:
-        return MappingProxyType({item.concern_kind: item.warning_type for item in self.concern_catalog})
 
-
-# This is technical dispatch metadata, not an authored domain vocabulary.  The
-# compiler imports it to validate the descriptor tree, while the decoder uses
-# it to reject silently ignored projection branches and row fields.  Deriving
-# record fields from the DTOs keeps the two boundaries closed together when a
-# retained runtime field is added or removed.
-_PROJECTION_RECORDS: Mapping[str, type[object]] = {
+# This is technical dispatch metadata, not an authored domain vocabulary. The
+# compiler uses it to validate the closed runtime record contract, while the
+# decoder rejects silently ignored record fields. Deriving record fields from
+# the DTOs keeps the two boundaries closed together when a retained runtime
+# field is added or removed.
+_RUNTIME_RECORDS: Mapping[str, type[object]] = {
     "engine_contract": RuntimeEngineContract,
     "engine_contract.semantics": RuntimeEngineSemantic,
     "glue_contract": RuntimeGlueContract,
     "glue_contract.stack_partition": RuntimeStackPartition,
-    "warning_types": RuntimeWarningTypePolicy,
-    "concern_catalog": RuntimeConcernCatalogEntry,
-    "relation_warning_rules": RuntimeRelationWarningRule,
-    "relation_presence_statuses": RuntimeRelationPresenceStatusPolicy,
     "selector_form_capabilities": RuntimeSelectorFormCapability,
     "dashboard_state_catalog": RuntimeDashboardStateCatalog,
     "dashboard_state_catalog.usage_states": RuntimeDashboardUsageStateDefinition,
@@ -527,7 +495,7 @@ _MAPPING_RECORD_PATHS = frozenset({
     "dashboard_state_catalog",
     "canonical_scheduling",
 })
-RUNTIME_PROJECTION_FIELDS: Mapping[str, frozenset[str]] = MappingProxyType({
+RUNTIME_PROGRAM_FIELDS: Mapping[str, frozenset[str]] = MappingProxyType({
     "": frozenset(
         field.name
         for field in fields(RuntimeProgram)
@@ -535,17 +503,16 @@ RUNTIME_PROJECTION_FIELDS: Mapping[str, frozenset[str]] = MappingProxyType({
     ),
     **{
         path: frozenset(field.name for field in fields(record))
-        for path, record in _PROJECTION_RECORDS.items()
+        for path, record in _RUNTIME_RECORDS.items()
         if path in _MAPPING_RECORD_PATHS
     },
 })
-RUNTIME_PROJECTION_ROW_FIELDS: Mapping[str, frozenset[str]] = MappingProxyType({
+RUNTIME_PROGRAM_ROW_FIELDS: Mapping[str, frozenset[str]] = MappingProxyType({
     **{
         path: frozenset(field.name for field in fields(record))
-        for path, record in _PROJECTION_RECORDS.items()
+        for path, record in _RUNTIME_RECORDS.items()
         if path not in _MAPPING_RECORD_PATHS
     },
-    "glue_contract.relation_presence_truth_table": frozenset({"source_active", "target_active"}),
 })
 
 
@@ -569,45 +536,6 @@ def _engine_semantic(row: Mapping[str, object], label: str) -> RuntimeEngineSema
         _str(row["category"], f"{label}.category"),
         _str(row["rule"], f"{label}.rule"),
         _str(row["source_of_truth"], f"{label}.source_of_truth"),
-    )
-
-
-def _warning_type(row: Mapping[str, object], label: str) -> RuntimeWarningTypePolicy:
-    return RuntimeWarningTypePolicy(
-        _str(row["id"], f"{label}.id"),
-        _str(row["warning_type"], f"{label}.warning_type"),
-        _str(row["label"], f"{label}.label"),
-        _str(row["action_text"], f"{label}.action_text"),
-    )
-
-
-def _concern_catalog(row: Mapping[str, object], label: str) -> RuntimeConcernCatalogEntry:
-    return RuntimeConcernCatalogEntry(
-        _str(row["id"], f"{label}.id"),
-        _str(row["concern_kind"], f"{label}.concern_kind"),
-        _str(row["warning_type"], f"{label}.warning_type"),
-    )
-
-
-def _relation_warning(row: Mapping[str, object], label: str) -> RuntimeRelationWarningRule:
-    return RuntimeRelationWarningRule(
-        _str(row["id"], f"{label}.id"),
-        _str(row["relation_kind"], f"{label}.relation_kind"),
-        _str(row["filter_field"], f"{label}.filter_field"),
-        _str(row["filter_value"], f"{label}.filter_value"),
-        _str(row["active_side"], f"{label}.active_side"),
-        _str(row["warning_type"], f"{label}.warning_type"),
-        _bool(row["reverse_output"], f"{label}.reverse_output"),
-    )
-
-
-def _presence(row: Mapping[str, object], label: str) -> RuntimeRelationPresenceStatusPolicy:
-    return RuntimeRelationPresenceStatusPolicy(
-        _str(row["id"], f"{label}.id"),
-        _str(row["status"], f"{label}.status"),
-        _bool(row["source_active"], f"{label}.source_active"),
-        _bool(row["target_active"], f"{label}.target_active"),
-        _str(row["description"], f"{label}.description"),
     )
 
 
@@ -753,14 +681,14 @@ def _canonical_law(row: Mapping[str, object], label: str) -> RuntimeCanonicalLaw
 
 
 def _pressure_dimension(row: Mapping[str, object], label: str) -> RuntimePressureDimension:
-    _exact_map(row, label, RUNTIME_PROJECTION_ROW_FIELDS["canonical_scheduling.dimensions"])
+    _exact_map(row, label, RUNTIME_PROGRAM_ROW_FIELDS["canonical_scheduling.dimensions"])
     return RuntimePressureDimension(
         _str(row["id"], f"{label}.id"), _strings(row["pressure_values"], f"{label}.pressure_values")
     )
 
 
 def _fact_family(row: Mapping[str, object], label: str) -> RuntimeCanonicalFactFamily:
-    _exact_map(row, label, RUNTIME_PROJECTION_ROW_FIELDS["canonical_scheduling.families"])
+    _exact_map(row, label, RUNTIME_PROGRAM_ROW_FIELDS["canonical_scheduling.families"])
     return RuntimeCanonicalFactFamily(
         _str(row["id"], f"{label}.id"),
         _strings(row["fact_values"], f"{label}.fact_values"),
@@ -769,7 +697,7 @@ def _fact_family(row: Mapping[str, object], label: str) -> RuntimeCanonicalFactF
 
 
 def _canonical_fact(row: Mapping[str, object], label: str) -> RuntimeCanonicalSchedulingFact:
-    _exact_map(row, label, RUNTIME_PROJECTION_ROW_FIELDS["canonical_scheduling.facts"])
+    _exact_map(row, label, RUNTIME_PROGRAM_ROW_FIELDS["canonical_scheduling.facts"])
     return RuntimeCanonicalSchedulingFact(
         _str(row["id"], f"{label}.id"),
         _str(row["family"], f"{label}.family"),
@@ -781,41 +709,41 @@ def _canonical_fact(row: Mapping[str, object], label: str) -> RuntimeCanonicalSc
 
 
 def _canonical_scheduling(value: object) -> RuntimeCanonicalScheduling:
-    raw = _exact_map(value, "canonical_scheduling", RUNTIME_PROJECTION_FIELDS["canonical_scheduling"])
+    raw = _exact_map(value, "canonical_scheduling", RUNTIME_PROGRAM_FIELDS["canonical_scheduling"])
     dimensions = _typed_rows(
         raw["dimensions"],
         "canonical_scheduling.dimensions",
         _pressure_dimension,
         semantic_keys=(("id",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["canonical_scheduling.dimensions"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["canonical_scheduling.dimensions"],
     )
     families = _typed_rows(
         raw["families"],
         "canonical_scheduling.families",
         _fact_family,
         semantic_keys=(("id",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["canonical_scheduling.families"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["canonical_scheduling.families"],
     )
     sources = _typed_rows(
         raw["evidence_sources"],
         "canonical_scheduling.evidence_sources",
         _evidence_source,
         semantic_keys=(("id",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["canonical_scheduling.evidence_sources"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["canonical_scheduling.evidence_sources"],
     )
     facts = _typed_rows(
         raw["facts"],
         "canonical_scheduling.facts",
         _canonical_fact,
         semantic_keys=(("id",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["canonical_scheduling.facts"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["canonical_scheduling.facts"],
     )
     laws = _typed_rows(
         raw["laws"],
         "canonical_scheduling.laws",
         _canonical_law,
         semantic_keys=(("family", "fact_value"),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["canonical_scheduling.laws"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["canonical_scheduling.laws"],
     )
     dimensions_by_id = {row.id: set(row.pressure_values) for row in dimensions}
     families_by_id = {row.id: row for row in families}
@@ -844,17 +772,6 @@ def _canonical_scheduling(value: object) -> RuntimeCanonicalScheduling:
         cast(tuple[RuntimeCanonicalSchedulingFact, ...], facts),
         cast(tuple[RuntimeCanonicalLaw, ...], laws),
     )
-
-
-def _validate_relation_presence_statuses(
-    truth: tuple[tuple[bool, bool], ...], statuses: Sequence[RuntimeRelationPresenceStatusPolicy]
-) -> None:
-    actual = {(row.source_active, row.target_active) for row in statuses}
-    if actual != set(truth):
-        raise _error(
-            "relation_presence_statuses",
-            "must have exact unique coverage matching glue_contract.relation_presence_truth_table",
-        )
 
 
 def _validate_dashboard_state_catalog(catalog: RuntimeDashboardStateCatalog) -> None:
@@ -930,7 +847,7 @@ def _decode_program_payload(payload: Mapping[str, object]) -> tuple[str, str, st
     expected_root = {"format_version", "schema_version", "source_hash", "provenance", "projection"}
     if set(root) != expected_root:
         raise _error("", "has an invalid top-level shape")
-    projection = _exact_map(root.get("projection"), "projection", RUNTIME_PROJECTION_FIELDS[""])
+    projection = _exact_map(root.get("projection"), "projection", RUNTIME_PROGRAM_FIELDS[""])
     return (
         _str(root["format_version"], "format_version"),
         _str(root["schema_version"], "schema_version"),
@@ -944,14 +861,14 @@ def _decode_engine_contract(projection: Mapping[str, object]) -> RuntimeEngineCo
     engine_raw = _exact_map(
         projection.get("engine_contract"),
         "engine_contract",
-        RUNTIME_PROJECTION_FIELDS["engine_contract"],
+        RUNTIME_PROGRAM_FIELDS["engine_contract"],
     )
     engine_semantics = _typed_rows(
         engine_raw["semantics"],
         "engine_contract.semantics",
         _engine_semantic,
         semantic_keys=(("id",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["engine_contract.semantics"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["engine_contract.semantics"],
     )
     if not engine_semantics:
         raise _error("engine_contract", "requires non-empty semantics")
@@ -998,19 +915,13 @@ def _decode_engine_contract(projection: Mapping[str, object]) -> RuntimeEngineCo
     return engine_contract
 
 
-def _decode_glue_contract(
-    projection: Mapping[str, object],
-) -> tuple[RuntimeGlueContract, tuple[tuple[bool, bool], ...]]:
+def _decode_glue_contract(projection: Mapping[str, object]) -> RuntimeGlueContract:
     """Decode the executable integration capability and partition section."""
-    glue_raw = _exact_map(projection.get("glue_contract"), "glue_contract", RUNTIME_PROJECTION_FIELDS["glue_contract"])
-    truth = _truth_table(
-        glue_raw.get("relation_presence_truth_table"),
-        "glue_contract.relation_presence_truth_table",
-    )
+    glue_raw = _exact_map(projection.get("glue_contract"), "glue_contract", RUNTIME_PROGRAM_FIELDS["glue_contract"])
     partition_raw = _exact_map(
         glue_raw["stack_partition"],
         "glue_contract.stack_partition",
-        RUNTIME_PROJECTION_FIELDS["glue_contract.stack_partition"],
+        RUNTIME_PROGRAM_FIELDS["glue_contract.stack_partition"],
     )
     partition = RuntimeStackPartition(
         _str(partition_raw["id"], "glue_contract.stack_partition.id"),
@@ -1035,17 +946,10 @@ def _decode_glue_contract(
         _str(glue_raw["id"], "glue_contract.id"),
         _str(glue_raw["inactive_stack_name"], "glue_contract.inactive_stack_name"),
         partition,
-        _strings(glue_raw["relation_warning_filter_fields"], "glue_contract.relation_warning_filter_fields"),
-        _strings(glue_raw["relation_warning_active_sides"], "glue_contract.relation_warning_active_sides"),
-        _strings(glue_raw["relation_presence_active_sides"], "glue_contract.relation_presence_active_sides"),
-        truth,
         _strings(glue_raw["relation_endpoint_selector_kinds"], "glue_contract.relation_endpoint_selector_kinds"),
         _strings(glue_raw["relation_selector_forms"], "glue_contract.relation_selector_forms"),
     )
     glue_capabilities: Mapping[str, tuple[str, ...]] = {
-        "relation_warning_filter_fields": glue.relation_warning_filter_fields,
-        "relation_warning_active_sides": glue.relation_warning_active_sides,
-        "relation_presence_active_sides": glue.relation_presence_active_sides,
         "relation_endpoint_selector_kinds": glue.relation_endpoint_selector_kinds,
         "relation_selector_forms": glue.relation_selector_forms,
     }
@@ -1055,54 +959,17 @@ def _decode_glue_contract(
         actual = glue_capabilities[field_name]
         if actual != expected:
             raise _error(f"glue_contract.{field_name}", "must exactly match executable capabilities")
-    return glue, truth
+    return glue
 
 
-def _decode_relation_review_catalog(
-    projection: Mapping[str, object], truth: tuple[tuple[bool, bool], ...]
-) -> tuple[
-    tuple[RuntimeWarningTypePolicy, ...],
-    tuple[RuntimeConcernCatalogEntry, ...],
-    tuple[RuntimeRelationWarningRule, ...],
-    tuple[RuntimeRelationPresenceStatusPolicy, ...],
-    tuple[RuntimeSelectorFormCapability, ...],
-]:
+def _decode_relation_review_catalog(projection: Mapping[str, object]) -> tuple[RuntimeSelectorFormCapability, ...]:
     """Decode review vocabulary that is independent of canonical scheduling facts."""
-    warning_types = _typed_rows(
-        projection["warning_types"],
-        "warning_types",
-        _warning_type,
-        semantic_keys=(("warning_type",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["warning_types"],
-    )
-    concern_catalog = _typed_rows(
-        projection["concern_catalog"],
-        "concern_catalog",
-        _concern_catalog,
-        semantic_keys=(("concern_kind",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["concern_catalog"],
-    )
-    relation_warning_rules = _typed_rows(
-        projection["relation_warning_rules"],
-        "relation_warning_rules",
-        _relation_warning,
-        semantic_keys=(("relation_kind", "filter_field", "filter_value", "active_side", "reverse_output"),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["relation_warning_rules"],
-    )
-    relation_presence_statuses = _typed_rows(
-        projection["relation_presence_statuses"],
-        "relation_presence_statuses",
-        _presence,
-        semantic_keys=(("status",), ("source_active", "target_active")),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["relation_presence_statuses"],
-    )
-    _validate_relation_presence_statuses(truth, relation_presence_statuses)
     selector_form_capabilities = _typed_rows(
         projection["selector_form_capabilities"],
         "selector_form_capabilities",
         _selector_form_capability,
         semantic_keys=(("selector_form",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["selector_form_capabilities"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["selector_form_capabilities"],
     )
     selector_forms = tuple(row.selector_form for row in selector_form_capabilities)
     if selector_forms != IMPLEMENTED_RELATION_SELECTOR_FORMS:
@@ -1113,13 +980,7 @@ def _decode_relation_review_catalog(
     endpoint_kinds = {row.endpoint_kind for row in selector_form_capabilities}
     if endpoint_kinds != set(IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS):
         raise _error("selector_form_capabilities", "must declare exactly the executable endpoint kinds")
-    return (
-        cast(tuple[RuntimeWarningTypePolicy, ...], warning_types),
-        cast(tuple[RuntimeConcernCatalogEntry, ...], concern_catalog),
-        cast(tuple[RuntimeRelationWarningRule, ...], relation_warning_rules),
-        cast(tuple[RuntimeRelationPresenceStatusPolicy, ...], relation_presence_statuses),
-        cast(tuple[RuntimeSelectorFormCapability, ...], selector_form_capabilities),
-    )
+    return cast(tuple[RuntimeSelectorFormCapability, ...], selector_form_capabilities)
 
 
 def _decode_dashboard_state_catalog(projection: Mapping[str, object]) -> RuntimeDashboardStateCatalog:
@@ -1127,35 +988,35 @@ def _decode_dashboard_state_catalog(projection: Mapping[str, object]) -> Runtime
     dashboard_catalog = _exact_map(
         projection.get("dashboard_state_catalog"),
         "dashboard_state_catalog",
-        RUNTIME_PROJECTION_FIELDS["dashboard_state_catalog"],
+        RUNTIME_PROGRAM_FIELDS["dashboard_state_catalog"],
     )
     usage_states = _typed_rows(
         dashboard_catalog["usage_states"],
         "dashboard_state_catalog.usage_states",
         _dashboard_usage_state,
         semantic_keys=(("state",), ("order",)),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["dashboard_state_catalog.usage_states"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["dashboard_state_catalog.usage_states"],
     )
     product_tracking_states = _typed_rows(
         dashboard_catalog["product_tracking_states"],
         "dashboard_state_catalog.product_tracking_states",
         _dashboard_product_tracking_state,
         semantic_keys=(("state",), ("order",)),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["dashboard_state_catalog.product_tracking_states"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["dashboard_state_catalog.product_tracking_states"],
     )
     usage_truth_table = _typed_rows(
         dashboard_catalog["usage_truth_table"],
         "dashboard_state_catalog.usage_truth_table",
         _dashboard_usage_truth_state,
         semantic_keys=(("active_stack_membership", "inactive_stack_membership", "tracked_product_presence"),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["dashboard_state_catalog.usage_truth_table"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["dashboard_state_catalog.usage_truth_table"],
     )
     product_tracking_truth_table = _typed_rows(
         dashboard_catalog["product_tracking_truth_table"],
         "dashboard_state_catalog.product_tracking_truth_table",
         _dashboard_tracking_truth_state,
         semantic_keys=(("tracked_product_presence",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["dashboard_state_catalog.product_tracking_truth_table"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["dashboard_state_catalog.product_tracking_truth_table"],
     )
     dashboard_state_catalog = RuntimeDashboardStateCatalog(
         usage_states=cast(tuple[RuntimeDashboardUsageStateDefinition, ...], usage_states),
@@ -1178,14 +1039,8 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     if format_version != "ontology-runtime-program-v2":
         raise _error("format_version", "is unsupported")
     engine_contract = _decode_engine_contract(projection)
-    glue_contract, presence_truth_table = _decode_glue_contract(projection)
-    (
-        warning_types,
-        concern_catalog,
-        relation_warning_rules,
-        relation_presence_statuses,
-        selector_form_capabilities,
-    ) = _decode_relation_review_catalog(projection, presence_truth_table)
+    glue_contract = _decode_glue_contract(projection)
+    selector_form_capabilities = _decode_relation_review_catalog(projection)
     dashboard_state_catalog = _decode_dashboard_state_catalog(projection)
     canonical_scheduling = _canonical_scheduling(projection["canonical_scheduling"])
     return RuntimeProgram(
@@ -1194,21 +1049,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         source_hash,
         engine_contract,
         glue_contract,
-        warning_types,
-        concern_catalog,
-        relation_warning_rules,
-        relation_presence_statuses,
         selector_form_capabilities,
         dashboard_state_catalog,
         canonical_scheduling,
     )
-
-
-def relation_presence_policy_for_active_side(
-    active_side: str,
-    relation_presence_by_active_side: Mapping[str, RuntimeRelationPresenceStatusPolicy],
-) -> RuntimeRelationPresenceStatusPolicy:
-    try:
-        return relation_presence_by_active_side[active_side]
-    except KeyError as error:
-        raise ValueError(f"unknown relation active side {active_side!r}") from error

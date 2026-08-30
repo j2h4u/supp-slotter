@@ -6,7 +6,7 @@ from planner.contracts import Product, Relation, Substance
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.policies import project_ontology_assertions
 from planner.query_model.data import ReadModelData
-from planner.query_model.facts import active_substance_ids, inactive_substance_ids
+from planner.query_model.facts import active_substance_ids
 from planner.query_model.relations import classify_relations, resolve_relation_queries
 from planner.query_model.types import RelationReviewRow
 
@@ -29,15 +29,10 @@ class StackReadModel:
     def active_substance_ids(self) -> set[str]:
         return active_substance_ids(self._data, self._ontology_bundle.runtime_program.glue_contract.inactive_stack_name)
 
-    def inactive_substance_ids(self) -> set[str]:
-        return inactive_substance_ids(
-            self._data, self._ontology_bundle.runtime_program.glue_contract.inactive_stack_name
-        )
-
     def classify_relations(
         self,
         active_substances: set[str],
-    ) -> dict[str, list[RelationReviewRow]]:
+    ) -> list[RelationReviewRow]:
         return classify_relations(self._data.relations, active_substances, self._ontology_bundle.runtime_program)
 
 

@@ -61,11 +61,10 @@ or resource-bounded work is `Indeterminate` and remains layout-free.
 
 ## Migration ledger
 
-[The migration ledger](migrations/legacy-atom-ledger.yaml) is the narrow record
-for evidence that still needs an explicit disposition. Each entry records one
-evidence atom as a typed fact, raw quotation, source metadata, Sol adjudication,
-or an explicit exclusion. The ledger does not authorize derived placements or
-other stored scheduling answers.
+[The migration receipt](migrations/legacy-atom-ledger.yaml) is a compact,
+immutable shape-and-hash closure record for the completed scheduling migration.
+Its historical generator is retired; it neither reconstructs legacy data nor
+authorizes derived placements or other stored scheduling answers.
 
 ## Runtime boundary and acceptance
 

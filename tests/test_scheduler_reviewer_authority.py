@@ -14,7 +14,6 @@ from planner.paths import ROOT
 
 from tests.planner_fixture import (
     PlannerFixtureInput,
-    PlannerFixtureOptions,
     plan_in_temp_dir,
     write_minimal_planner_fixture,
 )
@@ -92,47 +91,31 @@ def test_review_only_relation_cannot_change_command_level_schedule(tmp_path: Pat
     fixture = PlannerFixtureInput(
         stack_items={"product": {"stack": "daily"}, "active_product": {"stack": "daily"}},
         products={
-            "product": [("component", ["effect:circulation_support"])],
-            "active_product": [("epa_component", ["effect:platelet_aggregation_modulation"])],
+            "product": [("component", ["effect:nitric_oxide_support"])],
+            "active_product": [("epa_component", ["effect:pde5_inhibition"])],
         },
         traits={
-            "effect:circulation_support": {
-                "label": "Circulation support",
+            "effect:nitric_oxide_support": {
+                "label": "Nitric oxide support",
                 "description": "Fixture",
                 "applies_when": "Fixture",
             },
-            "effect:platelet_aggregation_modulation": {
-                "label": "Platelet aggregation modulation",
+            "effect:pde5_inhibition": {
+                "label": "PDE5 inhibition",
                 "description": "Fixture",
                 "applies_when": "Fixture",
             },
         },
     )
     write_minimal_planner_fixture(base, fixture)
-    write_minimal_planner_fixture(
-        reviewer,
-        fixture,
-        PlannerFixtureOptions(
-            substance_relations={
-                "component": [
-                    {
-                        "relation_type": "review_with",
-                        "substances": ["epa_component"],
-                        "reason": "Fixture explicit-metadata review_with relation.",
-                    }
-                ]
-            }
-        ),
-    )
+    write_minimal_planner_fixture(reviewer, fixture)
     relations_path = reviewer / "data" / "relations.yaml"
-    relations = yaml.safe_load(relations_path.read_text(encoding="utf-8"))
-    assert isinstance(relations, dict)
-    relation = cast(list[dict[str, object]], relations["relations"])[0]
-    relation["assertion_kind"] = "clinical_review_signal"
-    relation["semantic_family"] = "clinical_review_signal"
-    relation["research_state"] = "unassessed"
-    relation["sources"] = []
-    relations_path.write_text(yaml.safe_dump(relations, sort_keys=False), encoding="utf-8")
+    vocabulary = yaml.safe_load((ROOT / "ontology/generated/runtime-vocabulary.yaml").read_text(encoding="utf-8"))
+    assert isinstance(vocabulary, dict)
+    catalog = cast(dict[str, dict[str, object]], vocabulary["ontology_assertions"])
+    relations_path.write_text(
+        yaml.safe_dump({"relations": [catalog["rel_co_use_context_001"]]}, sort_keys=False), encoding="utf-8"
+    )
 
     assert cmd_plan(data_root=base).exit_code == 0
     assert cmd_plan(data_root=reviewer).exit_code == 0
@@ -151,11 +134,17 @@ def test_review_only_relation_cannot_change_command_level_schedule(tmp_path: Pat
     reviewer_review = cmd_review(data_root=reviewer)
     assert base_review.exit_code == reviewer_review.exit_code == 0
     assert base_review.output != reviewer_review.output
-    assert "Fixture explicit-metadata review_with relation." in reviewer_review.output
-    assert "Fixture explicit-metadata review_with relation." not in base_review.output
-    assert "[review_with]" in reviewer_review.output
-    assert "[warning: review_with_substance_present]" in reviewer_review.output
-    assert "[review_with]" not in base_review.output
+    assert "The convergence is mechanistic" in reviewer_review.output
+    assert "The convergence is mechanistic" not in base_review.output
+    assert "[Co-use context]" in reviewer_review.output
+    assert "[Co-use context]" not in base_review.output
+    assert "Evidence relations involving current stack" in reviewer_review.output
+    assert "state: mechanistic_only" in reviewer_review.output
+    assert "https://pubmed.ncbi.nlm.nih.gov/17662090/" in reviewer_review.output
+    assert not any(
+        token in reviewer_review.output.casefold()
+        for token in ("warning", "severity", "contraindication", "add ", "remove ", "separate ", "consult ")
+    )
 
 
 @pytest.mark.parametrize("command", ("plan", "find", "review"))

@@ -7,9 +7,6 @@ notes: Knowledge-only gastric-acidifier reference card. Added because betaine HC
   category, but evidence is narrow and it should not be confused with trimethylglycine/betaine as a methyl donor. Sources
   checked - PubMed gastric reacidification pilot studies; PubMed review on mealtime betaine HCl for functional hypochlorhydria.
 concerns:
-- kind: safety
-  text: Review GERD/reflux, gastritis, peptic-ulcer history, NSAID use, acid-suppressing medication context, pill esophagitis
-    risk, dose, and meal size before practical use discussion.
 - kind: data_quality
   text: Product cards should distinguish betaine HCl from anhydrous betaine/TMG, and capture whether pepsin or other digestive
     enzymes are co-formulated.

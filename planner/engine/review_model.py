@@ -12,25 +12,24 @@ from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import format_substance_name, load_substance_registry
 from planner.contracts import CardLoadError, ConcernRecord, Product, StackEntry, Substance
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.presentation import RelationPresentation, authored_relation_presentation, authored_term_label
 from planner.ontology.runtime_program import RuntimeDashboardStateCatalog
-from planner.ontology.warning_policy import authored_term_label
 from planner.paths import Paths
 from planner.query_model import build_stack_read_model, stacks_for_read_model
 from planner.query_model.types import RelationReviewRow
 from planner.schedule_types import DashboardReviewEntryWithMembers, DashboardReviewResult
 from planner.yaml_io import load_yaml
 
-ReviewRelationRows = dict[str, list[RelationReviewRow]]
+ReviewRelationRows = list[RelationReviewRow]
 
 
 @dataclass(frozen=True, slots=True)
 class ReviewModel:
     concerns_by_kind: dict[str, list[ConcernEntry]]
     concern_kind_labels: dict[str, str]
-    relations_by_status: ReviewRelationRows
-    relation_type_labels: dict[str, str]
+    relation_rows: ReviewRelationRows
+    relation_type_presentations: dict[str, RelationPresentation]
     relation_type_order: tuple[str, ...]
-    relation_status_order: tuple[str, ...]
     knowledge_index: dict[str, dict[str, list[str]]]
     knowledge_namespace_labels: dict[str, str]
     knowledge_index_order: tuple[str, ...]
@@ -106,17 +105,23 @@ def build_review_model(  # noqa: PLR0914
         ),
         (),
     )
-    relations_by_status = read_model.classify_relations(active_substances)
-    relation_type_order = tuple(sorted({row["type"] for rows in relations_by_status.values() for row in rows}))
+    relation_rows = read_model.classify_relations(active_substances)
+    relation_type_presentations = {
+        relation_type: authored_relation_presentation(relation_type, bundle)
+        for relation_type in {row["type"] for row in relation_rows}
+    }
+    relation_type_order = tuple(
+        relation_type
+        for relation_type, _ in sorted(relation_type_presentations.items(), key=lambda item: item[1].order)
+    )
     knowledge_index = _knowledge_index(active_substances, substances, bundle)
     return (
         ReviewModel(
             concerns_by_kind=concerns_by_kind,
             concern_kind_labels={kind: kind for kind in concerns_by_kind},
-            relations_by_status=relations_by_status,
-            relation_type_labels={relation_type: relation_type for relation_type in relation_type_order},
+            relation_rows=relation_rows,
+            relation_type_presentations=relation_type_presentations,
             relation_type_order=relation_type_order,
-            relation_status_order=tuple(row.status for row in bundle.runtime_program.relation_presence_statuses),
             knowledge_index=knowledge_index,
             knowledge_namespace_labels={namespace: namespace for namespace in knowledge_index},
             knowledge_index_order=tuple(sorted(knowledge_index)),

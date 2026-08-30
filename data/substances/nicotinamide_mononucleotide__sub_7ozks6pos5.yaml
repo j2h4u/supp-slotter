@@ -7,9 +7,6 @@ notes: Knowledge-only NAD-precursor reference card. Added because NMN is one of 
   and was missing while NR was already represented. Sources checked - PubChem beta-NMN record; PubMed NMN safety/performance
   reviews; FDA citizen-petition response context.
 concerns:
-- kind: safety
-  text: Review product quality, dose, long-term evidence limits, cancer-context caution, and current jurisdiction/regulatory
-    status before treating NMN as practical NAD support.
 - kind: data_quality
   text: Product cards should distinguish NMN from NR, niacin, nicotinamide, NAD+ injections, and multi-precursor blends; do
     not transfer evidence between forms without label-specific support.

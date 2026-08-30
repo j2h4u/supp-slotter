@@ -27,10 +27,10 @@ uses the stable item-ID and `(slot.order, slot_id)` assignment tuple. Only a
 proved global optimum is `Optimal`; every other outcome is layout-free
 `Indeterminate`.
 
-The [migration ledger](../migrations/legacy-atom-ledger.yaml) is the sole
-transition record for evidence atoms that require a typed fact, raw quotation,
-source metadata, Sol adjudication, or explicit exclusion. It cannot encode a
-scheduling result.
+The [migration receipt](../migrations/legacy-atom-ledger.yaml) is the immutable
+closure record for the completed transition. It preserves the fixed closure
+commit and does not encode a scheduling result; its historical generator is
+retired.
 
 ## Consequences
 

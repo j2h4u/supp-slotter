@@ -1,37 +1,5 @@
 {
   "$defs": {
-    "Action": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "field": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "operator": {
-          "type": "string"
-        },
-        "trace_key": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "value": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "operator"
-      ],
-      "title": "Action",
-      "type": "object"
-    },
     "AcuteAlertnessEffect": {
       "additionalProperties": false,
       "description": "Closed acute alertness effect fact family.",
@@ -678,82 +646,11 @@
     "ConcernKind": {
       "description": "",
       "enum": [
-        "safety",
         "model_gap",
         "data_quality"
       ],
       "title": "ConcernKind",
       "type": "string"
-    },
-    "Condition": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "conditions": {
-          "items": {
-            "$ref": "#/$defs/Condition"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "field": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "left": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Condition"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "operator": {
-          "type": "string"
-        },
-        "right": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Condition"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "selector": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "value": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "values": {
-          "items": {
-            "type": "string"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "operator"
-      ],
-      "title": "Condition",
-      "type": "object"
     },
     "Dashboard": {
       "additionalProperties": false,
@@ -1795,18 +1692,21 @@
       "title": "RelationAssertionEntitySelector",
       "type": "object"
     },
+    "RelationAssertionKind": {
+      "description": "",
+      "enum": [
+        "ontology_assertion",
+        "co_use_evidence"
+      ],
+      "title": "RelationAssertionKind",
+      "type": "string"
+    },
     "RelationAssertionRecord": {
       "additionalProperties": false,
       "description": "",
       "properties": {
-        "action": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "assertion_kind": {
-          "type": "string"
+          "$ref": "#/$defs/RelationAssertionKind"
         },
         "id": {
           "pattern": "^[a-z][a-z0-9_]*$",
@@ -1822,10 +1722,7 @@
           "$ref": "#/$defs/ResearchState"
         },
         "semantic_family": {
-          "type": "string"
-        },
-        "severity": {
-          "$ref": "#/$defs/Severity"
+          "$ref": "#/$defs/RelationSemanticFamily"
         },
         "source_selector": {
           "$ref": "#/$defs/RelationAssertionSelector"
@@ -1924,7 +1821,7 @@
     },
     "RelationCatalog": {
       "additionalProperties": false,
-      "description": "Authored operational relation vocabulary consumed by runtime review and warning policy.",
+      "description": "Authored operational relation vocabulary consumed by runtime review.",
       "properties": {
         "relation_types": {
           "items": {
@@ -1948,33 +1845,26 @@
       "title": "RelationSelectorForm",
       "type": "string"
     },
+    "RelationSemanticFamily": {
+      "description": "",
+      "enum": [
+        "absorption_interaction_claim",
+        "biochemical_mechanism_assertion",
+        "co_use_evidence",
+        "nutrient_balance_context",
+        "nutritional_adequacy_context"
+      ],
+      "title": "RelationSemanticFamily",
+      "type": "string"
+    },
     "RelationType": {
       "description": "Relation type identifiers are authored in the relation type catalog.",
       "enum": [
         "balance",
-        "review_with",
+        "co_use_context",
         "supports"
       ],
       "title": "RelationType",
-      "type": "string"
-    },
-    "RelationWarningActiveSide": {
-      "description": "",
-      "enum": [
-        "both",
-        "source",
-        "target"
-      ],
-      "title": "RelationWarningActiveSide",
-      "type": "string"
-    },
-    "RelationWarningFilterField": {
-      "description": "",
-      "enum": [
-        "assertion_kind",
-        "semantic_family"
-      ],
-      "title": "RelationWarningFilterField",
       "type": "string"
     },
     "ResearchState": {
@@ -1988,28 +1878,6 @@
       ],
       "title": "ResearchState",
       "type": "string"
-    },
-    "RuntimeConcernCatalogEntry": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "concern_kind": {
-          "$ref": "#/$defs/ConcernKind"
-        },
-        "id": {
-          "type": "string"
-        },
-        "warning_type": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "concern_kind",
-        "warning_type"
-      ],
-      "title": "RuntimeConcernCatalogEntry",
-      "type": "object"
     },
     "RuntimeDashboardProductTrackingStateDefinition": {
       "additionalProperties": false,
@@ -2254,33 +2122,9 @@
           },
           "type": "array"
         },
-        "relation_presence_active_sides": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "relation_presence_truth_table": {
-          "items": {
-            "$ref": "#/$defs/RuntimeRelationPresenceTruthState"
-          },
-          "type": "array"
-        },
         "relation_selector_forms": {
           "items": {
             "type": "string"
-          },
-          "type": "array"
-        },
-        "relation_warning_active_sides": {
-          "items": {
-            "$ref": "#/$defs/RelationWarningActiveSide"
-          },
-          "type": "array"
-        },
-        "relation_warning_filter_fields": {
-          "items": {
-            "$ref": "#/$defs/RelationWarningFilterField"
           },
           "type": "array"
         },
@@ -2292,10 +2136,6 @@
         "id",
         "inactive_stack_name",
         "stack_partition",
-        "relation_warning_filter_fields",
-        "relation_warning_active_sides",
-        "relation_presence_active_sides",
-        "relation_presence_truth_table",
         "relation_endpoint_selector_kinds",
         "relation_selector_forms"
       ],
@@ -2306,12 +2146,6 @@
       "additionalProperties": false,
       "description": "Typed executable policy contract consumed by planner runtime.",
       "properties": {
-        "concern_catalog": {
-          "items": {
-            "$ref": "#/$defs/RuntimeConcernCatalogEntry"
-          },
-          "type": "array"
-        },
         "dashboard_state_catalog": {
           "$ref": "#/$defs/RuntimeDashboardStateCatalog"
         },
@@ -2324,33 +2158,9 @@
         "id": {
           "type": "string"
         },
-        "relation_presence_statuses": {
-          "items": {
-            "$ref": "#/$defs/RuntimeRelationPresenceStatusPolicy"
-          },
-          "type": "array"
-        },
-        "relation_warning_rules": {
-          "items": {
-            "$ref": "#/$defs/RuntimeRelationWarningRule"
-          },
-          "type": "array"
-        },
-        "runtime_projection": {
-          "items": {
-            "$ref": "#/$defs/RuntimeProjectionDescriptor"
-          },
-          "type": "array"
-        },
         "selector_form_capabilities": {
           "items": {
             "$ref": "#/$defs/RuntimeSelectorFormCapability"
-          },
-          "type": "array"
-        },
-        "warning_types": {
-          "items": {
-            "$ref": "#/$defs/RuntimeWarningTypePolicy"
           },
           "type": "array"
         }
@@ -2359,136 +2169,10 @@
         "id",
         "engine_contract",
         "glue_contract",
-        "warning_types",
-        "concern_catalog",
-        "relation_warning_rules",
-        "relation_presence_statuses",
         "selector_form_capabilities",
-        "dashboard_state_catalog",
-        "runtime_projection"
+        "dashboard_state_catalog"
       ],
       "title": "RuntimePolicyCatalog",
-      "type": "object"
-    },
-    "RuntimeProjectionDescriptor": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "children": {
-          "items": {
-            "$ref": "#/$defs/RuntimeProjectionDescriptor"
-          },
-          "type": [
-            "array",
-            "null"
-          ]
-        },
-        "id": {
-          "type": "string"
-        },
-        "source": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "target": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "target"
-      ],
-      "title": "RuntimeProjectionDescriptor",
-      "type": "object"
-    },
-    "RuntimeRelationPresenceStatusPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "description": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "source_active": {
-          "type": "boolean"
-        },
-        "status": {
-          "type": "string"
-        },
-        "target_active": {
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "id",
-        "status",
-        "source_active",
-        "target_active",
-        "description"
-      ],
-      "title": "RuntimeRelationPresenceStatusPolicy",
-      "type": "object"
-    },
-    "RuntimeRelationPresenceTruthState": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "source_active": {
-          "type": "boolean"
-        },
-        "target_active": {
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "source_active",
-        "target_active"
-      ],
-      "title": "RuntimeRelationPresenceTruthState",
-      "type": "object"
-    },
-    "RuntimeRelationWarningRule": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "active_side": {
-          "$ref": "#/$defs/RelationWarningActiveSide"
-        },
-        "filter_field": {
-          "$ref": "#/$defs/RelationWarningFilterField"
-        },
-        "filter_value": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "relation_kind": {
-          "type": "string"
-        },
-        "reverse_output": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "warning_type": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "relation_kind",
-        "warning_type",
-        "filter_field",
-        "filter_value",
-        "active_side"
-      ],
-      "title": "RuntimeRelationWarningRule",
       "type": "object"
     },
     "RuntimeSelectorFormCapability": {
@@ -2549,32 +2233,6 @@
       "title": "RuntimeStackPartition",
       "type": "object"
     },
-    "RuntimeWarningTypePolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "action_text": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "label": {
-          "type": "string"
-        },
-        "warning_type": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "warning_type",
-        "label",
-        "action_text"
-      ],
-      "title": "RuntimeWarningTypePolicy",
-      "type": "object"
-    },
     "Selector": {
       "additionalProperties": false,
       "description": "",
@@ -2625,17 +2283,6 @@
       ],
       "title": "SemanticCategory",
       "type": "object"
-    },
-    "Severity": {
-      "description": "",
-      "enum": [
-        "critical",
-        "high",
-        "medium",
-        "low"
-      ],
-      "title": "Severity",
-      "type": "string"
     },
     "Slot": {
       "additionalProperties": false,

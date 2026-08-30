@@ -89,7 +89,6 @@ def load_plan_inputs(
 
     return PlanInputs(
         runtime_program=bundle.runtime_program,
-        canonical_scheduling=bundle.runtime_program.canonical_scheduling,
         slots=slots,
         substances=substances,
         products=products,

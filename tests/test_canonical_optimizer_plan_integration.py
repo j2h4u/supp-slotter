@@ -19,7 +19,9 @@ def _runtime() -> plan_module._PlanRuntime:
     inputs = SimpleNamespace(
         slots={"slot": slot},
         products={"prd": Product("prd", "Product", ())},
-        canonical_scheduling=SimpleNamespace(pressure_values_by_dimension={"meal": frozenset({"with_food"})}),
+        runtime_program=SimpleNamespace(
+            canonical_scheduling=SimpleNamespace(pressure_values_by_dimension={"meal": frozenset({"with_food"})})
+        ),
     )
     active = ActiveIndex({"item": "prd"}, {"item": "daily"}, Success(()))
     return plan_module._PlanRuntime(inputs, active)
@@ -28,11 +30,7 @@ def _runtime() -> plan_module._PlanRuntime:
 def test_plan_hands_only_answer_free_source_to_writer(monkeypatch, tmp_path: Path) -> None:
     captured: list[CanonicalPublicationSource] = []
     optimal = Optimal({"item": "slot"}, CanonicalObjective(0, 1, ((1, "slot"),)), ())
-    document = {
-        "pillboxes": {
-            "daily": {"label": "Daily", "slots": {"slot": {"label": "Slot", "products": [], "substances": []}}}
-        }
-    }
+    document = {"pillboxes": {"daily": {"label": "Daily", "slots": {"slot": {"label": "Slot", "products": []}}}}}
 
     def capture(_path: Path, source: CanonicalPublicationSource) -> PublishedSchedule:
         captured.append(source)

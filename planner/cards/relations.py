@@ -12,7 +12,6 @@ from planner.contracts import (
     RelationSelector,
     RelationType,
     ResearchState,
-    Severity,
     Substance,
 )
 from planner.ontology.artifacts import OntologyBundle
@@ -105,7 +104,7 @@ def _validated_relation_entry(raw: object, path: Path, label: str, bundle: Ontol
         value = entry[field]
         if not isinstance(value, str) or not value.strip():
             raise CardLoadError(path, f"{label}.{field} must be a non-empty string")
-    for field in ("action", "severity", "assertion_kind", "semantic_family", "research_state"):
+    for field in ("assertion_kind", "semantic_family", "research_state"):
         value = entry.get(field)
         if value is not None and (not isinstance(value, str) or not value.strip()):
             raise CardLoadError(path, f"{label}.{field} must be a non-empty string when present")
@@ -163,8 +162,6 @@ def _relation_from_mapping(  # noqa: PLR0913, PLR0917
         reason=cast(str, relation.get("reason", "")),
         source_selector=source,
         target_selector=target,
-        action=_optional_str(relation.get("action")),
-        severity=cast(Severity | None, relation.get("severity")),
         assertion_kind=_optional_str(relation.get("assertion_kind")),
         semantic_family=_optional_str(relation.get("semantic_family")),
         research_state=cast(ResearchState, relation["research_state"]),

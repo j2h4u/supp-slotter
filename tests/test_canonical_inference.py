@@ -6,7 +6,6 @@ import json
 from dataclasses import replace
 from functools import cache
 from pathlib import Path
-from types import SimpleNamespace
 from typing import Any, cast
 
 import pytest
@@ -69,7 +68,16 @@ def _cross_dimension_laws() -> tuple[RuntimeCanonicalLaw, RuntimeCanonicalLaw]:
 
 
 def _catalog(*facts: RuntimeCanonicalSchedulingFact) -> RuntimeCanonicalScheduling:
-    return RuntimeCanonicalScheduling((), (), (SOURCE,), facts, _laws())
+    compiled = decode_runtime_program(
+        cast(dict[str, Any], json.loads((ONTOLOGY / "generated/runtime-program.json").read_text(encoding="utf-8")))
+    ).canonical_scheduling
+    return RuntimeCanonicalScheduling(
+        compiled.dimensions,
+        compiled.families,
+        (SOURCE,),
+        facts,
+        compiled.laws,
+    )
 
 
 def _fact(
@@ -93,11 +101,15 @@ def _fact(
 def _execute(
     catalog: RuntimeCanonicalScheduling,
     selected_items: object,
-    laws: tuple[RuntimeCanonicalLaw, ...] | None = None,
     *,
     roles: tuple[RuntimeCompositionRole, ...] = (ROLE,),
 ) -> Success | Conflict:
-    return execute_canonical_inference(catalog, selected_items, laws or _laws(), composition_roles=roles)  # type: ignore[arg-type]
+    return execute_canonical_inference(
+        catalog,
+        selected_items,  # type: ignore[arg-type]
+        composition_roles=roles,
+        known_products={role.product for role in roles},
+    )
 
 
 def test_every_admitted_value_maps_to_one_pressure() -> None:
@@ -120,7 +132,7 @@ def test_every_admitted_value_maps_to_one_pressure() -> None:
     runtime_laws = decode_runtime_program(generated_payload).canonical_scheduling.laws
     assert len(runtime_laws) == len(compiled_laws) == 9
     for law in runtime_laws:
-        result = _execute(_catalog(_fact(law.family, law.fact_value)), ("prd_demo",), runtime_laws)
+        result = _execute(_catalog(_fact(law.family, law.fact_value)), ("prd_demo",))
         assert isinstance(result, Success)
         assert result.pressures[0].identity == UnaryPressureIdentity("prd_demo", law.dimension, law.pressure_value)
         assert result.pressures[0].derivations[0].family == law.family
@@ -129,14 +141,14 @@ def test_every_admitted_value_maps_to_one_pressure() -> None:
 
 def test_wrong_or_unselected_applicability_does_not_emit_pressure() -> None:
     law = _primary_law()
-    fact = _fact(law.family, law.fact_value)
     wrong_subject = _fact(
         law.family,
         law.fact_value,
         subject=RuntimeFactSubject("sub_other", None),
+        applicability=RuntimeFactApplicability("sub_other", None),
         fact_id="fact_wrong_subject",
     )
-    result = _execute(_catalog(fact, wrong_subject), ("prd_other",), _laws())
+    result = _execute(_catalog(wrong_subject), ("prd_other",), roles=(OTHER_ROLE,))
     assert isinstance(result, Success)
     assert result.pressures == ()
 
@@ -159,7 +171,6 @@ def test_substance_applicability_reaches_each_exact_matching_role() -> None:
     result = _execute(
         _catalog(role_scoped, substance_subject),
         {"item_primary": ROLE.product, "item_other": OTHER_ROLE.product},
-        _laws(),
         roles=(ROLE, OTHER_ROLE),
     )
 
@@ -179,7 +190,7 @@ def test_substance_applicability_reaches_each_exact_matching_role() -> None:
 def test_proof_contains_law_fact_subject_path_and_provenance() -> None:
     law = _primary_law()
     fact = _fact(law.family, law.fact_value)
-    result = _execute(_catalog(fact), ("prd_demo",), _laws())
+    result = _execute(_catalog(fact), ("prd_demo",))
     assert isinstance(result, Success)
     proof = result.pressures[0].derivations[0]
     assert proof.law.id == law.id
@@ -198,7 +209,7 @@ def test_duplicate_witnesses_facts_components_and_paths_normalize_to_one_pressur
         id="fact_duplicate",  # type: ignore[call-arg]
         provenance=PROVENANCE + PROVENANCE,  # type: ignore[arg-type]
     )
-    result = _execute(_catalog(_fact(law.family, law.fact_value), duplicate), ("prd_demo",), _laws())
+    result = _execute(_catalog(_fact(law.family, law.fact_value), duplicate), ("prd_demo",))
     assert isinstance(result, Success)
     assert len(result.pressures) == 1
     assert len(result.pressures[0].derivations) == 2
@@ -213,7 +224,6 @@ def test_same_dimension_values_are_layout_free_conflict() -> None:
             _fact(second.family, second.fact_value, fact_id="fact_other"),
         ),
         ("prd_demo",),
-        _laws(),
     )
     assert isinstance(result, Conflict)
     assert result.conflicts[0].item_id == "prd_demo"
@@ -229,7 +239,6 @@ def test_cross_dimension_pressures_coexist() -> None:
             _fact(second.family, second.fact_value, fact_id="fact_alert"),
         ),
         ("prd_demo",),
-        _laws(),
     )
     assert isinstance(result, Success)
     assert {(pressure.dimension, pressure.value) for pressure in result.pressures} == {
@@ -238,25 +247,38 @@ def test_cross_dimension_pressures_coexist() -> None:
     }
 
 
-def test_admitted_fact_without_exact_law_fails_closed() -> None:
+def test_incomplete_law_graph_fails_closed_at_runtime_catalog_boundary() -> None:
     law = _primary_law()
-    laws = tuple(candidate for candidate in _laws() if candidate.id != law.id)
-    with pytest.raises(OntologyInfrastructureError, match="canonical law missing"):
-        _execute(
-            _catalog(_fact(law.family, law.fact_value)),
-            ("prd_demo",),
-            laws,
+    catalog = _catalog(_fact(law.family, law.fact_value))
+    with pytest.raises(OntologyInfrastructureError, match="exact admissible coverage"):
+        RuntimeCanonicalScheduling(
+            catalog.dimensions,
+            catalog.families,
+            catalog.evidence_sources,
+            catalog.facts,
+            tuple(candidate for candidate in catalog.laws if candidate.id != law.id),
         )
 
 
-def test_runtime_program_input_supplies_its_compiler_emitted_laws() -> None:
-    law = _primary_law()
-    runtime = SimpleNamespace(canonical_scheduling=_catalog(_fact(law.family, law.fact_value)))
+def test_inference_rejects_duck_typed_runtime_programs() -> None:
+    with pytest.raises(TypeError, match="RuntimeCanonicalScheduling"):
+        execute_canonical_inference(object(), ("prd_demo",), composition_roles=(ROLE,))  # type: ignore[arg-type]
 
-    result = execute_canonical_inference(runtime, ("prd_demo",), composition_roles=(ROLE,))
 
+@pytest.mark.parametrize("selected", (("",), (42,), {"item": ""}, {"": "prd_demo"}, ("prd_unknown",)))
+def test_malformed_or_unknown_selected_items_fail_closed(selected: object) -> None:
+    with pytest.raises(OntologyInfrastructureError):
+        _execute(_catalog(), selected)
+
+
+def test_valid_neutral_product_yields_no_pressures() -> None:
+    result = execute_canonical_inference(
+        _catalog(),
+        ("prd_neutral",),
+        known_products=("prd_neutral",),
+    )
     assert isinstance(result, Success)
-    assert result.pressures[0].identity == UnaryPressureIdentity("prd_demo", law.dimension, law.pressure_value)
+    assert result.pressures == ()
 
 
 def test_provenance_sort_is_deterministic_for_optional_quotations() -> None:
@@ -267,6 +289,6 @@ def test_provenance_sort_is_deterministic_for_optional_quotations() -> None:
         RuntimeEvidenceProvenance("src_demo", "paper#demo", "quoted"),
     )
     fact = replace(_fact(law.family, law.fact_value), provenance=provenance)
-    result = _execute(_catalog(fact), ("prd_demo",), _laws())
+    result = _execute(_catalog(fact), ("prd_demo",))
     assert isinstance(result, Success)
     assert result.pressures[0].derivations[0].provenance == (provenance[1], provenance[0])

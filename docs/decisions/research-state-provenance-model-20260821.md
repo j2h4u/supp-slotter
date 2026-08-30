@@ -18,8 +18,8 @@ sources, to reviewer knowledge assertions and relation assertions.
 | supported | Stronger independent medical or biochemical evidence supports the exact assertion and applicability. This is not a safety approval or universal clinical recommendation. | At least one reference |
 
 This is a categorical research/evidence state, not a numeric confidence score.
-It is independent of assertion_kind, semantic_family, relation_type, and
-severity: those fields describe meaning, not evidence strength. Use the best
+It is independent of assertion_kind, semantic_family, and relation_type: those
+fields describe meaning, not evidence strength. Use the best
 current basis for the exact assertion. If a search finds no adequate support,
 use searched_insufficient rather than anecdotal. Do not infer state from a URL
 embedded in reason, vendor identity, or assertion_kind.
@@ -37,8 +37,8 @@ Metadata applies to:
 - KnowledgeAssertion records for reviewer knowledge.* categories: kind, effect,
   risk, context, pathway, role, quality, and future reviewer categories.
 - RelationAssertionRecord records for both current assertion kinds:
-  ontology_assertion and clinical_review_signal, and all relation types:
-  supports, review_with, and balance.
+  ontology_assertion and co_use_evidence, and all relation types:
+  supports, co_use_context, and balance.
 
 Concerns and product labels are not reviewer assertions and receive no new
 state in this design. The canonical scheduling boundary is governed separately
@@ -70,9 +70,7 @@ classes:
       - relation_type
       - assertion_kind
       - semantic_family
-      - severity
       - reason
-      - action
       - research_state
       - sources
       - source_selector
@@ -126,7 +124,7 @@ Generated projections and the read model expose research_state and sources as
 ordinary assertion fields. Agents can query:
 
 - reviewer facts with state unassessed;
-- review_with or balance relations with state anecdotal or mechanistic_only;
+- co_use_context or balance relations with state anecdotal or mechanistic_only;
 - supports facts with state supported and their source references; and
 - searched_insufficient assertions separately from never-researched facts.
 
@@ -139,10 +137,9 @@ A derived grooming view groups findings as follows:
    unassessed or repeatedly treat as a fresh search gap.
 4. supported: no coverage gap solely due to state; retain sources for display.
 
-State is reviewer/grooming metadata only. It never suppresses or creates a
-relation warning, changes severity, affects slot assignment, creates a
-scheduling constraint, or changes a planner score. There is no automatic state
-promotion.
+State is reviewer/grooming metadata only. It never changes slot assignment,
+creates a scheduling constraint, or changes a planner score. There is no
+automatic state promotion.
 
 ## Migration
 
@@ -178,10 +175,8 @@ A bounded search with no usable conclusion is searched_insufficient.
    unassessed without sources is valid.
 5. Queries and grooming distinguish all five states, especially unassessed,
    searched_insufficient, and mechanistic_only.
-6. Planner scheduling behavior, relation warnings, and constraints are
-   behaviorally unchanged.
-7. Reviewer output may display state and source references without changing
-   warning semantics.
+6. Planner scheduling behavior and constraints are behaviorally unchanged.
+7. Reviewer output may display state and source references as passive evidence.
 8. A TypeDB/RDF smoke filters assertion nodes by state without a source entity,
    custom scalar type, or evidence graph join.
 
@@ -194,7 +189,7 @@ relation role is required.
 
 Do not add owner, reviewer, approval, lifecycle, expiry, freshness, safety,
 automatic grading, source ranking, numeric aggregation, or scheduling state.
-Do not infer supported from severity, relation type, vendor identity, or a URL.
+Do not infer supported from relation type, vendor identity, or a URL.
 The only remaining implementation choice is whether source syntax is validated
 beyond non-empty strings; the smallest portable choice is non-empty strings plus
 human review.

@@ -160,22 +160,6 @@ def flatten_pillbox_slots(pillboxes: dict[str, Pillbox]) -> dict[str, Slot]:
     return slots
 
 
-def build_empty_schedule_pillboxes(
-    pillboxes: dict[str, Pillbox],
-) -> dict[str, dict[str, object]]:
-    out: dict[str, dict[str, object]] = {}
-    for pillbox in pillboxes.values():
-        slot_entries: dict[str, dict[str, object]] = {}
-        for slot in sorted(pillbox.slots.values(), key=lambda s: s.order):
-            slot_entries[slot.slot_id] = {
-                "label": slot.label,
-                "products": [],
-                "substances": [],
-            }
-        out[pillbox.name] = {"label": pillbox.label, "slots": slot_entries}
-    return out
-
-
 def check_pillbox_slot_anchors(
     pillboxes: dict[str, Pillbox],
     slots_path: Path,

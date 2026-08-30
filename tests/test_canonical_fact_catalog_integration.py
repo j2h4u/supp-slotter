@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import json
 from dataclasses import replace
+from functools import cache
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any, cast
 
 import planner.engine._plan_inputs as plan_inputs_module
 import planner.engine.check as check_module
@@ -12,33 +15,44 @@ import pytest
 from planner.contracts import CardLoadError, Product, ProductComponent, Substance
 from planner.engine._plan_types import PlanInputs
 from planner.ontology.canonical_facts import validate_canonical_scheduling
+from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.runtime_program import (
     RuntimeCanonicalScheduling,
     RuntimeCanonicalSchedulingFact,
     RuntimeEvidenceProvenance,
-    RuntimeEvidenceSource,
     RuntimeFactApplicability,
     RuntimeFactSubject,
+    decode_runtime_program,
 )
 from planner.paths import Paths
 
+ROOT = Path(__file__).resolve().parents[1]
+
+
+@cache
+def _basis() -> RuntimeCanonicalScheduling:
+    return decode_runtime_program(
+        cast(dict[str, Any], json.loads((ROOT / "ontology/generated/runtime-program.json").read_text(encoding="utf-8")))
+    ).canonical_scheduling
+
 
 def _catalog() -> RuntimeCanonicalScheduling:
+    basis = _basis()
     return RuntimeCanonicalScheduling(
-        (),
-        (),
-        (RuntimeEvidenceSource("src_demo"),),
+        basis.dimensions,
+        basis.families,
+        basis.evidence_sources,
         (
             RuntimeCanonicalSchedulingFact(
                 "fact_food",
                 "FoodEffect",
                 RuntimeFactSubject("sub_demo", None),
                 RuntimeFactApplicability("sub_demo", None),
-                (RuntimeEvidenceProvenance("src_demo", "paper#food", None),),
+                (RuntimeEvidenceProvenance(basis.evidence_sources[0].id, "paper#food", None),),
                 "bioavailability_increases",
             ),
         ),
-        (),
+        basis.laws,
     )
 
 
@@ -117,7 +131,9 @@ def test_canonical_reference_validator_rejects_dangling_or_inconsistent_referenc
             catalog.facts[0],
             provenance=(RuntimeEvidenceProvenance("src_missing", "paper#food", None),),
         )
-        catalog = replace(catalog, facts=(fact,))
+        with pytest.raises(OntologyInfrastructureError, match="unknown family, value, or evidence source"):
+            replace(catalog, facts=(fact,))
+        return
     elif mutation == "mismatched_subject_role":
         catalog = replace(
             catalog,
@@ -134,7 +150,9 @@ def test_canonical_reference_validator_rejects_dangling_or_inconsistent_referenc
         validate_canonical_scheduling(catalog, substances, products)
 
 
-def test_plan_inputs_carries_verified_canonical_scheduling(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_plan_inputs_keeps_runtime_program_as_canonical_scheduling_authority(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     substances, products = _cards()
     catalog = _catalog()
     runtime = SimpleNamespace(
@@ -158,7 +176,8 @@ def test_plan_inputs_carries_verified_canonical_scheduling(monkeypatch: pytest.M
     result = plan_inputs_module.load_plan_inputs(Paths.from_root(tmp_path), bundle)  # type: ignore[arg-type]
 
     assert isinstance(result, PlanInputs)
-    assert result.canonical_scheduling is catalog
+    assert result.runtime_program.canonical_scheduling is catalog
+    assert "canonical_scheduling" not in PlanInputs._fields
 
 
 def test_plan_inputs_rejects_full_canonical_scheduling_before_relation_processing(

@@ -16,7 +16,6 @@ from scripts.ontology_compiler import (
     _normalized_terms,
     _stacks_schema,
     _validate_runtime_glue_contract,
-    _validate_runtime_relation_presence_contract,
     compile_ontology,
 )
 
@@ -216,19 +215,6 @@ def test_normalized_terms_rejects_noncanonical_slug() -> None:
         _normalized_terms(source, {})
 
 
-def test_compiler_rejects_non_boolean_runtime_presence_truth_values(tmp_path: Path) -> None:
-    root = _copy_repository_shape(tmp_path)
-    path = root / "runtime-policy.yaml"
-    source = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
-    glue = cast(dict[str, object], source["glue_contract"])
-    truth = cast(list[dict[str, object]], glue["relation_presence_truth_table"])
-    truth[0]["source_active"] = "false"
-    path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
-
-    with pytest.raises(OntologyInfrastructureError, match=r"strict booleans|boolean"):
-        compile_ontology(root)
-
-
 def test_compiler_rejects_unimplemented_canonical_engine_contract(tmp_path: Path) -> None:
     root = _copy_repository_shape(tmp_path)
     path = root / "runtime-policy.yaml"
@@ -241,26 +227,13 @@ def test_compiler_rejects_unimplemented_canonical_engine_contract(tmp_path: Path
         compile_ontology(root)
 
 
-def test_runtime_presence_contract_rejects_incomplete_statuses() -> None:
-    source = cast(
-        dict[str, object],
-        yaml.safe_load((ONTOLOGY / "runtime-policy.yaml").read_text(encoding="utf-8")),
-    )
-    glue = cast(dict[str, object], source["glue_contract"])
-    statuses = cast(list[dict[str, object]], source["relation_presence_statuses"])
-    statuses.pop()
-
-    with pytest.raises(OntologyInfrastructureError, match="exact unique four-state coverage"):
-        _validate_runtime_relation_presence_contract(glue, statuses)
-
-
 def test_runtime_glue_contract_rejects_incomplete_capability_parity() -> None:
     source = cast(
         dict[str, object],
         yaml.safe_load((ONTOLOGY / "runtime-policy.yaml").read_text(encoding="utf-8")),
     )
     glue = cast(dict[str, object], source["glue_contract"])
-    capability_field = "relation_warning_filter_fields"
+    capability_field = "relation_selector_forms"
     values = cast(list[object], glue[capability_field])
     values.pop()
 

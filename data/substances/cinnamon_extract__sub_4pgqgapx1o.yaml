@@ -8,10 +8,6 @@ aliases:
 notes: 'Knowledge-only popular glucose-metabolism botanical reference card. Added because cinnamon is one of the most common
   blood-sugar supplement categories and was missing from the knowledge base. Source checked: NCCIH diabetes and dietary supplements
   page.'
-concerns:
-- kind: safety
-  text: Review antidiabetes medications and hypoglycemia risk; distinguish Ceylon from cassia cinnamon because coumarin exposure
-    and liver-safety context can differ.
 knowledge:
   effect:
   - value: insulin_signaling_context

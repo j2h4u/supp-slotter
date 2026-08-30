@@ -142,7 +142,6 @@ def _pillboxes(source: CanonicalPublicationSource, assignments: Mapping[str, str
         output.setdefault(slot.pillbox, {"label": slot.pillbox_label, "slots": {}})["slots"][slot.slot_id] = {
             "label": slot.label,
             "products": [],
-            "substances": [],
         }
     for item_id, slot_id in assignments.items():
         product = source.products[source.item_products[item_id]]

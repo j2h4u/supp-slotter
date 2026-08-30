@@ -7,13 +7,6 @@ aliases:
 notes: Sensoril branded ashwagandha extract used in Life Extension Adrenal Energy Formula proprietary blend. Review context
   - stress/anxiety/sleep positioning is plausible for review, while thyroid, liver, sedative, BP/glucose-medication, and serotonergic
   context should stay visible.
-concerns:
-- kind: safety
-  text: Thyrotoxic case-report (PMC9035336) — supraventricular tachycardia from ashwagandha-induced thyrotoxicosis, resolved
-    on discontinuation; applies to all ashwagandha forms including Sensoril.
-- kind: safety
-  text: Possible serotonergic modulation (PMC10565488 retrospective chart review of 1816 reports) — 5-HT receptor and transporter
-    activity reported; review carefully if any SSRI or other 5-HT-active medication is introduced.
 knowledge:
   context:
   - value: cortisol_reduction

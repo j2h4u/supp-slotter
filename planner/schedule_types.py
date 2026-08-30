@@ -75,7 +75,6 @@ class ScheduleProductEntry(TypedDict):
 class ScheduleSlotEntry(TypedDict):
     label: str
     products: list[ScheduleProductEntry]
-    substances: list[str]
 
 
 class SchedulePillbox(TypedDict):

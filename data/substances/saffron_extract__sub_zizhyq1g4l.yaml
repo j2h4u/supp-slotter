@@ -6,10 +6,6 @@ aliases:
 notes: 'Knowledge-only popular mood/cognitive-adjacent botanical reference card. Added because saffron is a common supplement
   category and should be visible to expert panels without implying it belongs in the active stack. Sources checked: NCCIH
   depression complementary-health summary; Drugs.com saffron monograph.'
-concerns:
-- kind: safety
-  text: Review pregnancy, bipolar/mania history, serotonergic medications, and extract dose/standardization before treating
-    saffron as routine mood or cognitive support.
 knowledge:
   effect:
   - value: stress_reactivity_context

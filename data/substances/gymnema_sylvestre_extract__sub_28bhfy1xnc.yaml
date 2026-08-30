@@ -5,10 +5,6 @@ aliases:
 - Gurmar
 notes: Knowledge-only glucose-metabolism botanical reference card. Added as a common supplement-store companion to cinnamon,
   berberine, chromium, and alpha-lipoic acid in blood-sugar stacks.
-concerns:
-- kind: safety
-  text: Review antidiabetes medications, hypoglycemia risk, pregnancy/breastfeeding, and product standardization before practical
-    use discussion.
 knowledge:
   effect:
   - value: insulin_signaling_context

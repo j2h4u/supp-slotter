@@ -6,10 +6,6 @@ aliases:
 - ginseng
 notes: Adaptogen with HR/BP effects at therapeutic doses. Relevant to vascular-context review; also has fatigue, cognition,
   glucose, and medication-interaction review context without enough certainty for broad efficacy claims.
-concerns:
-- kind: safety
-  text: May interact with anticoagulants, antidepressants (especially MAOIs), and stimulants at therapeutic doses; review
-    carefully if any of these are introduced to the stack.
 knowledge:
   effect:
   - value: stress_resilience_context

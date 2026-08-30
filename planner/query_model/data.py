@@ -23,13 +23,11 @@ class RelationQuery:
     """Typed review metadata for one resolved ontology assertion."""
 
     relation_type: str
-    assertion_kind: str
-    semantic_family: str
     source: RelationEndpoint
     target: RelationEndpoint
     reason: str
-    action: str | None
-    severity: str | None
+    research_state: str
+    sources: tuple[str, ...]
 
 
 @dataclass(frozen=True, slots=True)

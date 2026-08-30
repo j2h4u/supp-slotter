@@ -137,63 +137,11 @@ def test_runtime_decode_requires_exact_executable_capability_parity() -> None:
         decode_runtime_program(payload)
 
 
-def test_runtime_derives_presence_active_side_from_endpoint_truth_state() -> None:
-    runtime = load_runtime_program(ONTOLOGY)
-    assert {(row.source_active, row.target_active): row.active_side for row in runtime.relation_presence_statuses} == {
-        (False, False): "none",
-        (False, True): "target",
-        (True, False): "source",
-        (True, True): "both",
-    }
-
-
 def _runtime_payload() -> dict[str, object]:
     return cast(
         dict[str, object],
         json.loads((ONTOLOGY / "generated/runtime-program.json").read_text(encoding="utf-8")),
     )
-
-
-def test_runtime_decode_rejects_duplicate_relation_rule_match_with_distinct_id() -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    rows = cast(list[dict[str, object]], projection["relation_warning_rules"])
-    rows.append({**rows[0], "id": f"{rows[0]['id']}_collision"})
-
-    with pytest.raises(OntologyInfrastructureError, match="duplicate semantic key"):
-        decode_runtime_program(payload)
-
-
-def test_runtime_decode_rejects_non_boolean_truth_table_values() -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    glue = cast(dict[str, object], projection["glue_contract"])
-    truth = cast(list[dict[str, object]], glue["relation_presence_truth_table"])
-    truth[0]["source_active"] = "false"
-
-    with pytest.raises(OntologyInfrastructureError, match="must be boolean"):
-        decode_runtime_program(payload)
-
-
-def test_runtime_decode_requires_exact_unique_four_state_truth_table() -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    glue = cast(dict[str, object], projection["glue_contract"])
-    truth = cast(list[dict[str, object]], glue["relation_presence_truth_table"])
-    truth.pop()
-
-    with pytest.raises(OntologyInfrastructureError, match="exact unique four-state coverage"):
-        decode_runtime_program(payload)
-
-
-def test_runtime_decode_requires_presence_status_for_each_truth_state() -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    statuses = cast(list[dict[str, object]], projection["relation_presence_statuses"])
-    statuses.pop()
-
-    with pytest.raises(OntologyInfrastructureError, match="relation_presence_statuses"):
-        decode_runtime_program(payload)
 
 
 def test_runtime_decode_rejects_unsupported_relation_endpoint_selector_kind() -> None:

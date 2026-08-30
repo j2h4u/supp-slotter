@@ -260,7 +260,6 @@ def test_ontology_contract_suite_runs_three_curated_groups_in_order(tmp_path: Pa
         tmp_path,
         [
             "test_ontology_artifacts.py",
-            "test_ontology_assertion_runtime.py",
             "test_ontology_presentation_cache.py",
             "test_ontology_compiler_outputs.py",
             "test_composition_role_identity.py",
@@ -269,7 +268,6 @@ def test_ontology_contract_suite_runs_three_curated_groups_in_order(tmp_path: Pa
             "test_linkml_core_schema.py",
             "test_real_canonical_catalog.py",
             "test_architecture_contracts.py",
-            "test_canonical_scheduling_migration.py",
             "test_cluster1_vright_contract.py",
             "test_ontology_formal_runtime_assertions.py",
             "test_ontology_ontoclean_contract.py",
@@ -304,7 +302,6 @@ def test_ontology_contract_suite_runs_three_curated_groups_in_order(tmp_path: Pa
         ],
         [
             "test_architecture_contracts.py",
-            "test_canonical_scheduling_migration.py",
             "test_cluster1_vright_contract.py",
             "test_ontology_formal_runtime_assertions.py",
             "test_ontology_ontoclean_contract.py",
@@ -312,7 +309,6 @@ def test_ontology_contract_suite_runs_three_curated_groups_in_order(tmp_path: Pa
         ],
         [
             "test_ontology_artifacts.py",
-            "test_ontology_assertion_runtime.py",
             "test_ontology_repository_projection.py",
             "test_ontology_runtime_loader.py",
             "test_ontology_presentation_cache.py",
@@ -386,7 +382,6 @@ def test_release_suite_runs_six_ordered_pytest_stages_without_fast_unit(
         ],
         [
             "test_architecture_contracts.py",
-            "test_canonical_scheduling_migration.py",
             "test_cluster1_vright_contract.py",
             "test_ontology_formal_runtime_assertions.py",
             "test_ontology_ontoclean_contract.py",
@@ -394,7 +389,6 @@ def test_release_suite_runs_six_ordered_pytest_stages_without_fast_unit(
         ],
         [
             "test_ontology_artifacts.py",
-            "test_ontology_assertion_runtime.py",
             "test_ontology_repository_projection.py",
             "test_ontology_runtime_loader.py",
             "test_ontology_presentation_cache.py",

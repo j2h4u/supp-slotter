@@ -10,16 +10,21 @@ imports:
   - model
 
 enums:
-  Severity:
-    permissible_values:
-      critical:
-      high:
-      medium:
-      low:
   RelationSelectorForm:
     permissible_values:
       term:
       entity:
+  RelationAssertionKind:
+    permissible_values:
+      ontology_assertion:
+      co_use_evidence:
+  RelationSemanticFamily:
+    permissible_values:
+      absorption_interaction_claim:
+      biochemical_mechanism_assertion:
+      co_use_evidence:
+      nutrient_balance_context:
+      nutritional_adequacy_context:
   RelationType:
     description: Relation type identifiers are authored in the relation type catalog.
     # The compiler injects the catalog's IDs into the generated JSON Schema.
@@ -28,7 +33,7 @@ enums:
 
 classes:
   RelationCatalog:
-    description: Authored operational relation vocabulary consumed by runtime review and warning policy.
+    description: Authored operational relation vocabulary consumed by runtime review.
     slots: [relation_types]
     slot_usage:
       relation_types: {required: true, inlined: true, inlined_as_list: true}
@@ -57,9 +62,7 @@ classes:
       - relation_type
       - assertion_kind
       - semantic_family
-      - severity
       - reason
-      - action
       - research_state
       - sources
       - source_selector
@@ -67,10 +70,9 @@ classes:
     slot_usage:
       id: {required: true, pattern: '^[a-z][a-z0-9_]*$'}
       relation_type: {required: true, range: RelationType}
-      assertion_kind: {required: true}
-      semantic_family: {required: true}
+      assertion_kind: {required: true, range: RelationAssertionKind}
+      semantic_family: {required: true, range: RelationSemanticFamily}
       reason: {required: true}
-      action: {range: string, inlined: false}
       research_state: {range: ResearchState, multivalued: false}
       sources: {multivalued: true, inlined_as_list: true}
       source_selector:
@@ -136,14 +138,12 @@ slots:
     range: RelationAssertionRecord
     inlined: true
     inlined_as_list: true
-  assertion_kind:
-  semantic_family:
+  assertion_kind: {range: RelationAssertionKind}
+  semantic_family: {range: RelationSemanticFamily}
   relation_type: {range: RelationType}
   entity:
     range: RelationAssertionEntitySelector
     inlined: true
   category: {range: string}
   term: {range: string}
-  severity:
-    range: Severity
   reason:

@@ -3,10 +3,6 @@ name: Iodine
 form: kelp
 notes: Kelp iodine source. Kept separate from potassium iodide because seaweed iodine content can vary; Linus Pauling Institute
   notes potassium iodide is preferred in pregnancy/lactation partly because seaweed iodine content varies considerably.
-concerns:
-- kind: safety
-  text: Review thyroid disease, thyroid medication, and cumulative iodine exposure; NIH ODS notes high iodine intake can trigger
-    thyroid effects in susceptible people.
 knowledge:
   kind:
   - value: mineral

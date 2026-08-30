@@ -1,10 +1,6 @@
 id: sub_a3ec9f9c52
 name: Tadalafil
 notes: 'Generic tadalafil evidence supports PDE5, vasodilator, NO-cGMP, and hypotension-interaction context; the exact Tadalista formulation and user-reported 1.25 mg amount are unverified, and no broad vascular benefit is established.'
-concerns:
-- kind: safety
-  text: PDE5 inhibitor context should be reviewed with nitrates, alpha-blockers, antihypertensives, alcohol, and other vasodilators
-    because symptomatic hypotension can become the limiting stack risk.
 knowledge:
   context:
   - value: vascular_health

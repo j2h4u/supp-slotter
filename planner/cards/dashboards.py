@@ -19,10 +19,10 @@ from planner.contracts import (
     Substance,
 )
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.presentation import authored_term_label
 from planner.ontology.runtime_program import RuntimeDashboardStateCatalog
 from planner.ontology.selector import resolve_dashboard_selector
 from planner.ontology.substance_fields import dashboard_selector_category, substance_terms_for_category
-from planner.ontology.warning_policy import authored_term_label
 from planner.schedule_types import (
     DashboardMatchedTrait,
     DashboardMember,

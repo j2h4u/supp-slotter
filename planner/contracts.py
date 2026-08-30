@@ -21,7 +21,6 @@ from typing import NamedTuple, TypedDict
 
 type SlotNear = str
 type RelationType = str
-type Severity = str
 type ConcernKind = str
 type ResearchState = str
 
@@ -153,8 +152,6 @@ class OntologyAssertion:
     reason: str
     source_selector: RelationSelector
     target_selector: RelationSelector
-    action: str | None = None
-    severity: Severity | None = None
     research_state: ResearchState = "unassessed"
     sources: tuple[str, ...] = ()
 
@@ -166,8 +163,6 @@ class Relation:
     reason: str
     source_selector: RelationSelector
     target_selector: RelationSelector
-    action: str | None = None
-    severity: Severity | None = None
     assertion_kind: str | None = None
     semantic_family: str | None = None
     research_state: ResearchState = "unassessed"

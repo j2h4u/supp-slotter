@@ -51,44 +51,6 @@
   ],
   "classes": [
     {
-      "name": "Action",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "field",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "operator",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "trace_key",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "value",
-          "range": "string",
-          "required": false
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Action"
-    },
-    {
       "name": "AcuteAlertnessEffect",
       "slots": [
         {
@@ -543,76 +505,6 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Concern"
-    },
-    {
-      "name": "Condition",
-      "slots": [
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "conditions",
-          "range": "Condition",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "field",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "left",
-          "range": "Condition",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "operator",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "right",
-          "range": "Condition",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "selector",
-          "range": "Selector",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "value",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "values",
-          "range": "string",
-          "required": false
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Condition"
     },
     {
       "name": "Dashboard",
@@ -1645,16 +1537,8 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "action",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
           "name": "assertion_kind",
-          "range": "string",
+          "range": "RelationAssertionKind",
           "required": true
         },
         {
@@ -1694,16 +1578,8 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "semantic_family",
-          "range": "string",
+          "range": "RelationSemanticFamily",
           "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "severity",
-          "range": "Severity",
-          "required": false
         },
         {
           "inlined": true,
@@ -1775,36 +1651,6 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RelationCatalog"
-    },
-    {
-      "name": "RuntimeConcernCatalogEntry",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "concern_kind",
-          "range": "ConcernKind",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "warning_type",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConcernCatalogEntry"
     },
     {
       "name": "RuntimeDashboardProductTrackingStateDefinition",
@@ -2151,40 +1997,8 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": true,
-          "name": "relation_presence_active_sides",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "relation_presence_truth_table",
-          "range": "RuntimeRelationPresenceTruthState",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
           "name": "relation_selector_forms",
           "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "relation_warning_active_sides",
-          "range": "RelationWarningActiveSide",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "relation_warning_filter_fields",
-          "range": "RelationWarningFilterField",
           "required": true
         },
         {
@@ -2201,14 +2015,6 @@
     {
       "name": "RuntimePolicyCatalog",
       "slots": [
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "concern_catalog",
-          "range": "RuntimeConcernCatalogEntry",
-          "required": true
-        },
         {
           "inlined": true,
           "inlined_as_list": false,
@@ -2245,212 +2051,12 @@
           "inlined": true,
           "inlined_as_list": true,
           "multivalued": true,
-          "name": "relation_presence_statuses",
-          "range": "RuntimeRelationPresenceStatusPolicy",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "relation_warning_rules",
-          "range": "RuntimeRelationWarningRule",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "runtime_projection",
-          "range": "RuntimeProjectionDescriptor",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
           "name": "selector_form_capabilities",
           "range": "RuntimeSelectorFormCapability",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "warning_types",
-          "range": "RuntimeWarningTypePolicy",
           "required": true
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog"
-    },
-    {
-      "name": "RuntimeProjectionDescriptor",
-      "slots": [
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "children",
-          "range": "RuntimeProjectionDescriptor",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "source",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "target",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeProjectionDescriptor"
-    },
-    {
-      "name": "RuntimeRelationPresenceStatusPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "description",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "source_active",
-          "range": "boolean",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "status",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "target_active",
-          "range": "boolean",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceStatusPolicy"
-    },
-    {
-      "name": "RuntimeRelationPresenceTruthState",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "source_active",
-          "range": "boolean",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "target_active",
-          "range": "boolean",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationPresenceTruthState"
-    },
-    {
-      "name": "RuntimeRelationWarningRule",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "active_side",
-          "range": "RelationWarningActiveSide",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "filter_field",
-          "range": "RelationWarningFilterField",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "filter_value",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "relation_kind",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "reverse_output",
-          "range": "boolean",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "warning_type",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeRelationWarningRule"
     },
     {
       "name": "RuntimeSelectorFormCapability",
@@ -2527,44 +2133,6 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeStackPartition"
-    },
-    {
-      "name": "RuntimeWarningTypePolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "action_text",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "label",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "warning_type",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningTypePolicy"
     },
     {
       "name": "Selector",
@@ -3049,12 +2617,6 @@
             },
             {
               "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/action",
-              "source": "relations[].action",
-              "subject": "relations[]"
-            },
-            {
-              "kind": "slot",
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/assertion_kind",
               "source": "relations[].assertion_kind",
               "subject": "relations[]"
@@ -3087,12 +2649,6 @@
               "kind": "slot",
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/semantic_family",
               "source": "relations[].semantic_family",
-              "subject": "relations[]"
-            },
-            {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/severity",
-              "source": "relations[].severity",
               "subject": "relations[]"
             },
             {
@@ -3562,12 +3118,6 @@
               "source": "knowledge.<key>[]",
               "subject": "knowledge.<key>[]",
               "token": "<key>[]"
-            },
-            {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/knowledge_value",
-              "source": "knowledge.<key>[]",
-              "subject": "knowledge.<key>[]"
             },
             {
               "kind": "slot",

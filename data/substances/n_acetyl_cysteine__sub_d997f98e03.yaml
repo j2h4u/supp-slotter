@@ -6,10 +6,6 @@ notes: 'Water-soluble glutathione precursor and mucolytic; also used as antidote
   dose 600–1800 mg/day, often split. GI tolerance (nausea, upset) is improved when taken with food. Known interaction with
   nitroglycerin (severe hypotension); caution with anticoagulants and chemotherapy agents. Sources: NIH MedlinePlus (Acetylcysteine);
   examine.com (NAC); Millea 2009 (Am Fam Physician); NIH ODS Selenium/Molybdenum fact sheets; NCI Drug Dictionary (acetylcysteine).'
-concerns:
-- kind: safety
-  text: Review nitroglycerin, anticoagulant/antiplatelet, chemotherapy, asthma/bronchospasm, and GI-tolerance context before
-    treating NAC as routine antioxidant support.
 knowledge:
   context:
   - value: antioxidant_protection

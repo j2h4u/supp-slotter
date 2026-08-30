@@ -9,7 +9,6 @@ imports: [linkml:types]
 enums:
   ConcernKind:
     permissible_values:
-      safety:
       model_gap:
       data_quality:
   ResearchState:
@@ -238,7 +237,6 @@ slots:
   id: {identifier: true, required: true, range: string}
   name:
   text:
-  action:
   source_selector:
   target_selector:
   label:

@@ -2,9 +2,6 @@ id: sub_f7780f899b
 name: Potassium
 form: citrate
 notes: 'Water-soluble potassium citrate. The active TiM component supplies 66.5 mg elemental potassium per capsule; prescription urinary-alkalinization and meal/GI directions are pharmacologic or product-specific and do not establish a schedule for this low-dose electrolyte. Significant interaction contexts include renal impairment, ACE inhibitors, ARBs, potassium-sparing diuretics, and NSAIDs, which can raise hyperkalemia risk. Sources: NIH ODS Potassium Fact Sheet and DailyMed potassium labeling.'
-concerns:
-- kind: safety
-  text: Review renal function, potassium exposure, and hyperkalemia-promoting medications; low-dose active electrolyte use does not establish a universal potassium timing rule.
 knowledge:
   context:
   - value: workout_performance

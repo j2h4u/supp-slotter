@@ -89,9 +89,9 @@ def _write_authored_vertical_fixture(root: Path) -> None:
         "relations": [
             {
                 "id": "rel_vertical_review",
-                "relation_type": "review_with",
-                "assertion_kind": "clinical_review_signal",
-                "semantic_family": "nutrient_balance_review_signal",
+                "relation_type": "co_use_context",
+                "assertion_kind": "co_use_evidence",
+                "semantic_family": "nutrient_balance_context",
                 "research_state": "unassessed",
                 "sources": [],
                 "reason": "Fixture reviewer relation.",
