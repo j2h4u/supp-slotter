@@ -24,11 +24,17 @@ def test_product_components_are_unique_by_substance_reference() -> None:
         "id": "prd_aaaaaaaaaa",
         "name": "Duplicate component probe",
         "components": [
-            {"substance": "sub_aaaaaaaaaa", "label": "first"},
-            {"substance": "sub_aaaaaaaaaa", "label": "second"},
+            {"id": "cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa_first", "substance": "sub_aaaaaaaaaa", "label": "first"},
+            {"id": "cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa_second", "substance": "sub_aaaaaaaaaa", "label": "second"},
         ],
     }
-    distinct = {**duplicate, "components": [{"substance": "sub_aaaaaaaaaa"}, {"substance": "sub_bbbbbbbbbb"}]}
+    distinct = {
+        **duplicate,
+        "components": [
+            {"id": "cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa", "substance": "sub_aaaaaaaaaa"},
+            {"id": "cmp_prd_aaaaaaaaaa__sub_bbbbbbbbbb", "substance": "sub_bbbbbbbbbb"},
+        ],
+    }
 
     errors = schema_errors(duplicate, "product", Path("product.yaml"), ontology_bundle())
     assert any("duplicate value 'sub_aaaaaaaaaa'" in error for error in errors)
@@ -40,8 +46,8 @@ def test_product_loader_rejects_duplicate_component_substance(tmp_path: Path) ->
     path = tmp_path / "product.yaml"
     path.write_text(
         "id: prd_aaaaaaaaaa\nname: Duplicate component probe\ncomponents:\n"
-        "  - substance: sub_aaaaaaaaaa\n    label: first\n"
-        "  - substance: sub_aaaaaaaaaa\n    label: second\n",
+        "  - id: cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa_first\n    substance: sub_aaaaaaaaaa\n    label: first\n"
+        "  - id: cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa_second\n    substance: sub_aaaaaaaaaa\n    label: second\n",
         encoding="utf-8",
     )
 
