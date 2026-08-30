@@ -164,15 +164,24 @@ def test_any_satisfied_match_makes_mixed_evidence_pressure_basis(tmp_path: Path)
 
 
 @pytest.mark.parametrize(
-    "kwargs",
+    ("kwargs", "message"),
     [
-        {"item_products": {"item_a": "missing"}, "item_domains": {"item_a": "daily"}},
-        {"item_products": {"item_a": "prd_a"}, "item_domains": {"other": "daily"}},
-        {"slots": {"wrong": _slot("first", 1)}},
+        (
+            {"item_products": {"item_a": "missing"}, "item_domains": {"item_a": "daily"}},
+            "canonical publication item references an unknown product",
+        ),
+        (
+            {"item_products": {"item_a": "prd_a"}, "item_domains": {"other": "daily"}},
+            "canonical publication item mappings must be exact and non-empty",
+        ),
+        (
+            {"slots": {"wrong": _slot("first", 1)}},
+            "canonical publication slots must be keyed by their stable IDs",
+        ),
     ],
 )
 def test_invalid_source_mapping_product_domain_or_slot_publishes_nothing(
-    tmp_path: Path, kwargs: dict[str, object]
+    tmp_path: Path, kwargs: dict[str, object], message: str
 ) -> None:
     target = tmp_path / "schedule.yaml"
     target.write_text("stale", encoding="utf-8")
@@ -184,9 +193,10 @@ def test_invalid_source_mapping_product_domain_or_slot_publishes_nothing(
         "inference": source.inference,
         "products": source.products,
         "pressure_values_by_dimension": source.pressure_values_by_dimension,
+        "pressure_satisfaction_strategy": source.pressure_satisfaction_strategy,
     }
     values.update(kwargs)
-    with pytest.raises((TypeError, ValueError)):
+    with pytest.raises(ValueError, match=message):
         CanonicalPublicationSource(**values)  # type: ignore[arg-type]
     assert target.read_text(encoding="utf-8") == "stale"
 
