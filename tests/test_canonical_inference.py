@@ -198,7 +198,7 @@ def test_proof_contains_law_fact_subject_path_and_provenance() -> None:
     assert proof.law.id == law.id
     assert proof.fact.id == "fact_demo"
     assert proof.subject == fact.subject  # type: ignore[attr-defined]
-    assert proof.path.applicability_role == ROLE.id
+    assert proof.path.role_id == ROLE.id
     assert (proof.path.target_kind, proof.path.target_id) == ("substance", "sub_demo")
     assert proof.path.product == ROLE.product
     assert proof.provenance == PROVENANCE

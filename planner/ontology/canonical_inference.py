@@ -47,11 +47,6 @@ class CompositionApplicabilityPath:
         return self.resolved_role
 
     @property
-    def applicability_role(self) -> str:
-        """Compatibility alias for the resolved role in an emitted proof."""
-        return self.resolved_role
-
-    @property
     def product_id(self) -> str:
         return self.product
 
@@ -373,27 +368,6 @@ def execute_canonical_inference(
     return Success(normalized)
 
 
-def infer_canonical_pressures(
-    catalog: RuntimeCanonicalScheduling,
-    selected_items: Iterable[object] | Mapping[object, object],
-    *,
-    applicability_expansion_strategy: str,
-    composition_roles: Iterable[RuntimeCompositionRole] = (),
-    known_products: Iterable[str] = (),
-) -> InferenceResult:
-    """Descriptive alias for :func:`execute_canonical_inference`."""
-    return execute_canonical_inference(
-        catalog,
-        selected_items,
-        applicability_expansion_strategy=applicability_expansion_strategy,
-        composition_roles=composition_roles,
-        known_products=known_products,
-    )
-
-
-infer_pressures = infer_canonical_pressures
-
-
 __all__ = [
     "CompositionApplicabilityPath",
     "Conflict",
@@ -404,6 +378,4 @@ __all__ = [
     "Success",
     "UnaryPressureIdentity",
     "execute_canonical_inference",
-    "infer_canonical_pressures",
-    "infer_pressures",
 ]
