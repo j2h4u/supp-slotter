@@ -9,18 +9,23 @@ import planner.engine.plan as plan_module
 from planner.canonical_optimizer_result import CanonicalObjective, Optimal
 from planner.contracts import Product, Slot
 from planner.engine._plan_types import ActiveIndex
+from planner.ontology.artifacts import load_runtime_program
 from planner.ontology.canonical_inference import Success
 from planner.paths import Paths
 from planner.schedule_types import CanonicalPublicationSource, PublishedSchedule
 
+ROOT = Path(__file__).resolve().parents[1]
+
 
 def _runtime() -> plan_module._PlanRuntime:
     slot = Slot("slot", "Slot", 1, "daily", "Daily", "daily", {"meal": None})
+    runtime_program = load_runtime_program(ROOT / "ontology")
     inputs = SimpleNamespace(
         slots={"slot": slot},
         products={"prd": Product("prd", "Product", ())},
         runtime_program=SimpleNamespace(
-            canonical_scheduling=SimpleNamespace(pressure_values_by_dimension={"meal": frozenset({"with_food"})})
+            canonical_scheduling=SimpleNamespace(pressure_values_by_dimension={"meal": frozenset({"with_food"})}),
+            engine_contract=runtime_program.engine_contract,
         ),
     )
     active = ActiveIndex({"item": "prd"}, {"item": "daily"}, Success(()))
