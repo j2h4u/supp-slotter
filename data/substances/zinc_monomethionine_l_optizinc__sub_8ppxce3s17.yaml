@@ -38,24 +38,3 @@ knowledge:
     research_state: supported
     sources:
     - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://www.lifeextension.com/vitamins-supplements/item01328/only-trace-minerals
-    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/1375057/
-    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.924
-    summary: The Life Extension product provides a with-food instruction, while the cited zinc evidence addresses generic zinc or other forms and comparators; together they do not establish an intake preference for zinc monomethionine / L-OptiZinc or a universal food rule.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
-    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.924
-    summary: No general clock-time scheduling rule was demonstrated for zinc monomethionine / L-OptiZinc.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/
-    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.924
-    summary: No workout- or activity-linked placement rule was demonstrated for zinc monomethionine / L-OptiZinc.

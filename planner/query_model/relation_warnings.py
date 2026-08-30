@@ -1,19 +1,18 @@
-"""Relation warning queries for the planner read model."""
+"""Typed relation-warning queries for the planner review."""
 
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import NotRequired, TypedDict, cast
+from typing import NotRequired, TypedDict
 
-from planner.ontology.glue_capabilities import ONTOLOGY_ASSERTION_FILTER_COLUMNS
+from planner.ontology.glue_capabilities import ontology_assertion_filter_value
 from planner.ontology.runtime_program import (
     RuntimeProgram,
     RuntimeRelationPresenceStatusPolicy,
     RuntimeRelationWarningRule,
     relation_presence_policy_for_active_side,
 )
-
-_RELATION_WARNING_PROJECTION = "src_key, tgt_key, src_display, tgt_display, reason, action, severity"
+from planner.query_model.data import RelationEndpoint, RelationQuery
 
 
 class RelationWarningRow(TypedDict):
@@ -28,18 +27,8 @@ class RelationWarningRow(TypedDict):
     severity: NotRequired[str | int]
 
 
-class RelationWarningQueryRow(TypedDict):
-    src_key: str
-    tgt_key: str
-    src_display: str
-    tgt_display: str
-    reason: str
-    action: str
-    severity: str | int
-
-
 def collect_relation_warnings(
-    assertions: tuple[dict[str, object], ...],
+    assertions: tuple[RelationQuery, ...],
     active_substances: set[str],
     runtime: RuntimeProgram,
 ) -> list[RelationWarningRow]:
@@ -54,7 +43,7 @@ def collect_relation_warnings(
 
 
 def _collect_relation_warning_rules(
-    assertions: tuple[dict[str, object], ...],
+    assertions: tuple[RelationQuery, ...],
     active_substances: set[str],
     runtime: RuntimeProgram,
     relation_type: str,
@@ -81,71 +70,72 @@ def _rule_matcher(
     rule: RuntimeRelationWarningRule,
     active_substances: set[str],
     relation_presence_by_active_side: Mapping[str, RuntimeRelationPresenceStatusPolicy],
-) -> tuple[RuntimeRelationWarningRule, set[str], bool, bool, str]:
+) -> tuple[RuntimeRelationWarningRule, set[str], bool, bool]:
     presence = relation_presence_policy_for_active_side(rule.active_side, relation_presence_by_active_side)
-    column = ONTOLOGY_ASSERTION_FILTER_COLUMNS.get(rule.filter_field)
-    if column is None:
-        raise ValueError(f"ontology relation_warning_rules has unsupported filter_field {rule.filter_field!r}")
-    return rule, active_substances, presence.source_active, presence.target_active, column
+    return rule, active_substances, presence.source_active, presence.target_active
 
 
 def _collect_relation_warnings(
-    assertions: tuple[dict[str, object], ...],
+    assertions: tuple[RelationQuery, ...],
     *,
     relation_type: str,
     warning_type: str,
-    rules: list[tuple[RuntimeRelationWarningRule, set[str], bool, bool, str]],
+    rules: list[tuple[RuntimeRelationWarningRule, set[str], bool, bool]],
 ) -> list[RelationWarningRow]:
-    rows: list[dict[str, object]] = []
-    for rule, active, source_active, target_active, column in rules:
+    rows: list[tuple[RelationEndpoint, RelationEndpoint, RelationQuery]] = []
+    for rule, active, source_active, target_active in rules:
         for assertion in assertions:
-            src_matches = bool(set(cast(list[str], assertion.get("src_substances") or [])) & active)
-            tgt_matches = bool(set(cast(list[str], assertion.get("tgt_substances") or [])) & active)
+            source_matches = bool(set(assertion.source.substance_ids) & active)
+            target_matches = bool(set(assertion.target.substance_ids) & active)
             if (
-                assertion.get("type") == rule.relation_kind
-                and assertion.get(column) == rule.filter_value
-                and src_matches is source_active
-                and tgt_matches is target_active
+                assertion.relation_type == rule.relation_kind
+                and ontology_assertion_filter_value(
+                    rule.filter_field,
+                    assertion_kind=assertion.assertion_kind,
+                    semantic_family=assertion.semantic_family,
+                )
+                == rule.filter_value
+                and source_matches is source_active
+                and target_matches is target_active
             ):
-                rows.append(_warning_projection(assertion, reverse=rule.reverse_output))
+                source, target = (
+                    (assertion.target, assertion.source)
+                    if rule.reverse_output
+                    else (
+                        assertion.source,
+                        assertion.target,
+                    )
+                )
+                rows.append((source, target, assertion))
 
     seen: set[tuple[str, str, str]] = set()
     warnings: list[RelationWarningRow] = []
-    for row in rows:
-        typed_row = cast(RelationWarningQueryRow, row)
-        key = (typed_row["src_key"], relation_type, typed_row["tgt_key"])
+    for source, target, assertion in rows:
+        key = (source.key, relation_type, target.key)
         if key in seen:
             continue
         seen.add(key)
-        warnings.append(_warning_from_row(typed_row, warning_type, relation_type))
+        warnings.append(_warning_from_relation(source, target, assertion, warning_type, relation_type))
     return warnings
 
 
-def _warning_projection(row: dict[str, object], *, reverse: bool) -> dict[str, object]:
-    source, target = ("tgt", "src") if reverse else ("src", "tgt")
-    return {
-        "src_key": row.get(f"{source}_key", ""),
-        "tgt_key": row.get(f"{target}_key", ""),
-        "src_display": row.get(f"{source}_display", ""),
-        "tgt_display": row.get(f"{target}_display", ""),
-        "reason": row.get("reason", ""),
-        "action": row.get("action", ""),
-        **({"severity": row["severity"]} if "severity" in row else {}),
-    }
-
-
-def _warning_from_row(row: RelationWarningQueryRow, warning_type: str, relation_type: str) -> RelationWarningRow:
+def _warning_from_relation(
+    source: RelationEndpoint,
+    target: RelationEndpoint,
+    assertion: RelationQuery,
+    warning_type: str,
+    relation_type: str,
+) -> RelationWarningRow:
     out: RelationWarningRow = {
         "type": warning_type,
         "relation": relation_type,
-        "source_substance": row["src_key"],
-        "source_name": row["src_display"],
-        "target_substance": row["tgt_key"],
-        "target_name": row["tgt_display"],
-        "reason": row.get("reason") or "",
-        "action": row.get("action") or "",
+        "source_substance": source.key,
+        "source_name": source.display,
+        "target_substance": target.key,
+        "target_name": target.display,
+        "reason": assertion.reason,
+        "action": assertion.action or "",
     }
-    severity = row.get("severity")
-    if severity is not None:
-        out["severity"] = severity
+    if assertion.severity is not None:
+        out["severity"] = assertion.severity
     return out

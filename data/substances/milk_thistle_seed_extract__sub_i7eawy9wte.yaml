@@ -11,9 +11,6 @@ concerns:
 - kind: safety
   text: Review liver disease, medication list, allergy context, and extract standardization before treating milk thistle as
     practical liver support; clinical evidence is mixed and product quality varies.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - cyp_modulation_context

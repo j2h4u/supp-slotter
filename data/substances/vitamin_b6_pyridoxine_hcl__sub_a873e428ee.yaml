@@ -2,24 +2,6 @@ id: sub_a873e428ee
 name: Vitamin B6
 form: pyridoxine HCl
 notes: 'Country Life lists 50 mg total vitamin B6 per 2 capsules across pyridoxine HCl, pyridoxal-5-phosphate (P5P), and pyridoxine alpha-ketoglutarate hydrochloride; the split between forms is not disclosed. B6 intrinsic biology supports amino-acid/protein metabolism, neurotransmitter biosynthesis, and homocysteine handling, but no clinical cognition or homocysteine benefit, or categorical safety superiority over other supplemental forms, is established.'
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://www.ncbi.nlm.nih.gov/books/NBK114313/
-    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
-    summary: Research on B6 forms does not directly establish a general fed or fasted preference for pyridoxine HCl specifically.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://www.ncbi.nlm.nih.gov/books/NBK114313/
-    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
-    summary: No general clock-time rule was demonstrated for pyridoxine HCl supplementation.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/
-    summary: No workout- or activity-linked placement rule was demonstrated for pyridoxine HCl supplementation.
 concerns:
 - kind: safety
   text: 'Long-term supplemental vitamin B6 exposure can cause sensory peripheral neuropathy; review cumulative supplemental B6 intake across all forms and products and duration. Sources: NIH ODS Vitamin B6 (https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/) and EFSA 2023 guidance (https://doi.org/10.2903/j.efsa.2023.8006).'

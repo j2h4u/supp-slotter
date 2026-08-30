@@ -13,9 +13,6 @@ concerns:
 - kind: safety
   text: Review-level reports of palpitations at chronic doses around 1500 mg/day; threshold not actionable until a dose model
     exists, but worth recalling given user vascular context.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - cortisol_reduction

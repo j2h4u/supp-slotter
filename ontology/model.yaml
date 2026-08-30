@@ -12,12 +12,6 @@ enums:
       safety:
       model_gap:
       data_quality:
-  SchedulingAssessmentConclusion:
-    permissible_values:
-      supports_preference:
-      supports_no_rule:
-      insufficient:
-      conflicting:
   ResearchState:
     permissible_values:
       unassessed:
@@ -81,7 +75,7 @@ classes:
       label: {required: true}
   Substance:
     is_a: IdentifiedNode
-    slots: [aliases, form, notes, concerns, prefer_with, knowledge_assertions, schedule_assertions, scheduling_assessment]
+    slots: [aliases, form, notes, concerns, knowledge_assertions]
   Product:
     is_a: IdentifiedNode
     slots: [brand, components, urls, notes, concerns, use_pattern]
@@ -92,7 +86,6 @@ classes:
   CompositionRole:
     description: Stable composition identity joining one product to one substance.
     annotations:
-      canonical_shadow: true
       identity_scope: global
       identity_uniqueness: required
     slots: [id, product, substance]
@@ -104,23 +97,6 @@ classes:
     slots: [concern_kind, concern_text]
   KnowledgeAssertion:
     slots: [knowledge_category, knowledge_value, research_state, sources]
-  ScheduleAssertion:
-    slots: [schedule_axis, schedule_value]
-  SchedulingAssessment:
-    description: Substance-only, review-facing scheduling evidence by formal axis.
-    slots: [intake, timing, activity]
-    slot_usage:
-      intake: {range: SchedulingAssessmentRecord, inlined: true, multivalued: false}
-      timing: {range: SchedulingAssessmentRecord, inlined: true, multivalued: false}
-      activity: {range: SchedulingAssessmentRecord, inlined: true, multivalued: false}
-  SchedulingAssessmentRecord:
-    description: One axis assessment; this metadata never contributes to scheduling scores.
-    slots: [conclusion, policy, sources, summary]
-    slot_usage:
-      conclusion: {required: true, range: SchedulingAssessmentConclusion, multivalued: false}
-      policy: {range: string, multivalued: false}
-      sources: {required: true, multivalued: true, minimum_cardinality: 1, inlined_as_list: true}
-      summary: {required: true, multivalued: false}
   Pillbox:
     is_a: IdentifiedNode
     annotations:
@@ -153,7 +129,6 @@ classes:
       order_scope: topology
       order_uniqueness: required
       unbounded_group: true
-      canonical_shadow: true
     slots: [id, label, order, meal_context, circadian_anchor, exercise_anchor]
     slot_usage:
       id: {required: true, pattern: '^[a-z][a-z0-9_:-]*$'}
@@ -163,9 +138,8 @@ classes:
       circadian_anchor: {range: CircadianAnchor, multivalued: false}
       exercise_anchor: {range: ExerciseAnchor, multivalued: false}
   LogicalSlotTopology:
-    description: Shadow canonical topology containing unbounded logical intake groups.
+    description: Canonical topology containing unbounded logical intake groups.
     annotations:
-      canonical_shadow: true
       no_capacity_model: true
     slots: [id, label, slots]
     slot_usage:
@@ -178,11 +152,17 @@ classes:
       source_shape: keyed_map
       source_key_pattern: '^[a-z][a-z0-9_]*$'
       entry_uniqueness: required
-    slots: [entries]
+    slots: [entries, tracked_entries]
     slot_usage:
       label: {required: false}
   StackEntry:
     slots: [product]
+  TrackedUnassignedEntry:
+    description: An explicitly retained product excluded from all active routing.
+    slots: [product, reason]
+    slot_usage:
+      product: {required: true, range: Product, inlined: false, multivalued: false}
+      reason: {required: true, range: string, multivalued: false}
   Dashboard:
     is_a: IdentifiedNode
     annotations:
@@ -222,24 +202,15 @@ classes:
       assertion_value_uniqueness: required
     # Concrete knowledge fields are compiler-generated from the authored
     # vocabulary catalog.  The base schema owns only this envelope.
-  CardSchedule:
-    description: Nested scheduling namespaces and stable substance references.
-    # Assignment-axis fields are compiler-generated from runtime policy.  The
-    # stable preference relation is part of the envelope, not an axis catalog.
-    slots: [prefer_with]
-    slot_usage:
-      prefer_with: {multivalued: true, minimum_cardinality: 1, inlined_as_list: true, range: string, pattern: '^sub_[a-z0-9]{10}$'}
   SubstanceCard:
     description: Source-facing canonical substance card contract.
-    slots: [id, name, form, aliases, notes, concerns, knowledge, schedule, scheduling_assessment]
+    slots: [id, name, form, aliases, notes, concerns, knowledge]
     slot_usage:
       id: {required: true, pattern: '^sub_[a-z0-9]{10}$'}
       name: {required: true, pattern: '^.+$'}
       aliases: {multivalued: true, inlined_as_list: true}
       concerns: {multivalued: true, range: CardConcern, inlined: true, inlined_as_list: true}
       knowledge: {range: CardKnowledge, inlined: true}
-      schedule: {range: CardSchedule, inlined: true}
-      scheduling_assessment: {range: SchedulingAssessment, inlined: true, multivalued: false}
   ProductCard:
     description: Source-facing canonical product card contract.
     annotations:
@@ -267,10 +238,8 @@ slots:
   label:
   description: {}
   aliases: {multivalued: true}
-  prefer_with: {multivalued: true, range: Substance, inlined: false}
   form: {}
   knowledge:
-  schedule:
   notes: {}
   brand: {}
   components: {multivalued: true, range: ProductComponent, inlined: true, inlined_as_list: true}
@@ -281,33 +250,21 @@ slots:
   use_pattern: {range: ProductUsePattern, multivalued: false}
   kind: {}
   knowledge_assertions: {multivalued: true, range: KnowledgeAssertion, inlined: true, inlined_as_list: true}
-  schedule_assertions: {multivalued: true, range: ScheduleAssertion, inlined: true, inlined_as_list: true}
-  scheduling_assessment: {range: SchedulingAssessment, inlined: true}
-  intake: {range: SchedulingAssessmentRecord, inlined: true, multivalued: false}
-  timing: {range: SchedulingAssessmentRecord, inlined: true, multivalued: false}
-  activity: {range: SchedulingAssessmentRecord, inlined: true, multivalued: false}
-  conclusion: {range: SchedulingAssessmentConclusion}
-  policy:
-  sources: {multivalued: true}
-  summary:
   concern_kind: {range: ConcernKind}
   concern_text: {}
   knowledge_category: {}
   knowledge_value: {}
   research_state: {range: ResearchState}
-  schedule_axis: {}
-  schedule_value: {}
+  sources: {multivalued: true}
   slots: {multivalued: true, range: Slot, inlined: true, inlined_as_list: true}
   order: {range: integer}
-  # Retained only for the temporary legacy SchedulingPolicy effect-match
-  # contract; these are not fields of the active Slot topology.
-  near: {}
-  food: {range: boolean}
   meal_context: {range: MealContext, multivalued: false}
   circadian_anchor: {range: CircadianAnchor, multivalued: false}
   exercise_anchor: {range: ExerciseAnchor, multivalued: false}
   entries: {multivalued: true, range: StackEntry, inlined: true, inlined_as_list: true}
+  tracked_entries: {multivalued: true, range: TrackedUnassignedEntry, inlined: true, inlined_as_list: true}
   product: {required: true, range: Product, inlined: false}
+  reason: {}
   stack: {required: true, range: Stack}
   benefit_description: {}
   risk_description: {}

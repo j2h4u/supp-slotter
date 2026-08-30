@@ -1,4 +1,4 @@
-"""Lock management for planner auto-maintenance."""
+"""Lock management for explicit planner normalization."""
 
 from __future__ import annotations
 
@@ -57,7 +57,7 @@ def acquire_maintenance_lock(
         except FileExistsError:
             pid = read_lock_pid(lock_dir)
             owner = f" by pid {pid}" if pid is not None else ""
-            msg = f"auto-maintenance skipped: another planner process is running{owner}"
+            msg = f"normalize skipped: another planner process is running{owner}"
             print(msg, file=sys.stderr)
             if collect_errors is not None:
                 collect_errors.append(msg)

@@ -9,9 +9,6 @@ concerns:
 - kind: safety
   text: Review thyroid disease, thyroid medication, and cumulative iodine exposure; NIH ODS notes high iodine intake can trigger
     thyroid effects in susceptible people.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   kind:
   - mineral

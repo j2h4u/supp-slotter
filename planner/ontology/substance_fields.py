@@ -12,23 +12,9 @@ from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import IMPLEMENTED_PREDICATE_NAMESPACES
 from planner.ontology.presentation import _VerifiedBundleCache, load_category_predicates, load_term_catalog
 
-_SCHEDULE_FIELDS_CACHE = _VerifiedBundleCache[tuple[str, ...]]()
 _KNOWLEDGE_FIELDS_CACHE = _VerifiedBundleCache[tuple[str, ...]]()
 _CANONICAL_TERMS_CACHE = _VerifiedBundleCache[Mapping[str, frozenset[str]]]()
 _SUBSTANCE_TRAIT_FIELDS_CACHE = _VerifiedBundleCache[tuple[tuple[str, str], ...]]()
-
-
-def schedule_assignment_fields(bundle: OntologyBundleView) -> tuple[str, ...]:
-    """Return substance ``schedule`` fields controlled by assignment axes."""
-
-    return _SCHEDULE_FIELDS_CACHE.get(bundle, _decode_schedule_assignment_fields)
-
-
-def _decode_schedule_assignment_fields(bundle: OntologyBundleView) -> tuple[str, ...]:
-    return tuple(
-        row.assignment_field
-        for row in sorted(bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
-    )
 
 
 def knowledge_category_fields(bundle: OntologyBundleView) -> tuple[str, ...]:
@@ -87,12 +73,7 @@ def substance_trait_fields(bundle: OntologyBundleView) -> tuple[tuple[str, str],
 
 def _decode_substance_trait_fields(bundle: OntologyBundleView) -> tuple[tuple[str, str], ...]:
     categories = knowledge_category_fields(bundle)
-    axes = tuple(
-        row.axis for row in sorted(bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
-    )
-    return tuple(("schedule_assertions", axis) for axis in axes) + tuple(
-        ("knowledge_assertions", category) for category in categories
-    )
+    return tuple(("knowledge_assertions", category) for category in categories)
 
 
 def allowed_predicate_fields_for_category(bundle: OntologyBundleView, category: str) -> tuple[str, ...] | None:
@@ -123,9 +104,7 @@ def allowed_predicate_fields_for_category(bundle: OntologyBundleView, category: 
 def dashboard_selector_category(bundle: OntologyBundleView, category: str) -> bool:
     """Return whether a vocabulary category is backed by knowledge assertions.
 
-    Dashboards are review projections over ``KnowledgeAssertion`` records.  A
-    schedule axis is a valid selector for scheduling constraints, but it is not
-    a dashboard membership dimension and must fail closed at this boundary.
+    Dashboards are review projections over ``KnowledgeAssertion`` records.
     """
 
     try:
@@ -146,9 +125,6 @@ def substance_terms_for_category(
     accessor shape mismatch.  An empty tuple is a valid category with no terms.
     """
 
-    schedule_axes = _schedule_axes_for_category(bundle, category)
-    if schedule_axes is not None:
-        return tuple(assertion.value for assertion in substance.schedule_assertions if assertion.axis in schedule_axes)
     try:
         predicates = load_category_predicates(bundle).get(category)
     except OntologyInfrastructureError:
@@ -156,32 +132,6 @@ def substance_terms_for_category(
     if predicates is None:
         return None
     return tuple(assertion.value for assertion in substance.knowledge_assertions if assertion.category == category)
-
-
-def _schedule_axes_for_category(bundle: OntologyBundleView, category: str) -> frozenset[str] | None:
-    """Return the authored assignment axes represented by one category.
-
-    A selector category is not an alias for all scheduling assertions.  Its
-    declared ``schedule.<axis>`` predicates define the exact assertion stream
-    it can inspect; unknown or malformed categories are unsupported.
-    """
-    try:
-        predicates = load_category_predicates(bundle).get(category)
-    except OntologyInfrastructureError:
-        return None
-    if predicates is None:
-        return None
-    axis_by_field = {row.assignment_field: row.axis for row in bundle.runtime_program.assignment_axes}
-    axes: set[str] = set()
-    for predicate in predicates:
-        if not isinstance(predicate, str) or not predicate.startswith("schedule."):
-            return None
-        field = predicate.removeprefix("schedule.")
-        axis = axis_by_field.get(field)
-        if axis is None:
-            return None
-        axes.add(axis)
-    return frozenset(axes) or None
 
 
 def validate_substance_schema_conformance(bundle: OntologyBundleView) -> None:

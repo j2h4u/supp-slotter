@@ -12,19 +12,3 @@ knowledge:
     research_state: supported
     sources:
     - https://ods.od.nih.gov/factsheets/Boron-HealthProfessional/
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Boron-HealthProfessional/
-    summary: No evidence establishes a form-specific bioavailability advantage or a fed-versus-fasted preference for boron.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Boron-HealthProfessional/
-    summary: No comparative clock-time evidence establishes a timing rule for boron.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Boron-HealthProfessional/
-    summary: No evidence establishes a workout- or activity-linked timing rule for boron; no activity placement is supported.

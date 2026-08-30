@@ -3,9 +3,6 @@ name: Melatonin
 notes: 'Sleep-onset hormone used in bedtime products. Labels in the intake batch range from 300 mcg to 6 mg and direct use
   before bedtime. Review context: melatonin helps time circadian rhythm and sleep signaling; evidence is stronger for jet
   lag and delayed sleep-wake timing than for routine chronic insomnia.'
-schedule:
-  timing:
-  - sleep_support
 knowledge:
   context:
   - sleep_recovery

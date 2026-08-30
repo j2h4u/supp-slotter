@@ -2,32 +2,6 @@ id: sub_2476bf9d4b
 name: Vitamin D3
 form: cholecalciferol
 notes: 'Vitamin D3 is the fat-soluble cholecalciferol form of vitamin D. NIH ODS supports vitamin identity, calcium absorption, and bone physiology. Human meal studies support a bounded food preference, especially with dietary fat, while absorption also occurs without fat; fat_meal_required is not established. No clock-time or activity-linked rule is established. Sources: NIH ODS Vitamin D; PMID 25441954; PMID 20200983.'
-schedule:
-  intake:
-  - food_preferred
-scheduling_assessment:
-  intake:
-    conclusion: supports_preference
-    policy: food_preferred
-    sources:
-    - https://ods.od.nih.gov/factsheets/Vitamind-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/25441954/
-    - https://pubmed.ncbi.nlm.nih.gov/20200983/
-    summary: Human meal studies support a bounded food preference for vitamin D3, especially with dietary fat, while absorption also occurs without fat; fat_meal_required is not established.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Vitamind-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/25441954/
-    - https://pubmed.ncbi.nlm.nih.gov/20200983/
-    summary: The cited evidence does not establish a clock-time rule for vitamin D3.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Vitamind-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/25441954/
-    - https://pubmed.ncbi.nlm.nih.gov/20200983/
-    summary: The cited evidence does not establish an activity-linked timing rule for vitamin D3.
 knowledge:
   effect:
   - value: calcium_absorption_support

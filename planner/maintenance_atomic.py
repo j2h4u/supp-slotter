@@ -1,4 +1,4 @@
-"""Atomic staged writes for planner auto-maintenance."""
+"""Atomic staged writes for explicit planner normalization."""
 
 from __future__ import annotations
 
@@ -52,7 +52,7 @@ class EditPlan:
                 tmp_path.write_text(entry.new_content, encoding="utf-8")
             except OSError as e:
                 print(
-                    f"auto-maintenance: staging failed for {strip_root_prefix(str(entry.final_path))}: {e}",
+                    f"normalize: staging failed for {strip_root_prefix(str(entry.final_path))}: {e}",
                     file=sys.stderr,
                 )
                 self.abort()
@@ -75,7 +75,7 @@ class EditPlan:
             except OSError as e:
                 self.abort()
                 print(
-                    f"auto-maintenance: CRITICAL: commit failed for "
+                    f"normalize: CRITICAL: commit failed for "
                     f"{strip_root_prefix(str(final_path))}: {e}. "
                     f"Some files may be in a partially-renamed state; "
                     f"reconcile data/ manually.",

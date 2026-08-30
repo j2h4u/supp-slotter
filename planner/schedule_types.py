@@ -7,8 +7,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal, TypedDict
 
 if TYPE_CHECKING:
+    from planner.canonical_optimizer_result import Optimal
     from planner.contracts import Slot
-    from planner.engine._canonical_optimizer import Optimal
     from planner.ontology.canonical_inference import Success
 
 ProductTrackingState = str
@@ -106,8 +106,7 @@ class SchedulePlacementNote(TypedDict):
 
 
 class ScheduleSummary(TypedDict):
-    take: dict[str, list[str]]
-    usage_groups: dict[str, list[str]]
+    placement_groups: dict[str, list[str]]
 
 
 class ActiveFactIndexEntry(TypedDict):
@@ -215,9 +214,7 @@ class OptimalPublication:
         deliberate: TypedDict values remain mutable after construction, so a
         one-time constructor check is not a sufficient publication boundary.
         """
-        # Import lazily: planner.engine is a re-exporting package and imports
-        # legacy output modules that themselves depend on these TypedDicts.
-        from planner.engine._canonical_optimizer import Optimal as _Optimal
+        from planner.canonical_optimizer_result import Optimal as _Optimal
         from planner.ontology.canonical_inference import Success as _Success
 
         if not isinstance(self.result, _Optimal):

@@ -1,24 +1,5 @@
 # Authoritative reusable canonical evidence catalog.
 #
-composition_roles:
-  - id: cmp_prd_eb6337a6dc__sub_2476bf9d4b
-    product: prd_eb6337a6dc
-    substance: sub_2476bf9d4b
-  - id: cmp_prd_bb212cffc2__sub_67fc2be8aa
-    product: prd_bb212cffc2
-    substance: sub_67fc2be8aa
-  - id: cmp_prd_htuhz2s2gt__sub_sunkcr05vl
-    product: prd_htuhz2s2gt
-    substance: sub_sunkcr05vl
-  - id: cmp_prd_cfce0b36b6__sub_3918fe347e
-    product: prd_cfce0b36b6
-    substance: sub_3918fe347e
-  - id: cmp_prd_io1peb9syp__sub_85w45nbob4
-    product: prd_io1peb9syp
-    substance: sub_85w45nbob4
-  - id: cmp_prd_io1peb9syp__sub_iu7b8h87g2
-    product: prd_io1peb9syp
-    substance: sub_iu7b8h87g2
 evidence_sources:
   - id: src_pubmed_25441954
   - id: src_pubmed_20200983
@@ -36,7 +17,8 @@ food_effects:
   - id: fact_food_prd_eb6337a6dc_sub_2476bf9d4b
     subject:
       substance: sub_2476bf9d4b
-    applicability: cmp_prd_eb6337a6dc__sub_2476bf9d4b
+    applicability:
+      substance: sub_2476bf9d4b
     provenance:
       - source: src_pubmed_25441954
         locator: https://pubmed.ncbi.nlm.nih.gov/25441954/
@@ -46,7 +28,8 @@ food_effects:
   - id: fact_food_prd_bb212cffc2_sub_67fc2be8aa
     subject:
       substance: sub_67fc2be8aa
-    applicability: cmp_prd_bb212cffc2__sub_67fc2be8aa
+    applicability:
+      substance: sub_67fc2be8aa
     provenance:
       - source: src_doi_10_1002_jps_2600550305
         locator: https://doi.org/10.1002/jps.2600550305
@@ -56,7 +39,8 @@ food_effects:
   - id: fact_food_prd_htuhz2s2gt_sub_sunkcr05vl
     subject:
       composition_role: cmp_prd_htuhz2s2gt__sub_sunkcr05vl
-    applicability: cmp_prd_htuhz2s2gt__sub_sunkcr05vl
+    applicability:
+      composition_role: cmp_prd_htuhz2s2gt__sub_sunkcr05vl
     provenance:
       - source: src_solgar_triple_strength_omega3
         locator: https://www.solgar.com/products/solgar-triple-strength-omega-3-950-mg-softgels
@@ -68,7 +52,8 @@ food_effects:
   - id: fact_food_prd_io1peb9syp_sub_85w45nbob4
     subject:
       substance: sub_85w45nbob4
-    applicability: cmp_prd_io1peb9syp__sub_85w45nbob4
+    applicability:
+      substance: sub_85w45nbob4
     provenance:
       - source: src_card_sub_85w45nbob4_notes
         locator: data/substances/l_glutamine__sub_85w45nbob4.yaml#/notes
@@ -77,7 +62,8 @@ food_effects:
   - id: fact_food_prd_io1peb9syp_sub_iu7b8h87g2
     subject:
       substance: sub_iu7b8h87g2
-    applicability: cmp_prd_io1peb9syp__sub_iu7b8h87g2
+    applicability:
+      substance: sub_iu7b8h87g2
     provenance:
       - source: src_card_sub_iu7b8h87g2_notes
         locator: data/substances/alpha_lipoic_acid__sub_iu7b8h87g2.yaml#/notes
@@ -89,7 +75,8 @@ pre_exercise_performance_effects:
   - id: fact_pre_exercise_performance_prd_cfce0b36b6_sub_3918fe347e
     subject:
       composition_role: cmp_prd_cfce0b36b6__sub_3918fe347e
-    applicability: cmp_prd_cfce0b36b6__sub_3918fe347e
+    applicability:
+      composition_role: cmp_prd_cfce0b36b6__sub_3918fe347e
     provenance:
       - source: src_pubmed_17953788
         locator: https://pubmed.ncbi.nlm.nih.gov/17953788/

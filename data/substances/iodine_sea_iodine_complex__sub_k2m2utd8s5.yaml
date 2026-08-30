@@ -12,9 +12,6 @@ concerns:
 - kind: safety
   text: Review thyroid disease, thyroid medication, and cumulative iodine exposure; this product pattern can approach the
     usual adult iodine UL.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   kind:
   - mineral

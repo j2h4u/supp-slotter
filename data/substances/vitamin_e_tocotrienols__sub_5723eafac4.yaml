@@ -8,9 +8,6 @@ concerns:
 - kind: safety
   text: Review cumulative vitamin E dose, anticoagulant/antiplatelet medication context, vitamin K context, and co-use with
     tocopherol products because tocotrienol and tocopherol handling may differ.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - skin_support

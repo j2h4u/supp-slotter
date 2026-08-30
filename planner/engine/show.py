@@ -53,10 +53,10 @@ def _show_inner(schedule_path: Path) -> int:
     pillboxes = schedule["pillboxes"]
 
     print()
-    print("Here's your schedule for today:")
+    print("Current plan:")
     print()
 
-    _print_daily_usage_groups(schedule)
+    _print_current_plan_groups(schedule)
     for pillbox_key, pillbox in pillboxes.items():
         if pillbox_key != "training":
             continue
@@ -68,21 +68,21 @@ def _show_inner(schedule_path: Path) -> int:
     return 0
 
 
-def _print_daily_usage_groups(schedule: CanonicalScheduleData) -> None:
-    """Print active daily products by presentation marker, retaining slot detail."""
-    groups = _usage_groups(schedule)
+def _print_current_plan_groups(schedule: CanonicalScheduleData) -> None:
+    """Print current-plan placement groups, retaining their logical-slot detail."""
+    groups = _placement_groups(schedule)
     pillboxes = schedule["pillboxes"]
     daily_products = _daily_products(pillboxes)
-    for group_key, label in (("daily_base", "Daily base"), ("not_every_day", "Not every day")):
+    for group_key, label in (("routine", "Routine placements"), ("episodic", "Episodic placements")):
         names = _active_group_names(groups.get(group_key, []), daily_products)
         if not names:
             continue
         _print_usage_group(label, names, pillboxes)
 
 
-def _usage_groups(schedule: CanonicalScheduleData) -> dict[str, list[str]]:
+def _placement_groups(schedule: CanonicalScheduleData) -> dict[str, list[str]]:
     summary = schedule.get("summary", {})
-    raw_groups = summary.get("usage_groups", {}) if isinstance(summary, dict) else {}
+    raw_groups = summary.get("placement_groups", {}) if isinstance(summary, dict) else {}
     return raw_groups if isinstance(raw_groups, dict) else {}
 
 

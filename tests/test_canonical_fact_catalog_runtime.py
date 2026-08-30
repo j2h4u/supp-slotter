@@ -12,7 +12,7 @@ from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.runtime_program import (
     RuntimeAcuteAlertnessEffect,
     RuntimeAcuteSleepEffect,
-    RuntimeCompositionRole,
+    RuntimeFactApplicability,
     RuntimeFoodEffect,
     RuntimePostExerciseRecoveryEffect,
     RuntimePreExercisePerformanceEffect,
@@ -30,7 +30,6 @@ def _runtime_payload() -> dict[str, object]:
     )
     projection = cast(dict[str, object], payload["projection"])
     projection["canonical_fact_catalog"] = {
-        "composition_roles": [],
         "evidence_sources": [],
         "food_effects": [],
         "acute_alertness_effects": [],
@@ -51,7 +50,6 @@ def test_compiler_emits_authoritative_catalog(monkeypatch: pytest.MonkeyPatch) -
     projection = cast(dict[str, object], payload["projection"])
     catalog = cast(dict[str, object], projection["canonical_fact_catalog"])
     assert set(catalog) == {
-        "composition_roles",
         "evidence_sources",
         "food_effects",
         "acute_alertness_effects",
@@ -63,6 +61,8 @@ def test_compiler_emits_authoritative_catalog(monkeypatch: pytest.MonkeyPatch) -
         "fact_food_prd_eb6337a6dc_sub_2476bf9d4b",
         "fact_food_prd_bb212cffc2_sub_67fc2be8aa",
         "fact_food_prd_htuhz2s2gt_sub_sunkcr05vl",
+        "fact_food_prd_io1peb9syp_sub_85w45nbob4",
+        "fact_food_prd_io1peb9syp_sub_iu7b8h87g2",
     ]
     assert [fact["id"] for fact in cast(list[dict[str, object]], catalog["pre_exercise_performance_effects"])] == [
         "fact_pre_exercise_performance_prd_cfce0b36b6_sub_3918fe347e",
@@ -79,13 +79,12 @@ def test_runtime_decodes_all_typed_fact_families() -> None:
     payload = _runtime_payload()
     projection = cast(dict[str, object], payload["projection"])
     projection["canonical_fact_catalog"] = {
-        "composition_roles": [{"id": "cmp_demo", "product": "prd_demo", "substance": "sub_demo"}],
         "evidence_sources": [{"id": "src_demo"}],
         "food_effects": [
             {
                 "id": "fact_food",
                 "subject": {"substance": "sub_demo"},
-                "applicability": "cmp_demo",
+                "applicability": {"substance": "sub_demo"},
                 "provenance": [{"source": "src_demo", "locator": "paper#food"}],
                 "value": "bioavailability_increases",
             }
@@ -94,7 +93,7 @@ def test_runtime_decodes_all_typed_fact_families() -> None:
             {
                 "id": "fact_alertness",
                 "subject": {"composition_role": "cmp_demo"},
-                "applicability": "cmp_demo",
+                "applicability": {"composition_role": "cmp_demo"},
                 "provenance": [{"source": "src_demo", "locator": "paper#alertness", "quotation": "quoted"}],
                 "value": "acute_alertness_increases",
             }
@@ -103,7 +102,7 @@ def test_runtime_decodes_all_typed_fact_families() -> None:
             {
                 "id": "fact_sleep",
                 "subject": {"composition_role": "cmp_demo"},
-                "applicability": "cmp_demo",
+                "applicability": {"composition_role": "cmp_demo"},
                 "provenance": [{"source": "src_demo", "locator": "paper#sleep"}],
                 "value": "continuity_improves",
             }
@@ -112,7 +111,7 @@ def test_runtime_decodes_all_typed_fact_families() -> None:
             {
                 "id": "fact_pre",
                 "subject": {"composition_role": "cmp_demo"},
-                "applicability": "cmp_demo",
+                "applicability": {"composition_role": "cmp_demo"},
                 "provenance": [{"source": "src_demo", "locator": "paper#pre"}],
                 "value": "performance_improves",
             }
@@ -121,7 +120,7 @@ def test_runtime_decodes_all_typed_fact_families() -> None:
             {
                 "id": "fact_post",
                 "subject": {"composition_role": "cmp_demo"},
-                "applicability": "cmp_demo",
+                "applicability": {"composition_role": "cmp_demo"},
                 "provenance": [{"source": "src_demo", "locator": "paper#post"}],
                 "value": "recovery_improves",
             }
@@ -130,13 +129,13 @@ def test_runtime_decodes_all_typed_fact_families() -> None:
 
     runtime = decode_runtime_program(payload)
     catalog = runtime.canonical_fact_catalog
-    assert isinstance(catalog.composition_roles[0], RuntimeCompositionRole)
     assert isinstance(catalog.food_effects[0], RuntimeFoodEffect)
     assert isinstance(catalog.acute_alertness_effects[0], RuntimeAcuteAlertnessEffect)
     assert isinstance(catalog.acute_sleep_effects[0], RuntimeAcuteSleepEffect)
     assert isinstance(catalog.pre_exercise_performance_effects[0], RuntimePreExercisePerformanceEffect)
     assert isinstance(catalog.post_exercise_recovery_effects[0], RuntimePostExerciseRecoveryEffect)
     assert catalog.food_effects[0].subject.substance == "sub_demo"
+    assert catalog.food_effects[0].applicability == RuntimeFactApplicability("sub_demo", None)
 
 
 @pytest.mark.parametrize(
@@ -146,6 +145,9 @@ def test_runtime_decodes_all_typed_fact_families() -> None:
         ("invalid_value", "not an admitted value"),
         ("both_subjects", "exactly one"),
         ("no_subject", "exactly one"),
+        ("scalar_applicability", "must be a mapping"),
+        ("both_applicability", "exactly one"),
+        ("no_applicability", "exactly one"),
         ("blank_locator", "must be a non-empty string"),
         ("whitespace_locator", "non-whitespace"),
     ],
@@ -157,7 +159,7 @@ def test_runtime_rejects_malformed_canonical_facts(mutation: str, match: str) ->
     fact = {
         "id": "fact_demo",
         "subject": {"composition_role": "cmp_demo"},
-        "applicability": "cmp_demo",
+        "applicability": {"composition_role": "cmp_demo"},
         "provenance": [{"source": "src_demo", "locator": "paper#demo"}],
         "value": "bioavailability_increases",
     }
@@ -170,6 +172,12 @@ def test_runtime_rejects_malformed_canonical_facts(mutation: str, match: str) ->
         fact["subject"] = {"substance": "sub_demo", "composition_role": "cmp_demo"}
     elif mutation == "no_subject":
         fact["subject"] = {}
+    elif mutation == "scalar_applicability":
+        fact["applicability"] = "cmp_demo"
+    elif mutation == "both_applicability":
+        fact["applicability"] = {"substance": "sub_demo", "composition_role": "cmp_demo"}
+    elif mutation == "no_applicability":
+        fact["applicability"] = {}
     elif mutation == "blank_locator":
         cast(list[dict[str, object]], fact["provenance"])[0]["locator"] = ""
     elif mutation == "whitespace_locator":

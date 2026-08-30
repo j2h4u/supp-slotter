@@ -32,27 +32,6 @@ ss:term_placement
     }
   """ ] .
 
-ss:schedule_assertion_term_registry
-  a sh:NodeShape ; sh:name "schedule_assertion_term_registry" ;
-  sh:targetClass ss:ScheduleAssertion ;
-  sh:sparql [ sh:message "[schedule_assertion_term_registry] every schedule assertion axis/value pair must be a canonical ontology term placed on its authored assignment axis" ; sh:select """
-    PREFIX ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/>
-    SELECT $this WHERE {
-      $this ss:schedule_axis ?axis ;
-        ss:schedule_value ?value .
-      FILTER NOT EXISTS {
-        ?registered_term a ss:OntologyTerm ;
-          ss:slug ?value ;
-          ss:semantic_category ?declared_category .
-        ?declared_category ss:allowed_predicates ?allowed_predicate .
-        ?assignment_axis ss:axis ?axis ;
-          ss:assignment_source "schedule" ;
-          ss:assignment_field ?assignment_field .
-        FILTER(?allowed_predicate = CONCAT("schedule.", STR(?assignment_field)))
-      }
-    }
-  """ ] .
-
 ss:component_reference_integrity
   a sh:NodeShape ; sh:name "component_reference_integrity" ;
   sh:targetClass ss:ProductComponent ;

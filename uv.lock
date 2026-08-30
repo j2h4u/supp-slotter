@@ -1426,9 +1426,7 @@ version = "0.0.0"
 source = { virtual = "." }
 dependencies = [
     { name = "jsonschema" },
-    { name = "pyshacl" },
     { name = "pyyaml" },
-    { name = "rdflib" },
 ]
 
 [package.dev-dependencies]
@@ -1438,8 +1436,6 @@ dev = [
     { name = "coverage" },
     { name = "deptry" },
     { name = "import-linter" },
-    { name = "linkml" },
-    { name = "linkml-runtime" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "pytest-crap" },
@@ -1447,13 +1443,17 @@ dev = [
     { name = "ruff" },
     { name = "vulture" },
 ]
+ontology = [
+    { name = "linkml" },
+    { name = "linkml-runtime" },
+    { name = "pyshacl" },
+    { name = "rdflib" },
+]
 
 [package.metadata]
 requires-dist = [
     { name = "jsonschema", specifier = ">=4.21" },
-    { name = "pyshacl", specifier = ">=0.40.0" },
     { name = "pyyaml", specifier = ">=6.0" },
-    { name = "rdflib", specifier = ">=7.6.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -1463,14 +1463,18 @@ dev = [
     { name = "coverage", specifier = ">=7.15.2" },
     { name = "deptry", specifier = ">=0.25.1" },
     { name = "import-linter", specifier = ">=2.13" },
-    { name = "linkml", specifier = ">=1.11.1" },
-    { name = "linkml-runtime", specifier = ">=1.11.1" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-cov", specifier = ">=7" },
     { name = "pytest-crap", specifier = ">=0.3.0" },
     { name = "pytest-xdist", specifier = ">=3.8.0" },
     { name = "ruff", specifier = ">=0.15.22" },
     { name = "vulture", specifier = ">=2.14" },
+]
+ontology = [
+    { name = "linkml", specifier = ">=1.11.1" },
+    { name = "linkml-runtime", specifier = ">=1.11.1" },
+    { name = "pyshacl", specifier = ">=0.40.0" },
+    { name = "rdflib", specifier = ">=7.6.0" },
 ]
 
 [[package]]

@@ -1,4 +1,4 @@
-"""Typed records shared across planner review modules."""
+"""Typed query result records shared by read-model and review rendering."""
 
 from __future__ import annotations
 
@@ -17,11 +17,3 @@ class RelationReviewRow(TypedDict):
     source_matches: list[str]
     target_matches: list[str]
     show_matches: bool
-
-
-class SubstanceRelationMatchRow(TypedDict):
-    type: str
-    src_display: str
-    tgt_display: str
-    reason: str
-    action: str

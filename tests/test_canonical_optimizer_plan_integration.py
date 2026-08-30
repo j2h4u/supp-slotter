@@ -19,29 +19,29 @@ from planner.schedule_types import OptimalPublication
 
 def _runtime() -> SimpleNamespace:
     return SimpleNamespace(
-        glue_contract=SimpleNamespace(inactive_stack_name="inactive"),
+        glue_contract=SimpleNamespace(
+            inactive_stack_name="inactive",
+            stack_partition=SimpleNamespace(routable_stack_names=("daily", "training")),
+        ),
         canonical_laws=(),
     )
 
 
 def _inputs(*, use_pattern: str | None = None) -> PlanInputs:
     slots = {
-        "daily_food": Slot("daily_food", "Food", 1, (), "daily", "Daily", "daily", "with_food", None, None),
-        "daily_empty": Slot("daily_empty", "Empty", 2, (), "daily", "Daily", "daily", "without_food", None, None),
-        "training_pre": Slot("training_pre", "Pre", 1, (), "training", "Training", "training", None, None, "before"),
+        "daily_food": Slot("daily_food", "Food", 1, "daily", "Daily", "daily", "with_food", None, None),
+        "daily_empty": Slot("daily_empty", "Empty", 2, "daily", "Daily", "daily", "without_food", None, None),
+        "training_pre": Slot("training_pre", "Pre", 1, "training", "Training", "training", None, None, "before"),
     }
     product = Product(
         "product", "Product", (ProductComponent("substance", id="cmp_product__substance"),), use_pattern=use_pattern
     )
     return PlanInputs(
-        ontology_bundle=SimpleNamespace(),  # type: ignore[arg-type]
         runtime_program=_runtime(),  # type: ignore[arg-type]
-        canonical_fact_catalog=RuntimeCanonicalFactCatalog((), (), (), (), (), (), ()),
+        canonical_fact_catalog=RuntimeCanonicalFactCatalog((), (), (), (), (), ()),
         slots=slots,
         substances={},
         products={"product": product},
-        global_relations=[],
-        dashboard_files=[],
         stack_entries={"product": {"product": "product", "stack": "daily"}},
         pillboxes={
             "daily": Pillbox(
@@ -78,7 +78,6 @@ def test_same_axis_conflict_is_layout_free_and_stops_before_optimizer(monkeypatc
     conflict = Conflict((SameDimensionPressureConflict("product", "meal_context", ("with_food", "without_food"), ()),))
     active = ActiveIndex(
         item_products={"product": "product"},
-        active_components={"product": []},
         item_stacks={"product": "daily"},
         canonical_inference=conflict,
     )
@@ -104,7 +103,10 @@ def test_not_every_day_is_an_ordinary_optimizer_item_with_presentation_grouping(
         _catalog: RuntimeCanonicalFactCatalog,
         items: dict[str, str],
         _laws: tuple[object, ...],
+        *,
+        composition_roles: tuple[object, ...],
     ) -> Success:
+        del composition_roles
         selected.append(items)
         return Success(())
 
@@ -136,7 +138,6 @@ def test_successful_path_uses_canonical_publication_and_writer(monkeypatch, tmp_
     inputs = _inputs()
     active = ActiveIndex(
         item_products={"product": "product"},
-        active_components={"product": []},
         item_stacks={"product": "daily"},
         canonical_inference=Success(()),
     )
@@ -161,7 +162,6 @@ def test_keyboard_interrupt_during_publication_is_indeterminate_and_does_not_wri
     inputs = _inputs()
     active = ActiveIndex(
         item_products={"product": "product"},
-        active_components={"product": []},
         item_stacks={"product": "daily"},
         canonical_inference=Success(()),
     )
@@ -174,17 +174,15 @@ def test_keyboard_interrupt_during_publication_is_indeterminate_and_does_not_wri
     )
     writer_calls: list[object] = []
     monkeypatch.setattr(plan_module, "write_schedule_file", lambda *_args: writer_calls.append(True))
-    output = plan_module._write_successful_plan(Paths.from_root(tmp_path), [], runtime, result)
-    assert output.status == "Indeterminate"
-    assert output.schedule_written is False
+    with pytest.raises(KeyboardInterrupt):
+        plan_module._write_successful_plan(Paths.from_root(tmp_path), [], runtime, result)
     assert writer_calls == []
 
 
-def test_keyboard_interrupt_during_write_is_indeterminate(monkeypatch, tmp_path: Path) -> None:
+def test_keyboard_interrupt_during_write_propagates_to_the_public_boundary(monkeypatch, tmp_path: Path) -> None:
     inputs = _inputs()
     active = ActiveIndex(
         item_products={"product": "product"},
-        active_components={"product": []},
         item_stacks={"product": "daily"},
         canonical_inference=Success(()),
     )
@@ -194,7 +192,5 @@ def test_keyboard_interrupt_during_write_is_indeterminate(monkeypatch, tmp_path:
     monkeypatch.setattr(plan_module, "build_canonical_schedule_output", lambda *_args: publication)
     monkeypatch.setattr(plan_module, "write_schedule_file", lambda *_args: (_ for _ in ()).throw(KeyboardInterrupt))
 
-    output = plan_module._write_successful_plan(Paths.from_root(tmp_path), [], runtime, result)
-
-    assert output.status == "Indeterminate"
-    assert output.schedule_written is False
+    with pytest.raises(KeyboardInterrupt):
+        plan_module._write_successful_plan(Paths.from_root(tmp_path), [], runtime, result)

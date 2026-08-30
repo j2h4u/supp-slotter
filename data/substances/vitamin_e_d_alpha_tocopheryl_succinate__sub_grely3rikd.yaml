@@ -11,9 +11,6 @@ concerns:
 - kind: safety
   text: Review cumulative vitamin E dose, anticoagulant/antiplatelet medication context, vitamin K context, and product form
     before treating this form as routine background antioxidant coverage.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - antioxidant_protection

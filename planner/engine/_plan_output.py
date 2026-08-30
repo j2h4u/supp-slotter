@@ -79,7 +79,7 @@ def build_canonical_schedule_output(
         slot_map = cast(dict[str, dict[str, object]], pillboxes[slot.pillbox]["slots"])
         cast(list[str], slot_map[slot_id]["products"]).append(_canonical_product_name(item_id, item_products, products))
 
-    not_every_day_items = sorted(
+    episodic_items = sorted(
         item_id
         for item_id, product_id in item_products.items()
         if item_id in assignments
@@ -107,25 +107,17 @@ def build_canonical_schedule_output(
             "optimizer_proof": list(output_input.result.proofs),
             "canonical_explanations": canonical_explanations,
             "summary": {
-                "take": {
-                    pillbox_name: [
-                        product
-                        for slot in cast(dict[str, dict[str, object]], pillbox["slots"]).values()
-                        for product in cast(list[str], slot["products"])
-                    ]
-                    for pillbox_name, pillbox in sorted(pillboxes.items())
-                },
-                "usage_groups": {
-                    "daily_base": [
+                "placement_groups": {
+                    "routine": [
                         _canonical_product_name(item_id, item_products, products)
                         for item_id, product_id in sorted(item_products.items())
                         if item_stacks.get(item_id) == "daily"
-                        and item_id not in not_every_day_items
+                        and item_id not in episodic_items
                         and products.get(product_id) is not None
                         and products[product_id].use_pattern != "not_every_day"
                     ],
-                    "not_every_day": [
-                        _canonical_product_name(item_id, item_products, products) for item_id in not_every_day_items
+                    "episodic": [
+                        _canonical_product_name(item_id, item_products, products) for item_id in episodic_items
                     ],
                 },
             },

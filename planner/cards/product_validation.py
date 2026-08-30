@@ -101,6 +101,5 @@ def _validate_component_refs(
             expected = composition_role_id(product_id, ref)
             if role_id != expected:
                 errors.append(
-                    f"{path}: components[{index}].id '{role_id}' must equal "
-                    f"'{expected}' for product/substance pair"
+                    f"{path}: components[{index}].id '{role_id}' must equal '{expected}' for product/substance pair"
                 )

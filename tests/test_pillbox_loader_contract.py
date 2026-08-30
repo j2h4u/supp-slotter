@@ -101,3 +101,29 @@ def test_generated_contract_resolves_stack_references_from_validation_context() 
     )
 
     assert any("unknown reference 'missing'" in error for error in errors)
+
+
+def test_loader_rejects_multiple_pillboxes_for_one_stack(tmp_path: Path) -> None:
+    path = tmp_path / "pillboxes.yaml"
+    path.write_text(
+        """
+first:
+  label: First
+  stack: daily
+  slots:
+    first_slot:
+      label: First slot
+      order: 1
+second:
+  label: Second
+  stack: daily
+  slots:
+    second_slot:
+      label: Second slot
+      order: 1
+""",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(CardLoadError, match="duplicate pillbox stack reference"):
+        load_pillboxes(path, None)  # type: ignore[arg-type]

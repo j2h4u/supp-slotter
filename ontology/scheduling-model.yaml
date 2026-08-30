@@ -1,9 +1,7 @@
 id: https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling-model
 name: supp_slotter_scheduling
 title: Generic scheduling ontology
-description: >-
-  Open scheduling structures. Values such as intake, timing, activity, slot
-  names, and effects are authored instances, never schema enums.
+description: Canonical scheduling fact families and universal inference laws.
 prefixes:
   ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
   linkml: https://w3id.org/linkml/
@@ -15,11 +13,6 @@ imports:
   - runtime-protocol
   - vocabulary-model
 
-enums:
-  SchedulingConstraintScope:
-    permissible_values:
-      exact_form:
-
 classes:
   # Universal inference laws are authored separately from evidence facts.  A
   # law is deliberately tiny: its closed typed fact value and the one anchor
@@ -28,7 +21,6 @@ classes:
   CanonicalLawCatalog:
     description: Closed universal law catalog for canonical pressure inference.
     annotations:
-      canonical_shadow: true
       closed_universal_laws: true
     slots: [food_effect_laws, acute_alertness_effect_laws, acute_sleep_effect_laws, pre_exercise_performance_effect_laws, post_exercise_recovery_effect_laws]
     slot_usage:
@@ -79,14 +71,12 @@ classes:
       exercise_anchor: {required: true, range: ExerciseAnchor, multivalued: false}
 
   CanonicalFactCatalog:
-    description: Shadow catalog of scheduler-consumable canonical evidence facts.
+    description: Catalog of scheduler-consumable canonical evidence facts.
     annotations:
-      canonical_shadow: true
       source_reference_resolution: runtime_validation_required
       composition_role_reference_resolution: runtime_validation_required
-    slots: [composition_roles, evidence_sources, food_effects, acute_alertness_effects, acute_sleep_effects, pre_exercise_performance_effects, post_exercise_recovery_effects]
+    slots: [evidence_sources, food_effects, acute_alertness_effects, acute_sleep_effects, pre_exercise_performance_effects, post_exercise_recovery_effects]
     slot_usage:
-      composition_roles: {required: false, multivalued: true, range: CompositionRole, inlined: true, inlined_as_list: true}
       evidence_sources: {required: false, multivalued: true, range: EvidenceSource, inlined: true, inlined_as_list: true}
       food_effects: {required: false, multivalued: true, range: FoodEffect, inlined: true, inlined_as_list: true}
       acute_alertness_effects: {required: false, multivalued: true, range: AcuteAlertnessEffect, inlined: true, inlined_as_list: true}
@@ -100,17 +90,16 @@ classes:
       Shared evidence boundary for one typed, admitted scheduling fact.  The
       concrete subclasses below are the only scheduler fact families.
     annotations:
-      canonical_shadow: true
       typed_subject_role: fact_subject
       typed_applicability_role: fact_applicability
       typed_provenance_role: evidence_provenance
       admission_mode: by_construction
-      subject_applicability_invariant: 'runtime_required: subject.substance == applicability.substance OR subject.composition_role == applicability'
+      subject_applicability_invariant: 'runtime_required: subject.substance == applicability.substance OR subject.composition_role == applicability.composition_role'
     slots: [id, subject, applicability, provenance]
     slot_usage:
       id: {required: true, pattern: '^[a-z][a-z0-9_:-]*$'}
       subject: {required: true, range: FactSubject, inlined: true, multivalued: false}
-      applicability: {required: true, range: CompositionRole, inlined: false, multivalued: false}
+      applicability: {required: true, range: FactApplicability, inlined: true, multivalued: false}
       provenance: {required: true, minimum_cardinality: 1, multivalued: true, range: EvidenceProvenance, inlined: true, inlined_as_list: true}
 
   FoodEffect:
@@ -164,6 +153,23 @@ classes:
       substance: {required: false, range: Substance, inlined: false, multivalued: false}
       composition_role: {required: false, range: CompositionRole, inlined: false, multivalued: false}
 
+  FactApplicability:
+    description: >-
+      Typed target selector for a canonical fact. A substance target applies to
+      every exact-form composition role with that substance; a composition-role
+      target applies only to that role.
+    slots: [substance, composition_role]
+    exactly_one_of:
+      - slot_conditions:
+          substance: {required: true}
+          composition_role: {maximum_cardinality: 0}
+      - slot_conditions:
+          substance: {maximum_cardinality: 0}
+          composition_role: {required: true}
+    slot_usage:
+      substance: {required: false, range: Substance, inlined: false, multivalued: false}
+      composition_role: {required: false, range: CompositionRole, inlined: false, multivalued: false}
+
   EvidenceSource:
     description: Stable source identity; witness locators do not live here.
     slots: [id]
@@ -185,146 +191,6 @@ classes:
       locator: {required: true, pattern: '^\S+$', multivalued: false}
       quotation: {required: false, multivalued: false}
 
-  SchedulingConstraint:
-    slots: [id, key, effect, condition, action, rationale]
-    slot_usage:
-      key: {required: true}
-      effect: {required: true}
-      action: {range: Action, inlined: true}
-
-  # Source-facing catalog contract for real scheduling constraints.
-  SchedulingPolicyCatalog:
-    description: Authored planner policy catalog for slot preferences, warnings, and presentation.
-    slots: [scheduling_policies, schedule_presentation]
-    slot_usage:
-      scheduling_policies: {required: true, inlined: true, inlined_as_list: false}
-      schedule_presentation: {required: true, inlined: true}
-
-  SchedulingPolicyRecord:
-    slots: [id, term, applies_when, effects, warning, action]
-    slot_usage:
-      id: {required: true}
-      term: {required: true}
-      applies_when: {required: true}
-      effects: {required: true, range: SchedulingPolicyEffectRecord, inlined: true, inlined_as_list: true}
-      warning: {required: true}
-      action: {range: string, inlined: false}
-
-  SchedulingPolicyEffectRecord:
-    slots: [match, level]
-    slot_usage:
-      match: {required: true, inlined: true}
-      level: {required: true}
-
-  SchedulingPolicyEffectMatch:
-    slots: [near, food]
-
-  SchedulePresentationPolicy:
-    slots: [concern_annotations, review_tags, active_fact_index, zero_effect]
-    slot_usage:
-      concern_annotations: {required: true, inlined: true}
-      review_tags: {required: true, inlined: true}
-      active_fact_index: {required: true, inlined: true}
-      zero_effect: {required: true, inlined: true}
-
-  SchedulePresentationZeroEffect:
-    description: Authored explanation for a placement with no non-zero scheduling effect.
-    slots: [condition, template]
-    slot_usage:
-      condition: {required: true, range: string}
-      template: {required: true, range: string}
-
-  SchedulePresentationConcernAnnotations:
-    slots: [include_kinds, labels]
-    slot_usage:
-      include_kinds: {required: true, multivalued: true}
-      labels: {required: true, multivalued: true, inlined: true, inlined_as_list: true}
-
-  SchedulePresentationLabel:
-    slots: [key, label]
-    slot_usage:
-      key: {required: true}
-      label: {required: true}
-
-  SchedulePresentationReviewTags:
-    slots: [include_namespaces, exclude_policy_ids]
-
-  SchedulePresentationActiveFactIndex:
-    slots: [include_namespaces, labels]
-    slot_usage:
-      labels: {required: true, multivalued: true, inlined: true, inlined_as_list: true}
-
-  SchedulingConstraintCatalog:
-    slots: [scheduling_constraints]
-
-  SchedulingConstraintRecord:
-    slots:
-      - id
-      - operation
-      - source_selector
-      - target_selector
-      - rationale
-      - action
-      - blocks_slots
-      - scores_advisory
-      - score_delta
-    slot_usage:
-      operation: {required: true}
-      source_selector:
-        required: true
-        range: SchedulingConstraintSelector
-        multivalued: false
-        inlined: true
-      target_selector:
-        required: true
-        range: SchedulingConstraintSelector
-        multivalued: false
-        inlined: true
-      rationale: {required: true}
-      action:
-        required: true
-        range: string
-        multivalued: false
-        inlined: false
-      blocks_slots: {range: boolean, required: false}
-      scores_advisory: {range: boolean, required: false}
-      score_delta: {range: integer, required: false}
-
-  SchedulingConstraintSelector:
-    slots: [entity, category, term, scope]
-    exactly_one_of:
-      - slot_conditions:
-          entity: {required: true}
-          category: {maximum_cardinality: 0}
-          term: {maximum_cardinality: 0}
-      - slot_conditions:
-          entity: {maximum_cardinality: 0}
-          category: {required: true}
-          term: {required: true}
-          scope: {maximum_cardinality: 0}
-    slot_usage:
-      entity:
-        range: SchedulingConstraintEntitySelector
-        multivalued: false
-        inlined: true
-      category: {range: string, required: false}
-      term: {range: string, required: false}
-      scope: {range: SchedulingConstraintScope, required: false}
-
-  SchedulingConstraintEntitySelector:
-    description: Stable identity selector used by executable scheduling constraints.
-    slots: [entity_id, name]
-    exactly_one_of:
-      - slot_conditions:
-          entity_id: {required: true}
-          name: {maximum_cardinality: 0}
-      - slot_conditions:
-          entity_id: {maximum_cardinality: 0}
-          name: {required: true}
-    slot_usage:
-      entity_id: {required: false, range: Substance, pattern: '\S'}
-      name: {required: false, pattern: '\S'}
-
 slots:
   food_effect_laws: {multivalued: true, range: FoodEffectLaw, inlined: true, inlined_as_list: true}
   acute_alertness_effect_laws: {multivalued: true, range: AcuteAlertnessEffectLaw, inlined: true, inlined_as_list: true}
@@ -332,84 +198,18 @@ slots:
   pre_exercise_performance_effect_laws: {multivalued: true, range: PreExercisePerformanceEffectLaw, inlined: true, inlined_as_list: true}
   post_exercise_recovery_effect_laws: {multivalued: true, range: PostExerciseRecoveryEffectLaw, inlined: true, inlined_as_list: true}
   fact_value:
-  composition_roles: {multivalued: true, range: CompositionRole, inlined: true, inlined_as_list: true}
   evidence_sources: {multivalued: true, range: EvidenceSource, inlined: true, inlined_as_list: true}
   food_effects: {multivalued: true, range: FoodEffect, inlined: true, inlined_as_list: true}
   acute_alertness_effects: {multivalued: true, range: AcuteAlertnessEffect, inlined: true, inlined_as_list: true}
   acute_sleep_effects: {multivalued: true, range: AcuteSleepEffect, inlined: true, inlined_as_list: true}
   pre_exercise_performance_effects: {multivalued: true, range: PreExercisePerformanceEffect, inlined: true, inlined_as_list: true}
   post_exercise_recovery_effects: {multivalued: true, range: PostExerciseRecoveryEffect, inlined: true, inlined_as_list: true}
-  applicability: {range: CompositionRole, inlined: false, multivalued: false}
+  applicability: {range: FactApplicability, inlined: true, multivalued: false}
   provenance: {multivalued: true, range: EvidenceProvenance, inlined: true, inlined_as_list: true}
   composition_role: {range: CompositionRole, inlined: false, multivalued: false}
   locator: {multivalued: false}
   quotation: {multivalued: false}
   id: {identifier: true, required: true}
-  key:
-  effect:
   label:
   description:
   value:
-  axis:
-  effects: {multivalued: true}
-  subject: {range: Selector, inlined: false}
-  constraints: {multivalued: true, range: SchedulingConstraint, inlined: false}
-  condition: {range: Condition, inlined: true}
-  action:
-  operation: {range: ConstraintExecutionOperation}
-  entity:
-    range: SchedulingConstraintEntitySelector
-    inlined: true
-  category:
-    range: string
-  term:
-  scope:
-  name:
-  expression:
-  weight: {range: decimal}
-  rationale:
-  precedence: {range: integer}
-  scheduling_constraints:
-    multivalued: true
-    range: SchedulingConstraintRecord
-    inlined: true
-    inlined_as_list: false
-  scheduling_policies:
-    multivalued: true
-    range: SchedulingPolicyRecord
-    inlined: true
-    inlined_as_list: false
-  schedule_presentation:
-    range: SchedulePresentationPolicy
-    inlined: true
-  applies_when:
-    range: string
-  warning:
-    range: boolean
-  match:
-    range: SchedulingPolicyEffectMatch
-    inlined: true
-  review_tags:
-    range: SchedulePresentationReviewTags
-
-  concern_annotations:
-    range: SchedulePresentationConcernAnnotations
-    inlined: true
-  active_fact_index:
-    range: SchedulePresentationActiveFactIndex
-    inlined: true
-  zero_effect:
-    range: SchedulePresentationZeroEffect
-    inlined: true
-  template:
-  include_namespaces:
-    multivalued: true
-  include_kinds:
-    multivalued: true
-  labels:
-    multivalued: true
-    range: SchedulePresentationLabel
-    inlined: true
-    inlined_as_list: true
-  exclude_policy_ids:
-    multivalued: true

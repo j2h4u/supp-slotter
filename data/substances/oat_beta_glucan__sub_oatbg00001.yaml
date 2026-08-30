@@ -8,9 +8,6 @@ notes: Viscous beta-glucan soluble fiber from oats or barley. FDA cholesterol/CH
   or more beta-glucan soluble fiber from whole oats, barley, or their combination as the associated daily intake level. Keep
   distinct from mushroom beta-(1,3)(1,6)-glucans, which are immune marker polysaccharides rather than the canonical oat/barley
   cholesterol fiber.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - lipid_metabolism_support

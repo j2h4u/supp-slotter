@@ -4,9 +4,6 @@ form: calcium ascorbate
 notes: Calcium contribution from calcium ascorbate listed on NOW Foods Vitamin C-1000 Complex. Kept separate from generic
   calcium because the product label exposes the source salt. Review context - treat as a calcium source for bone-mineral,
   clotting, nerve/muscle, and vitamin-D/calcium-axis review while preserving the ascorbate salt form.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - bone_mineral_metabolism_support

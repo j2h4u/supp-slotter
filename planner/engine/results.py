@@ -13,6 +13,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from planner.canonical_optimizer_result import Diagnostic
 from planner.schedule_types import ScheduleWarning
 
 
@@ -30,6 +31,7 @@ class PlanResult:
     warnings: list[ScheduleWarning]
     slot_loads: dict[str, int]
     errors: list[str] = field(default_factory=list[str])
+    diagnostic: Diagnostic | None = None
 
     @property
     def status(self) -> str:
@@ -53,84 +55,18 @@ class ReviewResult:
 
 
 @dataclass(frozen=True, slots=True)
-class GroomProduct:
-    id: str
-    name: str
-    brand: str | None
-    notes: str | None
-    use_pattern: str | None
-    components: tuple[tuple[str, str | None, str | None, str | None], ...]
-
-
-@dataclass(frozen=True, slots=True)
-class GroomKnowledge:
-    category: str
-    value: str
-    research_state: str
-    sources: tuple[str, ...]
-
-    @property
-    def open(self) -> bool:
-        return self.research_state == "unassessed"
-
-
-@dataclass(frozen=True, slots=True)
-class GroomRelation:
-    id: str
-    relation_type: str
-    source: str
-    target: str
-    reason: str
-    research_state: str
-    sources: tuple[str, ...]
-    active_endpoint_ids: tuple[str, ...]
-    owner_id: str
-
-    @property
-    def open(self) -> bool:
-        return self.research_state == "unassessed"
-
-
-@dataclass(frozen=True, slots=True)
-class GroomSchedule:
-    axis: str
-    value: str
-
-
-@dataclass(frozen=True, slots=True)
-class GroomAssessment:
-    axis: str
-    conclusion: str
-    policy: str | None
-    sources: tuple[str, ...]
-    summary: str
-
-    @property
-    def open(self) -> bool:
-        return self.conclusion == "unassessed"
-
-
-@dataclass(frozen=True, slots=True)
 class GroomWorkItem:
-    """One immutable, complete substance-card grooming dossier."""
+    """One selected component role whose operational receipt is absent."""
 
+    composition_role_id: str
+    product_id: str
+    product_name: str
     substance_id: str
-    name: str
-    path: Path
-    aliases: tuple[str, ...]
-    form: str | None
-    notes: str | None
-    active_unique_product_count: int
-    open_owned_item_count: int
-    active_products: tuple[GroomProduct, ...]
-    knowledge: tuple[GroomKnowledge, ...]
-    open_relations: tuple[GroomRelation, ...]
-    schedule_assertions: tuple[GroomSchedule, ...]
-    scheduling_assessments: tuple[GroomAssessment, ...]
+    substance_name: str
 
     @property
     def id(self) -> str:
-        return self.substance_id
+        return self.composition_role_id
 
 
 @dataclass(frozen=True, slots=True)

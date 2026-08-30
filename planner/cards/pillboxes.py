@@ -53,7 +53,11 @@ def load_pillboxes(path: Path, bundle: OntologyBundle | RuntimeProgram) -> dict[
         for pillbox_name, pillbox in sorted(data.items(), key=lambda item: str(item[0]))
     }
     seen_ids: set[str] = set()
+    seen_stacks: set[str] = set()
     for pillbox in loaded.values():
+        if pillbox.stack in seen_stacks:
+            raise CardLoadError(path, f"{path}: duplicate pillbox stack reference {pillbox.stack!r}")
+        seen_stacks.add(pillbox.stack)
         seen_orders: set[int] = set()
         for slot in pillbox.slots.values():
             if slot.slot_id in seen_ids:
@@ -148,7 +152,6 @@ def _load_slot(
         slot_id,
         label,
         order,
-        (),
         context.pillbox_name,
         context.pillbox_label,
         context.stack,

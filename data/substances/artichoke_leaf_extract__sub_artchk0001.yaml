@@ -8,9 +8,6 @@ notes: Botanical extract sometimes used for lipid and bile-flow support. Meta-an
 concerns:
 - kind: safety
   text: Review gallbladder/bile-duct disease, ragweed-family allergy context, and product standardization before active use.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - lipid_metabolism_support

@@ -10,9 +10,6 @@ concerns:
 - kind: safety
   text: Review anticoagulant/antiplatelet context, gastrointestinal tolerance, and timing away from medications when high-fiber
     flaxseed is used therapeutically.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - lipid_metabolism_support

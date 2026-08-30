@@ -13,9 +13,6 @@ concerns:
 - kind: safety
   text: Review with PDE5 inhibitors, nitrates, antihypertensives, or other vasodilators; AAKG is an arginine donor used for
     nitric-oxide/blood-flow positioning and could add to hypotensive stack load.
-schedule:
-  intake:
-  - empty_preferred
 knowledge:
   context:
   - vascular_health

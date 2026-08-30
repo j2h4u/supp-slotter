@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
+from planner.card_ids import composition_role_id as composition_role_id
 from planner.cards._common import load_card_mapping, normalize_filename_part
 from planner.cards.search import collect_search_strings, combined_search_score
 from planner.contracts import (
@@ -19,11 +20,6 @@ from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.schema_enums import schema_enum_values
 from planner.paths import Paths
 from planner.schema_validation import schema_errors
-
-
-def composition_role_id(product_id: str, substance_id: str) -> str:
-    """Return the portable authored identity for one product/substance role."""
-    return f"cmp_{product_id}__{substance_id}"
 
 
 def load_product(path: Path, bundle: OntologyBundle) -> Product:
@@ -65,10 +61,10 @@ def _product_components(value: object) -> list[ProductComponent]:
         components.append(
             ProductComponent(
                 substance=substance,
+                id=cast(str, component_dict["id"]),
                 label=cast(str | None, component_dict.get("label")),
                 amount=cast(str | None, component_dict.get("amount")),
                 notes=cast(str | None, component_dict.get("notes")),
-                id=cast(str | None, component_dict.get("id")),
             )
         )
     return components

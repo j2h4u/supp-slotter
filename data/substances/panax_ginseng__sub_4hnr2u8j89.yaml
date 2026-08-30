@@ -10,9 +10,6 @@ concerns:
 - kind: safety
   text: May interact with anticoagulants, antidepressants (especially MAOIs), and stimulants at therapeutic doses; review
     carefully if any of these are introduced to the stack.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - stress_resilience_context

@@ -14,9 +14,6 @@ concerns:
 - kind: data_quality
   text: Product cards should record grams per serving and fiber type; do not treat tiny blend amounts as meaningful prebiotic
     or lipid-metabolism coverage.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - bowel_regularity_context

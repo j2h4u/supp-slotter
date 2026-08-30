@@ -26,12 +26,11 @@ embedded in reason, vendor identity, or assertion_kind.
 
 ## Existing primitives and scope
 
-Reuse SchedulingAssessmentRecord.sources as the repeated reference convention,
-but do not reuse scheduling_assessment.conclusion. That contract is tied to one
-Substance and one scheduling axis. semantic_enrichment_attempted_on is a
-card-level queue marker, not fact-level state. assertion_kind and
-semantic_family are semantic/runtime classifiers. reason and notes are
-explanatory text, not queryable provenance.
+This decision applies only to reviewer facts and relations. It defines no
+scheduler input, scheduling assessment, or placement authority.
+`semantic_enrichment_attempted_on` is a card-level queue marker, not fact-level
+state. `assertion_kind` and `semantic_family` are semantic/runtime classifiers.
+`reason` and `notes` are explanatory text, not queryable provenance.
 
 Metadata applies to:
 
@@ -41,10 +40,9 @@ Metadata applies to:
   ontology_assertion and clinical_review_signal, and all relation types:
   supports, review_with, and balance.
 
-Metadata does not apply to individual schedule.* strings: scheduling evidence
-remains owned by scheduling_assessment. Concerns, product labels, and
-scheduling constraints are not reusable evidence assertions and receive no new
-state in this design.
+Concerns and product labels are not reviewer assertions and receive no new
+state in this design. The canonical scheduling boundary is governed separately
+by the canonical-instance ADR and domain model.
 
 ## Minimal ontology shape
 
@@ -153,15 +151,14 @@ unassessed. This conservatively records repository state, not proof that prior
 research did not happen. URLs embedded in relation reason remain readable
 context until explicitly extracted into sources and assigned a state.
 
-For new or materially revised facts, author research_state explicitly. A
-bounded search with no usable conclusion is searched_insufficient. Existing
-scheduling cards retain their current assessment contract and axis glossary.
+For new or materially revised reviewer facts, author research_state explicitly.
+A bounded search with no usable conclusion is searched_insufficient.
 
 ## Options considered
 
 | Option | Decision | Reason |
 | --- | --- | --- |
-| Reuse scheduling_assessment for every assertion | Reject | Substance/axis-specific and policy-coupled; cannot represent relation endpoints or reviewer facts. |
+| Reuse a scheduler assessment for every assertion | Reject | Scheduler outputs are not reviewer-fact authority and cannot represent relation endpoints. |
 | Encode state in reason, notes, or semantic_family | Reject | Not reliably queryable and conflates meaning with evidence. |
 | Add a generic numeric confidence score | Reject | Hides why evidence is weak, is not comparable across assertions, and is out of scope. |
 | Add an EvidenceClaim/source graph with governance fields | Reject for now | A provenance warehouse and workflow would overengineer this query need. |
@@ -179,8 +176,8 @@ scheduling cards retain their current assessment contract and axis glossary.
    unassessed without sources is valid.
 5. Queries and grooming distinguish all five states, especially unassessed,
    searched_insufficient, and mechanistic_only.
-6. Scheduling assessments, planner scores, relation warnings, and constraints
-   are behaviorally unchanged.
+6. Planner scheduling behavior, relation warnings, and constraints are
+   behaviorally unchanged.
 7. Reviewer output may display state and source references without changing
    warning semantics.
 8. A TypeDB/RDF smoke filters assertion nodes by state without a source entity,

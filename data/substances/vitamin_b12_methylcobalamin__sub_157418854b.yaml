@@ -2,24 +2,6 @@ id: sub_157418854b
 name: Vitamin B12
 form: methylcobalamin
 notes: 'Coenzyme B-Complex component: methylcobalamin active B12 form. Physiological and deficiency context: vitamin B12 is required for central nervous system development and function, DNA synthesis, and healthy red blood cell formation; these functions and deficiency-repletion contexts do not establish cognitive or performance enhancement in people who are replete. NIH ODS does not establish methylcobalamin superiority over other supplemental B12 forms; preserve product formulation disclosure.'
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/28223907/
-    summary: Research on vitamin B12 does not directly establish a general fed or fasted preference for methylcobalamin specifically.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/28223907/
-    summary: No general clock-time rule was demonstrated for methylcobalamin supplementation.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
-    summary: The cited evidence does not establish a workout- or activity-linked timing rule for methylcobalamin supplementation.
 knowledge:
   context:
   - value: neurocognitive_support

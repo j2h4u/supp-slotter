@@ -9,19 +9,10 @@ from __future__ import annotations
 
 from typing import Final, cast
 
-# Authored effect-match value types are dispatch IDs.  Keep the closed mapping
-# here so policy consumers do not own domain-specific type names.
-IMPLEMENTED_EFFECT_MATCH_VALUE_HANDLERS: Final[dict[str, str]] = {
-    "boolean": "boolean",
-    "slot_near": "capability_values",
-}
 # Predicate namespaces are part of the planner execution grammar.  Keep this
 # boundary in the glue capability module so authored vocabulary cannot expand
 # the runtime surface merely by introducing a new prefix.
-IMPLEMENTED_PREDICATE_NAMESPACES: Final[tuple[str, ...]] = (
-    "schedule",
-    "knowledge",
-)
+IMPLEMENTED_PREDICATE_NAMESPACES: Final[tuple[str, ...]] = ("knowledge",)
 RELATION_WARNING_FILTER_ASSERTION_KIND: Final = "assertion_kind"
 RELATION_WARNING_FILTER_SEMANTIC_FAMILY: Final = "semantic_family"
 IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS: Final[tuple[str, ...]] = (
@@ -60,28 +51,16 @@ IMPLEMENTED_RELATION_SELECTOR_FORMS: Final[tuple[str, ...]] = (
     "name",
     "term",
 )
-WARNING_EMITTER_INTRA_PRODUCT_CONSTRAINT_CONFLICT: Final = "intra_product_constraint_conflict"
-WARNING_EMITTER_PREFER_WITH_RESOLVER: Final = "prefer_with_resolver"
-WARNING_EMITTER_TRAIT_REVIEW_ASSIGNMENT: Final = "trait_review_assignment"
-IMPLEMENTED_WARNING_EMITTER_IDS: Final[tuple[str, ...]] = (
-    WARNING_EMITTER_INTRA_PRODUCT_CONSTRAINT_CONFLICT,
-    WARNING_EMITTER_PREFER_WITH_RESOLVER,
-    WARNING_EMITTER_TRAIT_REVIEW_ASSIGNMENT,
-)
 ONTOLOGY_COMPOSITE_KEY_SEPARATOR: Final = ":"
-SOURCE_KIND_ROLE_ASSIGNMENT: Final = "assignment_source"
-IMPLEMENTED_SOURCE_KIND_ROLES: Final[tuple[str, ...]] = (SOURCE_KIND_ROLE_ASSIGNMENT,)
 ONTOLOGY_ASSERTION_FILTER_COLUMNS: Final[dict[str, str]] = {
     field: field for field in IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS
 }
 IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS: Final[dict[str, tuple[str, ...]]] = {
-    "source_kind_roles": IMPLEMENTED_SOURCE_KIND_ROLES,
     "relation_warning_filter_fields": IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS,
     "relation_warning_active_sides": IMPLEMENTED_RELATION_WARNING_ACTIVE_SIDES,
     "relation_presence_active_sides": IMPLEMENTED_RELATION_PRESENCE_ACTIVE_SIDES,
     "relation_endpoint_selector_kinds": IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS,
     "relation_selector_forms": IMPLEMENTED_RELATION_SELECTOR_FORMS,
-    "warning_emitter_ids": IMPLEMENTED_WARNING_EMITTER_IDS,
 }
 
 

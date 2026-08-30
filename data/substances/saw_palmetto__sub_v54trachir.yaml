@@ -5,9 +5,6 @@ aliases:
 - saw palmetto berry extract
 notes: Hormone-modulating berry extract used for prostate/men's-health context; NCCIH finds little or no benefit for BPH urinary
   symptoms when used alone. May interact with anti-androgens, anticoagulants, and hormonal medications.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - prostate_urinary_context

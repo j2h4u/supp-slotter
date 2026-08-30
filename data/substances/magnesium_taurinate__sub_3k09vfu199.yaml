@@ -3,9 +3,6 @@ name: Magnesium
 form: taurinate
 notes: Magnesium source in taurinate form. Review context - treat as a magnesium source for enzyme/energy, glucose, blood-pressure,
   nerve/muscle, bone-mineral, and vitamin-D/calcium-axis review while preserving the taurinate form.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - bone_mineral_metabolism_support

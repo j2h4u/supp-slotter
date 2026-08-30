@@ -6,25 +6,6 @@ aliases:
 notes: GLS discloses 500 mg of Lion's Mane extract, but not the source tissue, extraction method, or marker identity. Human
   evidence is heterogeneous and preparation-specific, so findings from powders, blends, and marker-enriched extracts do not
   transfer directly to this product.
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://doi.org/10.3389/fnut.2025.1641246
-    - https://doi.org/10.3389/fnut.2025.1405796
-    summary: Human studies use heterogeneous fruiting-body powders/extracts, mycelium, and blends; no fed-vs-fasted comparison was found. GLS discloses only 500 mg extract without source, extraction, or marker identity, limiting applicability.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://doi.org/10.3389/fnut.2025.1641246
-    - https://doi.org/10.3389/fnut.2025.1405796
-    summary: Protocols use varying administration times, including an after-breakfast acute study, but no clock-time comparison. Product-specific sleep outcomes do not establish evening dosing for the unidentified GLS extract.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://doi.org/10.3389/fnut.2025.1641246
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC9762243/
-    summary: Human studies do not establish a workout-linked intake or performance rule, and the heterogeneous preparations and unidentified GLS extract prevent transferring an activity-specific protocol.
 knowledge:
   context:
   - value: neurocognitive_support

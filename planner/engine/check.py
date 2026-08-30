@@ -1,8 +1,7 @@
-"""`check` command: full-repo YAML validation with auto-maintenance pass."""
+"""`check` command: read-only full-repository YAML validation."""
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 from planner.cards.dashboard_validation import check_dashboards
@@ -16,11 +15,9 @@ from planner.cards.substance_validation import check_substances
 from planner.check_report import report
 from planner.contracts import CardLoadError
 from planner.engine.results import CheckResult
-from planner.maintenance import run_auto_maintenance
 from planner.ontology.artifacts import OntologyBundle, load_ontology
 from planner.ontology.canonical_facts import validate_canonical_fact_catalog
 from planner.ontology.errors import OntologyInfrastructureError
-from planner.ontology.policies import check_scheduling_policies, load_scheduling_policies
 from planner.ontology.warning_policy import check_warning_type_references
 from planner.paths import ROOT, Paths
 from planner.schema_validation import schema_errors
@@ -28,7 +25,7 @@ from planner.yaml_io import load_yaml
 
 
 def cmd_check(data_root: Path | None = None) -> CheckResult:
-    """Run auto-maintenance first so check operates on normalised filenames and ids; returns exit_code 0 only when all card cross-references are clean."""
+    """Validate canonical repository inputs without modifying them."""
     paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
     try:
         bundle = load_ontology(ROOT / "ontology")
@@ -42,10 +39,6 @@ def cmd_check(data_root: Path | None = None) -> CheckResult:
 def _cmd_check_inner(paths: Paths, bundle: OntologyBundle) -> CheckResult:
     errors: list[str] = []
     info: list[str] = []
-    maintenance_result = run_auto_maintenance(paths, suppress_output=True, collect_errors=errors, ontology=bundle)
-    if maintenance_result != 0:
-        print("check: skipped (auto-maintenance failed; see errors above)", file=sys.stderr)
-        return CheckResult(exit_code=maintenance_result, errors=errors, info=info)
 
     required_error = _missing_required_file_error(paths)
     if required_error is not None:
@@ -111,27 +104,18 @@ def _load_domain_validators(paths: Paths, info: list[str], bundle: OntologyBundl
     except CardLoadError as e:
         report([e.message], info)
         return CheckResult(exit_code=1, errors=[e.message], info=info)
-    try:
-        policies = load_scheduling_policies(bundle)
-    except CardLoadError as e:
-        report([e.message], info)
-        return CheckResult(exit_code=1, errors=[e.message], info=info)
-
-    errors.extend(check_scheduling_policies(policies))
     errors.extend(check_warning_type_references(bundle))
     return CheckResult(exit_code=0, errors=errors, info=info)
 
 
-def _extend_card_validation_errors(  # noqa: PLR0914
+def _extend_card_validation_errors(
     paths: Paths,
     errors: list[str],
     info: list[str],
     bundle: OntologyBundle,
 ) -> CheckResult | None:
-    policies = load_scheduling_policies(bundle)
-    trait_ids = set(policies)
     all_substance_files = sorted(paths.substances.glob("*.yaml"))
-    s_errors, s_info, substance_ids = check_substances(all_substance_files, trait_ids, paths, bundle)
+    s_errors, s_info, substance_ids = check_substances(all_substance_files, bundle)
     errors.extend(s_errors)
     info.extend(s_info)
     substances = load_substance_registry(paths, bundle)
@@ -156,7 +140,7 @@ def _extend_card_validation_errors(  # noqa: PLR0914
     errors.extend(stacks_errors)
     _append_stack_diagnostics(paths, bundle, stacks_info, info)
     dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
-    errors.extend(check_dashboards(dashboard_files, trait_ids, paths, bundle, substances, info))
+    errors.extend(check_dashboards(dashboard_files, set(), paths, bundle, substances, info))
     return None
 
 

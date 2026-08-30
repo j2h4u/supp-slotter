@@ -2,35 +2,6 @@ id: sub_9c0908e7f7
 name: Creatine
 form: monohydrate
 notes: 'Creatine monohydrate is the exact active form for this card, labeled 5 g per serving. Chronic consistent intake and muscle saturation dominate over acute clock timing. The prefer_with link to L-Citrulline records co-use only and does not establish synergy (PMID 40010353).'
-schedule:
-  intake:
-  - food_preferred
-  activity:
-  - any_workout
-  prefer_with:
-  - sub_3918fe347e
-scheduling_assessment:
-  intake:
-    conclusion: supports_preference
-    policy: food_preferred
-    sources:
-    - https://pubmed.ncbi.nlm.nih.gov/8899067/
-    - https://pubmed.ncbi.nlm.nih.gov/20035494/
-    summary: 'Optional loading and co-ingestion evidence supports taking with food when convenient, but food is not required and no post-workout priority is established.'
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC9163789/
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC9708881/
-    summary: Pre/post timing evidence is limited and does not establish acute superiority over consistent daily intake.
-  activity:
-    conclusion: supports_preference
-    policy: any_workout
-    sources:
-    - https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-HealthProfessional/
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC5469049/
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC9163789/
-    summary: 'Exercise evidence is strongest for high-intensity work, supporting an any_workout context, but does not establish an acute timing requirement.'
 knowledge:
   context:
   - value: mitochondrial_health

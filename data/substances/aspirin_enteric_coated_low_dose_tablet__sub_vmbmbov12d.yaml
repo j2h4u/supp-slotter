@@ -6,9 +6,6 @@ aliases:
 notes: Low-dose 81 mg enteric-coated aspirin / acetylsalicylic acid drug-like product. Enteric coating delays action and is
   not for fast headache relief. Antiplatelet bleeding-risk stacking should be reviewed with omega-3, nattokinase, and similar
   substances.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   risk:
   - manual_review

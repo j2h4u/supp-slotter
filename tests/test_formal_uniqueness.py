@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import cast
 
 import pytest
 import yaml
@@ -12,9 +11,9 @@ from planner.cards.product import load_product
 from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance
 from planner.contracts import CardLoadError, Relation, RelationSelector, Substance
+from planner.ontology.selector import resolve_selector
 from planner.paths import Paths
 from planner.query_model import build_stack_read_model
-from planner.query_model.projections import relation_record
 from planner.schema_validation import schema_errors
 
 from tests.helpers import ontology_bundle
@@ -224,12 +223,10 @@ def test_name_selector_resolves_new_same_name_form_in_runtime_record(tmp_path: P
     }
 
     [relation] = load_global_relations(Paths.from_root(tmp_path), ontology_bundle(), substances)
-    record = relation_record(relation, substances, ontology_bundle())
+    resolved = resolve_selector(relation.source_selector, substances, ontology_bundle())
 
     assert relation.source_selector == RelationSelector(entity_name="Known")
-    assert record["src_substances"] == ["sub_known000", "sub_knownform"]
-    assert record["src_member_names"] == ["Known", "Known (second form)"]
-    assert record["src_selector"] == {"form": "name", "kind": "entity", "id": None, "name": "Known"}
+    assert resolved.substance_ids == ("sub_known000", "sub_knownform")
 
 
 @pytest.mark.parametrize(
@@ -250,24 +247,6 @@ def test_selector_form_capabilities_are_semantic_not_cardinality(
     capability = runtime.selector_form_capabilities_by_form[expected_form]
     assert capability.endpoint_kind == expected_kind
     assert capability.show_match_details is expected_details
-
-    substances = {
-        "sub_known000": Substance(id="sub_known000", name="Known"),
-        "sub_other000": Substance(id="sub_other000", name="Other"),
-    }
-    relation = Relation(
-        id="rel_selector_capability",
-        type="supports",
-        assertion_kind="ontology_assertion",
-        semantic_family="biochemical_mechanism_assertion",
-        reason="selector capability probe",
-        source_selector=selector,
-        target_selector=RelationSelector(entity_id="sub_other000"),
-    )
-    record = relation_record(relation, substances, ontology_bundle())
-    source_selector = cast(dict[str, object], record["src_selector"])
-    assert source_selector["form"] == expected_form
-    assert source_selector["kind"] == ("term" if expected_form == "term" else "entity")
 
 
 @pytest.mark.parametrize(
@@ -302,7 +281,8 @@ def test_name_family_review_always_shows_match_details(
         source_selector=RelationSelector(entity_name="Known"),
         target_selector=RelationSelector(entity_id="sub_other000"),
     )
-    model = build_stack_read_model(substances, [relation], ontology_bundle=ontology_bundle())
+    bundle = ontology_bundle()
+    model = build_stack_read_model(substances, [relation], {}, {}, ontology_bundle=bundle)
     rows = model.classify_relations(set(substances))
     row = next(row for entries in rows.values() for row in entries)
     assert row["show_matches"] is True
@@ -330,4 +310,4 @@ def test_read_model_rejects_duplicate_typed_relation_ids() -> None:
     )
 
     with pytest.raises(ValueError, match=r"relations\[1\]\.id duplicates 'rel_duplicate'"):
-        build_stack_read_model({}, [relation, relation], ontology_bundle=ontology_bundle())
+        build_stack_read_model({}, [relation, relation], {}, {}, ontology_bundle=ontology_bundle())

@@ -1,60 +1,9 @@
 {
   "format_version": "ontology-runtime-program-v1",
   "projection": {
-    "assignment_axes": [
-      {
-        "assignment_field": "intake",
-        "assignment_source": "schedule",
-        "axis": "intake",
-        "id": "assignment_axis_intake",
-        "maximum_cardinality": 1,
-        "minimum_cardinality": 0,
-        "order": 0
-      },
-      {
-        "assignment_field": "timing",
-        "assignment_source": "schedule",
-        "axis": "timing",
-        "id": "assignment_axis_timing",
-        "maximum_cardinality": 1,
-        "minimum_cardinality": 0,
-        "order": 1
-      },
-      {
-        "assignment_field": "activity",
-        "assignment_source": "schedule",
-        "axis": "activity",
-        "id": "assignment_axis_activity",
-        "maximum_cardinality": 1,
-        "minimum_cardinality": 0,
-        "order": 2
-      }
-    ],
     "canonical_fact_catalog": {
       "acute_alertness_effects": [],
       "acute_sleep_effects": [],
-      "composition_roles": [
-        {
-          "id": "cmp_prd_eb6337a6dc__sub_2476bf9d4b",
-          "product": "prd_eb6337a6dc",
-          "substance": "sub_2476bf9d4b"
-        },
-        {
-          "id": "cmp_prd_bb212cffc2__sub_67fc2be8aa",
-          "product": "prd_bb212cffc2",
-          "substance": "sub_67fc2be8aa"
-        },
-        {
-          "id": "cmp_prd_htuhz2s2gt__sub_sunkcr05vl",
-          "product": "prd_htuhz2s2gt",
-          "substance": "sub_sunkcr05vl"
-        },
-        {
-          "id": "cmp_prd_cfce0b36b6__sub_3918fe347e",
-          "product": "prd_cfce0b36b6",
-          "substance": "sub_3918fe347e"
-        }
-      ],
       "evidence_sources": [
         {
           "id": "src_pubmed_25441954"
@@ -85,11 +34,19 @@
         },
         {
           "id": "src_pmc_13304508"
+        },
+        {
+          "id": "src_card_sub_85w45nbob4_notes"
+        },
+        {
+          "id": "src_card_sub_iu7b8h87g2_notes"
         }
       ],
       "food_effects": [
         {
-          "applicability": "cmp_prd_eb6337a6dc__sub_2476bf9d4b",
+          "applicability": {
+            "substance": "sub_2476bf9d4b"
+          },
           "id": "fact_food_prd_eb6337a6dc_sub_2476bf9d4b",
           "provenance": [
             {
@@ -107,7 +64,9 @@
           "value": "bioavailability_increases"
         },
         {
-          "applicability": "cmp_prd_bb212cffc2__sub_67fc2be8aa",
+          "applicability": {
+            "substance": "sub_67fc2be8aa"
+          },
           "id": "fact_food_prd_bb212cffc2_sub_67fc2be8aa",
           "provenance": [
             {
@@ -125,7 +84,9 @@
           "value": "bioavailability_increases"
         },
         {
-          "applicability": "cmp_prd_htuhz2s2gt__sub_sunkcr05vl",
+          "applicability": {
+            "composition_role": "cmp_prd_htuhz2s2gt__sub_sunkcr05vl"
+          },
           "id": "fact_food_prd_htuhz2s2gt_sub_sunkcr05vl",
           "provenance": [
             {
@@ -145,12 +106,48 @@
             "composition_role": "cmp_prd_htuhz2s2gt__sub_sunkcr05vl"
           },
           "value": "bioavailability_increases"
+        },
+        {
+          "applicability": {
+            "substance": "sub_85w45nbob4"
+          },
+          "id": "fact_food_prd_io1peb9syp_sub_85w45nbob4",
+          "provenance": [
+            {
+              "locator": "data/substances/l_glutamine__sub_85w45nbob4.yaml#/notes",
+              "quotation": "Empty stomach preferred for systemic absorption away from food amino-acid competition.",
+              "source": "src_card_sub_85w45nbob4_notes"
+            }
+          ],
+          "subject": {
+            "substance": "sub_85w45nbob4"
+          },
+          "value": "bioavailability_decreases"
+        },
+        {
+          "applicability": {
+            "substance": "sub_iu7b8h87g2"
+          },
+          "id": "fact_food_prd_io1peb9syp_sub_iu7b8h87g2",
+          "provenance": [
+            {
+              "locator": "data/substances/alpha_lipoic_acid__sub_iu7b8h87g2.yaml#/notes",
+              "quotation": "food may reduce absorption.",
+              "source": "src_card_sub_iu7b8h87g2_notes"
+            }
+          ],
+          "subject": {
+            "substance": "sub_iu7b8h87g2"
+          },
+          "value": "bioavailability_decreases"
         }
       ],
       "post_exercise_recovery_effects": [],
       "pre_exercise_performance_effects": [
         {
-          "applicability": "cmp_prd_cfce0b36b6__sub_3918fe347e",
+          "applicability": {
+            "composition_role": "cmp_prd_cfce0b36b6__sub_3918fe347e"
+          },
           "id": "fact_pre_exercise_performance_prd_cfce0b36b6_sub_3918fe347e",
           "provenance": [
             {
@@ -357,20 +354,6 @@
         }
       ]
     },
-    "effect_match_dimensions": [
-      {
-        "id": "match_near",
-        "key": "near",
-        "slot_field": "near",
-        "value_type": "slot_near"
-      },
-      {
-        "id": "match_food",
-        "key": "food",
-        "slot_field": "food",
-        "value_type": "boolean"
-      }
-    ],
     "engine_contract": {
       "conformance_scenarios": [
         {
@@ -386,7 +369,7 @@
           "semantic": "selector_resolution"
         },
         {
-          "expected": "inactive is excluded, absent membership is unassigned, daily not_every_day is presented separately",
+          "expected": "only authored daily/training partitions route, inactive and tracked_unassigned remain excluded, absent membership is unassigned, daily not_every_day is presented separately",
           "fixture": "stack_and_episodic",
           "id": "stack_and_episodic",
           "semantic": "stack_partition"
@@ -447,7 +430,7 @@
         {
           "category": "stack_state",
           "id": "stack_partition",
-          "rule": "normalize each product into one stack; only the configured inactive stack is excluded from planning; absent membership is unassigned; any other stack is active and selects slots from its matching pillbox.",
+          "rule": "normalize each product into one authored partition; only declared routable daily/training partitions enter planning, while declared inactive and tracked-unassigned ownership partitions are excluded; absent membership is unassigned.",
           "source_of_truth": "data/stacks.yaml + ontology/runtime-policy.yaml"
         },
         {
@@ -528,42 +511,17 @@
         "assertion_kind",
         "semantic_family"
       ],
-      "source_kind_roles": [
-        "assignment_source"
-      ],
-      "source_kinds": [
-        "assignment"
-      ],
-      "warning_emitter_ids": [
-        "intra_product_constraint_conflict",
-        "prefer_with_resolver",
-        "trait_review_assignment"
-      ]
-    },
-    "grooming_policy": {
-      "id": "grooming_policy",
-      "open_research_state": "unassessed",
-      "rank_fields": [
-        {
-          "direction": "descending",
-          "field": "active_unique_product_count",
-          "id": "grooming_rank_active_products"
-        },
-        {
-          "direction": "descending",
-          "field": "open_owned_item_count",
-          "id": "grooming_rank_open_items"
-        },
-        {
-          "direction": "ascending",
-          "field": "substance_id",
-          "id": "grooming_rank_substance_id"
-        }
-      ],
-      "relation_owner_direction": "ascending",
-      "relation_owner_field": "substance_id",
-      "require_active_reachable": true,
-      "selection_count": 1
+      "stack_partition": {
+        "excluded_stack_names": [
+          "inactive"
+        ],
+        "id": "planner_stack_partition",
+        "routable_stack_names": [
+          "daily",
+          "training"
+        ],
+        "tracked_unassigned_partition_name": "tracked_unassigned"
+      }
     },
     "relation_presence_statuses": [
       {
@@ -653,84 +611,12 @@
         "show_match_details": true
       }
     ],
-    "slot_near_values": [
-      "wake",
-      "breakfast",
-      "day_meal",
-      "sleep",
-      "workout_before",
-      "workout_after"
-    ],
-    "source_kind_values": [
-      {
-        "applies_to": [
-          "assignment_source"
-        ],
-        "id": "source_kind_assignment",
-        "source_kind": "assignment"
-      }
-    ],
-    "warning_emitters": [
-      {
-        "default_message": "Multiple active stack items match this companion request; manual review is required.",
-        "emitter": "prefer_with_resolver",
-        "id": "warning_emitter_prefer_with_resolver",
-        "warning_type": "ambiguous_prefer_with"
-      },
-      {
-        "default_message": "Scheduling constraint applies inside one physical product; scheduling keeps the product together and emits this warning.",
-        "emitter": "intra_product_constraint_conflict",
-        "id": "warning_emitter_intra_product_constraint_conflict",
-        "warning_type": "intra_product_scheduling_constraint_conflict"
-      },
-      {
-        "default_message": "Manual review required.",
-        "emitter": "trait_review_assignment",
-        "id": "warning_emitter_trait_review_assignment",
-        "warning_type": "trait_review"
-      }
-    ],
-    "warning_trait_actions": [
-      {
-        "action_text": "Review this substance/product context manually before treating the schedule as final.",
-        "id": "warning_trait_manual_review",
-        "trait_id": "risk:manual_review"
-      },
-      {
-        "action_text": "Review total daily amount across products and avoid accidental stacking.",
-        "id": "warning_trait_narrow_therapeutic_window",
-        "trait_id": "risk:narrow_therapeutic_window"
-      },
-      {
-        "action_text": "Review potassium-related medication context before using this stack.",
-        "id": "warning_trait_hyperkalemia_med_interaction",
-        "trait_id": "risk:hyperkalemia_med_interaction"
-      }
-    ],
     "warning_types": [
       {
         "action_text": "Review this safety concern before treating the schedule as final.",
         "id": "warning_safety_concern",
         "label": "Safety concern",
         "warning_type": "safety_concern"
-      },
-      {
-        "action_text": "Review this product manually; competing components are inside one physical product and cannot be separated by scheduling.",
-        "id": "warning_intra_product_scheduling_constraint_conflict",
-        "label": "Component conflict inside one product",
-        "warning_type": "intra_product_scheduling_constraint_conflict"
-      },
-      {
-        "action_text": "Choose the intended companion product before relying on co-location.",
-        "id": "warning_ambiguous_prefer_with",
-        "label": "Companion product is ambiguous",
-        "warning_type": "ambiguous_prefer_with"
-      },
-      {
-        "action_text": "Review this ontology trait before treating the schedule as final.",
-        "id": "warning_trait_review",
-        "label": "Trait review",
-        "warning_type": "trait_review"
       },
       {
         "action_text": "Review whether the paired balancing substance should be present in the active stack.",
@@ -753,11 +639,11 @@
     ]
   },
   "provenance": {
-    "compiler_sha256": "4f512cce3e2f9a84548b1115680b7824bc61e51a7961e13d25e195b98239430d",
+    "compiler_sha256": "96fd950e6ddda5ce497d5e8cf71b76ea2f297a840c42229ce6afc510f98b0bbd",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "3d49f124d00f9e54fbbef224650b3a4e3d93bd479eb0aa60d5904f743af80f57"
+    "source_sha256": "4fd34a20a4d7cf0a14d3de885c66d3414da7342da0ea79e4c2ba985ff90fc95c"
   },
   "schema_version": "2",
-  "source_hash": "0b0a964282d91b024ef666590d244de581b7c9c3f6fc350f705bea5d2145c673"
+  "source_hash": "4d96fc948208fcf7aa77753532bc98010ac00a2ca9f88e57c2446ee5694f775d"
 }

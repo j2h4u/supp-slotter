@@ -14,9 +14,6 @@ concerns:
 - kind: data_quality
   text: Product cards should record total oil grams, GLA percentage or milligrams, capsule count per serving, and whether
     the product is evening primrose, borage, black currant seed, or a mixed GLA oil.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - reproductive_hormone_context

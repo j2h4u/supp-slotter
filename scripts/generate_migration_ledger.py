@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Generate the deterministic pre-cutover legacy-atom reconciliation ledger.
+"""Validate the finite legacy-atom migration closure and write its receipt.
 
-The default mode writes nothing and emits the ledger to stdout. ``--output``
-is the explicit write mode. This inventory reads only clean, tracked
-authoritative source cards and policy catalogs; it never reads generated
-schedule or ontology output and never imports the planner runtime.
+The full row-level crosswalk deliberately lives only in a temporary directory.
+Git object ``3c6cc44...`` is the immutable forensic source; the checked-in YAML
+is a compact, deterministic receipt of the successful reconstruction.
 """
 
 from __future__ import annotations
@@ -16,340 +15,392 @@ import subprocess
 import sys
 from collections import Counter
 from pathlib import Path
-from typing import Any
+from tempfile import TemporaryDirectory
+from typing import Final, cast
 
 import yaml
+from planner.yaml_io import YamlValue, safe_load_yaml
 
-GENERATOR_VERSION = "legacy-atom-ledger-v2"
-ADJUDICATION_BATCH = "sol-20260822-canonical-cutover-v1"
-MAX_EXCERPT_LENGTH = 240
-MAX_EXCERPT_BODY = MAX_EXCERPT_LENGTH - len("...")
-DISPOSITIONS = (
+RECEIPT_FORMAT: Final = "canonical-migration-provenance-closure-v1"
+PRE_DELETION_COMMIT: Final = "9050ca70ea2eaff6c92dc86612219634a985fb90"
+SOURCE_HEAD: Final = PRE_DELETION_COMMIT
+ORIGINAL_LEDGER_BLOB: Final = "3c6cc44f361547d273c43bb8108dfe8d1960800c"
+LEDGER_PATH: Final = "docs/migrations/legacy-atom-ledger.yaml"
+ORIGINAL_ATOM_COUNT: Final = 2161
+ORIGINAL_SOL_COUNT: Final = 1786
+SCHEDULE_AXIS_INDEX: Final = 1
+FACT_FAMILIES: Final = (
+    ("food_effects", "intake"),
+    ("acute_alertness_effects", "timing"),
+    ("acute_sleep_effects", "timing"),
+    ("pre_exercise_performance_effects", "activity"),
+    ("post_exercise_recovery_effects", "activity"),
+)
+ALLOWED_DISPOSITIONS: Final = frozenset({
+    "retained_unchanged",
     "typed_fact",
     "raw_quotation",
     "source_metadata",
-    "sol_adjudication",
     "explicit_exclusion",
-)
-AUTO_EXCLUSION_KEYS = frozenset({"action", "action_text", "default_message", "template", "why_here"})
-QUOTATION_KEYS = frozenset({"quotation", "quote", "raw_quotation", "raw_quote"})
-POLICY_FILES = frozenset({
-    "ontology/policies.yaml",
-    "ontology/runtime-policy.yaml",
-    "ontology/scheduling-constraints.yaml",
 })
-EXACT_FILES = frozenset({"data/relations.yaml", *POLICY_FILES})
-AUTHORITATIVE_PREFIXES = ("data/substances/", "data/products/")
-EXCLUDED_SOURCE_FAMILIES = (
-    "schedule.yaml (generated projection; intentionally ignored)",
-    "ontology/generated/* (generated ontology artifacts; intentionally ignored)",
-    "data/stacks.yaml and data/pillboxes.yaml (retained scenario/topology inputs; intentionally ignored)",
-    "product urls, retained knowledge assertions and source facts (outside this migration scope)",
-    "allowed IDs, labels, order and composition identity/amount fields (retained facts; intentionally ignored)",
-)
+EXCLUSION_RULES: Final = {
+    "schedule_assertion": "operational_presentation_prose",
+    "scheduling_assessment": "operational_presentation_prose",
+    "schedule_prefer_with": "stored_pair_answer",
+    "pair_constraint": "superseded_runtime_mechanism",
+    "policy_runtime_semantics": "superseded_runtime_mechanism",
+    "relation_semantics": "superseded_runtime_mechanism",
+    "prescribed_action_or_generated_wording": "generated_action_not_canonical_evidence",
+    "substance_notes": "operational_presentation_prose",
+    "product_notes": "operational_presentation_prose",
+    "component_notes": "operational_presentation_prose",
+    "concern_text": "operational_presentation_prose",
+}
 
 
-def _canonical(value: Any) -> Any:
+def _git(root: Path, *args: str) -> str:
+    return subprocess.run(["git", "-C", str(root), *args], check=True, capture_output=True, text=True).stdout
+
+
+def _narrow(value: object, *, source: str) -> YamlValue:
+    if value is None or isinstance(value, (bool, float, int, str)):
+        return value
+    if isinstance(value, list):
+        return [_narrow(item, source=source) for item in cast(list[object], value)]
+    if isinstance(value, dict) and all(isinstance(key, str) for key in value):
+        return {cast(str, key): _narrow(item, source=source) for key, item in cast(dict[object, object], value).items()}
+    raise RuntimeError(f"{source}: unsupported YAML value")
+
+
+def _mapping(value: YamlValue | None, *, source: str) -> dict[str, YamlValue]:
+    if not isinstance(value, dict):
+        raise RuntimeError(f"{source} must be a mapping")
+    return value
+
+
+def _list(value: YamlValue | None, *, source: str) -> list[YamlValue]:
+    if not isinstance(value, list):
+        raise RuntimeError(f"{source} must be a list")
+    return value
+
+
+def _string(value: YamlValue | None, *, source: str) -> str:
+    if not isinstance(value, str) or not value:
+        raise RuntimeError(f"{source} must be a non-empty string")
+    return value
+
+
+def _canonical(value: object) -> YamlValue:
+    value = _narrow(value, source="canonical value")
     if isinstance(value, dict):
-        return {str(key): _canonical(item) for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))}
+        return {key: _canonical(value[key]) for key in sorted(value)}
     if isinstance(value, list):
         return [_canonical(item) for item in value]
-    if value is None or isinstance(value, (str, int, float, bool)):
-        return value
-    return str(value)
+    return value
 
 
-def _sha256(value: Any) -> str:
+def _sha256(value: object) -> str:
     encoded = json.dumps(_canonical(value), ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
-def _file_sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def _git(root: Path, *args: str) -> str:
-    result = subprocess.run(
-        ["git", "-C", str(root), *args],
-        check=True,
-        capture_output=True,
-        text=True,
+def _blob_document(root: Path) -> dict[str, YamlValue]:
+    actual_blob = _git(root, "rev-parse", f"{PRE_DELETION_COMMIT}:{LEDGER_PATH}").strip()
+    if actual_blob != ORIGINAL_LEDGER_BLOB:
+        raise RuntimeError(f"pre-deletion ledger blob drifted: {actual_blob}")
+    raw = _git(root, "cat-file", "-p", ORIGINAL_LEDGER_BLOB)
+    return _mapping(
+        _narrow(safe_load_yaml(raw, path=ORIGINAL_LEDGER_BLOB), source=ORIGINAL_LEDGER_BLOB), source="ledger"
     )
-    return result.stdout
 
 
-def _source_head(root: Path) -> str:
-    return _git(root, "rev-parse", "HEAD").strip()
-
-
-def _pointer(tokens: tuple[str | int, ...]) -> str:
-    if not tokens:
-        return "/"
-    return "/" + "/".join(str(token).replace("~", "~0").replace("/", "~1") for token in tokens)
-
-
-def _path_text(tokens: tuple[str | int, ...]) -> str:
-    path = ""
-    for token in tokens:
-        if isinstance(token, int):
-            path += f"[{token}]"
-        elif path:
-            path += f".{token}"
-        else:
-            path = token
-    return path
-
-
-def _excerpt(value: Any) -> str | int | float | bool | None:
-    if isinstance(value, (str, int, float, bool)) or value is None:
-        if isinstance(value, str) and len(value) > MAX_EXCERPT_LENGTH:
-            return value[:MAX_EXCERPT_BODY] + "..."
-        return value
-    return None
-
-
-def _tracked_authoritative_files(root: Path) -> list[Path]:
-    tracked = {
-        item
-        for item in _git(
-            root,
-            "ls-files",
-            "-z",
-            "--",
-            "data/substances",
-            "data/products",
-            *sorted(EXACT_FILES),
-        ).split("\0")
-        if item
-    }
-    filesystem = {
-        path.relative_to(root).as_posix()
-        for path in root.rglob("*.yaml")
-        if path.is_file()
-        and (
-            path.relative_to(root).as_posix().startswith(AUTHORITATIVE_PREFIXES)
-            or path.relative_to(root).as_posix() in EXACT_FILES
-        )
-    }
-    untracked = sorted(filesystem - tracked)
-    if untracked:
-        raise RuntimeError("untracked authoritative inputs: " + ", ".join(untracked))
-    relevant_status = _git(
-        root,
-        "status",
-        "--porcelain=v1",
-        "--untracked-files=all",
-        "--",
-        "data/substances",
-        "data/products",
-        *sorted(EXACT_FILES),
+def _decode_pointer(pointer: str) -> tuple[str | int, ...]:
+    if not pointer.startswith("/"):
+        raise RuntimeError(f"invalid JSON pointer: {pointer}")
+    return tuple(
+        int(token) if token.isdecimal() else token.replace("~1", "/").replace("~0", "~")
+        for token in pointer.removeprefix("/").split("/")
     )
-    if relevant_status.strip():
-        raise RuntimeError("dirty authoritative inputs:\n" + relevant_status)
-    return [root / item for item in sorted(tracked)]
 
 
-def _iter_leaves(value: Any, tokens: tuple[str | int, ...] = ()) -> Any:
-    if isinstance(value, dict):
-        for key in sorted(value, key=lambda item: str(item)):
-            yield from _iter_leaves(value[key], (*tokens, str(key)))
-    elif isinstance(value, list):
-        for index, item in enumerate(value):
-            yield from _iter_leaves(item, (*tokens, index))
-    else:
-        yield tokens, value
+_MISSING = object()
 
 
-def _is_selected(source: str, tokens: tuple[str | int, ...]) -> bool:
-    keys = {str(token) for token in tokens if isinstance(token, str)}
-    if source.startswith(AUTHORITATIVE_PREFIXES):
-        if not tokens:
-            return False
-        if tokens[0] in {"notes", "concerns", "schedule", "scheduling_assessment"}:
-            return True
-        return tokens[0] == "components" and "notes" in keys
-    if source == "data/relations.yaml":
-        return "id" not in keys and bool(
-            keys
-            & {
-                "relations",
-                "reason",
-                "action",
-                "severity",
-                "relation_type",
-                "assertion_kind",
-                "semantic_family",
-                "research_state",
-                "source_selector",
-                "target_selector",
-                "sources",
-            }
-        )
-    if source == "ontology/scheduling-constraints.yaml":
-        return "id" not in keys
-    return "id" not in keys and "label" not in keys and "order" not in keys
-
-
-def _category(source: str, tokens: tuple[str | int, ...]) -> str:  # noqa: C901, PLR0911
-    keys = {str(token) for token in tokens if isinstance(token, str)}
-    if "sources" in keys:
-        return "source_metadata"
-    if keys & QUOTATION_KEYS:
-        return "raw_quotation"
-    if keys & AUTO_EXCLUSION_KEYS:
-        return "prescribed_action_or_generated_wording"
-    if source == "data/relations.yaml":
-        return "relation_semantics"
-    if source == "ontology/scheduling-constraints.yaml":
-        return "pair_constraint"
-    if source in POLICY_FILES:
-        return "policy_runtime_semantics"
-    if "prefer_with" in keys:
-        return "schedule_prefer_with"
-    if "scheduling_assessment" in keys:
-        return "scheduling_assessment"
-    if "schedule" in keys:
-        return "schedule_assertion"
-    if "concerns" in keys:
-        return "concern_text"
-    if "notes" in keys and "components" in keys:
-        return "component_notes"
-    if "notes" in keys:
-        return "substance_notes" if source.startswith("data/substances/") else "product_notes"
-    return "legacy_semantic_field"
-
-
-def _disposition(
-    category: str, tokens: tuple[str | int, ...], source: str, pointer: str
-) -> tuple[str, str | None, str | None]:
-    if category == "source_metadata":
-        target = f"source_metadata:{source}#{pointer}"
-        return "source_metadata", target, None
-    if category == "raw_quotation":
-        target = f"raw_quotation:{source}#{pointer}"
-        return "raw_quotation", target, None
-    if category == "prescribed_action_or_generated_wording":
-        return (
-            "explicit_exclusion",
-            None,
-            "prescribed action/template/generated wording is not canonical evidence",
-        )
-    reasons = {
-        "schedule_assertion": "legacy schedule assertion needs closed-fact or exclusion adjudication",
-        "schedule_prefer_with": "pair preference is forbidden canonical input and needs disposition adjudication",
-        "scheduling_assessment": "assessment outcome/prose is a stored answer and needs evidence adjudication",
-        "substance_notes": "substance prose needs evidence-boundary adjudication",
-        "product_notes": "product prose needs evidence-boundary adjudication",
-        "component_notes": "component prose needs evidence-boundary adjudication",
-        "concern_text": "concern prose needs evidence-boundary adjudication",
-        "relation_semantics": "relation meaning is outside the closed scheduling fact vocabulary",
-        "pair_constraint": "constraint operation/score is a stored answer and needs disposition adjudication",
-        "policy_runtime_semantics": "policy/runtime meaning must not become hidden canonical semantics",
-        "legacy_semantic_field": "legacy semantic field needs closed-boundary adjudication",
-    }
-    reason = reasons[category]
-    return "sol_adjudication", None, reason
-
-
-def build_document(root: Path) -> dict[str, Any]:  # noqa: PLR0914
-    files = _tracked_authoritative_files(root)
-    rows: list[dict[str, Any]] = []
-    source_inventory: list[dict[str, Any]] = []
-    parse_errors: list[dict[str, str]] = []
-
-    for path in files:
-        source = path.relative_to(root).as_posix()
-        source_hash = _file_sha256(path)
-        try:
-            loaded = yaml.safe_load(path.read_text(encoding="utf-8"))
-        except (OSError, yaml.YAMLError) as error:
-            parse_errors.append({"source_path": source, "error": str(error)})
+def _at_pointer(document: YamlValue, pointer: str) -> YamlValue | object:
+    current: YamlValue = document
+    for token in _decode_pointer(pointer):
+        if isinstance(current, dict):
+            if not isinstance(token, str) or token not in current:
+                return _MISSING
+            current = current[token]
             continue
-        selected = [(tokens, value) for tokens, value in _iter_leaves(loaded) if _is_selected(source, tokens)]
-        source_inventory.append({
-            "source_path": source,
-            "source_file_sha256": source_hash,
-            "atom_count": len(selected),
-        })
-        for tokens, value in selected:
-            pointer = _pointer(tokens)
-            exact_hash = _sha256(value)
-            atom_hash = _sha256({"source_path": source, "pointer": pointer, "exact_value_sha256": exact_hash})
-            category = _category(source, tokens)
-            disposition, target_id, reason = _disposition(category, tokens, source, pointer)
-            rows.append({
-                "atom_id": f"atom_{atom_hash[:24]}",
-                "source_path": source,
-                "pointer": pointer,
-                "category": category,
-                "exact_value_sha256": exact_hash,
-                "value_excerpt": _excerpt(value),
-                "disposition": disposition,
-            })
-            if target_id:
-                rows[-1]["target_id"] = target_id
-            if reason and disposition not in {"source_metadata", "raw_quotation"}:
-                rows[-1]["disposition_reason"] = reason
+        if isinstance(current, list):
+            if not isinstance(token, int) or token >= len(current):
+                return _MISSING
+            current = current[token]
+            continue
+        if current is None or isinstance(current, (bool, float, int, str)):
+            return _MISSING
+    return current
 
-    if parse_errors:
-        raise RuntimeError("authoritative YAML parse errors: " + repr(parse_errors))
-    rows.sort(key=lambda row: (row["source_path"], row["pointer"], row["atom_id"]))
-    counts = Counter(row["disposition"] for row in rows)
-    categories = Counter(row["category"] for row in rows)
+
+def _working_document(root: Path, cache: dict[str, YamlValue | object], path: str) -> YamlValue | object:
+    if path not in cache:
+        candidate = root / path
+        cache[path] = (
+            _narrow(safe_load_yaml(candidate.read_text(encoding="utf-8"), path=path), source=path)
+            if candidate.is_file()
+            else _MISSING
+        )
+    return cache[path]
+
+
+def _unchanged(root: Path, cache: dict[str, YamlValue | object], row: dict[str, YamlValue]) -> bool:
+    document = _working_document(root, cache, _string(row.get("source_path"), source="atom path"))
+    if document is _MISSING:
+        return False
+    value = _at_pointer(cast(YamlValue, document), _string(row.get("pointer"), source="atom pointer"))
+    return value is not _MISSING and _sha256(cast(YamlValue, value)) == _string(
+        row.get("exact_value_sha256"), source="atom hash"
+    )
+
+
+def _tree_document(root: Path, path: str) -> dict[str, YamlValue]:
+    source = f"{PRE_DELETION_COMMIT}:{path}"
+    return _mapping(_narrow(safe_load_yaml(_git(root, "show", source), path=source), source=source), source=source)
+
+
+def _fact_targets(root: Path) -> tuple[dict[tuple[str, str], str], set[str], set[str]]:
+    path = root / "ontology/canonical-facts.yaml"
+    current_catalog = _mapping(
+        _narrow(safe_load_yaml(path.read_text(encoding="utf-8"), path=str(path)), source=str(path)),
+        source="canonical fact catalog",
+    )
+    reference_catalog = _tree_document(root, "ontology/canonical-facts.yaml")
+    roles = {
+        _string(_mapping(item, source="role").get("id"), source="role id"): _string(
+            _mapping(item, source="role").get("substance"), source="role substance"
+        )
+        for item in _list(reference_catalog.get("composition_roles"), source="composition_roles")
+    }
+    targets: dict[tuple[str, str], str] = {}
+    expected_fact_ids: set[str] = set()
+    current_fact_ids: set[str] = set()
+    quotations: set[str] = set()
+    for family, axis in FACT_FAMILIES:
+        for item in _list(reference_catalog.get(family), source=family):
+            fact = _mapping(item, source=f"{family} fact")
+            fact_id = _string(fact.get("id"), source=f"{family} fact id")
+            subject = _mapping(fact.get("subject"), source=f"{family} subject")
+            role = subject.get("composition_role")
+            substance = subject.get("substance") or (roles.get(role) if isinstance(role, str) else None)
+            if not isinstance(substance, str):
+                raise RuntimeError(f"{fact_id}: unresolved fact subject")
+            targets[(substance, axis)] = fact_id
+            expected_fact_ids.add(fact_id)
+        for item in _list(current_catalog.get(family), source=f"current {family}"):
+            fact = _mapping(item, source=f"current {family} fact")
+            fact_id = _string(fact.get("id"), source=f"current {family} fact id")
+            current_fact_ids.add(fact_id)
+            for provenance in _list(fact.get("provenance"), source=f"{fact_id} provenance"):
+                quotation = _mapping(provenance, source=f"{fact_id} provenance").get("quotation")
+                if isinstance(quotation, str):
+                    quotations.add(_sha256(quotation))
+    if not expected_fact_ids <= current_fact_ids:
+        raise RuntimeError("a pre-deletion canonical fact target is absent from the current catalog")
+    return targets, current_fact_ids, quotations
+
+
+def _substance_id(root: Path, cache: dict[str, str], path: str) -> str:
+    if path not in cache:
+        cache[path] = _string(_tree_document(root, path).get("id"), source=f"{path} id")
+    return cache[path]
+
+
+def _classify(  # noqa: PLR0913, PLR0917
+    root: Path,
+    working_cache: dict[str, YamlValue | object],
+    substance_cache: dict[str, str],
+    fact_targets: dict[tuple[str, str], str],
+    quotation_hashes: set[str],
+    row: dict[str, YamlValue],
+) -> dict[str, YamlValue]:
+    atom_id = _string(row.get("atom_id"), source="atom id")
+    category = _string(row.get("category"), source=f"{atom_id} category")
+    source_path = _string(row.get("source_path"), source=f"{atom_id} path")
+    pointer = _string(row.get("pointer"), source=f"{atom_id} pointer")
+    result: dict[str, YamlValue] = {
+        "atom_id": atom_id,
+        "category": category,
+        "source_path": source_path,
+        "pointer": pointer,
+        "exact_value_sha256": _string(row.get("exact_value_sha256"), source=f"{atom_id} hash"),
+    }
+    if _unchanged(root, working_cache, row):
+        result["disposition"] = "retained_unchanged"
+        return result
+    if category == "source_metadata":
+        result["disposition"] = "source_metadata"
+        return result
+    if category == "schedule_assertion":
+        tokens = _decode_pointer(pointer)
+        axis: str | None = None
+        if len(tokens) > SCHEDULE_AXIS_INDEX and tokens[0] == "schedule":
+            candidate_axis = tokens[SCHEDULE_AXIS_INDEX]
+            if isinstance(candidate_axis, str):
+                axis = candidate_axis
+        fact_id = fact_targets.get((_substance_id(root, substance_cache, source_path), axis)) if axis else None
+        if fact_id:
+            result.update({"disposition": "typed_fact", "target_id": fact_id, "scheduling_receipt": "axis-disposition"})
+            return result
+    if (
+        category in {"substance_notes", "product_notes", "component_notes", "concern_text"}
+        and result["exact_value_sha256"] in quotation_hashes
+    ):
+        result.update({"disposition": "raw_quotation", "scheduling_receipt": "quoted-evidence"})
+        return result
+    exclusion = EXCLUSION_RULES.get(category)
+    if exclusion is None:
+        raise RuntimeError(f"{atom_id}: no closed rule for {category}")
+    result.update({"disposition": "explicit_exclusion", "exclusion": exclusion})
+    if category in {"schedule_assertion", "scheduling_assessment", "schedule_prefer_with"}:
+        result["scheduling_receipt"] = "axis-disposition"
+    return result
+
+
+def _ruleset() -> dict[str, YamlValue]:
     return {
-        "ledger_format": GENERATOR_VERSION,
-        "adjudication_batch": ADJUDICATION_BATCH,
-        "source_head": _source_head(root),
-        "source_diff_policy": "authoritative files must be git-tracked and clean at generation; regenerate after any source change",
-        "scope": {
-            "included_source_families": [
-                "data/substances/*.yaml: schedule, prefer_with, scheduling_assessment, notes, concerns",
-                "data/products/*.yaml: product/component notes and concerns",
-                "data/relations.yaml: relation semantic metadata, reason/action/severity/selectors/sources",
-                "ontology/scheduling-constraints.yaml: constraint selectors/rationale/action/scores",
-                "ontology/policies.yaml and ontology/runtime-policy.yaml: authored semantic prose and stored-answer fields",
-            ],
-            "excluded_source_families": list(EXCLUDED_SOURCE_FAMILIES),
-            "atomization": "Every selected scalar/list leaf receives one row; containers are represented by child pointers.",
-        },
-        "disposition_enum": list(DISPOSITIONS),
-        "coverage": {
-            "source_file_count": len(source_inventory),
-            "atom_count": len(rows),
-            "pending_atom_count": 0,
-            "final_disposition_counts": dict(sorted(counts.items())),
-            "outstanding_sol_adjudication_count": counts["sol_adjudication"],
-            "by_category": dict(sorted(categories.items())),
-            "parse_error_count": 0,
-            "migration_complete": False,
-            "migration_blocker": "outstanding Sol adjudication atoms must receive typed_fact/raw_quotation/source_metadata/explicit_exclusion before deletion",
-        },
-        "source_inventory": source_inventory,
-        "atoms": rows,
+        "unchanged": "same path and exact canonical value hash in target working tree",
+        "source_metadata": "preserve selected source URLs and locators as non-causal metadata",
+        "typed_fact": "only pre-deletion canonical-facts subject and axis targets",
+        "raw_quotation": "only quotations already carried by canonical-fact provenance",
+        "explicit_exclusion": dict(sorted(EXCLUSION_RULES.items())),
     }
 
 
-def _dump(document: dict[str, Any]) -> str:
+def _write_crosswalk(rows: list[dict[str, YamlValue]]) -> tuple[int, str]:
+    with TemporaryDirectory(prefix="supp-slotter-migration-crosswalk-") as temporary:
+        path = Path(temporary) / "crosswalk.jsonl"
+        digest = hashlib.sha256()
+        with path.open("w", encoding="utf-8") as handle:
+            for row in rows:
+                line = json.dumps(_canonical(row), ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
+                handle.write(line)
+                digest.update(line.encode("utf-8"))
+        if len(rows) != len({cast(str, row["atom_id"]) for row in rows}) or not path.stat().st_size:
+            raise RuntimeError("crosswalk failed uniqueness or completeness validation")
+        return len(rows), digest.hexdigest()
+
+
+def _validate(rows: list[dict[str, YamlValue]], fact_ids: set[str]) -> None:
+    if len(rows) != ORIGINAL_ATOM_COUNT or len({cast(str, row["atom_id"]) for row in rows}) != ORIGINAL_ATOM_COUNT:
+        raise RuntimeError("original atoms are not complete and unique")
+    if sum(row["original_disposition"] == "sol_adjudication" for row in rows) != ORIGINAL_SOL_COUNT:
+        raise RuntimeError("original Sol atoms are not complete")
+    if any(row["disposition"] not in ALLOWED_DISPOSITIONS for row in rows):
+        raise RuntimeError("unapproved final disposition")
+    if any(row["disposition"] == "typed_fact" and row.get("target_id") not in fact_ids for row in rows):
+        raise RuntimeError("missing canonical fact target")
+    if any(row["disposition"] == "explicit_exclusion" and "exclusion" not in row for row in rows):
+        raise RuntimeError("unclosed explicit exclusion")
+
+
+def build_document(root: Path) -> dict[str, YamlValue]:  # noqa: PLR0914
+    root = root.resolve()
+    _git(root, "cat-file", "-e", f"{PRE_DELETION_COMMIT}^{{commit}}")
+    original = _blob_document(root)
+    if original.get("ledger_format") != "legacy-atom-ledger-v2":
+        raise RuntimeError("unexpected original ledger format")
+    fact_targets, fact_ids, quotation_hashes = _fact_targets(root)
+    working_cache: dict[str, YamlValue | object] = {}
+    substance_cache: dict[str, str] = {}
+    crosswalk: list[dict[str, YamlValue]] = []
+    for old_row in _list(original.get("atoms"), source="original atoms"):
+        row = _classify(
+            root,
+            working_cache,
+            substance_cache,
+            fact_targets,
+            quotation_hashes,
+            _mapping(old_row, source="original atom"),
+        )
+        row["original_disposition"] = _string(
+            _mapping(old_row, source="original atom").get("disposition"), source="original disposition"
+        )
+        crosswalk.append(row)
+    crosswalk.sort(key=lambda row: cast(str, row["atom_id"]))
+    _validate(crosswalk, fact_ids)
+    row_count, crosswalk_hash = _write_crosswalk(crosswalk)
+    dispositions = Counter(cast(str, row["disposition"]) for row in crosswalk)
+    exclusions = Counter(cast(str, row["exclusion"]) for row in crosswalk if row["disposition"] == "explicit_exclusion")
+    categories = Counter(cast(str, row["category"]) for row in crosswalk)
+    metadata = [row for row in crosswalk if row["disposition"] == "source_metadata"]
+    scheduling = [
+        row
+        for row in crosswalk
+        if cast(str, row["category"]) in {"schedule_assertion", "scheduling_assessment", "schedule_prefer_with"}
+    ]
+    typed_fact_ids = sorted(cast(str, row["target_id"]) for row in crosswalk if row["disposition"] == "typed_fact")
+    ruleset = _ruleset()
+    return {
+        "receipt_format": RECEIPT_FORMAT,
+        "acceptance": "complete",
+        "forensic_inputs": {
+            "pre_deletion_commit": PRE_DELETION_COMMIT,
+            "original_ledger_blob": ORIGINAL_LEDGER_BLOB,
+            "original_ledger_source_head": _string(original.get("source_head"), source="original source head"),
+        },
+        "coverage": {
+            "original_atom_count": row_count,
+            "original_sol_adjudication_count": ORIGINAL_SOL_COUNT,
+            "original_atom_id_sha256": _sha256(sorted(cast(str, row["atom_id"]) for row in crosswalk)),
+            "crosswalk_sha256": crosswalk_hash,
+            "classification_rules_sha256": _sha256(ruleset),
+            "category_counts": dict(sorted(categories.items())),
+            "final_disposition_counts": dict(sorted(dispositions.items())),
+            "closed_exclusion_counts": dict(sorted(exclusions.items())),
+        },
+        "canonical_fact_links": {"count": len(typed_fact_ids), "fact_ids_sha256": _sha256(typed_fact_ids)},
+        "source_metadata": {
+            "count": len(metadata),
+            "assessment_url_occurrence_count": len(metadata),
+            "rows_sha256": _sha256(metadata),
+        },
+        "scheduling_disposition_link": {
+            "format": "canonical-scheduling-migration-v1",
+            "covered_original_atom_count": len(scheduling),
+            "final_disposition_counts": dict(
+                sorted(Counter(cast(str, row["disposition"]) for row in scheduling).items())
+            ),
+            "rows_sha256": _sha256(scheduling),
+        },
+        "ruleset": ruleset,
+        "temporary_crosswalk": "generated in a TemporaryDirectory, validated, hashed, and removed before receipt emission",
+    }
+
+
+def _dump(document: dict[str, YamlValue]) -> str:
     return yaml.safe_dump(document, allow_unicode=True, sort_keys=False, width=120)
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
-    parser.add_argument("--output", type=Path, help="Write the ledger here; omitted means stdout only")
+    parser.add_argument("--output", type=Path, help="Write the compact receipt here; omit for stdout")
     args = parser.parse_args(argv)
+    root = cast(Path, args.root).resolve()
+    output = cast(Path | None, args.output)
     try:
-        document = build_document(args.root.resolve())
-    except (OSError, RuntimeError, subprocess.CalledProcessError) as error:
-        print(f"migration ledger generation failed closed: {error}", file=sys.stderr)
+        rendered = _dump(build_document(root))
+    except (KeyError, OSError, RuntimeError, subprocess.CalledProcessError, TypeError, yaml.YAMLError) as error:
+        print(f"migration closure failed closed: {error}", file=sys.stderr)
         return 2
-    rendered = _dump(document)
-    if args.output is None:
+    if output is None:
         sys.stdout.write(rendered)
     else:
-        output = args.output if args.output.is_absolute() else args.root.resolve() / args.output
-        output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(rendered, encoding="utf-8")
+        destination = output if output.is_absolute() else root / output
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(rendered, encoding="utf-8")
     return 0
 
 

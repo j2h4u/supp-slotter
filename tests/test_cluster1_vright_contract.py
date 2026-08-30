@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import Any, cast
 
 import pytest
-import scripts.generate_migration_ledger as migration_ledger
 import yaml
 from jsonschema import Draft202012Validator
 from planner.engine._plan_types import PlanInputs
@@ -79,11 +78,10 @@ def test_existing_relation_selector_positive_and_negative_contract(
     assert (_errors(schema, "RelationAssertionSelector", instance) == []) is valid
 
 
-def test_canonical_shadow_catalog_and_topology_are_closed(schema: dict[str, Any]) -> None:
+def test_canonical_catalog_and_topology_are_closed(schema: dict[str, Any]) -> None:
     definitions = cast(dict[str, dict[str, Any]], schema["$defs"])
     catalog = definitions["CanonicalFactCatalog"]
     expected_collections = {
-        "composition_roles": "CompositionRole",
         "evidence_sources": "EvidenceSource",
         "food_effects": "FoodEffect",
         "acute_alertness_effects": "AcuteAlertnessEffect",
@@ -119,6 +117,7 @@ def test_canonical_shadow_catalog_and_topology_are_closed(schema: dict[str, Any]
         "capacity",
         "placement",
         "desired_slot",
+        "composition_roles",
     ):
         assert _errors(schema, "CanonicalFactCatalog", {forbidden: "x"}), forbidden
 
@@ -145,7 +144,7 @@ def test_canonical_shadow_catalog_and_topology_are_closed(schema: dict[str, Any]
         assert set(definitions[law_class]["properties"]) == {"id", "fact_value", anchor}
 
 
-def test_shadow_catalog_and_topology_are_not_manifest_or_scheduler_inputs() -> None:
+def test_canonical_catalog_and_topology_have_one_runtime_boundary() -> None:
     manifest = cast(dict[str, Any], yaml.safe_load((ONTOLOGY / "manifest.yaml").read_text(encoding="utf-8")))
     catalogs = cast(list[dict[str, Any]], manifest["catalogs"])
     assert {catalog["root_class"] for catalog in catalogs}.isdisjoint({"LogicalSlotTopology"})
@@ -156,66 +155,3 @@ def test_shadow_catalog_and_topology_are_not_manifest_or_scheduler_inputs() -> N
     assert {field for field in PlanInputs._fields if "catalog" in field or "topology" in field} == {
         "canonical_fact_catalog"
     }
-
-
-def test_migration_ledger_is_deterministic_complete_in_shape_and_fail_closed(tmp_path: Path) -> None:
-    first_path = tmp_path / "ledger-first.yaml"
-    second_path = tmp_path / "ledger-second.yaml"
-    assert migration_ledger.main(["--root", str(ROOT), "--output", str(first_path)]) == 0
-    assert migration_ledger.main(["--root", str(ROOT), "--output", str(second_path)]) == 0
-    assert first_path.read_bytes() == second_path.read_bytes()
-
-    document = cast(dict[str, Any], yaml.safe_load(first_path.read_text(encoding="utf-8")))
-    coverage = cast(dict[str, Any], document["coverage"])
-    counts = cast(dict[str, int], coverage["final_disposition_counts"])
-    assert sum(counts.values()) == coverage["atom_count"]
-    assert coverage["pending_atom_count"] == 0
-    assert coverage["migration_complete"] is False
-    assert coverage["outstanding_sol_adjudication_count"] == 1735
-    assert "before deletion" in coverage["migration_blocker"]
-
-    allowed = {"data/relations.yaml", "ontology/policies.yaml", "ontology/runtime-policy.yaml"}
-    allowed.add("ontology/scheduling-constraints.yaml")
-    source_paths = {str(atom["source_path"]) for atom in document["atoms"]}
-    assert all(path.startswith(("data/substances/", "data/products/")) or path in allowed for path in source_paths)
-    assert not any(
-        "schedule.yaml" in path or "ontology/generated" in path or path in {"data/stacks.yaml", "data/pillboxes.yaml"}
-        for path in source_paths
-    )
-
-    authoritative = tmp_path / "authoritative"
-    source = authoritative / "data/substances/source.yaml"
-    source.parent.mkdir(parents=True)
-    source.write_text("id: sub_demo\n", encoding="utf-8")
-
-    def fake_git(_root: Path, *args: str) -> str:
-        if args[0] == "ls-files":
-            return "data/substances/source.yaml\0"
-        if args[0] == "status":
-            return " M data/substances/source.yaml\n"
-        raise AssertionError(args)
-
-    original_git = migration_ledger._git
-    try:
-        migration_ledger._git = fake_git
-        with pytest.raises(RuntimeError, match="dirty authoritative inputs"):
-            migration_ledger._tracked_authoritative_files(authoritative)
-    finally:
-        migration_ledger._git = original_git
-
-    rogue = authoritative / "data/substances/rogue.yaml"
-    rogue.write_text("id: sub_rogue\n", encoding="utf-8")
-
-    def fake_untracked_git(_root: Path, *args: str) -> str:
-        if args[0] == "ls-files":
-            return "data/substances/source.yaml\0"
-        if args[0] == "status":
-            return "?? data/substances/rogue.yaml\n"
-        raise AssertionError(args)
-
-    try:
-        migration_ledger._git = fake_untracked_git
-        with pytest.raises(RuntimeError, match="untracked authoritative inputs"):
-            migration_ledger._tracked_authoritative_files(authoritative)
-    finally:
-        migration_ledger._git = original_git

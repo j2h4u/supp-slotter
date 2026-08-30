@@ -13,9 +13,6 @@ concerns:
 - kind: data_quality
   text: Product cards should record elemental zinc amount, zinc L-carnosine complex amount, brand/trademark, dose timing,
     and whether other mucosal-support botanicals are co-formulated.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - gut_barrier_context

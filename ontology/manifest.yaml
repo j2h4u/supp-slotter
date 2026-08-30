@@ -29,14 +29,6 @@ catalogs:
     role: canonical_laws
     path: ontology/canonical-laws.yaml
     root_class: CanonicalLawCatalog
-  - id: policies
-    role: policies
-    path: ontology/policies.yaml
-    root_class: SchedulingPolicyCatalog
-  - id: constraints
-    role: constraints
-    path: ontology/scheduling-constraints.yaml
-    root_class: SchedulingConstraintCatalog
   - id: shapes
     role: custom_shapes
     path: ontology/constraints/semantic.ttl
@@ -95,32 +87,6 @@ repository_projection:
         - {kind: slot, source: "knowledge.<key>[].value", subject: "knowledge.<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/knowledge_value}
         - {kind: slot, source: "knowledge.<key>[].research_state", subject: "knowledge.<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/research_state}
         - {kind: sequence, source: "knowledge.<key>[].sources[]", subject: "knowledge.<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/sources}
-        - {kind: sequence, source: "schedule.prefer_with[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/prefer_with, target: Substance}
-        - {kind: inlined-node, source: "schedule.intake[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_assertions, target: ScheduleAssertion}
-        - {kind: path-token, source: "schedule.intake[]", subject: "schedule.intake[]", token: "intake[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axis}
-        - {kind: slot, source: "schedule.intake[]", subject: "schedule.intake[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_value}
-        - {kind: inlined-node, source: "schedule.timing[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_assertions, target: ScheduleAssertion}
-        - {kind: path-token, source: "schedule.timing[]", subject: "schedule.timing[]", token: "timing[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axis}
-        - {kind: slot, source: "schedule.timing[]", subject: "schedule.timing[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_value}
-        - {kind: inlined-node, source: "schedule.activity[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_assertions, target: ScheduleAssertion}
-        - {kind: path-token, source: "schedule.activity[]", subject: "schedule.activity[]", token: "activity[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axis}
-        - {kind: slot, source: "schedule.activity[]", subject: "schedule.activity[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_value}
-        - {kind: inlined-node, source: scheduling_assessment, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_assessment, target: SchedulingAssessment}
-        - {kind: inlined-node, source: "scheduling_assessment.intake", subject: scheduling_assessment, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/intake, target: SchedulingAssessmentRecord}
-        - {kind: slot, source: "scheduling_assessment.intake.conclusion", subject: "scheduling_assessment.intake", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/conclusion}
-        - {kind: slot, source: "scheduling_assessment.intake.policy", subject: "scheduling_assessment.intake", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/policy}
-        - {kind: sequence, source: "scheduling_assessment.intake.sources[]", subject: "scheduling_assessment.intake", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/sources}
-        - {kind: slot, source: "scheduling_assessment.intake.summary", subject: "scheduling_assessment.intake", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/summary}
-        - {kind: inlined-node, source: "scheduling_assessment.timing", subject: scheduling_assessment, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/timing, target: SchedulingAssessmentRecord}
-        - {kind: slot, source: "scheduling_assessment.timing.conclusion", subject: "scheduling_assessment.timing", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/conclusion}
-        - {kind: slot, source: "scheduling_assessment.timing.policy", subject: "scheduling_assessment.timing", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/policy}
-        - {kind: sequence, source: "scheduling_assessment.timing.sources[]", subject: "scheduling_assessment.timing", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/sources}
-        - {kind: slot, source: "scheduling_assessment.timing.summary", subject: "scheduling_assessment.timing", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/summary}
-        - {kind: inlined-node, source: "scheduling_assessment.activity", subject: scheduling_assessment, predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/activity, target: SchedulingAssessmentRecord}
-        - {kind: slot, source: "scheduling_assessment.activity.conclusion", subject: "scheduling_assessment.activity", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/conclusion}
-        - {kind: slot, source: "scheduling_assessment.activity.policy", subject: "scheduling_assessment.activity", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/policy}
-        - {kind: sequence, source: "scheduling_assessment.activity.sources[]", subject: "scheduling_assessment.activity", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/sources}
-        - {kind: slot, source: "scheduling_assessment.activity.summary", subject: "scheduling_assessment.activity", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/summary}
     - source: products
       root_class: Product
       document_shape: mapping
@@ -162,8 +128,15 @@ repository_projection:
       identity: {source: "<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/id}
       maintenance: {role: stack, label: Stack, schema_artifact: stacks.schema.json}
       instructions:
-        - {kind: inlined-node, source: "<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/entries, target: StackEntry}
-        - {kind: reference, source: "<key>[]", subject: "<key>[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/product, target: Product}
+        - {kind: inlined-node, source: "daily[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/entries, target: StackEntry}
+        - {kind: reference, source: "daily[]", subject: "daily[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/product, target: Product}
+        - {kind: inlined-node, source: "training[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/entries, target: StackEntry}
+        - {kind: reference, source: "training[]", subject: "training[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/product, target: Product}
+        - {kind: inlined-node, source: "inactive[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/entries, target: StackEntry}
+        - {kind: reference, source: "inactive[]", subject: "inactive[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/product, target: Product}
+        - {kind: inlined-node, source: "tracked_unassigned[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/tracked_entries, target: TrackedUnassignedEntry}
+        - {kind: reference, source: "tracked_unassigned[].product", subject: "tracked_unassigned[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/product, target: Product}
+        - {kind: slot, source: "tracked_unassigned[].reason", subject: "tracked_unassigned[]", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/reason}
     - source: pillboxes
       root_class: Pillbox
       document_shape: keyed-map
@@ -227,5 +200,6 @@ artifacts:
   - projection-map.json
   - runtime-program.json
   - runtime-vocabulary.yaml
+  - runtime-lock.json
   - artifact-lock.json
 runtime_vocabulary_format: supp-slotter.runtime-vocabulary/v2

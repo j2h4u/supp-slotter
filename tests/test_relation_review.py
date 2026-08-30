@@ -5,6 +5,8 @@ from typing import TypedDict, cast
 
 import pytest
 import yaml
+from planner.cards.substance import canonical_substance_filename
+from planner.contracts import Substance
 from planner.engine import cmd_check, cmd_review
 from planner.ontology.runtime_program import RuntimeRelationWarningRule
 from planner.query_model.relations import _RelationReviewContext, _warning_type_for_relation
@@ -131,6 +133,13 @@ def _rename_substance(temp_data: Path, substance_id: str, name: str) -> None:
     substance = cast(dict[str, object], yaml.safe_load(substance_path.read_text()))
     substance["name"] = name
     substance_path.write_text(yaml.safe_dump(substance, sort_keys=False))
+    substance_path.replace(
+        substance_path.with_name(
+            canonical_substance_filename(
+                Substance(id=substance_id, name=name, form=cast(str | None, substance.get("form")))
+            )
+        )
+    )
 
 
 def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -> None:

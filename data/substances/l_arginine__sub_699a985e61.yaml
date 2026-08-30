@@ -6,9 +6,6 @@ concerns:
 - kind: safety
   text: Review with PDE5 inhibitors, nitrates, antihypertensives, or other vasodilators; L-arginine is a nitric-oxide precursor
     and can add to hypotensive stack load.
-schedule:
-  intake:
-  - empty_preferred
 knowledge:
   context:
   - vascular_health

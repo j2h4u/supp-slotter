@@ -5,9 +5,6 @@ aliases:
 - starch-digesting enzyme
 notes: Carbohydrate-digesting enzyme; common in digestive-enzyme blends. Review context - food-timed digestive enzyme support
   rather than systemic effect.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - carbohydrate_digestion_support

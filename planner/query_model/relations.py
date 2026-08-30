@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import cast
 
-from planner.ontology.glue_capabilities import ontology_assertion_filter_value
+from planner.contracts import OntologyAssertion, RelationSelector, Substance
+from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR, ontology_assertion_filter_value
 from planner.ontology.runtime_program import (
     RuntimeProgram,
     RuntimeRelationPresenceStatusPolicy,
@@ -14,6 +15,10 @@ from planner.ontology.runtime_program import (
     RuntimeSelectorFormCapability,
     relation_presence_policy_for_active_side,
 )
+from planner.ontology.selector import resolve_selector, selector_capability_form
+from planner.ontology.warning_policy import authored_term_label
+from planner.query_model.data import RelationEndpoint, RelationQuery
+from planner.query_model.types import RelationReviewRow
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,12 +37,33 @@ class _RelationSemantics:
     presence_status: str
 
 
+def resolve_relation_queries(
+    assertions: tuple[OntologyAssertion, ...],
+    substances: dict[str, Substance],
+    ontology_bundle: OntologyBundle,
+) -> tuple[RelationQuery, ...]:
+    """Resolve canonical review assertions into their typed query inputs."""
+    return tuple(
+        RelationQuery(
+            relation_type=assertion.relation_type,
+            assertion_kind=assertion.assertion_kind,
+            semantic_family=assertion.semantic_family,
+            source=_relation_endpoint(assertion.id, "source", assertion.source_selector, substances, ontology_bundle),
+            target=_relation_endpoint(assertion.id, "target", assertion.target_selector, substances, ontology_bundle),
+            reason=assertion.reason,
+            action=assertion.action,
+            severity=assertion.severity,
+        )
+        for assertion in assertions
+    )
+
+
 def classify_relations(
-    assertions: tuple[dict[str, object], ...],
+    assertions: tuple[RelationQuery, ...],
     active_substances: set[str],
     runtime: RuntimeProgram,
-) -> dict[str, list[dict[str, object]]]:
-    by_status: dict[str, list[dict[str, object]]] = {
+) -> dict[str, list[RelationReviewRow]]:
+    by_status: dict[str, list[RelationReviewRow]] = {
         status: [] for status in (row.status for row in runtime.relation_presence_statuses)
     }
     context = _RelationReviewContext(
@@ -47,41 +73,33 @@ def classify_relations(
         runtime.selector_form_capabilities_by_form,
     )
     for assertion in assertions:
-        row = _relation_status_row(assertion, active_substances, runtime)
-        relation_type = _row_str(row, "type")
-        presence_status = _row_str(row, "status")
+        presence_status = _presence_status_for(
+            runtime,
+            source_active=bool(set(assertion.source.substance_ids) & active_substances),
+            target_active=bool(set(assertion.target.substance_ids) & active_substances),
+        )
         warning_type = _warning_type_for_relation(
-            relation_type,
-            _row_str(row, "assertion_kind"),
-            _row_str(row, "semantic_family"),
+            assertion.relation_type,
+            assertion.assertion_kind,
+            assertion.semantic_family,
             presence_status,
             context,
         )
-        review_row: dict[str, object] = {
-            "type": relation_type,
-            "source": _row_str(row, "source"),
-            "target": _row_str(row, "target"),
-            "reason": _row_str(row, "reason"),
+        review_row: RelationReviewRow = {
+            "type": assertion.relation_type,
+            "source": assertion.source.display,
+            "target": assertion.target.display,
+            "reason": assertion.reason,
             "presence": _presence_description(presence_status, context.presence_by_status),
             "warning_type": warning_type,
-            "source_matches": _active_match_names(
-                row,
-                substance_ids_key="src_substances",
-                names_key="src_member_names",
-                active_substances=active_substances,
-            ),
-            "target_matches": _active_match_names(
-                row,
-                substance_ids_key="tgt_substances",
-                names_key="tgt_member_names",
-                active_substances=active_substances,
-            ),
-            "show_matches": _show_match_details(row, context.endpoint_policies_by_selector_form),
+            "source_matches": _active_match_names(assertion.source, active_substances),
+            "target_matches": _active_match_names(assertion.target, active_substances),
+            "show_matches": _show_match_details(assertion, context.endpoint_policies_by_selector_form),
         }
-        for field in ("action", "severity"):
-            value = row.get(field)
-            if isinstance(value, str):
-                review_row[field] = value
+        if assertion.action is not None:
+            review_row["action"] = assertion.action
+        if assertion.severity is not None:
+            review_row["severity"] = assertion.severity
         by_status[presence_status].append(review_row)
     return by_status
 
@@ -151,76 +169,90 @@ def _presence_description(
     return _declared_presence_status(presence_status, relation_presence_statuses).description
 
 
-def _active_match_names(
-    row: dict[str, object],
-    *,
-    substance_ids_key: str,
-    names_key: str,
-    active_substances: set[str],
-) -> list[str]:
-    substance_ids = _string_list(row.get(substance_ids_key))
-    names = _string_list(row.get(names_key))
+def _active_match_names(endpoint: RelationEndpoint, active_substances: set[str]) -> list[str]:
     out: list[str] = []
-    for index, substance_id in enumerate(substance_ids):
+    for index, substance_id in enumerate(endpoint.substance_ids):
         if substance_id not in active_substances:
             continue
-        if index < len(names):
-            out.append(names[index])
+        if index < len(endpoint.member_names):
+            out.append(endpoint.member_names[index])
         else:
             out.append(substance_id)
     return out
 
 
 def _show_match_details(
-    row: dict[str, object],
+    assertion: RelationQuery,
     endpoint_policies_by_selector_form: Mapping[str, RuntimeSelectorFormCapability] | None,
 ) -> bool:
     if endpoint_policies_by_selector_form is None:
         raise ValueError("ontology selector_form_capabilities are required")
     return (
-        _endpoint_policy(row.get("src_selector"), endpoint_policies_by_selector_form).show_match_details
-        or _endpoint_policy(row.get("tgt_selector"), endpoint_policies_by_selector_form).show_match_details
+        _endpoint_policy(assertion.source.selector_form, endpoint_policies_by_selector_form).show_match_details
+        or _endpoint_policy(assertion.target.selector_form, endpoint_policies_by_selector_form).show_match_details
     )
 
 
 def _endpoint_policy(
-    selector: object,
+    selector_form: str,
     endpoint_policies_by_selector_form: Mapping[str, RuntimeSelectorFormCapability],
 ) -> RuntimeSelectorFormCapability:
-    if not isinstance(selector, Mapping):
-        raise ValueError("relation selector projection must be a mapping")
-    selector_mapping = cast(Mapping[str, object], selector)
-    selector_form = selector_mapping.get("form")
-    if not isinstance(selector_form, str):
-        raise ValueError("relation selector projection has no selector form")
     try:
         return endpoint_policies_by_selector_form[selector_form]
     except KeyError as error:
         raise ValueError(f"ontology selector_form_capabilities does not declare {selector_form!r}") from error
 
 
-def _string_list(value: object) -> list[str]:
-    if not isinstance(value, list):
-        return []
-    return [item for item in value if isinstance(item, str)]
+def _relation_endpoint(
+    assertion_id: str,
+    side: str,
+    selector: RelationSelector,
+    substances: dict[str, Substance],
+    ontology_bundle: OntologyBundle,
+) -> RelationEndpoint:
+    resolution = resolve_selector(selector, substances, ontology_bundle)
+    if resolution.outcome not in {"resolved", "empty"}:
+        raise ValueError(f"relation assertion {assertion_id!r} has unresolved {side} endpoint: {resolution.outcome}")
+    substance_ids = resolution.substance_ids
+    return RelationEndpoint(
+        key=_selector_key(selector),
+        display=_selector_display(selector, substances, ontology_bundle),
+        substance_ids=substance_ids,
+        member_names=tuple(_format_substance_name(substances[item]) for item in substance_ids),
+        selector_form=selector_capability_form(selector),
+    )
 
 
-def _row_str(row: dict[str, object], key: str) -> str:
-    value = row.get(key)
-    return value if isinstance(value, str) else ""
+def _selector_key(selector: RelationSelector) -> str:
+    if selector.entity_id is not None:
+        return selector.entity_id
+    if selector.entity_name is not None:
+        return selector.entity_name
+    if selector.category is not None and selector.term is not None:
+        return f"{selector.category}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{selector.term}"
+    raise ValueError("relation selector has no endpoint identity")
 
 
-def _relation_status_row(
-    assertion: dict[str, object], active_substances: set[str], runtime: RuntimeProgram
-) -> dict[str, object]:
-    source_active = bool(set(_string_list(assertion.get("src_substances"))) & active_substances)
-    target_active = bool(set(_string_list(assertion.get("tgt_substances"))) & active_substances)
-    return {
-        **assertion,
-        "source": assertion.get("src_display", ""),
-        "target": assertion.get("tgt_display", ""),
-        "status": _presence_status_for(runtime, source_active=source_active, target_active=target_active),
-    }
+def _selector_display(
+    selector: RelationSelector,
+    substances: dict[str, Substance],
+    ontology_bundle: OntologyBundle,
+) -> str:
+    if selector.entity_name is not None:
+        return selector.entity_name
+    if selector.entity_id is not None:
+        return _format_substance_name(substances[selector.entity_id])
+    if selector.category is None or selector.term is None:
+        raise ValueError("relation selector has no displayable authored endpoint")
+    return authored_term_label(
+        f"{selector.category}{ONTOLOGY_COMPOSITE_KEY_SEPARATOR}{selector.term}",
+        ontology_bundle,
+    )
+
+
+def _format_substance_name(substance: Substance) -> str:
+    name = substance.name or substance.id or "unknown"
+    return f"{name} ({substance.form})" if substance.form else name
 
 
 def _presence_status_for(runtime: RuntimeProgram, *, source_active: bool, target_active: bool) -> str:

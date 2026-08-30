@@ -4,18 +4,32 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from planner.contracts import Dashboard, OntologyAssertion, Product, SchedulingPolicy, Substance
+from planner.contracts import Product, Substance
 
 
 @dataclass(frozen=True, slots=True)
-class ReadModelContext:
-    """Optional inputs needed by review and warning projections."""
+class RelationEndpoint:
+    """Resolved relation endpoint used by review-only queries."""
 
-    policies: dict[str, SchedulingPolicy] | None
-    stacks_data: dict[str, list[str]] | None
-    pillbox_stack_names: set[str] | None
-    dashboards: dict[str, Dashboard] | None
-    ontology_assertions: tuple[OntologyAssertion, ...] = ()
+    key: str
+    display: str
+    substance_ids: tuple[str, ...]
+    member_names: tuple[str, ...]
+    selector_form: str
+
+
+@dataclass(frozen=True, slots=True)
+class RelationQuery:
+    """Typed review metadata for one resolved ontology assertion."""
+
+    relation_type: str
+    assertion_kind: str
+    semantic_family: str
+    source: RelationEndpoint
+    target: RelationEndpoint
+    reason: str
+    action: str | None
+    severity: str | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -25,4 +39,4 @@ class ReadModelData:
     substances: dict[str, Substance]
     products: dict[str, Product]
     stacks: dict[str, list[str]]
-    assertions: tuple[dict[str, object], ...]
+    relations: tuple[RelationQuery, ...]

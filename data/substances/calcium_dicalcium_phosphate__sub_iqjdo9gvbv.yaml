@@ -9,24 +9,6 @@ notes: >-
   vascular contraction/dilation, and hormone secretion; vitamin D supports active
   calcium absorption. No dicalcium-phosphate-specific superiority or schedule is
   established.
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/calcium-HealthProfessional/
-    - https://ods.od.nih.gov/factsheets/Calcium-Consumer/
-    - https://pubmed.ncbi.nlm.nih.gov/2935812/
-    summary: Calcium meal guidance is form-specific, and the human calcium-phosphate absorption study does not validate a meal preference for this low-dose dicalcium phosphate component; no dicalcium-phosphate-specific superiority or schedule is established.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/calcium-HealthProfessional/
-    summary: No comparative morning or evening rule was demonstrated for calcium.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/calcium-HealthProfessional/
-    summary: The active electrolyte product is in training, but evidence does not establish pre-, during-, or post-workout calcium placement.
 knowledge:
   context:
   - value: workout_performance

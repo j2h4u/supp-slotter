@@ -11,26 +11,6 @@ notes: >-
   clinical harm, a clinical risk threshold, or a schedule. The planner is
   dose-agnostic.
 id: sub_kwudyhex2o
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://pubmed.ncbi.nlm.nih.gov/31652561/
-    - https://pubmed.ncbi.nlm.nih.gov/32722424/
-    - https://pubmed.ncbi.nlm.nih.gov/34287673/
-    summary: No fed-vs-fasted comparison establishes an intake preference for choline bitartrate.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://pubmed.ncbi.nlm.nih.gov/26271904/
-    - https://pubmed.ncbi.nlm.nih.gov/27341028/
-    summary: No AM-vs-PM or energy-related comparison establishes a clock-time preference.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://pubmed.ncbi.nlm.nih.gov/26271904/
-    - https://pubmed.ncbi.nlm.nih.gov/27341028/
-    summary: No workout- or activity-linked comparison establishes an exercise timing preference.
 knowledge:
   effect:
   - value: cholinergic_support

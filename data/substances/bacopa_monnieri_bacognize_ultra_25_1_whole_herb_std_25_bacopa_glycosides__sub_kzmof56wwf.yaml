@@ -11,9 +11,6 @@ notes: BaCognize Ultra branded bacopa extract used in Life Extension Adrenal Ene
 concerns:
 - kind: model_gap
   text: Anecdotal reports (Reddit) of daytime sedation; not actionable for scheduling without stronger evidence.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - neurocognitive_support

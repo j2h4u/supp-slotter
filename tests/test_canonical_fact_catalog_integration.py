@@ -14,9 +14,9 @@ from planner.engine._plan_types import PlanInputs
 from planner.ontology.canonical_facts import validate_canonical_fact_catalog
 from planner.ontology.runtime_program import (
     RuntimeCanonicalFactCatalog,
-    RuntimeCompositionRole,
     RuntimeEvidenceProvenance,
     RuntimeEvidenceSource,
+    RuntimeFactApplicability,
     RuntimeFactSubject,
     RuntimeFoodEffect,
 )
@@ -25,13 +25,12 @@ from planner.paths import Paths
 
 def _catalog() -> RuntimeCanonicalFactCatalog:
     return RuntimeCanonicalFactCatalog(
-        composition_roles=(RuntimeCompositionRole("cmp_prd_demo__sub_demo", "prd_demo", "sub_demo"),),
         evidence_sources=(RuntimeEvidenceSource("src_demo"),),
         food_effects=(
             RuntimeFoodEffect(
                 "fact_food",
                 RuntimeFactSubject("sub_demo", None),
-                "cmp_prd_demo__sub_demo",
+                RuntimeFactApplicability("sub_demo", None),
                 (RuntimeEvidenceProvenance("src_demo", "paper#food", None),),
                 "bioavailability_increases",
             ),
@@ -57,7 +56,7 @@ def _cards() -> tuple[dict[str, Substance], dict[str, Product]]:
 
 def test_canonical_reference_validator_accepts_empty_catalog() -> None:
     validate_canonical_fact_catalog(
-        RuntimeCanonicalFactCatalog((), (), (), (), (), (), ()),
+        RuntimeCanonicalFactCatalog((), (), (), (), (), ()),
         {},
         {},
     )
@@ -71,51 +70,35 @@ def test_canonical_reference_validator_accepts_matching_role_and_fact() -> None:
 @pytest.mark.parametrize(
     "mutation",
     [
-        "unknown_product",
-        "unknown_substance",
-        "missing_component",
-        "mismatched_component_id",
         "unknown_subject",
         "unknown_applicability",
         "mismatched_subject",
-        "mismatched_role_id",
+        "mismatched_role_target",
         "unknown_source",
         "mismatched_subject_role",
     ],
 )
-def test_canonical_reference_validator_rejects_dangling_or_inconsistent_references(  # noqa: C901
+def test_canonical_reference_validator_rejects_dangling_or_inconsistent_references(
     mutation: str,
 ) -> None:
     substances, products = _cards()
     catalog = _catalog()
-    if mutation == "unknown_product":
-        role = replace(catalog.composition_roles[0], product="prd_missing")
-        catalog = replace(catalog, composition_roles=(role,))
-    elif mutation == "unknown_substance":
-        role = replace(catalog.composition_roles[0], substance="sub_missing")
-        catalog = replace(catalog, composition_roles=(role,))
-    elif mutation == "missing_component":
-        products = {"prd_demo": replace(products["prd_demo"], components=())}
-    elif mutation == "mismatched_component_id":
-        products = {
-            "prd_demo": replace(
-                products["prd_demo"],
-                components=(ProductComponent("sub_demo", id="cmp_wrong__sub_demo"),),
-            )
-        }
-    elif mutation == "unknown_subject":
+    if mutation == "unknown_subject":
         fact = replace(catalog.food_effects[0], subject=RuntimeFactSubject("sub_missing", None))
         catalog = replace(catalog, food_effects=(fact,))
     elif mutation == "unknown_applicability":
-        fact = replace(catalog.food_effects[0], applicability="cmp_missing")
+        fact = replace(catalog.food_effects[0], applicability=RuntimeFactApplicability(None, "cmp_missing"))
         catalog = replace(catalog, food_effects=(fact,))
     elif mutation == "mismatched_subject":
         substances["sub_other"] = Substance("sub_other", "Other substance")
         fact = replace(catalog.food_effects[0], subject=RuntimeFactSubject("sub_other", None))
         catalog = replace(catalog, food_effects=(fact,))
-    elif mutation == "mismatched_role_id":
-        role = replace(catalog.composition_roles[0], id="cmp_other__sub_demo")
-        catalog = replace(catalog, composition_roles=(role,))
+    elif mutation == "mismatched_role_target":
+        fact = replace(
+            catalog.food_effects[0],
+            applicability=RuntimeFactApplicability(None, "cmp_prd_demo__sub_demo"),
+        )
+        catalog = replace(catalog, food_effects=(fact,))
     elif mutation == "unknown_source":
         fact = replace(
             catalog.food_effects[0],
@@ -125,8 +108,13 @@ def test_canonical_reference_validator_rejects_dangling_or_inconsistent_referenc
     elif mutation == "mismatched_subject_role":
         catalog = replace(
             catalog,
-            composition_roles=(*catalog.composition_roles, RuntimeCompositionRole("cmp_other", "prd_demo", "sub_demo")),
-            food_effects=(replace(catalog.food_effects[0], subject=RuntimeFactSubject(None, "cmp_other")),),
+            food_effects=(
+                replace(
+                    catalog.food_effects[0],
+                    subject=RuntimeFactSubject(None, "cmp_prd_demo__sub_demo"),
+                    applicability=RuntimeFactApplicability("sub_demo", None),
+                ),
+            ),
         )
 
     with pytest.raises(CardLoadError, match="canonical fact catalog reference validation failed"):
@@ -136,7 +124,14 @@ def test_canonical_reference_validator_rejects_dangling_or_inconsistent_referenc
 def test_plan_inputs_carries_verified_canonical_catalog(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     substances, products = _cards()
     catalog = _catalog()
-    runtime = SimpleNamespace(canonical_fact_catalog=catalog, effect_scoring=object())
+    runtime = SimpleNamespace(
+        canonical_fact_catalog=catalog,
+        effect_scoring=object(),
+        glue_contract=SimpleNamespace(
+            inactive_stack_name="inactive",
+            stack_partition=SimpleNamespace(routable_stack_names=("daily", "training")),
+        ),
+    )
     bundle = SimpleNamespace(runtime_program=runtime)
     monkeypatch.setattr(plan_inputs_module, "load_pillboxes", lambda *_args: {})
     monkeypatch.setattr(plan_inputs_module, "check_pillbox_slot_anchors", lambda *_args: [])
@@ -144,8 +139,9 @@ def test_plan_inputs_carries_verified_canonical_catalog(monkeypatch: pytest.Monk
     monkeypatch.setattr(plan_inputs_module, "flatten_pillbox_slots", lambda *_args: {})
     monkeypatch.setattr(plan_inputs_module, "load_substance_registry", lambda *_args: substances)
     monkeypatch.setattr(plan_inputs_module, "load_product_registry", lambda *_args: products)
-    monkeypatch.setattr(plan_inputs_module, "load_global_relations", lambda *_args: [])
     monkeypatch.setattr(plan_inputs_module, "normalize_stack_entries", lambda *_args: {})
+    monkeypatch.setattr(plan_inputs_module, "check_stack_alignment", lambda *_args: ([], object()))
+    monkeypatch.setattr(plan_inputs_module, "check_routable_topologies", lambda *_args: [])
 
     result = plan_inputs_module.load_plan_inputs(Paths.from_root(tmp_path), bundle)  # type: ignore[arg-type]
 
@@ -159,19 +155,27 @@ def test_plan_inputs_rejects_full_catalog_before_relation_processing(
     """A dangling canonical reference cannot disappear through later plan scoping."""
     substances, products = _cards()
     catalog = _catalog()
-    catalog = replace(catalog, composition_roles=(replace(catalog.composition_roles[0], product="prd_missing"),))
-    bundle = SimpleNamespace(runtime_program=SimpleNamespace(canonical_fact_catalog=catalog))
+    catalog = replace(
+        catalog,
+        food_effects=(replace(catalog.food_effects[0], applicability=RuntimeFactApplicability("sub_missing", None)),),
+    )
+    bundle = SimpleNamespace(
+        runtime_program=SimpleNamespace(
+            canonical_fact_catalog=catalog,
+            glue_contract=SimpleNamespace(
+                inactive_stack_name="inactive",
+                stack_partition=SimpleNamespace(routable_stack_names=("daily", "training")),
+            ),
+        )
+    )
     monkeypatch.setattr(plan_inputs_module, "load_pillboxes", lambda *_args: {})
     monkeypatch.setattr(plan_inputs_module, "check_pillbox_slot_anchors", lambda *_args: [])
     monkeypatch.setattr(plan_inputs_module, "load_yaml", lambda *_args: {})
     monkeypatch.setattr(plan_inputs_module, "flatten_pillbox_slots", lambda *_args: {})
     monkeypatch.setattr(plan_inputs_module, "load_substance_registry", lambda *_args: substances)
     monkeypatch.setattr(plan_inputs_module, "load_product_registry", lambda *_args: products)
-    monkeypatch.setattr(
-        plan_inputs_module,
-        "load_global_relations",
-        lambda *_args: pytest.fail("canonical validation must run before relation/scenario processing"),
-    )
+    monkeypatch.setattr(plan_inputs_module, "check_stack_alignment", lambda *_args: ([], object()))
+    monkeypatch.setattr(plan_inputs_module, "check_routable_topologies", lambda *_args: [])
 
     assert plan_inputs_module.load_plan_inputs(Paths.from_root(tmp_path), bundle) is None  # type: ignore[arg-type]
 
@@ -182,7 +186,6 @@ def test_check_uses_the_same_canonical_reference_validator(monkeypatch: pytest.M
     runtime = SimpleNamespace(canonical_fact_catalog=catalog)
     bundle = SimpleNamespace(runtime_program=runtime)
     calls: list[tuple[object, object, object]] = []
-    monkeypatch.setattr(check_module, "load_scheduling_policies", lambda *_args: {})
     monkeypatch.setattr(check_module, "check_substances", lambda *_args: ([], [], set(substances)))
     monkeypatch.setattr(check_module, "load_substance_registry", lambda *_args: substances)
     monkeypatch.setattr(check_module, "load_yaml", lambda *_args: {})

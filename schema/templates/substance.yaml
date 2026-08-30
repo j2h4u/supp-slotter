@@ -32,49 +32,40 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
              # label discrepancies, evidence caveats. Not shown in schedule output.
              # Use for anything an agent should know that doesn't fit structured fields.
              # For a new substance used by an active product, follow the bounded
-             # evidence-enrichment rule in SKILL.md before adding schedule facts.
+             # evidence-enrichment rule in SKILL.md before adding canonical facts.
 
 # ---------------------------------------------------------------------------
-# SCHEDULING — read by Planner
-# The schedule: section is the only data the Planner reads for slot placement.
-# Putting a slug under knowledge:effect or
-# knowledge:risk does NOT affect slot assignment — it only surfaces in
-# `planner review`.
+# CANONICAL PLANNING INPUT
+#
+# This card stores only substance/form world facts. It does not control a slot.
+# Do not add a desired placement, pair preference, weight, policy, or
+# constraint here. Admitted planner facts are authored, with stable substance
+# or composition-role scope and provenance, in
+# ontology/canonical-facts.yaml. Universal mappings from those facts to
+# pressures live in ontology/canonical-laws.yaml.
+#
+# The runtime derives normalized pressures and publishes a layout only after
+# the exact optimizer proves it Optimal. A conflict or unproved result is
+# layout-free Indeterminate.
 # ---------------------------------------------------------------------------
 
-# schedule:
-#   intake:                   # MAX ONE slug. Absorption / food interaction.
-#   - food_preferred          # Values: empty_preferred | fat_meal_required |
-#                             #         food_preferred | food_neutral | food_required
-#   timing:                   # MAX ONE slug. Scheduling-relevant effect.
-#   - sleep_support           # Values: energy_like | sleep_disruptive | sleep_support
-#                             # (any other effect slug goes under knowledge.effect)
-#   activity:                 # MAX ONE slug. Training-context specificity.
-#   - pre_workout             # Values: pre_workout | post_workout | any_workout
-#                             # Activity terms are soft workout-slot preferences;
-#                             # they do not require training-stack membership.
-#   prefer_with:              # Substance IDs (sub_*) to co-schedule when possible.
-#   - sub_xxxxxxxxxx          # Planner awards a bonus for placing prefer_with pairs together.
-
 # ---------------------------------------------------------------------------
-# KNOWLEDGE — read by Reviewer
-# These fields do not affect slot assignment. The active fact namespaces surface
-# in `planner review` for a smart agent to interpret; authored risk/pathway facts
-# remain reviewer-only data. Trait-backed namespaces are validated against the
-# canonical ontology vocabulary.
+# KNOWLEDGE — review facts about this substance/form
+# These fields remain review data; they do not directly create pressures or
+# placement. Trait-backed namespaces are validated against the canonical
+# runtime vocabulary.
 # ---------------------------------------------------------------------------
 
 # knowledge:
 #   kind:                     # Structural classification. Used for class-level
 #   - mineral                 # intrinsic class for review/dashboard/context membership.
 #                             # See ontology/vocabulary.yaml for valid slugs.
-#   effect:                   # Non-scheduling pharmacological effects.
+#   effect:                   # Pharmacological effects for review.
 #   - vasodilator             # See ontology/vocabulary.yaml for valid slugs.
 #                             # Examples: vasodilator, cholinergic_support,
 #                             # pde5_inhibition, fibrinolytic
-#   risk:                     # Authored reviewer-only safety / interaction facts;
-#                             # not part of the active fact projection in `planner review`.
-#   - manual_review           # NOT used for slot assignment or active-fact rendering.
+#   risk:                     # Authored reviewer-only safety / interaction facts.
+#   - manual_review           # Never a placement instruction.
 #                             # See ontology/vocabulary.yaml.
 #                             # Examples: manual_review, bleeding_med_interaction,
 #                             # hypotension_med_interaction

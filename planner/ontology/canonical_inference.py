@@ -41,13 +41,20 @@ class UnaryPressureIdentity:
 class CompositionApplicabilityPath:
     """The explicit role traversal used to reach a selected product item."""
 
-    applicability_role: str
+    target_kind: str
+    target_id: str
+    resolved_role: str
     product: str
     substance: str
 
     @property
     def role_id(self) -> str:
-        return self.applicability_role
+        return self.resolved_role
+
+    @property
+    def applicability_role(self) -> str:
+        """Compatibility alias for the resolved role in an emitted proof."""
+        return self.resolved_role
 
     @property
     def product_id(self) -> str:
@@ -208,8 +215,14 @@ def _unique_provenance(rows: Sequence[RuntimeEvidenceProvenance]) -> tuple[Runti
     )
 
 
-def _path(role: RuntimeCompositionRole) -> CompositionApplicabilityPath:
-    return CompositionApplicabilityPath(role.id, role.product, role.substance)
+def _path(fact: RuntimeCanonicalSchedulingFact, role: RuntimeCompositionRole) -> CompositionApplicabilityPath:
+    return CompositionApplicabilityPath(
+        fact.applicability.target_kind,
+        fact.applicability.target_id,
+        role.id,
+        role.product,
+        role.substance,
+    )
 
 
 def _law_index(laws: Iterable[RuntimeCanonicalLaw]) -> dict[tuple[str, str], RuntimeCanonicalLaw]:
@@ -230,10 +243,12 @@ def _law_for(
     return laws.get((family, value))
 
 
-def execute_canonical_inference(  # noqa: C901, PLR0912, PLR0914
+def execute_canonical_inference(  # noqa: C901, PLR0912, PLR0914, PLR0915
     catalog: RuntimeCanonicalFactCatalog | object,
     selected_items: Iterable[object] | Mapping[object, object],
     laws: Iterable[RuntimeCanonicalLaw] | Mapping[tuple[str, str], RuntimeCanonicalLaw] | None = None,
+    *,
+    composition_roles: Iterable[RuntimeCompositionRole] = (),
 ) -> InferenceResult:
     """Apply compiled laws to selected items and normalize their proofs.
 
@@ -260,7 +275,7 @@ def execute_canonical_inference(  # noqa: C901, PLR0912, PLR0914
         else _law_index(laws)
     )
     selected = _selected_items(selected_items)
-    roles = {role.id: role for role in catalog.composition_roles}
+    roles = {role.id: role for role in composition_roles}
     by_identity: dict[UnaryPressureIdentity, list[PressureDerivation]] = {}
 
     families: tuple[Sequence[RuntimeCanonicalSchedulingFact], ...] = (
@@ -283,27 +298,30 @@ def execute_canonical_inference(  # noqa: C901, PLR0912, PLR0914
                 raise OntologyInfrastructureError(
                     f"canonical law missing for family={family!r}, fact_value={fact_value!r}"
                 )
-            role = roles.get(fact.applicability)
-            if role is None:
-                continue
-            if fact.subject.substance is not None:
-                if fact.subject.substance != role.substance:
+            target = fact.applicability
+            if target.substance is not None:
+                if fact.subject.substance != target.substance:
                     continue
-            elif fact.subject.composition_role != role.id:
-                continue
-            item_ids = sorted(item_id for item_id, product_id in selected.items() if product_id == role.product)
-            for item_id in item_ids:
-                identity = UnaryPressureIdentity(item_id, law.dimension, law.pressure_value)
-                derivation = PressureDerivation(
-                    law=law,
-                    family=family,
-                    fact=fact,
-                    value=fact_value,
-                    subject=fact.subject,
-                    path=_path(role),
-                    provenance=_unique_provenance(fact.provenance),
-                )
-                by_identity.setdefault(identity, []).append(derivation)
+                resolved_roles = tuple(role for role in roles.values() if role.substance == target.substance)
+            else:
+                if fact.subject.composition_role != target.composition_role:
+                    continue
+                role = roles.get(target.composition_role or "")
+                resolved_roles = () if role is None else (role,)
+            for role in resolved_roles:
+                item_ids = sorted(item_id for item_id, product_id in selected.items() if product_id == role.product)
+                for item_id in item_ids:
+                    identity = UnaryPressureIdentity(item_id, law.dimension, law.pressure_value)
+                    derivation = PressureDerivation(
+                        law=law,
+                        family=family,
+                        fact=fact,
+                        value=fact_value,
+                        subject=fact.subject,
+                        path=_path(fact, role),
+                        provenance=_unique_provenance(fact.provenance),
+                    )
+                    by_identity.setdefault(identity, []).append(derivation)
 
     normalized: dict[UnaryPressureIdentity, NormalizedUnaryPressure] = {}
     for identity in sorted(by_identity, key=lambda row: (row.item_id, row.dimension, row.value)):

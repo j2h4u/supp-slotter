@@ -8,10 +8,13 @@ from typing import TypeGuard, cast
 
 import pytest
 import yaml
+from jsonschema import Draft202012Validator
+from linkml_runtime.utils.schemaview import SchemaView
 from planner.ontology.errors import OntologyInfrastructureError
 from rdflib import RDF, Graph, Namespace
 from scripts.ontology_compiler import (
     _normalized_terms,
+    _stacks_schema,
     _validate_runtime_glue_contract,
     _validate_runtime_relation_presence_contract,
     compile_ontology,
@@ -35,6 +38,7 @@ EXPECTED = {
     "projection-map.json",
     "runtime-program.json",
     "runtime-vocabulary.yaml",
+    "runtime-lock.json",
     "artifact-lock.json",
 }
 
@@ -91,30 +95,8 @@ def test_compilation_is_byte_identical_and_has_exact_inventory() -> None:
     assert {path.name for path in first} == EXPECTED
 
 
-def test_authored_zero_effect_template_is_compiled_without_runtime_rewording(tmp_path: Path) -> None:
-    root = _copy_repository_shape(tmp_path)
-    source_path = root / "policies.yaml"
-    source = cast(dict[str, object], yaml.safe_load(source_path.read_text(encoding="utf-8")))
-    presentation = cast(dict[str, object], source["schedule_presentation"])
-    zero_effect = cast(dict[str, object], presentation["zero_effect"])
-    zero_effect["template"] = "A source-authored neutral placement explanation."
-    source_path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
-
-    artifacts = compile_ontology(root)
-    runtime = cast(dict[str, object], yaml.safe_load(artifacts[Path("runtime-vocabulary.yaml")].decode("utf-8")))
-    compiled_presentation = cast(dict[str, object], runtime["schedule_presentation"])
-    compiled_zero_effect = cast(dict[str, object], compiled_presentation["zero_effect"])
-    assert compiled_zero_effect == {
-        "condition": "no_nonzero_effects",
-        "template": "A source-authored neutral placement explanation.",
-    }
-
-
-def test_committed_projection_matches_schema_and_authored_policy() -> None:
+def test_committed_projection_matches_schema_and_authored_runtime() -> None:
     schema = _json("schema.json")
-    effect_schema = _json_mapping(_json_mapping(schema["$defs"])["SchedulingPolicyEffectRecord"])
-    assert "level" in cast(list[JsonValue], effect_schema["required"])
-    assert "block" not in _json_mapping(effect_schema["properties"])
     rooted_schemas = {
         "card.schema.json": "SubstanceCard",
         "product.schema.json": "ProductCard",
@@ -138,8 +120,6 @@ def test_committed_projection_matches_schema_and_authored_policy() -> None:
     provenance = _json_mapping(runtime_program["provenance"])
     assert provenance["source"] == "ontology/runtime-policy.yaml"
     runtime_projection = _json_mapping(runtime_program["projection"])
-    assert _is_json_list(runtime_projection["slot_near_values"])
-    assert all(isinstance(value, str) and value for value in runtime_projection["slot_near_values"])
     assert set(runtime_program) == {"format_version", "schema_version", "source_hash", "provenance", "projection"}
     engine_contract = _json_mapping(runtime_projection["engine_contract"])
     authored_policy = cast(
@@ -147,35 +127,12 @@ def test_committed_projection_matches_schema_and_authored_policy() -> None:
         yaml.safe_load((ONTOLOGY / "runtime-policy.yaml").read_text(encoding="utf-8")),
     )
     assert engine_contract == cast(dict[str, object], authored_policy["engine_contract"])
-    assert "effect_scoring" not in runtime_projection
-    assert "constraint_execution_policies" not in runtime_projection
-    assert "prefer_with_policy" not in runtime_projection
-
-
-def test_generated_constraint_schema_preserves_required_metadata_contract() -> None:
-    schema = _json("schema.json")
-    definition = _json_mapping(_json_mapping(schema["$defs"])["SchedulingConstraintRecord__identifier_optional"])
-    required = set(cast(list[str], definition["required"]))
-    properties = _json_mapping(definition["properties"])
-
-    assert {"action", "rationale"} <= required
-    assert properties["action"] == {"type": "string"}
-    assert properties["rationale"] == {"type": "string"}
 
 
 def test_rdf_records_emit_canonical_terms_and_semantic_profiles() -> None:
     graph = Graph()
     graph.parse(data=(ONTOLOGY / "generated/ontology.ttl").read_text(encoding="utf-8"), format="turtle")
     ss = Namespace("https://j2h4u.github.io/supp-slotter/ontology/v1/")
-    records = set(graph.subjects(RDF.type, ss.SchedulingPolicyRecord))
-    assert records
-    for record in records:
-        terms = list(graph.objects(record, ss["term"]))
-        assert len(terms) == 1
-        policy_id = next(iter(graph.objects(record, ss.id)))
-        category, slug = str(policy_id).split(":", maxsplit=1)
-        assert str(terms[0]).endswith(f"term/{category}/{slug}")
-
     categories = set(graph.subjects(RDF.type, ss.SemanticCategory))
     profiles = set(graph.subjects(RDF.type, ss.OntoCleanProfile))
     assert categories
@@ -207,6 +164,38 @@ def test_generated_pillbox_schema_projects_canonical_topology() -> None:
     assert not {"near", "food"} & set(_json_mapping(slot["properties"]))
 
 
+def test_generated_stack_schema_closes_the_explicit_product_partition() -> None:
+    schema_view = SchemaView(str(ONTOLOGY / "model.yaml"))
+    schema = _stacks_schema(
+        {
+            "$defs": {
+                "ProductCard": {"properties": {"id": {"pattern": "^prd_[a-z0-9]{10}$"}}},
+                "TrackedUnassignedEntry": {"properties": {"product": {}, "reason": {}}},
+            }
+        },
+        schema_view,
+        {},
+        "https://example.test/",
+    )
+    validator = Draft202012Validator(schema)
+    valid = {
+        "daily": ["prd_aaaaaaaaaa"],
+        "training": [],
+        "inactive": ["prd_bbbbbbbbbb"],
+        "tracked_unassigned": [{"product": "prd_cccccccccc", "reason": "Not currently owned."}],
+    }
+
+    assert list(validator.iter_errors(valid)) == []
+    for invalid in (
+        {**valid, "daily": [{"product": "prd_aaaaaaaaaa"}]},
+        {**valid, "tracked_unassigned": ["prd_cccccccccc"]},
+        {**valid, "tracked_unassigned": [{"product": "prd_cccccccccc"}]},
+        {**valid, "tracked_unassigned": [{"product": "prd_cccccccccc", "reason": "   "}]},
+        {**valid, "tracked_unassigned": [{"product": "prd_cccccccccc", "reason": "Current", "extra": True}]},
+    ):
+        assert list(validator.iter_errors(invalid)), invalid
+
+
 def test_compiler_rejects_missing_terms_catalog(tmp_path: Path) -> None:
     root = _copy_repository_shape(tmp_path)
     path = root / "vocabulary.yaml"
@@ -225,18 +214,6 @@ def test_normalized_terms_rejects_noncanonical_slug() -> None:
 
     with pytest.raises(OntologyInfrastructureError, match="canonical namespace/slug"):
         _normalized_terms(source, {})
-
-
-def test_compiler_rejects_runtime_semantic_collision_with_distinct_id(tmp_path: Path) -> None:
-    root = _copy_repository_shape(tmp_path)
-    path = root / "runtime-policy.yaml"
-    source = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
-    rows = cast(list[dict[str, object]], source["source_kind_values"])
-    rows.append({**rows[0], "id": f"{rows[0]['id']}_collision"})
-    path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
-
-    with pytest.raises(OntologyInfrastructureError, match="duplicate semantic key"):
-        compile_ontology(root)
 
 
 def test_compiler_rejects_non_boolean_runtime_presence_truth_values(tmp_path: Path) -> None:

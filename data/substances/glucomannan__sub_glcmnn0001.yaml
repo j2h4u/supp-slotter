@@ -9,9 +9,6 @@ concerns:
 - kind: safety
   text: Review water intake, swallowing risk, gastrointestinal tolerance, and timing away from medications because viscous
     fiber can impair oral drug or supplement absorption when co-administered.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - lipid_metabolism_support

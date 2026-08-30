@@ -16,12 +16,19 @@ from __future__ import annotations
 import time
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Literal
+from typing import cast
 
+from planner.canonical_optimizer_result import (
+    CanonicalObjective,
+    CanonicalOptimizerResult,
+    Diagnostic,
+    DiagnosticCode,
+    Indeterminate,
+    Optimal,
+)
 from planner.contracts import Slot
 from planner.ontology.canonical_inference import NormalizedUnaryPressure, UnaryPressureIdentity
 
-OptimizerStatus = Literal["Optimal", "Indeterminate"]
 Pressure = UnaryPressureIdentity | NormalizedUnaryPressure
 InterruptCheck = Callable[[], bool]
 MonotonicNs = Callable[[], int]
@@ -56,97 +63,6 @@ class CanonicalOptimizerInput:
 
 
 @dataclass(frozen=True, slots=True)
-class CanonicalObjective:
-    """The exact observable objective of a proved layout."""
-
-    satisfied_pressures: int
-    squared_load: int
-    assignment_key: tuple[tuple[int, str], ...]
-
-    @property
-    def pressure_count(self) -> int:
-        return self.satisfied_pressures
-
-    @property
-    def load_square_sum(self) -> int:
-        return self.squared_load
-
-    @property
-    def balance_cost(self) -> int:
-        return self.squared_load
-
-    def as_tuple(self) -> tuple[int, int, tuple[tuple[int, str], ...]]:
-        return (self.satisfied_pressures, self.squared_load, self.assignment_key)
-
-
-@dataclass(frozen=True, slots=True)
-class Optimal:
-    """A proved globally optimal layout."""
-
-    assignments: dict[str, str]
-    objective: CanonicalObjective
-    proofs: tuple[str, ...]
-
-    @property
-    def status(self) -> OptimizerStatus:
-        return "Optimal"
-
-    @property
-    def layout(self) -> dict[str, str]:
-        return self.assignments
-
-    @property
-    def assignment(self) -> dict[str, str]:
-        return self.assignments
-
-    @property
-    def objective_tuple(self) -> tuple[int, int, tuple[tuple[int, str], ...]]:
-        return self.objective.as_tuple()
-
-    @property
-    def optimal(self) -> bool:
-        return True
-
-    @property
-    def proof(self) -> tuple[str, ...]:
-        return self.proofs
-
-
-@dataclass(frozen=True, slots=True)
-class Indeterminate:
-    """A layout-free result when optimality cannot be proved."""
-
-    diagnostics: tuple[str, ...]
-
-    @property
-    def status(self) -> OptimizerStatus:
-        return "Indeterminate"
-
-    @property
-    def layout(self) -> None:
-        return None
-
-    @property
-    def assignment(self) -> None:
-        return None
-
-    @property
-    def objective(self) -> None:
-        return None
-
-    @property
-    def objective_tuple(self) -> None:
-        return None
-
-    @property
-    def optimal(self) -> bool:
-        return False
-
-
-CanonicalOptimizerResult = Optimal | Indeterminate
-
-
-@dataclass(frozen=True, slots=True)
 class _PreparedItem:
     item_id: str
     domain: str
@@ -165,9 +81,9 @@ class _PreparedInput:
 class _IndeterminateError(Exception):
     """Internal fail-closed signal carrying a user-facing diagnostic."""
 
-    def __init__(self, diagnostic: str) -> None:
-        super().__init__(diagnostic)
-        self.diagnostic = diagnostic
+    def __init__(self, code: DiagnosticCode, message: str) -> None:
+        super().__init__(message)
+        self.diagnostic: Diagnostic = Diagnostic(code, message)
 
 
 def optimize_canonical_layout(  # noqa: PLR0913
@@ -218,7 +134,9 @@ def optimize_canonical_layout(  # noqa: PLR0913
 
         _check_abort(optimizer_input)
         if set(assignment) != set(optimizer_input.item_domains):
-            raise _IndeterminateError("proof_incomplete: not every scenario item received an assignment")
+            raise _IndeterminateError(
+                "proof_failed", "proof_incomplete: not every scenario item received an assignment"
+            )
         assignment_key = tuple(
             (prepared_slot.order, slot_id)
             for item_id, slot_id in sorted(assignment.items())
@@ -232,49 +150,15 @@ def optimize_canonical_layout(  # noqa: PLR0913
         _check_abort(optimizer_input)
         return result
     except _IndeterminateError as error:
-        return Indeterminate((error.diagnostic,))
-    except MemoryError, KeyboardInterrupt:
-        return Indeterminate(("optimization interrupted or resource exhausted",))
+        return Indeterminate(error.diagnostic)
+    except MemoryError:
+        return Indeterminate(Diagnostic("resource_exhausted", "optimization resource exhausted"))
+    except KeyboardInterrupt:
+        return Indeterminate(Diagnostic("interrupted", "optimization interrupted"))
     except Exception as error:  # noqa: BLE001
         # The publication boundary is deliberately closed.  An unexpected
         # malformed input or proof error must never leak an incumbent layout.
-        return Indeterminate((f"optimization failed closed: {error}",))
-
-
-def run_exact_optimizer(
-    optimizer_input: CanonicalOptimizerInput,
-) -> CanonicalOptimizerResult:
-    """Named adapter useful to callers that keep optimizer inputs together."""
-
-    return optimize_canonical_layout(optimizer_input)
-
-
-def run_canonical_optimizer(  # noqa: PLR0913
-    item_domains: Mapping[str, str] | CanonicalOptimizerInput,
-    slots: Mapping[str, Slot] | None = None,
-    pressures: Sequence[Pressure] | None = None,
-    *,
-    deadline_monotonic_ns: int | None = None,
-    interruption: InterruptCheck | None = None,
-    state_bound: int | None = None,
-    monotonic_ns: MonotonicNs = time.monotonic_ns,
-) -> CanonicalOptimizerResult:
-    """Compatibility spelling matching other engine ``run_*`` entrypoints."""
-
-    return optimize_canonical_layout(
-        item_domains,
-        slots,
-        pressures,
-        deadline_monotonic_ns=deadline_monotonic_ns,
-        interruption=interruption,
-        state_bound=state_bound,
-        monotonic_ns=monotonic_ns,
-    )
-
-
-CanonicalOptimizationInput = CanonicalOptimizerInput
-CanonicalOptimizationResult = CanonicalOptimizerResult
-ExactObjective = CanonicalObjective
+        return Indeterminate(Diagnostic("infrastructure_failed", f"optimization failed closed: {error}"))
 
 
 def _coerce_input(  # noqa: PLR0913
@@ -293,10 +177,10 @@ def _coerce_input(  # noqa: PLR0913
             or pressures is not None
             or any(value is not None for value in (deadline_monotonic_ns, interruption, state_bound))
         ):
-            raise _IndeterminateError("optimizer input object cannot be combined with keyword inputs")
+            raise _IndeterminateError("invalid_input", "optimizer input object cannot be combined with keyword inputs")
         return item_domains
     if slots is None or pressures is None:
-        raise _IndeterminateError("item_domains, slots, and pressures are required")
+        raise _IndeterminateError("invalid_input", "item_domains, slots, and pressures are required")
     return CanonicalOptimizerInput(
         item_domains,
         slots,
@@ -312,38 +196,38 @@ def _prepare(optimizer_input: CanonicalOptimizerInput) -> _PreparedInput:  # noq
     if optimizer_input.state_bound is not None and (
         isinstance(optimizer_input.state_bound, bool) or optimizer_input.state_bound < 1
     ):
-        raise _IndeterminateError("invalid state bound")
+        raise _IndeterminateError("invalid_input", "invalid state bound")
     if optimizer_input.deadline_monotonic_ns is not None and (
         isinstance(optimizer_input.deadline_monotonic_ns, bool)
         or not isinstance(optimizer_input.deadline_monotonic_ns, int)
         or optimizer_input.deadline_monotonic_ns < 0
     ):
-        raise _IndeterminateError("invalid deadline")
+        raise _IndeterminateError("invalid_input", "invalid deadline")
     if not isinstance(optimizer_input.item_domains, Mapping):
-        raise _IndeterminateError("item_domains must be a mapping")
+        raise _IndeterminateError("invalid_input", "item_domains must be a mapping")
     if not isinstance(optimizer_input.slots, Mapping):
-        raise _IndeterminateError("slots must be a mapping")
+        raise _IndeterminateError("invalid_input", "slots must be a mapping")
 
     domains: dict[str, str] = {}
     for item_id, domain in optimizer_input.item_domains.items():
         if not isinstance(item_id, str) or not item_id or not isinstance(domain, str) or not domain:
-            raise _IndeterminateError("item and domain IDs must be non-empty strings")
+            raise _IndeterminateError("invalid_input", "item and domain IDs must be non-empty strings")
         if item_id in domains:
-            raise _IndeterminateError(f"duplicate item ID {item_id!r}")
+            raise _IndeterminateError("invalid_input", f"duplicate item ID {item_id!r}")
         domains[item_id] = domain
 
     slots_by_domain: dict[str, list[Slot]] = {}
     for slot_key, slot in optimizer_input.slots.items():
         if not isinstance(slot_key, str) or not slot_key or not isinstance(slot, Slot):
-            raise _IndeterminateError("slots must be keyed by non-empty IDs and contain Slot values")
+            raise _IndeterminateError("invalid_input", "slots must be keyed by non-empty IDs and contain Slot values")
         if slot.slot_id != slot_key or not slot.slot_id or not isinstance(slot.stack, str) or not slot.stack:
-            raise _IndeterminateError(f"slot identity/domain is invalid for {slot_key!r}")
+            raise _IndeterminateError("invalid_input", f"slot identity/domain is invalid for {slot_key!r}")
         if isinstance(slot.order, bool) or not isinstance(slot.order, int):
-            raise _IndeterminateError(f"slot order is invalid for {slot_key!r}")
+            raise _IndeterminateError("invalid_input", f"slot order is invalid for {slot_key!r}")
         for dimension, values in _ANCHOR_VALUES.items():
-            value = getattr(slot, dimension)
+            value = cast(str | None, getattr(slot, dimension))
             if value is not None and value not in values:
-                raise _IndeterminateError(f"slot {slot_key!r} has invalid {dimension} value")
+                raise _IndeterminateError("invalid_input", f"slot {slot_key!r} has invalid {dimension} value")
         slots_by_domain.setdefault(slot.stack, []).append(slot)
 
     normalized_pressures = _pressure_identities(optimizer_input.pressures, domains)
@@ -359,7 +243,7 @@ def _prepare(optimizer_input: CanonicalOptimizerInput) -> _PreparedInput:  # noq
     for item_id, domain in sorted(domains.items()):
         domain_slots = prepared_slots.get(domain)
         if not domain_slots:
-            raise _IndeterminateError(f"item {item_id!r} has no slots in domain {domain!r}")
+            raise _IndeterminateError("invalid_input", f"item {item_id!r} has no slots in domain {domain!r}")
         item_pressures = pressure_by_item.get(item_id, [])
         scores = {slot.slot_id: _satisfied_count(slot, item_pressures) for slot in domain_slots}
         maximum = max(scores.values())
@@ -383,7 +267,7 @@ def _pressure_identities(
     pressures: Sequence[Pressure], item_domains: Mapping[str, str]
 ) -> tuple[UnaryPressureIdentity, ...]:
     if not isinstance(pressures, Sequence):
-        raise _IndeterminateError("pressures must be a sequence")
+        raise _IndeterminateError("invalid_input", "pressures must be a sequence")
     identities: set[UnaryPressureIdentity] = set()
     for pressure in pressures:
         identity: UnaryPressureIdentity
@@ -392,14 +276,14 @@ def _pressure_identities(
         elif isinstance(pressure, NormalizedUnaryPressure):
             identity = pressure.identity
         else:
-            raise _IndeterminateError("pressures must contain normalized pressure identities")
+            raise _IndeterminateError("invalid_input", "pressures must contain normalized pressure identities")
         _validate_pressure_identity(identity, item_domains)
         identities.add(identity)
     grouped: dict[tuple[str, str], set[str]] = {}
     for identity in identities:
         grouped.setdefault((identity.item_id, identity.dimension), set()).add(identity.value)
     if any(len(values) > 1 for values in grouped.values()):
-        raise _IndeterminateError("same-dimension pressure conflict")
+        raise _IndeterminateError("contradiction", "same-dimension pressure conflict")
     return tuple(sorted(identities, key=lambda row: (row.item_id, row.dimension, row.value)))
 
 
@@ -432,10 +316,10 @@ def _solve_domain(
                 if prior is None or _assignment_key(new_assignment, slot_keys) < _assignment_key(prior, slot_keys):
                     next_states[loads_key] = new_assignment
                 if optimizer_input.state_bound is not None and len(next_states) > optimizer_input.state_bound:
-                    raise _IndeterminateError("state bound exhausted")
+                    raise _IndeterminateError("resource_exhausted", "state bound exhausted")
         states = next_states
         if not states:
-            raise _IndeterminateError("proof failure: no reachable load vector")
+            raise _IndeterminateError("proof_failed", "proof failure: no reachable load vector")
     best_loads, best_assignment = min(
         states.items(),
         key=lambda row: (sum(load * load for load in row[0]), _assignment_key(row[1], slot_keys)),
@@ -458,7 +342,7 @@ def _verify_solution(
 
     expected_items = set(optimizer_input.item_domains)
     if set(assignment) != expected_items:
-        raise _IndeterminateError("proof_incomplete: assignment item set mismatch")
+        raise _IndeterminateError("proof_failed", "proof_incomplete: assignment item set mismatch")
 
     loads_by_domain: dict[str, dict[str, int]] = {}
     slots = optimizer_input.slots
@@ -466,7 +350,7 @@ def _verify_solution(
         slot_id = assignment.get(item_id)
         domain = optimizer_input.item_domains[item_id]
         if not isinstance(slot_id, str) or slot_id not in slots or slots[slot_id].stack != domain:
-            raise _IndeterminateError("proof_incomplete: assignment domain mismatch")
+            raise _IndeterminateError("proof_failed", "proof_incomplete: assignment domain mismatch")
         domain_loads = loads_by_domain.setdefault(domain, {})
         domain_loads[slot_id] = domain_loads.get(slot_id, 0) + 1
 
@@ -476,26 +360,26 @@ def _verify_solution(
         if getattr(slots[assignment[identity.item_id]], identity.dimension) == identity.value
     }
     if len(satisfied) != objective.satisfied_pressures:
-        raise _IndeterminateError("proof_incomplete: pressure count mismatch")
+        raise _IndeterminateError("proof_failed", "proof_incomplete: pressure count mismatch")
 
     squared_load = sum(load * load for domain_loads in loads_by_domain.values() for load in domain_loads.values())
     if squared_load != objective.squared_load:
-        raise _IndeterminateError("proof_incomplete: squared load mismatch")
+        raise _IndeterminateError("proof_failed", "proof_incomplete: squared load mismatch")
 
     assignment_key = tuple(
         (slots[assignment[item_id]].order, assignment[item_id]) for item_id in sorted(expected_items)
     )
     if assignment_key != objective.assignment_key:
-        raise _IndeterminateError("proof_incomplete: assignment key mismatch")
+        raise _IndeterminateError("proof_failed", "proof_incomplete: assignment key mismatch")
 
 
 def _validate_pressure_identity(identity: UnaryPressureIdentity, item_domains: Mapping[str, str]) -> None:
     if not isinstance(identity.item_id, str) or not identity.item_id or identity.item_id not in item_domains:
-        raise _IndeterminateError("invalid or unselected pressure identity")
+        raise _IndeterminateError("invalid_input", "invalid or unselected pressure identity")
     if identity.dimension not in _ANCHOR_VALUES:
-        raise _IndeterminateError("invalid or unselected pressure identity")
+        raise _IndeterminateError("invalid_input", "invalid or unselected pressure identity")
     if not isinstance(identity.value, str) or identity.value not in _ANCHOR_VALUES[identity.dimension]:
-        raise _IndeterminateError("invalid or unselected pressure identity")
+        raise _IndeterminateError("invalid_input", "invalid or unselected pressure identity")
 
 
 def _check_abort(optimizer_input: CanonicalOptimizerInput) -> None:
@@ -503,31 +387,27 @@ def _check_abort(optimizer_input: CanonicalOptimizerInput) -> None:
         optimizer_input.deadline_monotonic_ns is not None
         and optimizer_input.monotonic_ns() >= optimizer_input.deadline_monotonic_ns
     ):
-        raise _IndeterminateError("deadline expired")
+        raise _IndeterminateError("timeout", "deadline expired")
     if optimizer_input.interruption is not None:
         try:
             interrupted = optimizer_input.interruption()
         except KeyboardInterrupt, MemoryError:
             raise
         except Exception as error:
-            raise _IndeterminateError(f"interruption check failed: {error}") from error
+            raise _IndeterminateError("infrastructure_failed", f"interruption check failed: {error}") from error
         if interrupted:
-            raise _IndeterminateError("optimization interrupted")
+            raise _IndeterminateError("interrupted", "optimization interrupted")
 
 
 __all__ = [
     "CanonicalObjective",
-    "CanonicalOptimizationInput",
-    "CanonicalOptimizationResult",
     "CanonicalOptimizerInput",
     "CanonicalOptimizerResult",
-    "ExactObjective",
+    "Diagnostic",
+    "DiagnosticCode",
     "Indeterminate",
     "InterruptCheck",
     "MonotonicNs",
     "Optimal",
-    "OptimizerStatus",
     "optimize_canonical_layout",
-    "run_canonical_optimizer",
-    "run_exact_optimizer",
 ]

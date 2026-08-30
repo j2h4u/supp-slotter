@@ -9,9 +9,6 @@ concerns:
 - kind: safety
   text: Huperzine A is a cholinesterase-inhibitor context; review cumulative cholinergic load, anticholinergic or cholinergic
     medications, bradycardia tendency, and product standardization before active use.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - neurocognitive_support

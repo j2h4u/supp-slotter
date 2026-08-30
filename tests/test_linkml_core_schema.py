@@ -40,7 +40,6 @@ def test_core_classes_and_structural_slots_are_authored() -> None:
         "EntitySelector",
         "CardConcern",
         "CardKnowledge",
-        "CardSchedule",
         "SubstanceCard",
         "ProductCard",
     }
@@ -56,9 +55,7 @@ def test_vocabulary_terms_are_classes_not_linkml_enums() -> None:
 
 
 def test_global_slot_definitions_do_not_disagree() -> None:
-    # ``operation`` remains a source SchedulingConstraintRecord field for
-    # LinkML parsing, while runtime v2 does not admit it into its projection.
-    polymorphic_slots = {"axis", "operation", "source", "term"}
+    polymorphic_slots = {"axis", "source", "term"}
     modules = (
         "model.yaml",
         "vocabulary-model.yaml",
@@ -107,8 +104,6 @@ def test_composed_root_induced_embedding_and_reference_contracts() -> None:
         ("Condition", "conditions", "Condition"),
         ("Condition", "left", "Condition"),
         ("Condition", "right", "Condition"),
-        ("SchedulingConstraint", "condition", "Condition"),
-        ("SchedulingConstraint", "action", "Action"),
     ]:
         s = view.induced_slot(slot, cls)
         assert s.range == rng and s.inlined
@@ -151,23 +146,15 @@ def test_card_contracts_author_id_patterns_and_nested_cardinality() -> None:
     assert "label" not in view.class_slots("ProductCard")
     assert view.induced_slot("id", "SubstanceCard").pattern == r"^sub_[a-z0-9]{10}$"
     assert view.induced_slot("id", "ProductCard").pattern == r"^prd_[a-z0-9]{10}$"
-    # The base schema owns the schedule envelope only.  Concrete axis and
-    # knowledge properties are generated from authored catalogs.
-    assert not {"intake", "timing", "activity"} & set(view.class_slots("CardSchedule"))
     assert not {"kind", "role", "quality", "effect", "risk", "context", "pathway"} & set(
         view.class_slots("CardKnowledge")
     )
-    prefer_with = view.induced_slot("prefer_with", "CardSchedule")
-    assert prefer_with.range == "string"
-    assert prefer_with.pattern == r"^sub_[a-z0-9]{10}$"
-    assert prefer_with.minimum_cardinality == 1
     assert view.induced_slot("components", "ProductCard").minimum_cardinality == 1
 
 
-def test_generated_card_schema_projects_authored_axis_and_category_properties() -> None:
+def test_generated_card_schema_projects_authored_category_properties() -> None:
     generated = json.loads((ROOT / "ontology" / "generated" / "card.schema.json").read_text())
     definitions = generated["$defs"]
-    assert set(definitions["CardSchedule"]["properties"]) >= {"intake", "timing", "activity", "prefer_with"}
     assert set(definitions["CardKnowledge"]["properties"]) >= {
         "kind",
         "role",

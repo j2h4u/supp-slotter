@@ -10,9 +10,6 @@ concerns:
 - kind: data_quality
   text: Product cards should record enzyme units, timing with lactose-containing food, product form, and whether the issue
     is lactose intolerance versus milk allergy, which lactase does not address.
-schedule:
-  intake:
-  - food_required
 knowledge:
   effect:
   - digestive_enzyme_context

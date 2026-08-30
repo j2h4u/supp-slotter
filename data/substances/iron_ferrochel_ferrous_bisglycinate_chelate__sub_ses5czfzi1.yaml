@@ -6,9 +6,6 @@ aliases:
 - ferrous bisglycinate
 notes: Chelated iron form listed on Source Naturals Advanced Ferrochel. PubMed/PMC reviews report ferrous bisglycinate can
   be better tolerated than conventional iron salts; iron products still need overdose-risk review, especially around children.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - oxygen_transport_support

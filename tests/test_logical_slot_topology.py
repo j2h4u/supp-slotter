@@ -106,3 +106,30 @@ daily:
 
     with pytest.raises(CardLoadError, match="duplicate slot order"):
         load_pillboxes(path, None)  # type: ignore[arg-type]
+
+
+def test_distinct_topologies_keep_distinct_stack_references(tmp_path: Path) -> None:
+    path = tmp_path / "pillboxes.yaml"
+    path.write_text(
+        """
+daily:
+  label: Daily
+  stack: daily
+  slots:
+    daily_slot:
+      label: Daily slot
+      order: 1
+training:
+  label: Training
+  stack: training
+  slots:
+    training_slot:
+      label: Training slot
+      order: 1
+""",
+        encoding="utf-8",
+    )
+
+    pillboxes = load_pillboxes(path, None)  # type: ignore[arg-type]
+
+    assert {pillbox.stack for pillbox in pillboxes.values()} == {"daily", "training"}

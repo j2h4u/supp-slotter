@@ -9,9 +9,6 @@ concerns:
 - kind: safety
   text: Review pregnancy, breastfeeding, antidiabetes medications, antihypertensives, anticoagulants, statins, CYP/P-gp-sensitive
     drugs, and narrow-therapeutic-window medicines before active use.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - lipid_metabolism_support

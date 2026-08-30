@@ -13,8 +13,7 @@ from typing import cast
 
 from planner.cards.pillboxes import check_pillbox_slot_anchors, flatten_pillbox_slots, load_pillboxes
 from planner.cards.product import load_product_registry
-from planner.cards.relations import load_global_relations
-from planner.cards.stacks import normalize_stack_entries
+from planner.cards.stacks import check_routable_topologies, check_stack_alignment, normalize_stack_entries
 from planner.cards.substance import load_substance_registry
 from planner.contracts import CardLoadError, Slot
 from planner.engine._plan_types import PlanInputs
@@ -64,12 +63,24 @@ def load_plan_inputs(
     substances = load_substance_registry(paths, bundle)
     products = load_product_registry(paths, bundle)
     try:
+        partition_errors, _partition_info = check_stack_alignment(
+            stacks_dict,
+            {product_id: paths.products / product_id for product_id in products},
+            paths.stacks_file,
+            bundle.runtime_program.glue_contract.inactive_stack_name,
+        )
+        topology_errors = check_routable_topologies(
+            paths.stacks_file,
+            stacks_dict,
+            {pillbox.stack: 1 for pillbox in pillboxes.values()},
+            bundle.runtime_program.glue_contract.inactive_stack_name,
+        )
+        if partition_errors or topology_errors:
+            raise CardLoadError(paths.stacks_file, "\n".join((*partition_errors, *topology_errors)))
         validate_canonical_fact_catalog(bundle.runtime_program.canonical_fact_catalog, substances, products)
     except CardLoadError as e:
         print(f"plan: {e.message}", file=sys.stderr)
         return None
-    global_relations = load_global_relations(paths, bundle, substances)
-    dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
     try:
         stack_entries = normalize_stack_entries(stacks_dict)
     except ValueError as e:
@@ -77,14 +88,11 @@ def load_plan_inputs(
         return None
 
     return PlanInputs(
-        ontology_bundle=bundle,
         runtime_program=bundle.runtime_program,
         canonical_fact_catalog=bundle.runtime_program.canonical_fact_catalog,
         slots=slots,
         substances=substances,
         products=products,
-        global_relations=global_relations,
-        dashboard_files=dashboard_files,
         stack_entries=stack_entries,
         pillboxes=pillboxes,
     )

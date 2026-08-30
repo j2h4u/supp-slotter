@@ -5,6 +5,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import planner.engine.plan as plan_module
+from planner.canonical_optimizer_result import Diagnostic
 from planner.contracts import Product, ProductComponent, Slot, Substance
 from planner.engine._canonical_optimizer import CanonicalOptimizerInput, Indeterminate
 from planner.engine._plan_active_index import ActiveIndexInput, build_active_index
@@ -22,21 +23,20 @@ from planner.ontology.runtime_program import (
     RuntimeCompositionRole,
     RuntimeEvidenceProvenance,
     RuntimeEvidenceSource,
+    RuntimeFactApplicability,
     RuntimeFactSubject,
     RuntimeFoodEffect,
 )
 
 
 def _canonical_fixture() -> tuple[RuntimeCanonicalFactCatalog, tuple[RuntimeCanonicalLaw, ...]]:
-    role_id = "cmp_prd_demo__sub_demo"
     catalog = RuntimeCanonicalFactCatalog(
-        composition_roles=(RuntimeCompositionRole(role_id, "prd_demo", "sub_demo"),),
         evidence_sources=(RuntimeEvidenceSource("src_demo"),),
         food_effects=(
             RuntimeFoodEffect(
                 "fact_food",
                 RuntimeFactSubject("sub_demo", None),
-                role_id,
+                RuntimeFactApplicability("sub_demo", None),
                 (RuntimeEvidenceProvenance("src_demo", "paper#food", "food evidence"),),
                 "bioavailability_increases",
             ),
@@ -61,7 +61,14 @@ def _canonical_fixture() -> tuple[RuntimeCanonicalFactCatalog, tuple[RuntimeCano
 def test_canonical_facts_alone_derive_pressure_without_schedule_answers() -> None:
     catalog, laws = _canonical_fixture()
 
-    result = execute_canonical_inference(catalog, {"item_demo": "prd_demo"}, laws)
+    result = execute_canonical_inference(
+        catalog,
+        {"item_demo": "prd_demo"},
+        laws,
+        composition_roles=(
+            RuntimeCompositionRole(id="cmp_prd_demo__sub_demo", product="prd_demo", substance="sub_demo"),
+        ),
+    )
 
     assert isinstance(result, Success)
     assert [(pressure.item_id, pressure.dimension, pressure.value) for pressure in result.pressures] == [
@@ -69,12 +76,16 @@ def test_canonical_facts_alone_derive_pressure_without_schedule_answers() -> Non
     ]
     assert result.pressures[0].derivations[0].fact_id == "fact_food"
     assert result.pressures[0].derivations[0].law_id == "law_food_bioavailability_increases"
-    assert Substance("sub_demo", "Demo").schedule_assertions == ()
 
 
 def test_active_index_attaches_canonical_result_after_product_resolution() -> None:
     catalog, laws = _canonical_fixture()
-    runtime_program = SimpleNamespace(glue_contract=SimpleNamespace(inactive_stack_name="inactive"))
+    runtime_program = SimpleNamespace(
+        glue_contract=SimpleNamespace(
+            inactive_stack_name="inactive",
+            stack_partition=SimpleNamespace(routable_stack_names=("daily", "training")),
+        )
+    )
     products = {
         "prd_demo": Product(
             "prd_demo",
@@ -101,7 +112,6 @@ def test_active_index_attaches_canonical_result_after_product_resolution() -> No
 def _active_index_with_inference(inference: object) -> ActiveIndex:
     return ActiveIndex(
         item_products={"item_demo": "prd_demo"},
-        active_components={"item_demo": ["sub_demo"]},
         item_stacks={"item_demo": "daily"},
         canonical_inference=inference,  # type: ignore[arg-type]
     )
@@ -123,7 +133,7 @@ def test_same_dimension_conflict_stops_before_optimizer(monkeypatch) -> None:
         products={},
         substances={},
         runtime_program=SimpleNamespace(canonical_laws=()),
-        canonical_fact_catalog=RuntimeCanonicalFactCatalog((), (), (), (), (), (), ()),
+        canonical_fact_catalog=RuntimeCanonicalFactCatalog((), (), (), (), (), ()),
     )
 
     result = plan_module._build_plan_runtime(SimpleNamespace(), [], inputs)  # type: ignore[arg-type]
@@ -140,7 +150,7 @@ def test_same_dimension_conflict_stops_before_optimizer(monkeypatch) -> None:
 def test_conflict_free_inference_routes_only_to_exact_optimizer(monkeypatch) -> None:
     runtime = plan_module._PlanRuntime(
         SimpleNamespace(
-            slots={"food": Slot("food", "Food", 1, (), "daily", "Daily", "daily", "with_food", None, None)},
+            slots={"food": Slot("food", "Food", 1, "daily", "Daily", "daily", "with_food", None, None)},
         ),
         _active_index_with_inference(Success(())),
     )
@@ -148,7 +158,7 @@ def test_conflict_free_inference_routes_only_to_exact_optimizer(monkeypatch) -> 
 
     def indeterminate(optimizer_input: CanonicalOptimizerInput) -> Indeterminate:
         captured.append(optimizer_input)
-        return Indeterminate(("interrupted",))
+        return Indeterminate(Diagnostic("interrupted", "interrupted"))
 
     monkeypatch.setattr(plan_module, "optimize_canonical_layout", indeterminate)
 

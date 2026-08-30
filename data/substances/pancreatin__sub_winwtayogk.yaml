@@ -15,9 +15,6 @@ concerns:
 - kind: data_quality
   text: Product cards should distinguish OTC digestive-enzyme blends from prescription pancrelipase/PERT and capture amylase,
     lipase, and protease activity units.
-schedule:
-  intake:
-  - food_required
 knowledge:
   effect:
   - digestive_enzyme_context

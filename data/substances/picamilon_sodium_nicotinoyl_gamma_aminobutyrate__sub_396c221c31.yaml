@@ -15,28 +15,6 @@ notes: 'Synthetic conjugate of GABA and niacin (nicotinic acid), developed in th
   tested conditions and does not establish clinical efficacy or inefficacy. Sources:
   registered Russian instruction (Medi.ru); Russian medicines registry; FDA 2015
   scientific memorandum and constituent action; PubMed 36668678.'
-scheduling_assessment:
-  intake:
-    conclusion: supports_no_rule
-    sources:
-    - https://medi.ru/instrukciya/pikamilon_22339/
-    summary: The registered Russian tablet instruction states that Picamilon is taken
-      independently of meals, supporting no executable food-state rule for this product
-      form.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://medi.ru/instrukciya/pikamilon_22339/
-    - https://pubmed.ncbi.nlm.nih.gov/20359966/
-    summary: The registered instruction and available clinical evidence do not establish
-      a general clock-time preference; no AM or PM rule is supported for this planner.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://medi.ru/instrukciya/pikamilon_22339/
-    - https://pubmed.ncbi.nlm.nih.gov/20359966/
-    summary: The instruction and available evidence do not establish a workout-linked
-      activity rule; no pre-workout or post-workout assignment is supported.
 knowledge:
   context:
   - value: neurocognitive_support

@@ -13,9 +13,6 @@ concerns:
 - kind: data_quality
   text: Product cards should distinguish betaine HCl from anhydrous betaine/TMG, and capture whether pepsin or other digestive
     enzymes are co-formulated.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - digestive_comfort_context

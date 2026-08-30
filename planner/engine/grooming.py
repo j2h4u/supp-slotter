@@ -1,38 +1,40 @@
-"""Policy-driven, read-only substance-card grooming selection."""
+"""Read-only canonical-coverage grooming for active component roles."""
 
 from __future__ import annotations
 
 import contextlib
 import io
-import sys
+import re
 from collections.abc import Mapping
+from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 from typing import cast
 
-from planner.cards.product import load_product_registry
-from planner.cards.relations import check_global_relations, load_global_relations
+from planner.cards.product import composition_role_id, load_product_registry
 from planner.cards.substance import load_substance_registry
-from planner.contracts import CardLoadError, Product, Relation, Substance
-from planner.engine.results import (
-    GroomAssessment,
-    GroomKnowledge,
-    GroomProduct,
-    GroomRelation,
-    GroomResult,
-    GroomSchedule,
-    GroomWorkItem,
-)
+from planner.contracts import CardLoadError, Product, Substance
+from planner.engine.results import GroomResult, GroomWorkItem
 from planner.ontology.artifacts import OntologyBundle, load_ontology
 from planner.ontology.errors import OntologyInfrastructureError
-from planner.ontology.runtime_program import RuntimeGroomingRankFieldPolicy
-from planner.ontology.selector import resolve_selector
 from planner.paths import ROOT, Paths
 from planner.schema_validation import validate_schemas
-from planner.yaml_io import load_yaml, load_yaml_mapping
+from planner.yaml_io import load_yaml
+
+_RECEIPTS_FORMAT = "supp-slotter.grooming-receipts/v1"
+_OUTCOMES = frozenset({"no_supported_fact"})
+_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+@dataclass(frozen=True, slots=True)
+class _Receipt:
+    composition_role: str
+    assessed_on: str
+    outcome: str
 
 
 def cmd_groom(data_root: Path | None = None) -> GroomResult:
-    """Select exactly one policy-ranked substance-card dossier, or none."""
+    """Select one active component role without a completed grooming receipt."""
     bundle = load_ontology(ROOT / "ontology")
     stdout_buf, stderr_buf = io.StringIO(), io.StringIO()
     with contextlib.redirect_stdout(stdout_buf), contextlib.redirect_stderr(stderr_buf):
@@ -43,7 +45,7 @@ def cmd_groom(data_root: Path | None = None) -> GroomResult:
                 return GroomResult(schema_result, None, 0, stderr=stderr_buf.getvalue())
             selected, eligible_count = _select_work_items(paths, bundle)
             work_item = selected[0] if selected else None
-            _render(selected, eligible_count, bundle.runtime_program.grooming_policy.selection_count)
+            _render(selected, eligible_count)
             return GroomResult(0, work_item, eligible_count, stdout_buf.getvalue(), stderr_buf.getvalue())
         except (CardLoadError, OntologyInfrastructureError) as error:
             message = error.message if isinstance(error, CardLoadError) else str(error)
@@ -51,264 +53,137 @@ def cmd_groom(data_root: Path | None = None) -> GroomResult:
 
 
 def _select_work_items(paths: Paths, bundle: OntologyBundle) -> tuple[tuple[GroomWorkItem, ...], int]:
-    loaded = _load_inputs(paths, bundle)
-    if loaded is None:
-        raise CardLoadError(paths.relations_file, "relation validation failed")
-    substances, products, relations, stacks = loaded
-    active_products = _active_products(products, stacks, bundle)
-    active_ids = {
-        component.substance
-        for product in active_products
-        for component in product.components
-        if component.substance in substances
-    }
-    policy = bundle.runtime_program.grooming_policy
-    reachable_ids = active_ids if policy.require_active_reachable else set(substances)
-    owned_relations = _owned_open_relations(
-        relations,
-        substances,
-        active_ids,
-        bundle,
-        research_state=policy.open_research_state,
-        owner_field=policy.relation_owner_field,
-        owner_direction=policy.relation_owner_direction,
-    )
-    candidates = [
-        (substance, active_products, owned_relations.get(substance.id, ()))
-        for substance in substances.values()
-        if substance.id in reachable_ids
-        and _open_knowledge_count(substance, policy.open_research_state) + len(owned_relations.get(substance.id, ()))
-        > 0
-    ]
-    metrics: dict[str, dict[str, object]] = {
-        substance.id: {
-            "active_unique_product_count": len({
-                product.id for product in active_products if _has_substance(product, substance.id)
-            }),
-            "open_owned_item_count": _open_knowledge_count(substance, policy.open_research_state)
-            + len(owned_relations.get(substance.id, ())),
-            "substance_id": substance.id,
-        }
-        for substance, active_products, _ in candidates
-    }
-    ordered = sorted(candidates, key=lambda row: _rank_key(metrics[row[0].id], policy.rank_fields))
-    selected = ordered[: policy.selection_count]
-    return (
-        tuple(_build_work_item(row[0], row[1], row[2], paths, bundle) for row in selected),
-        len(ordered),
-    )
-
-
-def _load_inputs(
-    paths: Paths, bundle: OntologyBundle
-) -> tuple[dict[str, Substance], dict[str, Product], list[Relation], dict[str, list[str]]] | None:
     substances = load_substance_registry(paths, bundle)
     products = load_product_registry(paths, bundle)
-    relations_data = load_yaml(paths.relations_file)
-    relation_errors = check_global_relations(relations_data, substances, paths, bundle)
-    if relation_errors:
-        _print_errors(relation_errors)
-        return None
-    relations = load_global_relations(paths, bundle, substances)
-    return substances, products, relations, _stacks(paths)
+    all_roles = _component_roles(products, substances)
+    fact_role_ids = _canonical_fact_role_ids(bundle, all_roles)
+    receipts = _load_receipts(
+        paths.data / "grooming-receipts.yaml",
+        known_role_ids=set(all_roles),
+        fact_role_ids=fact_role_ids,
+    )
+    completed_role_ids = {receipt.composition_role for receipt in receipts}
+    active_role_ids = _active_role_ids(paths, products, bundle)
+    candidates = tuple(all_roles[role_id] for role_id in sorted(active_role_ids - fact_role_ids - completed_role_ids))
+    return candidates[:1], len(candidates)
 
 
-def _stacks(paths: Paths) -> dict[str, list[str]]:
-    raw = load_yaml_mapping(paths.stacks_file)
+def _component_roles(products: Mapping[str, Product], substances: Mapping[str, Substance]) -> dict[str, GroomWorkItem]:
+    roles: dict[str, GroomWorkItem] = {}
+    for product in products.values():
+        for component in product.components:
+            substance = substances.get(component.substance)
+            if substance is None:
+                continue
+            role_id = component.id or composition_role_id(product.id, substance.id)
+            if role_id in roles:
+                raise CardLoadError(Path("data/products"), f"duplicate composition role {role_id!r}")
+            roles[role_id] = GroomWorkItem(role_id, product.id, product.name, substance.id, substance.name)
+    return roles
+
+
+def _active_role_ids(paths: Paths, products: Mapping[str, Product], bundle: OntologyBundle) -> set[str]:
+    raw = load_yaml(paths.stacks_file)
+    if not isinstance(raw, Mapping):
+        raise CardLoadError(paths.stacks_file, "stacks must be a mapping")
+    active_product_ids = {
+        product_id
+        for stack_name, product_ids in raw.items()
+        if stack_name != bundle.runtime_program.glue_contract.inactive_stack_name and isinstance(product_ids, list)
+        for product_id in product_ids
+        if isinstance(product_id, str)
+    }
     return {
-        name: [item for item in cast(list[object], values) if isinstance(item, str)]
-        for name, values in raw.items()
-        if isinstance(values, list)
+        component.id or composition_role_id(product.id, component.substance)
+        for product_id, product in products.items()
+        if product_id in active_product_ids
+        for component in product.components
     }
 
 
-def _active_products(
-    products: Mapping[str, Product], stacks: Mapping[str, list[str]], bundle: OntologyBundle
-) -> tuple[Product, ...]:
-    inactive = bundle.runtime_program.glue_contract.inactive_stack_name
-    active_ids = {
-        product_id for stack_name, product_ids in stacks.items() if stack_name != inactive for product_id in product_ids
+def _canonical_fact_role_ids(bundle: OntologyBundle, roles: Mapping[str, GroomWorkItem]) -> set[str]:
+    catalog = bundle.runtime_program.canonical_fact_catalog
+    return {
+        role_id
+        for family in (
+            catalog.food_effects,
+            catalog.acute_alertness_effects,
+            catalog.acute_sleep_effects,
+            catalog.pre_exercise_performance_effects,
+            catalog.post_exercise_recovery_effects,
+        )
+        for fact in family
+        for role_id, role in roles.items()
+        if (
+            fact.applicability.substance == role.substance_id
+            if fact.applicability.substance is not None
+            else fact.applicability.composition_role == role_id
+        )
     }
-    return tuple(product for product in products.values() if product.id in active_ids)
 
 
-def _has_substance(product: Product, substance_id: str) -> bool:
-    return any(component.substance == substance_id for component in product.components)
-
-
-def _open_knowledge_count(substance: Substance, research_state: str) -> int:
-    return sum(assertion.research_state == research_state for assertion in substance.knowledge_assertions)
-
-
-def _owned_open_relations(  # noqa: PLR0913
-    relations: tuple[Relation, ...] | list[Relation],
-    substances: Mapping[str, Substance],
-    active_ids: set[str],
-    bundle: OntologyBundle,
-    *,
-    research_state: str,
-    owner_field: str,
-    owner_direction: str,
-) -> dict[str, tuple[GroomRelation, ...]]:
-    owned: dict[str, list[GroomRelation]] = {}
-    for relation in relations:
-        if relation.research_state != research_state:
-            continue
-        source_ids = set(resolve_selector(relation.source_selector, substances, bundle).substance_ids)
-        target_ids = set(resolve_selector(relation.target_selector, substances, bundle).substance_ids)
-        endpoint_ids = tuple(sorted((source_ids | target_ids) & active_ids, reverse=owner_direction == "descending"))
-        if not endpoint_ids:
-            continue
-        owner = endpoint_ids[0]
-        owned.setdefault(owner, []).append(
-            GroomRelation(
-                id=relation.id,
-                relation_type=relation.type,
-                source=_selector_label(relation.source_selector),
-                target=_selector_label(relation.target_selector),
-                reason=relation.reason,
-                research_state=relation.research_state,
-                sources=relation.sources,
-                active_endpoint_ids=endpoint_ids,
-                owner_id=endpoint_ids[0] if owner_field == "substance_id" else "",
-            )
+def _load_receipts(path: Path, *, known_role_ids: set[str], fact_role_ids: set[str]) -> tuple[_Receipt, ...]:
+    try:
+        raw = load_yaml(path)
+    except (CardLoadError, ValueError) as error:
+        raise CardLoadError(path, f"invalid grooming receipts: {error}") from error
+    if not isinstance(raw, Mapping) or set(raw) != {"format", "assessments"}:
+        raise CardLoadError(path, "grooming receipts must contain exactly format and assessments")
+    if raw["format"] != _RECEIPTS_FORMAT:
+        raise CardLoadError(path, f"grooming receipts format must be {_RECEIPTS_FORMAT!r}")
+    rows = raw["assessments"]
+    if not isinstance(rows, list):
+        raise CardLoadError(path, "grooming receipts assessments must be a list")
+    receipts = tuple(_receipt(row, path, index) for index, row in enumerate(rows))
+    receipt_roles = [receipt.composition_role for receipt in receipts]
+    if len(receipt_roles) != len(set(receipt_roles)):
+        raise CardLoadError(path, "grooming receipts must not contain duplicate composition_role values")
+    unknown = sorted(set(receipt_roles) - known_role_ids)
+    if unknown:
+        raise CardLoadError(path, f"grooming receipts reference unknown composition role(s): {', '.join(unknown)}")
+    covered = sorted(receipt.composition_role for receipt in receipts if receipt.composition_role in fact_role_ids)
+    if covered:
+        raise CardLoadError(
+            path,
+            "grooming receipt no_supported_fact is newly covered by canonical applicability for role(s): "
+            + ", ".join(covered),
         )
-    return {key: tuple(sorted(rows, key=lambda row: row.id)) for key, rows in owned.items()}
+    return receipts
 
 
-def _selector_label(selector: object) -> str:
-    if isinstance(selector, Mapping):
-        mapping = cast(Mapping[str, object], selector)
-        return str(mapping.get("entity_id") or mapping.get("entity_name") or mapping.get("term") or "")
-    return str(
-        getattr(selector, "entity_id", None)
-        or getattr(selector, "entity_name", None)
-        or getattr(selector, "term", None)
-        or ""
-    )
-
-
-def _rank_key(metrics: Mapping[str, object], fields: tuple[RuntimeGroomingRankFieldPolicy, ...]) -> tuple[object, ...]:
-    key: list[object] = []
-    for field in fields:
-        name = field.field
-        value = metrics[name]
-        key.append(-value if field.direction == "descending" and isinstance(value, int) else value)
-    return tuple(key)
-
-
-def _build_work_item(
-    substance: Substance,
-    active_products: tuple[Product, ...],
-    open_relations: tuple[GroomRelation, ...],
-    paths: Paths,
-    bundle: OntologyBundle,
-) -> GroomWorkItem:
-    products = tuple(
-        GroomProduct(
-            id=product.id,
-            name=product.name,
-            brand=product.brand,
-            notes=product.notes,
-            use_pattern=product.use_pattern,
-            components=tuple(
-                (component.substance, component.label, component.amount, component.notes)
-                for component in product.components
-            ),
+def _receipt(row: object, path: Path, index: int) -> _Receipt:
+    label = f"assessments[{index}]"
+    if not isinstance(row, Mapping):
+        raise CardLoadError(
+            path, f"grooming receipt {label} must contain exactly composition_role, assessed_on, and outcome"
         )
-        for product in sorted(active_products, key=lambda item: item.id)
-        if _has_substance(product, substance.id)
-    )
-    knowledge = tuple(
-        GroomKnowledge(row.category, row.value, row.research_state, row.sources)
-        for row in substance.knowledge_assertions
-    )
-    schedule = tuple(GroomSchedule(row.axis, row.value) for row in substance.schedule_assertions)
-    authored_assessments = {row.axis: row for row in substance.scheduling_assessments}
-    assessments = tuple(
-        GroomAssessment(
-            axis=axis.axis,
-            conclusion=(
-                authored_assessments[axis.axis].conclusion if axis.axis in authored_assessments else "unassessed"
-            ),
-            policy=(authored_assessments[axis.axis].policy if axis.axis in authored_assessments else None),
-            sources=(authored_assessments[axis.axis].sources if axis.axis in authored_assessments else ()),
-            summary=(
-                authored_assessments[axis.axis].summary
-                if axis.axis in authored_assessments
-                else "Open: no authored scheduling assessment."
-            ),
+    receipt = cast(Mapping[object, object], row)
+    if set(receipt) != {"composition_role", "assessed_on", "outcome"}:
+        raise CardLoadError(
+            path, f"grooming receipt {label} must contain exactly composition_role, assessed_on, and outcome"
         )
-        for axis in sorted(bundle.runtime_program.assignment_axes, key=lambda row: (row.order, row.id))
-    )
-    return GroomWorkItem(
-        substance_id=substance.id,
-        name=substance.name,
-        path=_substance_path(paths, substance),
-        aliases=substance.aliases,
-        form=substance.form,
-        notes=substance.notes,
-        active_unique_product_count=len(products),
-        open_owned_item_count=_open_knowledge_count(
-            substance, bundle.runtime_program.grooming_policy.open_research_state
-        )
-        + len(open_relations),
-        active_products=products,
-        knowledge=knowledge,
-        open_relations=open_relations,
-        schedule_assertions=schedule,
-        scheduling_assessments=assessments,
-    )
+    role = receipt["composition_role"]
+    assessed_on = receipt["assessed_on"]
+    outcome = receipt["outcome"]
+    if not isinstance(role, str) or not role:
+        raise CardLoadError(path, f"grooming receipt {label}.composition_role must be a non-empty string")
+    if not isinstance(assessed_on, str) or _DATE.fullmatch(assessed_on) is None:
+        raise CardLoadError(path, f"grooming receipt {label}.assessed_on must be a quoted YYYY-MM-DD string")
+    try:
+        date.fromisoformat(assessed_on)
+    except ValueError as error:
+        raise CardLoadError(path, f"grooming receipt {label}.assessed_on must be a valid calendar date") from error
+    if outcome not in _OUTCOMES:
+        raise CardLoadError(path, f"grooming receipt {label}.outcome must be one of {sorted(_OUTCOMES)!r}")
+    return _Receipt(role, assessed_on, cast(str, outcome))
 
 
-def _substance_path(paths: Paths, substance: Substance) -> Path:
-    matches = sorted(paths.substances.glob(f"*__{substance.id}.yaml"))
-    return matches[0] if matches else paths.substances
-
-
-def _render(items: tuple[GroomWorkItem, ...], eligible_count: int, selection_count: int) -> None:
-    print(f"Grooming queue: {eligible_count} eligible, showing {len(items)} (selection_count={selection_count})")
+def _render(items: tuple[GroomWorkItem, ...], eligible_count: int) -> None:
+    print(f"Grooming queue: {eligible_count} eligible, showing {len(items)}")
     for item in items:
-        _render_item(item)
-
-
-def _render_item(item: GroomWorkItem) -> None:
-    print(f"  card {item.substance_id} — {item.name}")
-    print(f"    path: {item.path}")
-    print(f"    form: {item.form or '—'}")
-    print(f"    aliases: {', '.join(item.aliases) or '—'}")
-    print(f"    notes: {item.notes or '—'}")
-    print(f"    active_unique_product_count: {item.active_unique_product_count}")
-    print(f"    open_owned_item_count: {item.open_owned_item_count}")
-    print("    active products:")
-    for product in item.active_products:
-        print(f"      - {product.id}: {product.brand + ' - ' if product.brand else ''}{product.name}")
-        print(f"        notes: {product.notes or '—'}; use_pattern: {product.use_pattern or '—'}")
-        for substance, label, amount, notes in product.components:
-            context = ", ".join(value for value in (label, amount, notes) if value) or "—"
-            print(f"        component {substance}: {context}")
-    print("    knowledge assertions:")
-    for row in item.knowledge:
-        marker = "OPEN" if row.open else row.research_state
-        print(f"      - {marker} {row.category}={row.value} sources={', '.join(row.sources) or '—'}")
-    print("    owned open relation leads:")
-    for row in item.open_relations:
+        print(f"  role {item.composition_role_id}")
+        print(f"    product: {item.product_id} — {item.product_name}")
+        print(f"    substance: {item.substance_id} — {item.substance_name}")
         print(
-            f"      - OPEN {row.id} {row.relation_type}: {row.source} -> {row.target} "
-            f"({row.reason}); sources={','.join(row.sources) or '—'}; "
-            f"endpoints={','.join(row.active_endpoint_ids) or '—'}; owner={row.owner_id or '—'}"
+            "    collection boundary: identify evidence or applicability gaps only; do not author or adjudicate facts."
         )
-    if not item.open_relations:
-        print("      - none")
-    print("    schedule assertions:")
-    for row in item.schedule_assertions:
-        print(f"      - {row.axis}={row.value}")
-    print("    scheduling assessments:")
-    for row in item.scheduling_assessments:
-        marker = "OPEN" if row.open else row.conclusion
-        print(f"      - {marker} {row.axis}: {row.summary} sources={', '.join(row.sources) or '—'}")
-
-
-def _print_errors(errors: list[str]) -> None:
-    for error in errors:
-        print(error, file=sys.stderr)

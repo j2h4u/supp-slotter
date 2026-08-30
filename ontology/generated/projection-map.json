@@ -19,22 +19,10 @@
       "root_class": "CanonicalLawCatalog"
     },
     {
-      "id": "constraints",
-      "path": "ontology/scheduling-constraints.yaml",
-      "role": "constraints",
-      "root_class": "SchedulingConstraintCatalog"
-    },
-    {
       "id": "ontoclean",
       "path": "ontology/ontoclean.yaml",
       "role": "ontoclean",
       "root_class": "OntoCleanCatalog"
-    },
-    {
-      "id": "policies",
-      "path": "ontology/policies.yaml",
-      "role": "policies",
-      "root_class": "SchedulingPolicyCatalog"
     },
     {
       "id": "relation_types",
@@ -104,11 +92,11 @@
       "name": "AcuteAlertnessEffect",
       "slots": [
         {
-          "inlined": false,
+          "inlined": true,
           "inlined_as_list": false,
           "multivalued": false,
           "name": "applicability",
-          "range": "CompositionRole",
+          "range": "FactApplicability",
           "required": true
         },
         {
@@ -180,11 +168,11 @@
       "name": "AcuteSleepEffect",
       "slots": [
         {
-          "inlined": false,
+          "inlined": true,
           "inlined_as_list": false,
           "multivalued": false,
           "name": "applicability",
-          "range": "CompositionRole",
+          "range": "FactApplicability",
           "required": true
         },
         {
@@ -275,14 +263,6 @@
           "inlined": true,
           "inlined_as_list": true,
           "multivalued": true,
-          "name": "composition_roles",
-          "range": "CompositionRole",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
           "name": "evidence_sources",
           "range": "EvidenceSource",
           "required": false
@@ -364,11 +344,11 @@
       "name": "CanonicalSchedulingFact",
       "slots": [
         {
-          "inlined": false,
+          "inlined": true,
           "inlined_as_list": false,
           "multivalued": false,
           "name": "applicability",
-          "range": "CompositionRole",
+          "range": "FactApplicability",
           "required": true
         },
         {
@@ -481,44 +461,6 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/CardKnowledge"
-    },
-    {
-      "name": "CardSchedule",
-      "slots": [
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "activity",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "intake",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "prefer_with",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "timing",
-          "range": "string",
-          "required": false
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/CardSchedule"
     },
     {
       "name": "Catalog",
@@ -823,6 +765,28 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/EvidenceSource"
     },
     {
+      "name": "FactApplicability",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "composition_role",
+          "range": "CompositionRole",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "substance",
+          "range": "Substance",
+          "required": false
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/FactApplicability"
+    },
+    {
       "name": "FactSubject",
       "slots": [
         {
@@ -848,11 +812,11 @@
       "name": "FoodEffect",
       "slots": [
         {
-          "inlined": false,
+          "inlined": true,
           "inlined_as_list": false,
           "multivalued": false,
           "name": "applicability",
-          "range": "CompositionRole",
+          "range": "FactApplicability",
           "required": true
         },
         {
@@ -1296,11 +1260,11 @@
       "name": "PostExerciseRecoveryEffect",
       "slots": [
         {
-          "inlined": false,
+          "inlined": true,
           "inlined_as_list": false,
           "multivalued": false,
           "name": "applicability",
-          "range": "CompositionRole",
+          "range": "FactApplicability",
           "required": true
         },
         {
@@ -1372,11 +1336,11 @@
       "name": "PreExercisePerformanceEffect",
       "slots": [
         {
-          "inlined": false,
+          "inlined": true,
           "inlined_as_list": false,
           "multivalued": false,
           "name": "applicability",
-          "range": "CompositionRole",
+          "range": "FactApplicability",
           "required": true
         },
         {
@@ -1813,68 +1777,6 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RelationCatalog"
     },
     {
-      "name": "RuntimeAssignmentAxisPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "assignment_field",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "assignment_source",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "axis",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "maximum_cardinality",
-          "range": "integer",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "minimum_cardinality",
-          "range": "integer",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "order",
-          "range": "integer",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAssignmentAxisPolicy"
-    },
-    {
       "name": "RuntimeConcernCatalogEntry",
       "slots": [
         {
@@ -2093,44 +1995,6 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDashboardUsageTruthState"
-    },
-    {
-      "name": "RuntimeEffectMatchDimensionPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "key",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "slot_field",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "value_type",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectMatchDimensionPolicy"
     },
     {
       "name": "RuntimeEngineConformanceScenario",
@@ -2370,135 +2234,19 @@
           "required": true
         },
         {
-          "inlined": false,
+          "inlined": true,
           "inlined_as_list": false,
-          "multivalued": true,
-          "name": "source_kind_roles",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "source_kinds",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "warning_emitter_ids",
-          "range": "string",
+          "multivalued": false,
+          "name": "stack_partition",
+          "range": "RuntimeStackPartition",
           "required": true
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGlueContract"
     },
     {
-      "name": "RuntimeGroomingPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "open_research_state",
-          "range": "ResearchState",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "rank_fields",
-          "range": "RuntimeGroomingRankFieldPolicy",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "relation_owner_direction",
-          "range": "GroomingRankDirection",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "relation_owner_field",
-          "range": "GroomingRankField",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "require_active_reachable",
-          "range": "boolean",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "selection_count",
-          "range": "integer",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGroomingPolicy"
-    },
-    {
-      "name": "RuntimeGroomingRankFieldPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "direction",
-          "range": "GroomingRankDirection",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "field",
-          "range": "GroomingRankField",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGroomingRankFieldPolicy"
-    },
-    {
       "name": "RuntimePolicyCatalog",
       "slots": [
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "assignment_axes",
-          "range": "RuntimeAssignmentAxisPolicy",
-          "required": true
-        },
         {
           "inlined": true,
           "inlined_as_list": true,
@@ -2517,14 +2265,6 @@
         },
         {
           "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "effect_match_dimensions",
-          "range": "RuntimeEffectMatchDimensionPolicy",
-          "required": true
-        },
-        {
-          "inlined": true,
           "inlined_as_list": false,
           "multivalued": false,
           "name": "engine_contract",
@@ -2537,14 +2277,6 @@
           "multivalued": false,
           "name": "glue_contract",
           "range": "RuntimeGlueContract",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "grooming_policy",
-          "range": "RuntimeGroomingPolicy",
           "required": true
         },
         {
@@ -2585,38 +2317,6 @@
           "multivalued": true,
           "name": "selector_form_capabilities",
           "range": "RuntimeSelectorFormCapability",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "slot_near_values",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "source_kind_values",
-          "range": "RuntimeSourceKindValuePolicy",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "warning_emitters",
-          "range": "RuntimeWarningEmitterPolicy",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "warning_trait_actions",
-          "range": "RuntimeWarningTraitActionPolicy",
           "required": true
         },
         {
@@ -2837,13 +2537,13 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSelectorFormCapability"
     },
     {
-      "name": "RuntimeSourceKindValuePolicy",
+      "name": "RuntimeStackPartition",
       "slots": [
         {
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": true,
-          "name": "applies_to",
+          "name": "excluded_stack_names",
           "range": "string",
           "required": true
         },
@@ -2858,81 +2558,21 @@
         {
           "inlined": false,
           "inlined_as_list": false,
+          "multivalued": true,
+          "name": "routable_stack_names",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
           "multivalued": false,
-          "name": "source_kind",
+          "name": "tracked_unassigned_partition_name",
           "range": "string",
           "required": true
         }
       ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSourceKindValuePolicy"
-    },
-    {
-      "name": "RuntimeWarningEmitterPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "default_message",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "emitter",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "warning_type",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningEmitterPolicy"
-    },
-    {
-      "name": "RuntimeWarningTraitActionPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "action_text",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "trait_id",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningTraitActionPolicy"
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeStackPartition"
     },
     {
       "name": "RuntimeWarningTypePolicy",
@@ -2971,570 +2611,6 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningTypePolicy"
-    },
-    {
-      "name": "ScheduleAssertion",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "schedule_axis",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "schedule_value",
-          "range": "string",
-          "required": false
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/ScheduleAssertion"
-    },
-    {
-      "name": "SchedulePresentationActiveFactIndex",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "include_namespaces",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "labels",
-          "range": "SchedulePresentationLabel",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationActiveFactIndex"
-    },
-    {
-      "name": "SchedulePresentationConcernAnnotations",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "include_kinds",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "labels",
-          "range": "SchedulePresentationLabel",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationConcernAnnotations"
-    },
-    {
-      "name": "SchedulePresentationLabel",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "key",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "label",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationLabel"
-    },
-    {
-      "name": "SchedulePresentationPolicy",
-      "slots": [
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "active_fact_index",
-          "range": "SchedulePresentationActiveFactIndex",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "concern_annotations",
-          "range": "SchedulePresentationConcernAnnotations",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "review_tags",
-          "range": "SchedulePresentationReviewTags",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "zero_effect",
-          "range": "SchedulePresentationZeroEffect",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationPolicy"
-    },
-    {
-      "name": "SchedulePresentationReviewTags",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "exclude_policy_ids",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "include_namespaces",
-          "range": "string",
-          "required": false
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationReviewTags"
-    },
-    {
-      "name": "SchedulePresentationZeroEffect",
-      "slots": [
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "condition",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "template",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationZeroEffect"
-    },
-    {
-      "name": "SchedulingAssessment",
-      "slots": [
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "activity",
-          "range": "SchedulingAssessmentRecord",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "intake",
-          "range": "SchedulingAssessmentRecord",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "timing",
-          "range": "SchedulingAssessmentRecord",
-          "required": false
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingAssessment"
-    },
-    {
-      "name": "SchedulingAssessmentRecord",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "conclusion",
-          "range": "SchedulingAssessmentConclusion",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "policy",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "sources",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "summary",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingAssessmentRecord"
-    },
-    {
-      "name": "SchedulingConstraint",
-      "slots": [
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "action",
-          "range": "Action",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "condition",
-          "range": "Condition",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "effect",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "key",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "rationale",
-          "range": "string",
-          "required": false
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraint"
-    },
-    {
-      "name": "SchedulingConstraintCatalog",
-      "slots": [
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "scheduling_constraints",
-          "range": "SchedulingConstraintRecord",
-          "required": false
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintCatalog"
-    },
-    {
-      "name": "SchedulingConstraintEntitySelector",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "entity_id",
-          "range": "Substance",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "name",
-          "range": "string",
-          "required": false
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintEntitySelector"
-    },
-    {
-      "name": "SchedulingConstraintRecord",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "action",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "blocks_slots",
-          "range": "boolean",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "operation",
-          "range": "ConstraintExecutionOperation",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "rationale",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "score_delta",
-          "range": "integer",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "scores_advisory",
-          "range": "boolean",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "source_selector",
-          "range": "SchedulingConstraintSelector",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "target_selector",
-          "range": "SchedulingConstraintSelector",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintRecord"
-    },
-    {
-      "name": "SchedulingConstraintSelector",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "category",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "entity",
-          "range": "SchedulingConstraintEntitySelector",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "scope",
-          "range": "SchedulingConstraintScope",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "term",
-          "range": "string",
-          "required": false
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintSelector"
-    },
-    {
-      "name": "SchedulingPolicyCatalog",
-      "slots": [
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "schedule_presentation",
-          "range": "SchedulePresentationPolicy",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "scheduling_policies",
-          "range": "SchedulingPolicyRecord",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicyCatalog"
-    },
-    {
-      "name": "SchedulingPolicyEffectMatch",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "food",
-          "range": "boolean",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "near",
-          "range": "string",
-          "required": false
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicyEffectMatch"
-    },
-    {
-      "name": "SchedulingPolicyEffectRecord",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "level",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "match",
-          "range": "SchedulingPolicyEffectMatch",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicyEffectRecord"
-    },
-    {
-      "name": "SchedulingPolicyRecord",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "action",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "applies_when",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "effects",
-          "range": "SchedulingPolicyEffectRecord",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "term",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "warning",
-          "range": "boolean",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicyRecord"
     },
     {
       "name": "Selector",
@@ -3692,6 +2768,14 @@
           "name": "label",
           "range": "string",
           "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "tracked_entries",
+          "range": "TrackedUnassignedEntry",
+          "required": false
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Stack"
@@ -3776,30 +2860,6 @@
           "name": "notes",
           "range": "string",
           "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "prefer_with",
-          "range": "Substance",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "schedule_assertions",
-          "range": "ScheduleAssertion",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "scheduling_assessment",
-          "range": "SchedulingAssessment",
-          "required": false
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Substance"
@@ -3862,22 +2922,6 @@
           "name": "notes",
           "range": "string",
           "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "schedule",
-          "range": "CardSchedule",
-          "required": false
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "scheduling_assessment",
-          "range": "SchedulingAssessment",
-          "required": false
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SubstanceCard"
@@ -3933,6 +2977,28 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/TermSelector"
+    },
+    {
+      "name": "TrackedUnassignedEntry",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "product",
+          "range": "Product",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "reason",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/TrackedUnassignedEntry"
     },
     {
       "name": "VocabularyCatalog",
@@ -4419,14 +3485,59 @@
             {
               "kind": "inlined-node",
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/entries",
-              "source": "<key>[]",
+              "source": "daily[]",
               "target": "StackEntry"
             },
             {
               "kind": "reference",
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/product",
-              "source": "<key>[]",
-              "subject": "<key>[]",
+              "source": "daily[]",
+              "subject": "daily[]",
+              "target": "Product"
+            },
+            {
+              "kind": "inlined-node",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/entries",
+              "source": "inactive[]",
+              "target": "StackEntry"
+            },
+            {
+              "kind": "reference",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/product",
+              "source": "inactive[]",
+              "subject": "inactive[]",
+              "target": "Product"
+            },
+            {
+              "kind": "inlined-node",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/tracked_entries",
+              "source": "tracked_unassigned[]",
+              "target": "TrackedUnassignedEntry"
+            },
+            {
+              "kind": "reference",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/product",
+              "source": "tracked_unassigned[].product",
+              "subject": "tracked_unassigned[]",
+              "target": "Product"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/reason",
+              "source": "tracked_unassigned[].reason",
+              "subject": "tracked_unassigned[]"
+            },
+            {
+              "kind": "inlined-node",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/entries",
+              "source": "training[]",
+              "target": "StackEntry"
+            },
+            {
+              "kind": "reference",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/product",
+              "source": "training[]",
+              "subject": "training[]",
               "target": "Product"
             }
           ],
@@ -4531,168 +3642,6 @@
               "kind": "slot",
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/notes",
               "source": "notes"
-            },
-            {
-              "kind": "inlined-node",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_assertions",
-              "source": "schedule.activity[]",
-              "target": "ScheduleAssertion"
-            },
-            {
-              "kind": "path-token",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axis",
-              "source": "schedule.activity[]",
-              "subject": "schedule.activity[]",
-              "token": "activity[]"
-            },
-            {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_value",
-              "source": "schedule.activity[]",
-              "subject": "schedule.activity[]"
-            },
-            {
-              "kind": "inlined-node",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_assertions",
-              "source": "schedule.intake[]",
-              "target": "ScheduleAssertion"
-            },
-            {
-              "kind": "path-token",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axis",
-              "source": "schedule.intake[]",
-              "subject": "schedule.intake[]",
-              "token": "intake[]"
-            },
-            {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_value",
-              "source": "schedule.intake[]",
-              "subject": "schedule.intake[]"
-            },
-            {
-              "kind": "sequence",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/prefer_with",
-              "source": "schedule.prefer_with[]",
-              "target": "Substance"
-            },
-            {
-              "kind": "inlined-node",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_assertions",
-              "source": "schedule.timing[]",
-              "target": "ScheduleAssertion"
-            },
-            {
-              "kind": "path-token",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axis",
-              "source": "schedule.timing[]",
-              "subject": "schedule.timing[]",
-              "token": "timing[]"
-            },
-            {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_value",
-              "source": "schedule.timing[]",
-              "subject": "schedule.timing[]"
-            },
-            {
-              "kind": "inlined-node",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_assessment",
-              "source": "scheduling_assessment",
-              "target": "SchedulingAssessment"
-            },
-            {
-              "kind": "inlined-node",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/activity",
-              "source": "scheduling_assessment.activity",
-              "subject": "scheduling_assessment",
-              "target": "SchedulingAssessmentRecord"
-            },
-            {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/conclusion",
-              "source": "scheduling_assessment.activity.conclusion",
-              "subject": "scheduling_assessment.activity"
-            },
-            {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/policy",
-              "source": "scheduling_assessment.activity.policy",
-              "subject": "scheduling_assessment.activity"
-            },
-            {
-              "kind": "sequence",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/sources",
-              "source": "scheduling_assessment.activity.sources[]",
-              "subject": "scheduling_assessment.activity"
-            },
-            {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/summary",
-              "source": "scheduling_assessment.activity.summary",
-              "subject": "scheduling_assessment.activity"
-            },
-            {
-              "kind": "inlined-node",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/intake",
-              "source": "scheduling_assessment.intake",
-              "subject": "scheduling_assessment",
-              "target": "SchedulingAssessmentRecord"
-            },
-            {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/conclusion",
-              "source": "scheduling_assessment.intake.conclusion",
-              "subject": "scheduling_assessment.intake"
-            },
-            {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/policy",
-              "source": "scheduling_assessment.intake.policy",
-              "subject": "scheduling_assessment.intake"
-            },
-            {
-              "kind": "sequence",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/sources",
-              "source": "scheduling_assessment.intake.sources[]",
-              "subject": "scheduling_assessment.intake"
-            },
-            {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/summary",
-              "source": "scheduling_assessment.intake.summary",
-              "subject": "scheduling_assessment.intake"
-            },
-            {
-              "kind": "inlined-node",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/timing",
-              "source": "scheduling_assessment.timing",
-              "subject": "scheduling_assessment",
-              "target": "SchedulingAssessmentRecord"
-            },
-            {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/conclusion",
-              "source": "scheduling_assessment.timing.conclusion",
-              "subject": "scheduling_assessment.timing"
-            },
-            {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/policy",
-              "source": "scheduling_assessment.timing.policy",
-              "subject": "scheduling_assessment.timing"
-            },
-            {
-              "kind": "sequence",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/sources",
-              "source": "scheduling_assessment.timing.sources[]",
-              "subject": "scheduling_assessment.timing"
-            },
-            {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/summary",
-              "source": "scheduling_assessment.timing.summary",
-              "subject": "scheduling_assessment.timing"
             }
           ],
           "maintenance": {

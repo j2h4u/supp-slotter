@@ -5,27 +5,6 @@ notes: 'Water-soluble potassium citrate. The active TiM component supplies 66.5 
 concerns:
 - kind: safety
   text: Review renal function, potassium exposure, and hyperkalemia-promoting medications; low-dose active electrolyte use does not establish a universal potassium timing rule.
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Potassium-HealthProfessional/
-    - https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=3dd9c9eb-df19-4ec9-bc77-f3a159b33d94
-    - https://pubmed.ncbi.nlm.nih.gov/1875495/
-    summary: No direct fed-versus-fasted absorption evidence establishes a meal preference for potassium citrate; GI tolerance and pharmacologic dose contexts do not transfer to the active low-dose electrolyte component, and practice may vary by tolerability.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Potassium-HealthProfessional/
-    - https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=3dd9c9eb-df19-4ec9-bc77-f3a159b33d94
-    - https://pubmed.ncbi.nlm.nih.gov/1875495/
-    summary: No comparative clock-time rule was demonstrated for potassium citrate; pharmacologic urinary-alkalinization timing does not transfer to this low-dose electrolyte.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://pubmed.ncbi.nlm.nih.gov/33333771/
-    - https://pubmed.ncbi.nlm.nih.gov/38116803/
-    summary: Mixed oral-rehydration-solution studies do not establish pre-, during-, or post-workout placement for the active TiM low-dose potassium component.
 knowledge:
   context:
   - value: workout_performance

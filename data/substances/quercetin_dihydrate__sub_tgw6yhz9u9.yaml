@@ -5,9 +5,6 @@ aliases:
 - quercetin dihydrate
 notes: Flavonoid with anti-inflammatory and CYP-modulating activity; mild antiplatelet potential and possible interaction
   with various medications. Distinct from dihydroquercetin (taxifolin), which is a different molecule.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - antioxidant_protection

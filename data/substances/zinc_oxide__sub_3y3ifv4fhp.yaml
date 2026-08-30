@@ -5,9 +5,6 @@ aliases:
 - ZnO
 notes: Zinc oxide form used in Optimum Nutrition Opti-Men and Animal Flex. Human tracer literature reports lower absorption
   from zinc oxide than citrate/gluconate, so it remains a separate review card.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - skin_support

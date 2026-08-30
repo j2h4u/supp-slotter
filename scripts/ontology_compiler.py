@@ -32,7 +32,6 @@ from linkml_runtime.linkml_model.meta import AnonymousClassExpression, Prefix, S
 from linkml_runtime.utils.schemaview import SchemaView
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
-    IMPLEMENTED_EFFECT_MATCH_VALUE_HANDLERS,
     IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
     IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS,
     IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE,
@@ -50,6 +49,7 @@ _GENERATED_DIR = "generated"
 _RUNTIME_FORMAT = "supp-slotter.runtime-vocabulary/v2"
 _JSON_SCHEMA_FORMAT = "https://json-schema.org/draft/2020-12/schema"
 _ARTIFACT_LOCK_FORMAT = "ontology-artifact-lock-v1"
+_RUNTIME_LOCK_FORMAT = "ontology-runtime-lock-v1"
 _PROJECTION_MAP_FORMAT = "ontology-projection-map-v1"
 _RUNTIME_PROGRAM_FORMAT = "ontology-runtime-program-v1"
 _REPOSITORY_PROJECTION_FORMAT = "repository-projection-v1"
@@ -68,6 +68,7 @@ _EXPECTED_ARTIFACTS = {
     "projection-map.json",
     "runtime-program.json",
     "runtime-vocabulary.yaml",
+    "runtime-lock.json",
     "artifact-lock.json",
 }
 _REPOSITORY_LOCATOR_KINDS = {"flat_root", "explicit_path", "explicit_paths", "catalog_ref"}
@@ -879,15 +880,6 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     terms = _normalized_terms(vocabulary, ontoclean_profiles)
     relation_types = _load_relation_types(ontology_root, manifest, schema_view)
     runtime = _load_runtime_policy(ontology_root, manifest, schema_view, set(relation_types))
-    scheduling_policies = _load_scheduling_policies(ontology_root, manifest, schema_view, terms, categories, runtime)
-    schedule_presentation = _load_schedule_presentation(ontology_root, manifest, scheduling_policies, categories)
-    scheduling_constraints = _load_scheduling_constraints(
-        ontology_root,
-        manifest,
-        schema_view,
-        terms,
-        runtime,
-    )
     ontology_assertions = _load_ontology_assertions(
         ontology_root,
         manifest,
@@ -899,7 +891,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     )
     _validate_relation_warning_filter_values(runtime.authored, ontology_assertions)
     base_iri = _required_string(manifest, _BASE_IRI_KEY)
-    _add_authored_card_fields(schema_view, runtime.authored, categories, base_iri)
+    _add_authored_card_fields(schema_view, categories, base_iri)
     header = _header(manifest, source_hash)
     runtime_vocabulary: object = {
         "format": _RUNTIME_FORMAT,
@@ -909,9 +901,6 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         "categories": categories,
         "ontoclean_profiles": ontoclean_profiles,
         "terms": terms,
-        "scheduling_policies": scheduling_policies,
-        "schedule_presentation": schedule_presentation,
-        "scheduling_constraints": scheduling_constraints,
         "relation_types": relation_types,
         "runtime_policy": runtime.authored,
         "ontology_assertions": ontology_assertions,
@@ -922,7 +911,6 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     generated_schema_doc["$id"] = f"{base_iri}generated/schema.json"
     _apply_relation_type_enum(generated_schema_doc, relation_types)
     _apply_card_uniqueness(generated_schema_doc, schema_view, categories)
-    _apply_scheduling_assessment_schema(generated_schema_doc)
     generated_schema = _json_bytes_no_header(generated_schema_doc)
     card_schema = _catalog_schema(
         generated_schema_doc, base_iri, "card.schema.json", "SubstanceCard", "Supp Slotter canonical substance card"
@@ -958,9 +946,6 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
             categories,
             terms,
             relation_types,
-            scheduling_policies,
-            scheduling_constraints,
-            runtime.authored,
             ontoclean_profiles,
             schema_view,
             manifest,
@@ -971,6 +956,10 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         Path("runtime-program.json"): _json_bytes_no_header(runtime_program),
         Path("runtime-vocabulary.yaml"): _yaml_bytes(runtime_vocabulary, sort_keys=False),
     }
+    # The online process is deliberately unable to discover the formal
+    # ontology.  Give it a closed, independently hashable inventory of only
+    # the executable program, vocabulary, and schema contracts.
+    artifacts[Path("runtime-lock.json")] = _json_bytes_no_header(_runtime_lock(manifest, artifacts))
     artifacts[Path("artifact-lock.json")] = _json_bytes_no_header(_artifact_lock(ontology_root, manifest, artifacts))
     return artifacts
 
@@ -1084,64 +1073,6 @@ def _apply_card_uniqueness(
                 },
             ]
         }
-
-
-def _apply_scheduling_assessment_schema(generated_schema: dict[str, object]) -> None:
-    """Tighten the substance-only assessment record's conditional contract.
-
-    LinkML owns the classes, slots, and conclusion enum.  JSON Schema carries
-    the small conditional invariant that a preference conclusion requires a
-    policy while every other conclusion forbids it; the loader adds only the
-    cross-field join against the card's same-axis schedule assertion.
-    """
-    definitions = generated_schema.get("$defs")
-    if not isinstance(definitions, dict):
-        raise OntologyInfrastructureError("Generated LinkML schema has no class definitions")
-    record = definitions.get("SchedulingAssessmentRecord")
-    if not isinstance(record, dict):
-        raise OntologyInfrastructureError("Generated schema has no SchedulingAssessmentRecord")
-    properties = record.get("properties")
-    if not isinstance(properties, dict):
-        raise OntologyInfrastructureError("Generated SchedulingAssessmentRecord has no properties")
-    conclusion = properties.get("conclusion")
-    if not isinstance(conclusion, dict):
-        raise OntologyInfrastructureError("Generated SchedulingAssessmentRecord.conclusion is missing")
-    conclusion_definition = definitions.get("SchedulingAssessmentConclusion")
-    if not isinstance(conclusion_definition, dict) or not isinstance(conclusion_definition.get("enum"), list):
-        raise OntologyInfrastructureError("Generated scheduling assessment conclusion enum is missing")
-    conclusion_values = conclusion_definition["enum"]
-    if not conclusion_values or any(not isinstance(value, str) for value in conclusion_values):
-        raise OntologyInfrastructureError("Generated scheduling assessment conclusion enum is malformed")
-    if "supports_preference" not in conclusion_values:
-        raise OntologyInfrastructureError("SchedulingAssessmentConclusion must include supports_preference")
-    other_values = [value for value in conclusion_values if value != "supports_preference"]
-    for field in ("sources", "summary"):
-        field_schema = properties.get(field)
-        if not isinstance(field_schema, dict):
-            raise OntologyInfrastructureError(f"Generated SchedulingAssessmentRecord.{field} is missing")
-        field_schema["type"] = "string" if field == "summary" else "array"
-        if field == "summary":
-            field_schema["minLength"] = 1
-            field_schema["pattern"] = r"\S"
-        else:
-            field_schema["minItems"] = 1
-            field_schema["items"] = {"type": "string", "minLength": 1, "pattern": r"\S"}
-    policy = properties.get("policy")
-    if not isinstance(policy, dict):
-        raise OntologyInfrastructureError("Generated SchedulingAssessmentRecord.policy is missing")
-    policy.clear()
-    policy.update({"type": "string", "minLength": 1, "pattern": r"\S"})
-    record["oneOf"] = [
-        {
-            "properties": {"conclusion": {"const": "supports_preference"}},
-            "required": ["conclusion", "policy", "sources", "summary"],
-        },
-        {
-            "properties": {"conclusion": {"enum": other_values}},
-            "required": ["conclusion", "sources", "summary"],
-            "not": {"required": ["policy"]},
-        },
-    ]
 
 
 def _class_annotations(schema_view: SchemaView, class_name: str) -> Mapping[str, object]:
@@ -1264,7 +1195,7 @@ def _dashboard_schema(
 def _stacks_schema(
     generated_schema: Mapping[str, object], schema_view: SchemaView, manifest: Mapping[str, object], base_iri: str
 ) -> dict[str, object]:
-    """Generate the keyed stack YAML projection from the authored Stack model."""
+    """Generate the closed product-partition YAML projection."""
     del manifest
     key_pattern = _annotation_text(schema_view, "Stack", "source_key_pattern")
     uniqueness = _annotation_text(schema_view, "Stack", "entry_uniqueness")
@@ -1273,18 +1204,38 @@ def _stacks_schema(
     product_pattern = _definition_property(generated_schema, "ProductCard", "id").get("pattern")
     if not isinstance(product_pattern, str) or not product_pattern:
         raise OntologyInfrastructureError("ProductCard id pattern is required for stack references")
+    _definition_property(generated_schema, "TrackedUnassignedEntry", "product")
+    _definition_property(generated_schema, "TrackedUnassignedEntry", "reason")
+    product_id_array: dict[str, object] = {
+        "type": "array",
+        "uniqueItems": True,
+        "items": {"type": "string", "pattern": product_pattern},
+    }
+    tracked_unassigned_array: dict[str, object] = {
+        "type": "array",
+        "uniqueItems": True,
+        "items": {
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["product", "reason"],
+            "properties": {
+                "product": {"type": "string", "pattern": product_pattern},
+                "reason": {"type": "string", "minLength": 1, "pattern": r"\S"},
+            },
+        },
+    }
     return {
         "$schema": _JSON_SCHEMA_FORMAT,
         "$id": f"{base_iri}generated/stacks.schema.json",
         "title": "Supp Slotter canonical stack source contract",
         "type": "object",
         "additionalProperties": False,
-        "patternProperties": {
-            key_pattern: {
-                "type": "array",
-                "uniqueItems": True,
-                "items": {"type": "string", "pattern": product_pattern},
-            }
+        "propertyNames": {"pattern": key_pattern},
+        "properties": {
+            "daily": product_id_array,
+            "training": product_id_array,
+            "inactive": product_id_array,
+            "tracked_unassigned": tracked_unassigned_array,
         },
     }
 
@@ -1415,16 +1366,15 @@ def _pillboxes_schema(
 
 _CARD_FIELD_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
 _CANONICAL_NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
-_CANONICAL_PREDICATE_NAMESPACES = frozenset({"knowledge", "schedule"})
+_CANONICAL_PREDICATE_NAMESPACES = frozenset({"knowledge"})
 
 
 def _add_authored_card_fields(
     schema_view: SchemaView,
-    runtime_policy: Mapping[str, object],
     categories: Mapping[str, object],
     base_iri: str,
 ) -> None:
-    """Project authored assignment and vocabulary predicates into card schemas.
+    """Project raw vocabulary predicates into card schemas.
 
     ``model.yaml`` deliberately contains only the card envelopes.  This
     compiler boundary is the one place that turns the authored domain catalogs
@@ -1432,24 +1382,7 @@ def _add_authored_card_fields(
     list of card fields.
     """
 
-    axes = runtime_policy.get("assignment_axes")
-    if not isinstance(axes, list) or not axes:
-        raise OntologyInfrastructureError("Runtime policy requires non-empty assignment_axes")
-    schedule_fields: dict[str, Mapping[str, object]] = {}
-    for raw_axis in axes:
-        if not isinstance(raw_axis, Mapping):
-            raise OntologyInfrastructureError("Runtime assignment axis records must be mappings")
-        axis = cast(Mapping[str, object], raw_axis)
-        field = _required_string(axis, "assignment_field")
-        _validate_card_field_name(field, "assignment axis")
-        if axis.get("assignment_source") != "schedule":
-            continue
-        if field in schedule_fields:
-            raise OntologyInfrastructureError(f"Duplicate generated schedule card field {field!r}")
-        schedule_fields[field] = axis
-
     knowledge_fields: dict[str, Mapping[str, object]] = {}
-    schedule_predicates: dict[str, str] = {}
     for category, raw_metadata in categories.items():
         if not isinstance(category, str) or not isinstance(raw_metadata, Mapping):
             raise OntologyInfrastructureError("Semantic category records must be mappings")
@@ -1471,37 +1404,11 @@ def _add_authored_card_fields(
                         f"Knowledge card field {field!r} is declared by multiple semantic categories"
                     )
                 knowledge_fields[field] = metadata
-            elif namespace == "schedule":
-                if field in schedule_predicates and schedule_predicates[field] != category:
-                    raise OntologyInfrastructureError(
-                        f"Schedule predicate {field!r} is declared by multiple semantic categories"
-                    )
-                schedule_predicates[field] = category
             else:
                 raise OntologyInfrastructureError(
                     f"Semantic category {category!r} uses unsupported predicate namespace {namespace!r}"
                 )
 
-    missing_axes = sorted(set(schedule_predicates) - set(schedule_fields))
-    if missing_axes:
-        raise OntologyInfrastructureError(
-            "Semantic schedule predicates have no authored assignment-axis backing: " + ", ".join(missing_axes)
-        )
-    cross_container_collisions = sorted(set(schedule_fields) & set(knowledge_fields))
-    if cross_container_collisions:
-        raise OntologyInfrastructureError(
-            "Card field is declared in both schedule and knowledge envelopes: " + ", ".join(cross_container_collisions)
-        )
-
-    for field, axis in sorted(schedule_fields.items()):
-        _add_card_slot(
-            schema_view,
-            class_name="CardSchedule",
-            field=field,
-            base_iri=base_iri,
-            cardinality=axis,
-            default_maximum=1,
-        )
     for field, category in sorted(knowledge_fields.items()):
         _add_card_slot(
             schema_view,
@@ -1516,6 +1423,17 @@ def _add_authored_card_fields(
 def _validate_card_field_name(field: str, owner: str) -> None:
     if not _CARD_FIELD_PATTERN.fullmatch(field):
         raise OntologyInfrastructureError(f"{owner} has invalid card field name {field!r}")
+
+
+def _knowledge_namespaces(categories: Mapping[str, object]) -> set[str]:
+    return {
+        namespace
+        for namespace, raw in categories.items()
+        if isinstance(namespace, str)
+        and isinstance(raw, Mapping)
+        and isinstance(raw.get("allowed_predicates"), list)
+        and f"knowledge.{namespace}" in cast(list[object], raw["allowed_predicates"])
+    }
 
 
 def _add_card_slot(
@@ -1552,9 +1470,7 @@ def _add_card_slot(
         global_slot = schema_view.get_slot(field)
         if global_slot is None:
             raise OntologyInfrastructureError(f"Generated card field global slot is missing: {field!r}")
-        if (global_slot.range is not None or bool(global_slot.multivalued)) and not (
-            class_name == "CardSchedule" and field in {"intake", "timing", "activity"}
-        ):
+        if global_slot.range is not None or bool(global_slot.multivalued):
             raise OntologyInfrastructureError(f"Generated card field collides with global slot {field!r}")
         card_class = schema_view.get_class(class_name)
         if card_class is None or not isinstance(card_class.slot_usage, dict):
@@ -1702,6 +1618,33 @@ def _artifact_lock(
             {"path": str(path), "sha256": hashlib.sha256(content).hexdigest()}
             for path, content in sorted(artifacts.items(), key=lambda item: str(item[0]))
             if str(path) != "artifact-lock.json"
+        ],
+    }
+
+
+def _runtime_lock(manifest: Mapping[str, object], artifacts: Mapping[Path, bytes]) -> dict[str, object]:
+    """Return the closed, online-only generated artifact inventory."""
+
+    runtime_paths = {
+        "card.schema.json",
+        "dashboard.schema.json",
+        "pillboxes.schema.json",
+        "product.schema.json",
+        "relations.schema.json",
+        "schema.json",
+        "stacks.schema.json",
+        "runtime-program.json",
+        "runtime-vocabulary.yaml",
+    }
+    available = {str(path): content for path, content in artifacts.items()}
+    missing = sorted(runtime_paths - set(available))
+    if missing:
+        raise OntologyInfrastructureError(f"Runtime lock is missing executable artifacts: {missing}")
+    return {
+        "format_version": _RUNTIME_LOCK_FORMAT,
+        "schema_version": str(manifest["schema_version"]),
+        "outputs": [
+            {"path": path, "sha256": hashlib.sha256(available[path]).hexdigest()} for path in sorted(runtime_paths)
         ],
     }
 
@@ -2120,12 +2063,7 @@ def _normalize_canonical_laws(catalog: Mapping[str, object]) -> tuple[dict[str, 
 # uniqueness guard for a catalog whose records can have distinct IDs but the
 # same executable meaning.
 _RUNTIME_SEMANTIC_KEYS: Mapping[str, tuple[tuple[str, ...], ...]] = {
-    "source_kind_values": (("source_kind",),),
-    "effect_match_dimensions": (("key",), ("slot_field",)),
-    "assignment_axes": (("axis",), ("order",)),
     "warning_types": (("warning_type",),),
-    "warning_emitters": (("emitter",),),
-    "warning_trait_actions": (("trait_id",),),
     "concern_catalog": (("concern_kind",),),
     "relation_warning_rules": (("relation_kind", "filter_field", "filter_value", "active_side", "reverse_output"),),
     "relation_presence_statuses": (("status",), ("source_active", "target_active")),
@@ -2160,19 +2098,6 @@ def _validate_runtime_semantic_keys(
 @dataclass(frozen=True)
 class _PolicyRuntime:
     authored: dict[str, object]
-    assignment_axes: set[str]
-    near_values: set[str]
-    score_levels: set[str]
-    effect_match_dimensions: Mapping[str, str]
-    effect_match_slot_fields: Mapping[str, str]
-
-
-@dataclass(frozen=True)
-class _SchedulingPolicyContext:
-    term_metadata: Mapping[str, object]
-    near_values: set[str]
-    score_levels: set[str]
-    effect_match_dimensions: Mapping[str, str]
 
 
 def _load_runtime_policy(
@@ -2186,12 +2111,7 @@ def _load_runtime_policy(
     records = {
         key: _runtime_records(source, key)
         for key in (
-            "source_kind_values",
-            "effect_match_dimensions",
-            "assignment_axes",
             "warning_types",
-            "warning_emitters",
-            "warning_trait_actions",
             "concern_catalog",
             "relation_warning_rules",
             "relation_presence_statuses",
@@ -2205,40 +2125,6 @@ def _load_runtime_policy(
         cast(Mapping[str, object], source["glue_contract"]),
         records["relation_presence_statuses"],
     )
-    _validate_runtime_source_kind_contract(
-        cast(Mapping[str, object], source["glue_contract"]), records["source_kind_values"]
-    )
-    # Policy effect levels remain source-facing review metadata.  They are
-    # intentionally not loaded into the online runtime objective: the v2
-    # contract has no score magnitudes, weights, bonuses, or penalties.
-    score_levels: set[str] = set()
-    assignment_axes = {_required_string(row, "axis") for row in records["assignment_axes"]}
-    raw_near_values = source.get("slot_near_values")
-    if (
-        not isinstance(raw_near_values, list)
-        or not raw_near_values
-        or not all(isinstance(value, str) and value for value in raw_near_values)
-    ):
-        raise OntologyInfrastructureError("Runtime policy slot_near_values must be a non-empty list of strings")
-    near_values = set(cast(list[str], raw_near_values))
-    if len(near_values) != len(raw_near_values):
-        raise OntologyInfrastructureError("Runtime policy slot_near_values must not contain duplicates")
-    effect_match_dimensions: dict[str, str] = {}
-    effect_match_slot_fields: dict[str, str] = {}
-    for row in records["effect_match_dimensions"]:
-        key = _required_string(row, "key")
-        slot_field = _required_string(row, "slot_field")
-        _validate_card_field_name(slot_field, "effect-match Slot projection")
-        if key in effect_match_dimensions:
-            raise OntologyInfrastructureError(f"Runtime effect-match dimension key is duplicated: {key!r}")
-        if slot_field in effect_match_slot_fields.values():
-            raise OntologyInfrastructureError(f"Runtime effect-match slot field is duplicated: {slot_field!r}")
-        if slot_field in {"id", "label", "order"}:
-            raise OntologyInfrastructureError(
-                f"Runtime effect-match slot field conflicts with a technical Slot field: {slot_field!r}"
-            )
-        effect_match_dimensions[key] = _required_string(row, "value_type")
-        effect_match_slot_fields[key] = slot_field
     selector_forms = tuple(_required_string(row, "selector_form") for row in records["selector_form_capabilities"])
     if selector_forms != IMPLEMENTED_RELATION_SELECTOR_FORMS:
         raise OntologyInfrastructureError(
@@ -2250,33 +2136,48 @@ def _load_runtime_policy(
         raise OntologyInfrastructureError(
             "Runtime selector form capabilities must exactly match executable endpoint kinds"
         )
-    emitter_ids = tuple(_required_string(row, "emitter") for row in records["warning_emitters"])
-    expected_emitter_ids = IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS["warning_emitter_ids"]
-    if set(emitter_ids) != set(expected_emitter_ids) or len(emitter_ids) != len(expected_emitter_ids):
-        raise OntologyInfrastructureError("Runtime warning emitters must exactly match executable emitter IDs")
     for row in records["relation_warning_rules"]:
         if _required_string(row, "relation_kind") not in relation_types:
             raise OntologyInfrastructureError("Runtime relation warning rule references unknown relation type")
     return _PolicyRuntime(
         authored=dict(source),
-        assignment_axes=assignment_axes,
-        near_values=near_values,
-        score_levels=score_levels,
-        effect_match_dimensions=effect_match_dimensions,
-        effect_match_slot_fields=effect_match_slot_fields,
     )
 
 
 def _validate_runtime_glue_contract(glue: Mapping[str, object]) -> None:
     if not glue:
         raise OntologyInfrastructureError("Runtime glue_contract must not be empty")
-    # Pair/preference capability rows belonged to the superseded weighted
-    # engine.  Keep the shared capability registry untouched for legacy
-    # consumers, but do not admit those fields into the online v2 projection.
-    removed = {"prefer_with_source_fields", "prefer_with_target_resolutions", "prefer_with_pair_modes"}
+    partition = glue.get("stack_partition")
+    if not isinstance(partition, Mapping):
+        raise OntologyInfrastructureError("Runtime glue_contract requires stack_partition")
+    required_partition_fields = {
+        "id",
+        "routable_stack_names",
+        "excluded_stack_names",
+        "tracked_unassigned_partition_name",
+    }
+    if set(partition) != required_partition_fields:
+        raise OntologyInfrastructureError("Runtime stack_partition has an invalid closed shape")
+    routable = partition.get("routable_stack_names")
+    excluded = partition.get("excluded_stack_names")
+    tracked = partition.get("tracked_unassigned_partition_name")
+    if (
+        not isinstance(routable, list)
+        or not routable
+        or not isinstance(excluded, list)
+        or not excluded
+        or not isinstance(tracked, str)
+        or not tracked
+        or any(not isinstance(name, str) or not name for name in (*routable, *excluded))
+        or len(set(routable)) != len(routable)
+        or len(set(excluded)) != len(excluded)
+        or set(routable) & set(excluded)
+        or tracked in set(routable) | set(excluded)
+    ):
+        raise OntologyInfrastructureError("Runtime stack_partition must be a disjoint, complete authored partition")
+    if glue.get("inactive_stack_name") not in excluded:
+        raise OntologyInfrastructureError("Runtime inactive_stack_name must be an excluded stack partition")
     for field, allowed in IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS.items():
-        if field in removed:
-            continue
         values = glue.get(field)
         if not isinstance(values, list) or tuple(values) != allowed:
             raise OntologyInfrastructureError(
@@ -2322,21 +2223,6 @@ def _validate_runtime_record_shapes(records: Mapping[str, Sequence[Mapping[str, 
         ids = [row.get("id") for row in rows]
         if any(not isinstance(identifier, str) or not identifier for identifier in ids) or len(set(ids)) != len(ids):
             raise OntologyInfrastructureError(f"Runtime policy {slot} has invalid or duplicate ids")
-    for row in records["assignment_axes"]:
-        if not isinstance(row.get("order"), int) or isinstance(row.get("order"), bool):
-            raise OntologyInfrastructureError("Runtime assignment axes require integer order")
-        if "minimum_cardinality" not in row or "maximum_cardinality" not in row:
-            raise OntologyInfrastructureError(
-                "Runtime assignment axes require minimum_cardinality and maximum_cardinality"
-            )
-        minimum = row["minimum_cardinality"]
-        maximum = row["maximum_cardinality"]
-        if minimum is not None and (not isinstance(minimum, int) or isinstance(minimum, bool) or minimum < 0):
-            raise OntologyInfrastructureError("Runtime assignment axes require non-negative minimum_cardinality")
-        if maximum is not None and (not isinstance(maximum, int) or isinstance(maximum, bool) or maximum < 0):
-            raise OntologyInfrastructureError("Runtime assignment axes require non-negative maximum_cardinality")
-        if minimum is not None and maximum is not None and minimum > maximum:
-            raise OntologyInfrastructureError("Runtime assignment axis minimum_cardinality exceeds maximum_cardinality")
     boolean_fields = {
         "relation_warning_rules": ("reverse_output",),
         "relation_presence_statuses": ("source_active", "target_active"),
@@ -2365,27 +2251,6 @@ def _validate_runtime_relation_presence_contract(
         raise OntologyInfrastructureError(
             "Runtime relation_presence_statuses must have exact unique four-state coverage"
         )
-
-
-def _validate_runtime_source_kind_contract(glue: Mapping[str, object], rows: Sequence[Mapping[str, object]]) -> None:
-    source_kinds = glue.get("source_kinds")
-    if not isinstance(source_kinds, list) or not all(isinstance(value, str) and value for value in source_kinds):
-        raise OntologyInfrastructureError("Runtime glue_contract source_kinds must be strings")
-    authored = {_required_string(row, "source_kind") for row in rows}
-    if set(source_kinds) != authored:
-        raise OntologyInfrastructureError("Runtime glue_contract source_kinds must match source_kind_values")
-    source_kind_roles = glue.get("source_kind_roles")
-    if not isinstance(source_kind_roles, list) or not all(
-        isinstance(value, str) and value for value in source_kind_roles
-    ):
-        raise OntologyInfrastructureError("Runtime glue_contract source_kind_roles must be strings")
-    declared_roles = set(source_kind_roles)
-    applied_roles = {
-        role for row in rows for role in cast(Sequence[object], row.get("applies_to", [])) if isinstance(role, str)
-    }
-    if not applied_roles.issubset(declared_roles):
-        unknown = sorted(applied_roles - declared_roles)
-        raise OntologyInfrastructureError(f"Runtime source_kind_values reference undeclared roles: {unknown}")
 
 
 def _slot_with_range(schema_view: SchemaView, class_name: str, range_name: str) -> str:
@@ -2577,11 +2442,6 @@ def _linkml_catalog_instance(class_name: str, source: Mapping[str, object]) -> M
         }
     if class_name == "OntoCleanCatalog":
         return {"ontoclean_profiles": _keyed_record_map(_required_mapping(source, "ontoclean_profiles"))}
-    if class_name == "SchedulingPolicyCatalog":
-        return {
-            "scheduling_policies": _keyed_record_map(_required_mapping(source, "scheduling_policies")),
-            "schedule_presentation": source.get("schedule_presentation"),
-        }
     if class_name == "RelationCatalog":
         return {"relation_types": source.get("relation_types", [])}
     if class_name == "RelationAssertionCatalog":
@@ -3162,373 +3022,6 @@ def _validate_canonical_name(value: str, owner: str) -> None:
         raise OntologyInfrastructureError(f"{owner} must be a canonical namespace/slug: {value!r}")
 
 
-def _load_scheduling_policies(  # noqa: PLR0917
-    ontology_root: Path,
-    manifest: Mapping[str, object],
-    schema_view: SchemaView,
-    terms: Sequence[Mapping[str, object]],
-    categories: Mapping[str, object],
-    policy_runtime: _PolicyRuntime,
-) -> dict[str, dict[str, object]]:
-    """Load the planner policy contract from manifest-owned canonical sources.
-
-    The deliberately broad name includes risk warnings: they are planner policy
-    facts, even though they do not affect slot scoring.  Runtime consumers get a
-    stable flat ``category:term`` key and never need a separate card registry.
-    """
-    known_terms = {(str(term["semantic_category"]), str(term["slug"])): term for term in terms}
-    policies: dict[str, dict[str, object]] = {}
-    for relative_path in _catalog_paths(ontology_root, manifest, "policies"):
-        source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
-        _validate_linkml_instance(
-            schema_view,
-            "SchedulingPolicyCatalog",
-            _linkml_catalog_instance("SchedulingPolicyCatalog", source),
-        )
-        raw_policies = _required_mapping(source, "scheduling_policies")
-        for key, raw_policy in raw_policies.items():
-            if not isinstance(key, str) or key.count(":") != 1:
-                raise OntologyInfrastructureError(f"Policy key must be category:term in {relative_path}: {key!r}")
-            raw_policy = raw_policy if isinstance(raw_policy, Mapping) else None
-            if raw_policy is None:
-                raise OntologyInfrastructureError(f"Policy {key!r} must be a mapping")
-            namespace, term_key = key.split(":", maxsplit=1)
-            term = _required_string(raw_policy, "term")
-            if term != term_key:
-                raise OntologyInfrastructureError(
-                    f"Policy {key!r} term must match its canonical key component: {term!r}"
-                )
-            term_metadata = known_terms.get((namespace, term))
-            if term_metadata is None:
-                raise OntologyInfrastructureError(
-                    f"Policy {key!r} references unknown canonical vocabulary term {namespace}:{term}"
-                )
-            if str(term_metadata["semantic_category"]) not in categories:
-                raise OntologyInfrastructureError(f"Policy {key!r} must target a controlled semantic category")
-            if key in policies:
-                raise OntologyInfrastructureError(f"Duplicate canonical scheduling policy {key!r}")
-            policies[key] = _normalize_scheduling_policy(
-                key,
-                cast(Mapping[str, object], raw_policy),
-                _SchedulingPolicyContext(
-                    term_metadata,
-                    policy_runtime.near_values,
-                    policy_runtime.score_levels,
-                    policy_runtime.effect_match_dimensions,
-                ),
-            )
-    # Assignment axes are the executable schedule surface.  Keep this
-    # bidirectional: every accepted schedule term must have one policy, while
-    # policy keys are already checked above against the canonical vocabulary.
-    accepted_schedule_terms = {
-        (str(term["semantic_category"]), str(term["slug"]))
-        for term in terms
-        if any(
-            f"schedule.{axis}" in cast(list[object], term.get("allowed_predicates", []))
-            for axis in policy_runtime.assignment_axes
-        )
-    }
-    executable_policy_terms = {
-        (namespace, policy_id.split(":", maxsplit=1)[1])
-        for policy_id in policies
-        if (namespace := policy_id.split(":", maxsplit=1)[0]) in policy_runtime.assignment_axes
-    }
-    missing = sorted(accepted_schedule_terms - executable_policy_terms)
-    extra = sorted(executable_policy_terms - accepted_schedule_terms)
-    if missing or extra:
-        details: list[str] = []
-        if missing:
-            details.append("missing policies for " + ", ".join(f"{category}:{slug}" for category, slug in missing))
-        if extra:
-            details.append(
-                "policies for non-schedule terms " + ", ".join(f"{category}:{slug}" for category, slug in extra)
-            )
-        raise OntologyInfrastructureError("Scheduling policy coverage is not bidirectional: " + "; ".join(details))
-    return dict(sorted(policies.items()))
-
-
-def _normalize_scheduling_policy(
-    key: str, raw: Mapping[str, object], context: _SchedulingPolicyContext
-) -> dict[str, object]:
-    allowed = {"term", "applies_when", "effects", "warning", "action"}
-    extras = sorted(set(raw) - allowed)
-    if extras:
-        raise OntologyInfrastructureError(f"Policy {key!r} has unsupported fields: {', '.join(extras)}")
-    effects = raw.get("effects")
-    if not isinstance(effects, list):
-        raise OntologyInfrastructureError(f"Policy {key!r} effects must be a list")
-    warning = raw.get("warning")
-    if not isinstance(warning, bool):
-        raise OntologyInfrastructureError(f"Policy {key!r} warning must be boolean")
-    normalized: dict[str, object] = {
-        "term": _required_string(raw, "term"),
-        "label": _required_string(context.term_metadata, "label"),
-        "description": _required_string(context.term_metadata, "description"),
-        "applies_when": _required_string(raw, "applies_when"),
-        "effects": [
-            _normalize_policy_effect(
-                key,
-                item,
-                context.near_values,
-                context.score_levels,
-                context.effect_match_dimensions,
-            )
-            for item in cast(list[object], effects)
-        ],
-        "warning": warning,
-    }
-    if "action" in raw:
-        normalized["action"] = _required_string(raw, "action")
-    return normalized
-
-
-def _normalize_policy_effect(
-    key: str,
-    raw: object,
-    near_values: set[str],
-    score_levels: set[str],
-    effect_match_dimensions: Mapping[str, str],
-) -> dict[str, object]:
-    if not isinstance(raw, Mapping):
-        raise OntologyInfrastructureError(f"Policy {key!r} effect must be a mapping")
-    effect = cast(Mapping[str, object], raw)
-    extras = sorted(set(effect) - {"match", "level"})
-    if extras:
-        raise OntologyInfrastructureError(f"Policy {key!r} effect has unsupported fields: {', '.join(extras)}")
-    match = effect.get("match")
-    if not isinstance(match, Mapping) or not match or set(match) - set(effect_match_dimensions):
-        raise OntologyInfrastructureError(f"Policy {key!r} effect match is invalid")
-    normalized_match: dict[str, object] = {}
-    for name, value in cast(Mapping[str, object], match).items():
-        value_type = effect_match_dimensions.get(name)
-        if value_type is None:
-            raise OntologyInfrastructureError(f"Policy {key!r} effect match is invalid")
-        normalized_match[name] = _normalize_policy_match_value(key, name, value, value_type, near_values)
-    normalized: dict[str, object] = {"match": normalized_match}
-    level = _normalize_policy_level(key, effect.get("level"), score_levels)
-    if level is not None:
-        normalized["level"] = level
-    if len(normalized) == 1:
-        raise OntologyInfrastructureError(f"Policy {key!r} effect must set level")
-    return normalized
-
-
-def _normalize_policy_match_value(
-    policy_key: str, dimension_key: str, value: object, value_type: str, near_values: set[str]
-) -> str | bool:
-    handler = IMPLEMENTED_EFFECT_MATCH_VALUE_HANDLERS.get(value_type)
-    if handler is None:
-        raise OntologyInfrastructureError(
-            f"Policy {policy_key!r} effect match dimension {dimension_key!r} has unsupported value type {value_type!r}"
-        )
-    if handler == "capability_values":
-        if not isinstance(value, str) or value not in near_values:
-            raise OntologyInfrastructureError(f"Policy {policy_key!r} has invalid {dimension_key} value {value!r}")
-        return value
-    if handler == "boolean":
-        if not isinstance(value, bool):
-            raise OntologyInfrastructureError(f"Policy {policy_key!r} {dimension_key} match must be boolean")
-        return value
-    raise OntologyInfrastructureError(
-        f"Policy {policy_key!r} effect match dimension {dimension_key!r} has unsupported match handler {handler!r}"
-    )
-
-
-def _load_schedule_presentation(
-    ontology_root: Path,
-    manifest: Mapping[str, object],
-    scheduling_policies: Mapping[str, object],
-    categories: Mapping[str, object],
-) -> dict[str, object]:
-    configured: dict[str, object] | None = None
-    for relative_path in _catalog_paths(ontology_root, manifest, "policies"):
-        source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
-        raw_presentation = source.get("schedule_presentation")
-        if raw_presentation is None:
-            continue
-        if configured is not None:
-            raise OntologyInfrastructureError("schedule_presentation must be declared in exactly one policy catalog")
-        if not isinstance(raw_presentation, dict):
-            raise OntologyInfrastructureError("schedule_presentation must be a mapping")
-        configured = _normalize_schedule_presentation(
-            cast(Mapping[str, object], raw_presentation),
-            scheduling_policies,
-            categories,
-        )
-    if configured is None:
-        raise OntologyInfrastructureError("policy catalog must declare schedule_presentation")
-    return configured
-
-
-def _normalize_schedule_presentation(
-    raw: Mapping[str, object],
-    scheduling_policies: Mapping[str, object],
-    categories: Mapping[str, object],
-) -> dict[str, object]:
-    if set(raw) != {"concern_annotations", "review_tags", "active_fact_index", "zero_effect"}:
-        raise OntologyInfrastructureError("schedule_presentation has unsupported fields")
-    concern_annotations = _required_mapping(raw, "concern_annotations")
-    review_tags = _required_mapping(raw, "review_tags")
-    active_fact_index = _required_mapping(raw, "active_fact_index")
-    zero_effect = _required_mapping(raw, "zero_effect")
-    if set(concern_annotations) != {"include_kinds", "labels"}:
-        raise OntologyInfrastructureError("schedule_presentation.concern_annotations has unsupported fields")
-    if set(review_tags) != {"include_namespaces", "exclude_policy_ids"}:
-        raise OntologyInfrastructureError("schedule_presentation.review_tags has unsupported fields")
-    if set(active_fact_index) != {"include_namespaces", "labels"}:
-        raise OntologyInfrastructureError("schedule_presentation.active_fact_index has unsupported fields")
-    if set(zero_effect) != {"condition", "template"}:
-        raise OntologyInfrastructureError("schedule_presentation.zero_effect has unsupported fields")
-    condition = _required_string(zero_effect, "condition")
-    if condition != "no_nonzero_effects":
-        raise OntologyInfrastructureError("schedule_presentation.zero_effect.condition must be 'no_nonzero_effects'")
-    template = _required_string(zero_effect, "template")
-    include_namespaces = _required_unique_string_list(review_tags, "include_namespaces")
-    exclude_policy_ids = _required_unique_string_list(review_tags, "exclude_policy_ids")
-    fact_index_namespaces = _required_unique_string_list(active_fact_index, "include_namespaces")
-    concern_kinds = _required_unique_string_list(concern_annotations, "include_kinds")
-    policy_ids = set(scheduling_policies)
-    policy_namespaces = {item.split(":", maxsplit=1)[0] for item in policy_ids if ":" in item}
-    knowledge_namespaces = _knowledge_namespaces(categories)
-    concern_labels = _presentation_labels(concern_annotations, "labels", set(concern_kinds), "concern kind")
-    fact_labels = _presentation_labels(
-        active_fact_index,
-        "labels",
-        set(fact_index_namespaces),
-        "active fact namespace",
-    )
-    if set(include_namespaces) - policy_namespaces:
-        raise OntologyInfrastructureError("schedule_presentation.review_tags includes unknown namespace")
-    if set(fact_index_namespaces) - knowledge_namespaces:
-        raise OntologyInfrastructureError("schedule_presentation.active_fact_index includes unknown namespace")
-    if set(exclude_policy_ids) - policy_ids:
-        raise OntologyInfrastructureError("schedule_presentation.review_tags excludes unknown policy")
-    return {
-        "concern_annotations": {"include_kinds": concern_kinds, "labels": concern_labels},
-        "review_tags": {"include_namespaces": include_namespaces, "exclude_policy_ids": exclude_policy_ids},
-        "active_fact_index": {"include_namespaces": fact_index_namespaces, "labels": fact_labels},
-        "zero_effect": {"condition": condition, "template": template},
-    }
-
-
-def _presentation_labels(
-    parent: Mapping[str, object],
-    field: str,
-    expected_keys: set[str],
-    label_kind: str,
-) -> list[dict[str, str]]:
-    """Decode an authored presentation label catalog without deriving text from IDs."""
-    raw_labels = parent.get(field)
-    if not isinstance(raw_labels, list):
-        raise OntologyInfrastructureError(f"schedule_presentation {label_kind} labels must be a list")
-    labels: list[dict[str, str]] = []
-    seen: set[str] = set()
-    for index, raw in enumerate(raw_labels):
-        if not isinstance(raw, Mapping):
-            raise OntologyInfrastructureError(f"schedule_presentation {label_kind} label {index} must be a mapping")
-        row = cast(Mapping[str, object], raw)
-        if set(row) != {"key", "label"}:
-            raise OntologyInfrastructureError(
-                f"schedule_presentation {label_kind} label {index} has unsupported fields"
-            )
-        key = _required_string(row, "key")
-        label = _required_string(row, "label")
-        if key in seen:
-            raise OntologyInfrastructureError(f"duplicate schedule_presentation {label_kind} label {key!r}")
-        seen.add(key)
-        labels.append({"key": key, "label": label})
-    if seen != expected_keys:
-        missing = sorted(expected_keys - seen)
-        extra = sorted(seen - expected_keys)
-        details = []
-        if missing:
-            details.append("missing " + ", ".join(repr(item) for item in missing))
-        if extra:
-            details.append("unknown " + ", ".join(repr(item) for item in extra))
-        raise OntologyInfrastructureError(
-            f"schedule_presentation {label_kind} labels are incomplete ({'; '.join(details)})"
-        )
-    return labels
-
-
-def _knowledge_namespaces(categories: Mapping[str, object]) -> set[str]:
-    return {
-        namespace
-        for namespace, raw in categories.items()
-        if isinstance(namespace, str)
-        and isinstance(raw, Mapping)
-        and isinstance(raw.get("allowed_predicates"), list)
-        and f"knowledge.{namespace}" in cast(list[object], raw["allowed_predicates"])
-    }
-
-
-def _load_scheduling_constraints(
-    ontology_root: Path,
-    manifest: Mapping[str, object],
-    schema_view: SchemaView,
-    terms: Sequence[Mapping[str, object]],
-    policy_runtime: _PolicyRuntime,
-) -> dict[str, dict[str, object]]:
-    known_terms = {(str(term["semantic_category"]), str(term["slug"])) for term in terms}
-    result: dict[str, dict[str, object]] = {}
-    for relative_path in _catalog_paths(ontology_root, manifest, "constraints"):
-        source = _load_yaml_mapping(_source_path(ontology_root, relative_path))
-        _validate_linkml_instance(schema_view, "SchedulingConstraintCatalog", source)
-        raw = _required_mapping(source, "scheduling_constraints")
-        for identifier, value in raw.items():
-            if not isinstance(identifier, str) or identifier in result or not isinstance(value, Mapping):
-                raise OntologyInfrastructureError(f"Scheduling constraint {identifier!r} is malformed or duplicated")
-            row = cast(Mapping[str, object], value)
-            allowed = {
-                "operation",
-                "source_selector",
-                "target_selector",
-                "rationale",
-                "action",
-                "blocks_slots",
-                "scores_advisory",
-                "score_delta",
-            }
-            if set(row) - allowed:
-                raise OntologyInfrastructureError(f"Scheduling constraint {identifier!r} has unsupported fields")
-            operation = _required_string(row, "operation")
-            if operation != "separate_products_same_slot":
-                raise OntologyInfrastructureError(f"Scheduling constraint {identifier!r} references unknown operation")
-            normalized: dict[str, object] = {
-                "operation": operation,
-                "source_selector": _normalize_constraint_selector(identifier, row.get("source_selector"), known_terms),
-                "target_selector": _normalize_constraint_selector(identifier, row.get("target_selector"), known_terms),
-                "rationale": _required_string(row, "rationale"),
-                "action": _required_string(row, "action"),
-            }
-            for field in ("blocks_slots", "scores_advisory"):
-                if field in row and not isinstance(row[field], bool):
-                    raise OntologyInfrastructureError(f"Scheduling constraint {identifier!r} {field} must be boolean")
-                if field in row:
-                    normalized[field] = row[field]
-            if "score_delta" in row:
-                if isinstance(row["score_delta"], bool) or not isinstance(row["score_delta"], int):
-                    raise OntologyInfrastructureError(
-                        f"Scheduling constraint {identifier!r} score_delta must be integer"
-                    )
-                normalized["score_delta"] = row["score_delta"]
-            result[identifier] = normalized
-    return dict(sorted(result.items()))
-
-
-def _normalize_constraint_selector(
-    constraint_id: str, raw: object, known_terms: set[tuple[str, str]]
-) -> dict[str, object]:
-    return _normalize_relation_selector(
-        owner_kind="Scheduling constraint",
-        owner_id=constraint_id,
-        raw=raw,
-        known_terms=known_terms,
-        allow_entity_name=True,
-        allow_scope=True,
-    )
-
-
 def _normalize_relation_selector(
     *,
     owner_kind: str,
@@ -3771,18 +3264,6 @@ def _load_substance_identity_registry(ontology_root: Path) -> dict[str, str]:
     return registry
 
 
-def _normalize_policy_level(key: str, level: object, score_levels: set[str]) -> str | None:
-    if level is None:
-        return None
-    # Levels are retained as authored review/presentation annotations.  The
-    # online v2 engine never interprets them as numeric scores, so validating
-    # membership in an effect-scoring catalog would reintroduce the retired
-    # objective boundary.
-    if not isinstance(level, str) or not level.strip():
-        raise OntologyInfrastructureError(f"Policy {key!r} has invalid review level {level!r}")
-    return level
-
-
 def _read_custom_shapes(
     ontology_root: Path,
     manifest: Mapping[str, object],
@@ -3839,7 +3320,7 @@ def _semantic_category_shape(base_iri: str, categories: Mapping[str, object]) ->
         "        $this ss:id ?id ; ss:allowed_predicates ?allowed .",
         "        FILTER (",
         f'          STR($this) != CONCAT("{base_iri}", STR(?id)) ||',
-        '          !(STR(?allowed) = CONCAT("knowledge.", STR(?id)) || STR(?allowed) = CONCAT("schedule.", STR(?id)))',
+        '          STR(?allowed) != CONCAT("knowledge.", STR(?id))',
         "        )",
         "      }",
         '    """',
@@ -3939,9 +3420,6 @@ def _ttl_bytes(  # noqa: PLR0917
     categories: Mapping[str, object],
     terms: Sequence[Mapping[str, object]],
     relation_types: Mapping[str, Mapping[str, object]],
-    scheduling_policies: Mapping[str, Mapping[str, object]],
-    scheduling_constraints: Mapping[str, Mapping[str, object]],
-    runtime_policy: Mapping[str, object],
     ontoclean_profiles: Mapping[str, Mapping[str, object]],
     schema_view: SchemaView,
     manifest: Mapping[str, object],
@@ -4022,26 +3500,6 @@ def _ttl_bytes(  # noqa: PLR0917
             lines.extend(f"<{relation_uri}> ss:{field} {_ttl_literal(str(form))} ." for form in forms)
         lines.append("")
 
-    axes = runtime_policy.get("assignment_axes")
-    if not isinstance(axes, list):
-        raise OntologyInfrastructureError("Runtime policy assignment_axes must be a list")
-    for raw_axis in axes:
-        if not isinstance(raw_axis, Mapping):
-            raise OntologyInfrastructureError("Runtime assignment axis metadata is malformed")
-        axis = cast(Mapping[str, object], raw_axis)
-        axis_name = _required_string(axis, "axis")
-        axis_id = _required_string(axis, "id")
-        assignment_source = _required_string(axis, "assignment_source")
-        assignment_field = _required_string(axis, "assignment_field")
-        axis_uri = f"{base_iri}assignment-axis/{_ttl_iri_path(axis_id)}"
-        lines.extend([
-            f"<{axis_uri}> ss:id {_ttl_literal(axis_id)} ;",
-            f"  ss:axis {_ttl_literal(axis_name)} ;",
-            f"  ss:assignment_source {_ttl_literal(assignment_source)} ;",
-            f"  ss:assignment_field {_ttl_literal(assignment_field)} .",
-            "",
-        ])
-    lines.append("")
     for term in terms:
         category = str(term["semantic_category"])
         slug = str(term["slug"])
@@ -4057,78 +3515,6 @@ def _ttl_bytes(  # noqa: PLR0917
             f"  ss:description {_ttl_literal(str(term['description']))} .",
             "",
         ])
-    for policy_id, policy in sorted(scheduling_policies.items()):
-        policy_uri = f"{base_iri}policy/{_ttl_iri_path(policy_id)}"
-        category, slug = policy_id.split(":", maxsplit=1)
-        lines.extend([
-            f"<{policy_uri}> a ss:SchedulingPolicyRecord ;",
-            f"  ss:id {_ttl_literal(policy_id)} ;",
-            f"  ss:term <{base_iri}term/{category}/{slug}> ;",
-            f"  ss:applies_when {_ttl_literal(str(policy['applies_when']))} ;",
-            f"  ss:warning {_ttl_bool(cast(bool, policy['warning']))} .",
-            "",
-        ])
-        action = policy.get("action")
-        if isinstance(action, str) and action:
-            lines.extend([
-                f"<{policy_uri}> ss:action {_ttl_literal(action)} .",
-                "",
-            ])
-        for index, effect in enumerate(cast(list[object], policy["effects"])):
-            if not isinstance(effect, Mapping):
-                continue
-            effect_uri = f"{policy_uri}/effect/{index}"
-            effect_mapping = cast(Mapping[str, object], effect)
-            lines.extend([
-                f"<{effect_uri}> a ss:SchedulingPolicyEffectRecord .",
-                f"<{policy_uri}> ss:effects <{effect_uri}> .",
-            ])
-            level = effect_mapping.get("level")
-            if isinstance(level, str):
-                lines.extend([
-                    f"<{effect_uri}> ss:level {_ttl_literal(level)} .",
-                ])
-            match = effect_mapping.get("match")
-            if isinstance(match, Mapping):
-                match_uri = f"{effect_uri}/match"
-                lines.extend([
-                    f"<{match_uri}> a ss:SchedulingPolicyEffectMatch .",
-                    f"<{effect_uri}> ss:match <{match_uri}> .",
-                ])
-                for key, value in sorted(cast(Mapping[str, object], match).items()):
-                    lines.extend([
-                        f"<{match_uri}> ss:{_ttl_local_name(str(key))} {_ttl_value(value)} .",
-                    ])
-            lines.append("")
-    for constraint_id, constraint in sorted(scheduling_constraints.items()):
-        constraint_uri = f"{base_iri}constraint/{_ttl_iri_path(constraint_id)}"
-        lines.extend([
-            f"<{constraint_uri}> a ss:SchedulingConstraintRecord ;",
-            f"  ss:id {_ttl_literal(constraint_id)} ;",
-            f"  ss:operation {_ttl_literal(str(constraint['operation']))} ;",
-            f"  ss:rationale {_ttl_literal(str(constraint['rationale']))} ;",
-            f"  ss:action {_ttl_literal(str(constraint['action']))} .",
-            "",
-        ])
-        for field in ("blocks_slots", "scores_advisory", "score_delta"):
-            value = constraint.get(field)
-            if isinstance(value, bool):
-                lines.extend([f"<{constraint_uri}> ss:{field} {_ttl_bool(value)} .", ""])
-            elif isinstance(value, int) and not isinstance(value, bool):
-                lines.extend([f"<{constraint_uri}> ss:{field} {value} .", ""])
-        for side in ("source_selector", "target_selector"):
-            selector = constraint.get(side)
-            if isinstance(selector, Mapping):
-                lines.extend(
-                    _ttl_selector_node_lines(
-                        base_iri,
-                        constraint_uri,
-                        side,
-                        cast(Mapping[str, object], selector),
-                        selector_class="SchedulingConstraintSelector",
-                        entity_selector_class="SchedulingConstraintEntitySelector",
-                    )
-                )
     return ("\n".join(lines).rstrip() + "\n").encode("utf-8")
 
 
@@ -4221,58 +3607,6 @@ def _ttl_value(value: object) -> str:
     if isinstance(value, bool):
         return _ttl_bool(value)
     return _ttl_literal(str(value))
-
-
-def _ttl_selector_facts(selector: Mapping[str, object]) -> list[tuple[str, object]]:
-    entity = selector.get("entity")
-    if isinstance(entity, Mapping):
-        entity_map = cast(Mapping[str, object], entity)
-        if "entity_id" in entity_map:
-            return [("entity_id", entity_map["entity_id"])]
-        if "name" in entity_map:
-            return [("name", entity_map["name"])]
-    if "category" in selector and "term" in selector:
-        return [("category", selector["category"]), ("term", selector["term"])]
-    if "scope" in selector:
-        return [("scope", selector["scope"])]
-    return []
-
-
-def _ttl_selector_node_lines(
-    base_iri: str,
-    owner_uri: str,
-    side: str,
-    selector: Mapping[str, object],
-    *,
-    selector_class: str,
-    entity_selector_class: str,
-) -> list[str]:
-    selector_uri = f"{owner_uri}/{side}"
-    lines = [
-        f"<{selector_uri}> a ss:{selector_class} .",
-        f"<{owner_uri}> ss:{side} <{selector_uri}> .",
-    ]
-    entity = selector.get("entity")
-    if isinstance(entity, Mapping):
-        entity_uri = f"{selector_uri}/entity"
-        entity_map = cast(Mapping[str, object], entity)
-        lines.extend([
-            f"<{entity_uri}> a ss:{entity_selector_class} .",
-            f"<{selector_uri}> ss:entity <{entity_uri}> .",
-        ])
-        for predicate, value in _ttl_selector_facts({"entity": entity_map}):
-            if predicate == "entity_id":
-                lines.append(f"<{entity_uri}> ss:entity_id <{base_iri}substance/{_ttl_iri_path(str(value))}> .")
-            else:
-                lines.append(f"<{entity_uri}> ss:{predicate} {_ttl_value(value)} .")
-        if "scope" in selector:
-            lines.append(f"<{selector_uri}> ss:scope {_ttl_value(selector['scope'])} .")
-        lines.append("")
-        return lines
-    for predicate, value in _ttl_selector_facts(selector):
-        lines.append(f"<{selector_uri}> ss:{predicate} {_ttl_value(value)} .")
-    lines.append("")
-    return lines
 
 
 def _ttl_iri_path(value: str) -> str:

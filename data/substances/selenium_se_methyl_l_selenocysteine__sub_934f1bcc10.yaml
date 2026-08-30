@@ -8,9 +8,6 @@ concerns:
 - kind: safety
   text: Narrow selenium intake range; review total daily selenium from all products before treating a 200 mcg standalone dose
     as routine background support.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - antioxidant_enzyme_cofactor

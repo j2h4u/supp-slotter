@@ -14,9 +14,6 @@ concerns:
 - kind: safety
   text: Possible serotonergic modulation (PMC10565488 retrospective chart review of 1816 reports) — 5-HT receptor and transporter
     activity reported; review carefully if any SSRI or other 5-HT-active medication is introduced.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - cortisol_reduction

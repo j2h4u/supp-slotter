@@ -1,38 +1,25 @@
-# Evidence coverage and card grooming
+# Evidence coverage grooming
 
-Grooming is a read-only evidence hand-off. The public command is:
+Grooming is a read-only queue for canonical evidence coverage:
 
 ```text
 uv run python -m planner groom
 ```
 
-It accepts no state, limit, queue, or batch arguments and selects at most one
-substance card. The executable selection contract is authored in
-`ontology/runtime-policy.yaml` and loaded from the generated runtime program:
+The queue considers active composition roles that have neither dynamically
+applicable canonical evidence nor a completed negative receipt in
+`data/grooming-receipts.yaml`, orders them by stable composition-role ID, and
+shows at most one role. Each receipt contains exactly a composition role,
+assessment date, and the one operational outcome:
 
-- work unit: `substance_card`;
-- eligibility: active-reachable and at least one unassessed owned item;
-- rank: `active_unique_product_count` descending,
-  `open_owned_item_count` descending, then `substance_id` ascending;
-- selection count: exactly one;
-- an open relation belongs to the lowest stable ID among its resolved active
-  endpoints, and is counted and shown once.
+- `no_supported_fact` when assessment found no supported canonical fact.
 
-The result is a complete dossier for the selected card. It includes the card's
-identity, source path, aliases, form, notes, active products and component
-context, every knowledge assertion with its research state and sources, owned
-open relation leads, authored scheduling assertions, and every scheduling
-assessment axis and conclusion. Missing assessment axes are explicitly shown as
-open. Open knowledge and relation items retain their `unassessed` state.
+Canonical facts close roles dynamically: a substance target closes every
+product component whose exact canonical substance matches, while a
+composition-role target closes only that role. Receipt validation rejects
+duplicates, unknown roles, and negative receipts newly covered by a fact. A
+negative receipt closes its role; removing it reopens the role.
 
-The command never writes cards, relations, schedules, or research conclusions.
-It only prepares a bounded evidence unit for review. The evidence collector may
-gather candidate sources; an adjudicator decides whether a claim is admitted.
-Only admitted facts are written to the authoritative substance or relation
-cards, with their provenance and state preserved. Insufficient, anecdotal, or
-mechanistic evidence remains visible rather than being promoted to a scheduler
-rule.
-
-Grooming priority is workflow ROI: improving a card used by more active products
-improves more current explanations or scheduling context. It is not a medical
-importance score and does not change scheduling semantics or product placement.
+Grooming identifies evidence or applicability gaps only. It does not write
+cards, relations, schedules, or conclusions. Evidence collection may produce
+candidate sources; only adjudication can admit a canonical fact with provenance.

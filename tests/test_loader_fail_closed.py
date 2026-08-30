@@ -14,8 +14,6 @@ from planner.cards.substance import load_substance
 from planner.contracts import CardLoadError, Substance
 from planner.ontology.selector import load_relation_type_contracts
 from planner.paths import Paths
-from planner.query_model.loaders import dashboards_for_read_model
-from planner.query_model.projections import dashboard_record
 
 from tests.helpers import ontology_bundle
 
@@ -68,11 +66,6 @@ def test_dashboard_loader_preserves_canonical_identity_and_declared_context(tmp_
 
     assert dashboard.id == "identity_probe"
     assert dashboard.declares_context == ("vascular_health",)
-    record = dashboard_record(dashboard, ontology_bundle())
-    assert record["id"] == "identity_probe"
-    assert "slug" not in record
-    assert record["declares_context"] == ["vascular_health"]
-    assert record["declares_context_labels"] == ["Vascular Health"]
 
 
 def test_dashboard_rename_preserves_authored_identity_and_behavior(tmp_path: Path) -> None:
@@ -111,23 +104,6 @@ def test_dashboard_rename_preserves_authored_identity_and_behavior(tmp_path: Pat
     assert after.id == "stable_dashboard_id"
     assert after.source_path == renamed_path
     assert before_review == after_review
-
-
-def test_dashboard_registry_rejects_duplicate_authored_ids(tmp_path: Path) -> None:
-    dashboards_dir = tmp_path / "data" / "dashboards"
-    dashboards_dir.mkdir(parents=True)
-    card = {
-        "id": "stable_dashboard_id",
-        "name": "Duplicate probe",
-        "description": "duplicate authored id",
-        "benefit": {"description": "duplicate authored id"},
-        "selectors": [{"category": "context", "term": "vascular_health"}],
-    }
-    for filename in ("first_source.yaml", "renamed_source.yaml"):
-        (dashboards_dir / filename).write_text(yaml.safe_dump(card, sort_keys=False), encoding="utf-8")
-
-    with pytest.raises(CardLoadError, match="duplicate dashboard id"):
-        dashboards_for_read_model(Paths.from_root(tmp_path), ontology_bundle())
 
 
 def test_dashboard_loader_rejects_unknown_declared_context(tmp_path: Path) -> None:
@@ -352,7 +328,6 @@ def test_relation_loader_rejects_unresolved_selector_references(
     ("section", "field", "predicate"),
     [
         ("knowledge", "effect", "knowledge.effect"),
-        ("schedule", "intake", "schedule.intake"),
     ],
 )
 def test_substance_loader_rejects_unknown_canonical_terms(
@@ -385,9 +360,6 @@ def test_substance_loader_accepts_known_and_registered_unused_terms(tmp_path: Pa
                 "id": "sub_zz0000zzzz",
                 "name": "Known term probe",
                 "knowledge": {"kind": ["mineral"]},
-                # Authored in the registry but intentionally unused by the
-                # repository's current substance cards.
-                "schedule": {"intake": ["fat_meal_required"]},
             },
             sort_keys=False,
         ),
@@ -398,8 +370,6 @@ def test_substance_loader_accepts_known_and_registered_unused_terms(tmp_path: Pa
 
     assert substance.knowledge_assertions[0].category == "kind"
     assert substance.knowledge_assertions[0].value == "mineral"
-    assert substance.schedule_assertions[0].axis == "intake"
-    assert substance.schedule_assertions[0].value == "fat_meal_required"
 
 
 def test_substance_loader_normalizes_legacy_and_reads_research_state_metadata(tmp_path: Path) -> None:
@@ -445,32 +415,4 @@ def test_substance_loader_rejects_research_state_without_sources(tmp_path: Path)
         encoding="utf-8",
     )
     with pytest.raises(CardLoadError, match="sources"):
-        load_substance(path, ontology_bundle())
-
-
-def test_substance_loader_joins_preference_assessment_to_same_axis_schedule_fact(tmp_path: Path) -> None:
-    path = tmp_path / "probe.yaml"
-    card = {
-        "id": "sub_zz0000zzzz",
-        "name": "Assessment join probe",
-        "schedule": {"intake": ["food_preferred"]},
-        "scheduling_assessment": {
-            "intake": {
-                "conclusion": "supports_preference",
-                "policy": "food_preferred",
-                "sources": ["https://example.test/source"],
-                "summary": "The source supports the same authored preference.",
-            }
-        },
-    }
-    path.write_text(yaml.safe_dump(card, sort_keys=False), encoding="utf-8")
-
-    substance = load_substance(path, ontology_bundle())
-
-    assert substance.scheduling_assessments[0].axis == "intake"
-    assert substance.scheduling_assessments[0].policy == "food_preferred"
-
-    card["scheduling_assessment"]["intake"]["policy"] = "empty_preferred"
-    path.write_text(yaml.safe_dump(card, sort_keys=False), encoding="utf-8")
-    with pytest.raises(CardLoadError, match="no matching schedule assertion"):
         load_substance(path, ontology_bundle())

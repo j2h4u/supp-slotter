@@ -38,22 +38,3 @@ knowledge:
     research_state: supported
     sources:
     - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
-    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2008.718
-    summary: No direct fed-versus-fasted comparison establishes an intake preference for copper bisglycinate; the cited evidence addresses copper generally and does not validate a form-specific comparator rule.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
-    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2008.718
-    summary: No direct clock-time comparison establishes a general timing rule for copper bisglycinate.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Copper-HealthProfessional/
-    - https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2008.718
-    summary: No activity or workout comparison establishes an activity-linked placement rule for copper bisglycinate.

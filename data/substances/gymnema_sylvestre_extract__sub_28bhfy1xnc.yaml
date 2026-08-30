@@ -9,9 +9,6 @@ concerns:
 - kind: safety
   text: Review antidiabetes medications, hypoglycemia risk, pregnancy/breastfeeding, and product standardization before practical
     use discussion.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - insulin_signaling_context

@@ -1,138 +1,201 @@
-"""Focused acceptance checks for the formal card-grooming contract."""
+"""Focused acceptance checks for operational canonical-coverage grooming."""
 
-from dataclasses import replace
+from __future__ import annotations
+
+from pathlib import Path
+from shutil import copytree
 from types import SimpleNamespace
 
 import planner.engine.grooming as grooming
-from planner.contracts import KnowledgeAssertion, Product, ProductComponent, Relation, RelationSelector, Substance
-from planner.engine import cmd_groom
+import pytest
+from planner.cards.product import load_product_registry
+from planner.cards.substance import load_substance_registry
+from planner.contracts import CardLoadError, Product, ProductComponent, Substance
 from planner.ontology.artifacts import load_ontology
 from planner.paths import ROOT, Paths
+from planner.yaml_io import load_yaml
 
 
-def test_groom_reports_empty_production_queue_deterministically() -> None:
-    first = cmd_groom()
-    second = cmd_groom()
-
-    assert first.exit_code == 0, first.stderr
-    assert second.exit_code == 0, second.stderr
-    assert first.work_item is None
-    assert second.work_item is None
-    assert first.eligible_count == 0
-    assert second.eligible_count == 0
-    assert first.output == second.output
-    assert "Grooming queue: 0 eligible, showing 0" in first.output
-    assert "card " not in first.output
-
-
-def test_groom_policy_is_closed_and_formal() -> None:
-    policy = load_ontology(ROOT / "ontology").runtime_program.grooming_policy
-
-    assert policy.require_active_reachable is True
-    assert policy.open_research_state == "unassessed"
-    assert [(row.field, row.direction) for row in policy.rank_fields] == [
-        ("active_unique_product_count", "descending"),
-        ("open_owned_item_count", "descending"),
-        ("substance_id", "ascending"),
-    ]
-    assert policy.selection_count == 1
-    assert policy.relation_owner_field == "substance_id"
-    assert policy.relation_owner_direction == "ascending"
+def _write_receipts(path: Path, rows: list[tuple[str, str]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not rows:
+        path.write_text(
+            "format: supp-slotter.grooming-receipts/v1\nassessments: []\n",
+            encoding="utf-8",
+        )
+        return
+    assessments = "\n".join(
+        f'  - composition_role: {role}\n    assessed_on: "2026-08-30"\n    outcome: {outcome}' for role, outcome in rows
+    )
+    path.write_text(f"format: supp-slotter.grooming-receipts/v1\nassessments:\n{assessments}\n", encoding="utf-8")
 
 
-def test_groom_policy_rank_fields_are_executable_structural_inputs() -> None:
-    policy = load_ontology(ROOT / "ontology").runtime_program.grooming_policy
-    metrics_a = {"active_unique_product_count": 1, "open_owned_item_count": 9, "substance_id": "sub_a"}
-    metrics_b = {"active_unique_product_count": 2, "open_owned_item_count": 1, "substance_id": "sub_b"}
-    from planner.engine.grooming import _rank_key
+def _bundle(*, substances: set[str] = frozenset(), roles: set[str] = frozenset()) -> SimpleNamespace:
+    facts = tuple(
+        SimpleNamespace(applicability=SimpleNamespace(substance=substance, composition_role=None))
+        for substance in substances
+    ) + tuple(SimpleNamespace(applicability=SimpleNamespace(substance=None, composition_role=role)) for role in roles)
+    catalog = SimpleNamespace(
+        food_effects=facts,
+        acute_alertness_effects=(),
+        acute_sleep_effects=(),
+        pre_exercise_performance_effects=(),
+        post_exercise_recovery_effects=(),
+    )
+    return SimpleNamespace(
+        runtime_program=SimpleNamespace(
+            canonical_fact_catalog=catalog,
+            glue_contract=SimpleNamespace(
+                inactive_stack_name="inactive",
+                stack_partition=SimpleNamespace(routable_stack_names=("daily", "training")),
+            ),
+        )
+    )
 
-    normal = sorted((metrics_a, metrics_b), key=lambda row: _rank_key(row, policy.rank_fields))
-    toggled = tuple(reversed(policy.rank_fields))
-    changed = sorted((metrics_a, metrics_b), key=lambda row: _rank_key(row, toggled))
-    assert normal != changed
 
-
-def _fixture(tmp_path):
-    a, b = "sub_aaaaaaaaaa", "sub_bbbbbbbbbb"
-    substances = {
-        a: Substance(a, "Alpha", knowledge_assertions=(KnowledgeAssertion("kind", "x"),)),
-        b: Substance(
-            b,
-            "Beta",
-            knowledge_assertions=(KnowledgeAssertion("kind", "y"),),
-        ),
+def _fixture(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> tuple[Paths, SimpleNamespace, str, str]:
+    role_a = "cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa"
+    role_b = "cmp_prd_aaaaaaaaaa__sub_bbbbbbbbbb"
+    products = {
+        "prd_aaaaaaaaaa": Product(
+            "prd_aaaaaaaaaa",
+            "Active product",
+            (ProductComponent("sub_aaaaaaaaaa", id=role_a), ProductComponent("sub_bbbbbbbbbb", id=role_b)),
+        )
     }
-    product = Product(
-        "prd_aaaaaaaaaa",
-        "Active product",
-        (ProductComponent(a, "label", "1 mg", "context"),),
-        notes="product notes",
-        use_pattern="not_every_day",
-    )
-    relation = Relation(
-        "rel_fixture",
-        "review_with",
-        "lead",
-        RelationSelector(entity_id=a),
-        RelationSelector(entity_id=b),
-        research_state="unassessed",
-        sources=("stored-source",),
-    )
-    paths = Paths.from_root(tmp_path)
-    return paths, substances, {product.id: product}, [relation], {"daily": [product.id]}, a, b
+    substances = {
+        "sub_aaaaaaaaaa": Substance("sub_aaaaaaaaaa", "Alpha"),
+        "sub_bbbbbbbbbb": Substance("sub_bbbbbbbbbb", "Beta"),
+    }
+    monkeypatch.setattr(grooming, "load_product_registry", lambda _paths, _bundle: products)
+    monkeypatch.setattr(grooming, "load_substance_registry", lambda _paths, _bundle: substances)
+    monkeypatch.setattr(grooming, "_active_role_ids", lambda _paths, _products, _bundle: {role_a, role_b})
+    return Paths.from_root(tmp_path), _bundle(substances={"sub_aaaaaaaaaa"}), role_a, role_b
 
 
-def _fixture_bundle(policy):
+def test_receipt_catalog_closes_the_real_active_queue(tmp_path: Path) -> None:
     bundle = load_ontology(ROOT / "ontology")
-    runtime = replace(bundle.runtime_program, grooming_policy=policy)
-    return SimpleNamespace(runtime_program=runtime)
-
-
-def test_policy_eligibility_and_open_state_change_execution(tmp_path, monkeypatch) -> None:  # noqa: PLR0914
-    paths, substances, products, relations, stacks, _a, _b = _fixture(tmp_path)
-    base = load_ontology(ROOT / "ontology").runtime_program.grooming_policy
-    monkeypatch.setattr(grooming, "_load_inputs", lambda _paths, _bundle: (substances, products, relations, stacks))
-
-    selected, eligible = grooming._select_work_items(paths, _fixture_bundle(base))
-    assert eligible == 1 and len(selected) == 1
-    unreachable = replace(base, require_active_reachable=False)
-    selected_unreachable, eligible_unreachable = grooming._select_work_items(paths, _fixture_bundle(unreachable))
-    assert eligible_unreachable == 2 and len(selected_unreachable) == 1
-    supported_open = replace(base, open_research_state="supported")
-    selected_supported, eligible_supported = grooming._select_work_items(paths, _fixture_bundle(supported_open))
-    assert eligible_supported == 0 and not selected_supported
-
-
-def test_policy_selection_count_and_owner_direction_change_execution(tmp_path, monkeypatch, capsys) -> None:
-    paths, substances, products, relations, stacks, a, b = _fixture(tmp_path)
-    base = load_ontology(ROOT / "ontology").runtime_program.grooming_policy
-    monkeypatch.setattr(grooming, "_load_inputs", lambda _paths, _bundle: (substances, products, relations, stacks))
-
-    product = products["prd_aaaaaaaaaa"]
-    products[product.id] = replace(
-        product, components=(*product.components, ProductComponent(b, "peer", "2 mg", "peer context"))
+    copytree(ROOT / "data", tmp_path / "data")
+    paths = Paths.from_root(tmp_path)
+    products = load_product_registry(paths, bundle)
+    substances = load_substance_registry(paths, bundle)
+    all_roles = grooming._component_roles(products, substances)
+    active_role_ids = grooming._active_role_ids(paths, products, bundle)
+    fact_role_ids = grooming._canonical_fact_role_ids(bundle, all_roles)
+    receipts = grooming._load_receipts(
+        paths.data / "grooming-receipts.yaml",
+        known_role_ids=set(all_roles),
+        fact_role_ids=fact_role_ids,
     )
-    two = replace(base, selection_count=2)
-    selected, _ = grooming._select_work_items(paths, _fixture_bundle(two))
-    assert len(selected) == 2
-    grooming._render(selected, 2, 2)
-    assert capsys.readouterr().out.count("card ") == 2
 
-    descending = replace(base, relation_owner_direction="descending")
-    selected_desc, _ = grooming._select_work_items(paths, _fixture_bundle(descending))
-    assert selected_desc[0].open_relations[0].owner_id == b
-    assert selected_desc[0].open_relations[0].active_endpoint_ids == (b, a)
-    assert a != b
+    assert len(active_role_ids) == 45
+    assert len(active_role_ids & fact_role_ids) == 4
+    assert len(fact_role_ids) >= 6
+    assert len(receipts) == 41
+    assert sum(receipt.outcome == "no_supported_fact" for receipt in receipts) == 41
+    assert not (active_role_ids - fact_role_ids - {receipt.composition_role for receipt in receipts})
 
 
-def test_relation_sources_render_populated_and_empty(tmp_path, monkeypatch, capsys) -> None:
-    paths, substances, products, relations, stacks, _a, _b = _fixture(tmp_path)
-    base = load_ontology(ROOT / "ontology").runtime_program.grooming_policy
-    monkeypatch.setattr(grooming, "_load_inputs", lambda _paths, _bundle: (substances, products, relations, stacks))
-    selected, _ = grooming._select_work_items(paths, _fixture_bundle(base))
-    grooming._render(selected, 1, 1)
-    assert "sources=stored-source" in capsys.readouterr().out
-    relations[0] = replace(relations[0], sources=())
-    selected_empty, _ = grooming._select_work_items(paths, _fixture_bundle(base))
-    grooming._render(selected_empty, 1, 1)
-    assert "sources=—" in capsys.readouterr().out
+def test_queue_is_stable_under_receipt_permutation(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    paths, bundle, _role_a, role_b = _fixture(monkeypatch, tmp_path)
+    _write_receipts(paths.data / "grooming-receipts.yaml", [(role_b, "no_supported_fact")])
+
+    selected, eligible = grooming._select_work_items(paths, bundle)
+    _write_receipts(paths.data / "grooming-receipts.yaml", [(role_b, "no_supported_fact")])
+    selected_reordered, eligible_reordered = grooming._select_work_items(paths, bundle)
+
+    assert (selected, eligible) == ((), 0)
+    assert (selected_reordered, eligible_reordered) == ((), 0)
+
+
+def test_removing_then_restoring_an_active_receipt_reopens_then_closes_its_role(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    paths, bundle, _role_a, role_b = _fixture(monkeypatch, tmp_path)
+    _write_receipts(paths.data / "grooming-receipts.yaml", [(role_b, "no_supported_fact")])
+    selected, eligible = grooming._select_work_items(paths, bundle)
+    assert not selected and eligible == 0
+
+    _write_receipts(paths.data / "grooming-receipts.yaml", [])
+    selected, eligible = grooming._select_work_items(paths, bundle)
+    assert selected[0].id == role_b and eligible == 1
+
+    _write_receipts(paths.data / "grooming-receipts.yaml", [(role_b, "no_supported_fact")])
+    selected, eligible = grooming._select_work_items(paths, bundle)
+    assert not selected and eligible == 0
+
+
+def test_inactive_receipt_does_not_queue_until_the_role_is_activated(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    paths, bundle, role_a, role_b = _fixture(monkeypatch, tmp_path)
+    monkeypatch.setattr(grooming, "_active_role_ids", lambda _paths, _products, _bundle: {role_a})
+    _write_receipts(paths.data / "grooming-receipts.yaml", [])
+    selected, eligible = grooming._select_work_items(paths, bundle)
+    assert not selected and eligible == 0
+
+    monkeypatch.setattr(grooming, "_active_role_ids", lambda _paths, _products, _bundle: {role_a, role_b})
+    selected, eligible = grooming._select_work_items(paths, bundle)
+    assert selected[0].id == role_b and eligible == 1
+
+    _write_receipts(paths.data / "grooming-receipts.yaml", [(role_b, "no_supported_fact")])
+    selected, eligible = grooming._select_work_items(paths, bundle)
+    assert not selected and eligible == 0
+
+
+@pytest.mark.parametrize(
+    ("rows", "fact_role_ids", "match"),
+    [
+        (
+            [
+                ("cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa", "no_supported_fact"),
+                ("cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa", "no_supported_fact"),
+            ],
+            {"cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa"},
+            "duplicate",
+        ),
+        ([("cmp_unknown", "no_supported_fact")], set(), "unknown"),
+        (
+            [("cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa", "no_supported_fact")],
+            {"cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa"},
+            "newly covered",
+        ),
+    ],
+)
+def test_receipt_loader_rejects_duplicate_unknown_and_incoherent_rows(
+    tmp_path: Path, rows: list[tuple[str, str]], fact_role_ids: set[str], match: str
+) -> None:
+    path = tmp_path / "grooming-receipts.yaml"
+    _write_receipts(path, rows)
+
+    with pytest.raises(CardLoadError, match=match):
+        grooming._load_receipts(
+            path,
+            known_role_ids={"cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa"},
+            fact_role_ids=fact_role_ids,
+        )
+
+
+@pytest.mark.parametrize(
+    ("assessed_on", "match"),
+    [("2026-02-28", "quoted YYYY-MM-DD"), ('"2026-02-30"', "valid calendar date")],
+)
+def test_receipt_loader_rejects_unquoted_or_invalid_dates(tmp_path: Path, assessed_on: str, match: str) -> None:
+    path = tmp_path / "grooming-receipts.yaml"
+    path.write_text(
+        "format: supp-slotter.grooming-receipts/v1\nassessments:\n"
+        "  - composition_role: cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa\n"
+        f"    assessed_on: {assessed_on}\n"
+        "    outcome: no_supported_fact\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(CardLoadError, match=match):
+        grooming._load_receipts(path, known_role_ids={"cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa"}, fact_role_ids=set())
+
+
+def test_receipts_are_operational_and_not_a_plan_runtime_input() -> None:
+    assert "grooming-receipts" not in (ROOT / "ontology" / "manifest.yaml").read_text(encoding="utf-8")
+    for path in (ROOT / "planner" / "engine" / "_plan_inputs.py", ROOT / "planner" / "engine" / "plan.py"):
+        assert "grooming-receipts" not in path.read_text(encoding="utf-8")
+    assert load_yaml(ROOT / "data" / "grooming-receipts.yaml") is not None

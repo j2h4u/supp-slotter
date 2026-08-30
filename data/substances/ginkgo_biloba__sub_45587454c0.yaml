@@ -9,9 +9,6 @@ concerns:
 - kind: safety
   text: Review with anticoagulants/antiplatelets, seizure history, insulin or antidiabetes therapy, efavirenz, midazolam,
     and other CYP/P-gp-sensitive medications; product dose and extract standardization are not captured on the current label.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - neurocognitive_support

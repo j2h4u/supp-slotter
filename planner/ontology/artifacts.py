@@ -40,6 +40,7 @@ if TYPE_CHECKING:
 
 RUNTIME_VOCABULARY_FORMAT = "supp-slotter.runtime-vocabulary/v2"
 ARTIFACT_LOCK_FORMAT = "ontology-artifact-lock-v1"
+RUNTIME_LOCK_FORMAT = "ontology-runtime-lock-v1"
 SCHEMA_VERSION = "2"
 _SHA256_HEX_LENGTH = 64
 _REQUIRED_OUTPUTS = frozenset({
@@ -57,7 +58,18 @@ _REQUIRED_OUTPUTS = frozenset({
     "runtime-program.json",
     "runtime-vocabulary.yaml",
 })
-_REQUIRED_MANIFEST_ARTIFACTS = _REQUIRED_OUTPUTS | {"artifact-lock.json"}
+_REQUIRED_MANIFEST_ARTIFACTS = _REQUIRED_OUTPUTS | {"artifact-lock.json", "runtime-lock.json"}
+_RUNTIME_OUTPUTS = frozenset({
+    "card.schema.json",
+    "dashboard.schema.json",
+    "pillboxes.schema.json",
+    "product.schema.json",
+    "relations.schema.json",
+    "schema.json",
+    "stacks.schema.json",
+    "runtime-program.json",
+    "runtime-vocabulary.yaml",
+})
 
 
 class _FrozenDict(dict[object, object]):
@@ -110,23 +122,32 @@ def _freeze(value: object) -> object:
 class OntologyBundle:
     """The verified artifact set and its decoded runtime projection.
 
-    ``artifacts`` contains the exact bytes keyed by the lock's output path.
-    ``decoded`` contains JSON/YAML values (and UTF-8 text for Turtle files).
+    ``artifacts`` contains the online executable payload only.  A formal load
+    may additionally retain its audited non-runtime artifacts privately for
+    formal-only consumers; ordinary runtime loads never discover or read them.
     The ``runtime_vocabulary`` property is the canonical runtime vocabulary
     view; it is not independently loaded or regenerated.
     """
 
     root: Path
-    manifest: Mapping[str, object]
-    artifact_lock: Mapping[str, object]
+    runtime_lock: Mapping[str, object]
     artifacts: Mapping[str, bytes]
     decoded: Mapping[str, object]
+    formal_artifacts: Mapping[str, bytes] = field(default_factory=dict, repr=False)
+    formal_decoded: Mapping[str, object] = field(default_factory=dict, repr=False)
     _runtime_program: RuntimeProgram | None = field(default=None, init=False, repr=False, compare=False)
 
     def __copy__(self) -> OntologyBundle:
         """Return an ordinary, deliberately unverified copy."""
 
-        return OntologyBundle(self.root, self.manifest, self.artifact_lock, self.artifacts, self.decoded)
+        return OntologyBundle(
+            self.root,
+            self.runtime_lock,
+            self.artifacts,
+            self.decoded,
+            self.formal_artifacts,
+            self.formal_decoded,
+        )
 
     def __deepcopy__(self, memo: dict[int, object]) -> OntologyBundle:
         """Immutable fields may be shared, but verification provenance may not."""
@@ -176,7 +197,7 @@ class OntologyBundle:
     def projection_map(self) -> Mapping[str, object]:
         """Compiled repository projection consumed by generic projectors."""
 
-        value = self.decoded.get("projection-map.json")
+        value = self.formal_decoded.get("projection-map.json")
         if not isinstance(value, dict):
             raise OntologyInfrastructureError(
                 "Verified ontology artifact set has no projection map",
@@ -196,33 +217,27 @@ def _register_verified_bundle(bundle: OntologyBundle) -> OntologyBundle:
 
 
 def load_ontology(root: Path) -> OntologyBundle:
-    """Verify and decode a committed ontology artifact set.
+    """Load only the closed online executable artifact inventory.
 
-    Every manifest, lock, source, and output file is read at most once.  The
-    output bytes retained in the returned bundle are the same bytes hashed and
-    decoded, avoiding a time-of-check/time-of-use second read.
+    This is intentionally incapable of reading the manifest, compiler,
+    artifact lock, source catalogs, RDF, SHACL, context, or projection map.
+    Formal verification has a separate entry point below.
     """
 
     ontology_root = root if isinstance(root, Path) else Path(root)
-    manifest, manifest_bytes, lock = _read_manifest_and_lock(ontology_root)
-    _validate_contract(manifest, lock)
-
-    repository_root = ontology_root.parent.resolve()
-    generated_root = ontology_root / "generated"
-    sources = _lock_records(lock, "sources")
-    outputs = _lock_records(lock, "outputs")
-    source_bytes = _verify_sources(repository_root, sources, manifest_bytes)
-    _check_locked_outputs(manifest, outputs)
-    artifact_bytes, decoded = _load_outputs(generated_root, outputs)
-    _validate_runtime_program(manifest, repository_root, sources, source_bytes, decoded)
-    frozen_artifacts = _FrozenDict(artifact_bytes)
-    frozen_decoded = _FrozenDict({key: _freeze(value) for key, value in decoded.items()})
+    runtime_lock, _ = _read_mapping(ontology_root / "generated" / "runtime-lock.json", yaml_format=False)
+    outputs = _validate_runtime_lock(runtime_lock)
+    artifact_bytes, decoded = _load_outputs(
+        ontology_root / "generated",
+        outputs,
+        decoded_outputs=_RUNTIME_OUTPUTS,
+    )
+    _validate_runtime_program(runtime_lock, decoded)
     bundle = OntologyBundle(
         ontology_root,
-        cast(Mapping[str, object], _freeze(manifest)),
-        cast(Mapping[str, object], _freeze(lock)),
-        frozen_artifacts,
-        frozen_decoded,
+        cast(Mapping[str, object], _freeze(runtime_lock)),
+        _FrozenDict(artifact_bytes),
+        _FrozenDict({key: _freeze(value) for key, value in decoded.items()}),
     )
     # Validate the complete generated term/category registries before the
     # bundle becomes observable to any card loader.  In particular, an empty
@@ -238,6 +253,36 @@ def load_ontology(root: Path) -> OntologyBundle:
     return _register_verified_bundle(bundle)
 
 
+def load_formal_ontology(root: Path) -> OntologyBundle:
+    """Verify live sources/compiler/full lock parity, then expose formal output."""
+
+    ontology_root = root if isinstance(root, Path) else Path(root)
+    runtime = load_ontology(ontology_root)
+    manifest, manifest_bytes, lock = _read_manifest_and_lock(ontology_root)
+    _validate_contract(manifest, lock)
+    repository_root = ontology_root.parent.resolve()
+    sources = _lock_records(lock, "sources")
+    outputs = _lock_records(lock, "outputs")
+    source_bytes = _verify_sources(repository_root, sources, manifest_bytes)
+    _check_locked_outputs(manifest, outputs)
+    _validate_runtime_lock_parity(runtime.runtime_lock, lock)
+    formal_artifacts, formal_decoded = _load_outputs(
+        ontology_root / "generated", outputs, decoded_outputs=_REQUIRED_OUTPUTS
+    )
+    _validate_runtime_program(runtime.runtime_lock, formal_decoded)
+    _validate_formal_program_provenance(manifest, repository_root, sources, source_bytes, formal_decoded)
+    return _register_verified_bundle(
+        OntologyBundle(
+            runtime.root,
+            runtime.runtime_lock,
+            _FrozenDict(formal_artifacts),
+            _FrozenDict({key: _freeze(value) for key, value in formal_decoded.items()}),
+            _FrozenDict(formal_artifacts),
+            _FrozenDict({key: _freeze(value) for key, value in formal_decoded.items()}),
+        )
+    )
+
+
 def _read_manifest_and_lock(ontology_root: Path) -> tuple[dict[str, object], bytes, dict[str, object]]:
     manifest, manifest_bytes = _read_mapping(ontology_root / "manifest.yaml", yaml_format=True)
     lock, _lock_bytes = _read_mapping(ontology_root / "generated" / "artifact-lock.json", yaml_format=False)
@@ -248,7 +293,7 @@ def _verify_sources(repository_root: Path, sources: list[dict[str, str]], manife
     source_bytes: dict[str, bytes] = {}
     for record in sources:
         relative = _safe_relative(record["path"], "source")
-        path = _contained_path(repository_root, relative, source_kind="source")
+        path = _contained_path(repository_root, relative, path_role="source")
         content = manifest_bytes if relative == "ontology/manifest.yaml" else _read_once(path, code=MISSING)
         _check_hash(content, record["sha256"], relative, source=True)
         source_bytes[relative] = content
@@ -260,33 +305,55 @@ def _check_locked_outputs(manifest: Mapping[str, object], outputs: list[dict[str
         raise _error(UNSUPPORTED, "Artifact lock output set does not equal manifest artifact declaration")
 
 
-def _load_outputs(generated_root: Path, outputs: list[dict[str, str]]) -> tuple[dict[str, bytes], dict[str, object]]:
+def _validate_runtime_lock(lock: Mapping[str, object]) -> list[dict[str, str]]:
+    if lock.get("format_version") != RUNTIME_LOCK_FORMAT:
+        raise _error(UNSUPPORTED, "Unsupported ontology runtime lock format")
+    if str(lock.get("schema_version")) != SCHEMA_VERSION:
+        raise _error(UNSUPPORTED, "Runtime lock schema version does not match supported runtime")
+    outputs = _lock_records(lock, "outputs")
+    if {record["path"] for record in outputs} != _RUNTIME_OUTPUTS:
+        raise _error(UNSUPPORTED, "Runtime lock output set is not the closed executable inventory")
+    if set(lock) != {"format_version", "schema_version", "outputs"}:
+        raise _error(MALFORMED, "Runtime lock has an invalid closed shape")
+    return outputs
+
+
+def _validate_runtime_lock_parity(runtime_lock: Mapping[str, object], artifact_lock: Mapping[str, object]) -> None:
+    runtime_outputs = {record["path"]: record["sha256"] for record in _validate_runtime_lock(runtime_lock)}
+    full_outputs = {record["path"]: record["sha256"] for record in _lock_records(artifact_lock, "outputs")}
+    if str(artifact_lock.get("schema_version")) != str(runtime_lock.get("schema_version")):
+        raise _error(STALE, "Runtime lock schema version does not match artifact lock")
+    if any(full_outputs.get(path) != digest for path, digest in runtime_outputs.items()):
+        raise _error(STALE, "Runtime lock does not match full artifact lock")
+
+
+def _load_outputs(
+    generated_root: Path,
+    outputs: list[dict[str, str]],
+    *,
+    decoded_outputs: frozenset[str],
+) -> tuple[dict[str, bytes], dict[str, object]]:
     artifact_bytes: dict[str, bytes] = {}
     decoded: dict[str, object] = {}
     for record in outputs:
         relative = _safe_relative(record["path"], "output")
-        path = _contained_path(generated_root, relative, source_kind="output")
+        path = _contained_path(generated_root, relative, path_role="output")
         content = _read_once(path, code=MISSING)
         _check_hash(content, record["sha256"], relative, source=False)
-        artifact_bytes[relative] = content
-        decoded[relative] = _decode_artifact(relative, content, path=path)
-        _validate_declared_format(relative, decoded[relative])
+        if relative in decoded_outputs:
+            artifact_bytes[relative] = content
+            decoded[relative] = _decode_artifact(relative, content, path=path)
+            _validate_declared_format(relative, decoded[relative])
     return artifact_bytes, decoded
 
 
-def _validate_runtime_program(
-    manifest: Mapping[str, object],
-    repository_root: Path,
-    sources: list[dict[str, str]],
-    source_bytes: Mapping[str, bytes],
-    decoded: Mapping[str, object],
-) -> None:
+def _validate_runtime_program(runtime_lock: Mapping[str, object], decoded: Mapping[str, object]) -> None:
     runtime = decoded.get("runtime-vocabulary.yaml")
     if not isinstance(runtime, dict):
         raise _error(UNSUPPORTED, "runtime-vocabulary.yaml is not a mapping")
     runtime_map = cast(Mapping[str, object], runtime)
-    schema_version = str(manifest.get("schema_version"))
-    if runtime_map.get("format") != manifest.get("runtime_vocabulary_format", RUNTIME_VOCABULARY_FORMAT):
+    schema_version = str(runtime_lock.get("schema_version"))
+    if runtime_map.get("format") != RUNTIME_VOCABULARY_FORMAT:
         raise _error(UNSUPPORTED, "Unsupported runtime vocabulary format")
     if runtime_map.get("schema_version") != schema_version:
         raise _error(UNSUPPORTED, "Runtime vocabulary schema version does not match manifest")
@@ -298,18 +365,20 @@ def _validate_runtime_program(
         raise _error(UNSUPPORTED, "Runtime program schema version does not match manifest")
     if program_map.get("source_hash") != runtime_map.get("source_hash"):
         raise _error(STALE, "Runtime program source hash does not match runtime vocabulary")
-    _validate_program_provenance(manifest, repository_root, sources, source_bytes, program_map)
-    if program_map.get("source_hash") != _source_set_hash(manifest, source_bytes):
-        raise _error(STALE, "Runtime program source-set hash does not match locked sources")
+    # The online boundary proves only agreement between its two executable
+    # payloads.  Source/compiler provenance is deliberately formal-only.
 
 
-def _validate_program_provenance(
+def _validate_formal_program_provenance(
     manifest: Mapping[str, object],
     repository_root: Path,
     sources: list[dict[str, str]],
     source_bytes: Mapping[str, bytes],
-    program: Mapping[str, object],
+    decoded: Mapping[str, object],
 ) -> None:
+    program = decoded.get("runtime-program.json")
+    if not isinstance(program, Mapping):
+        raise _error(UNSUPPORTED, "Verified ontology artifact set has no runtime program")
     provenance = program.get("provenance")
     expected_fields = {"source", "source_sha256", "manifest_schema_version", "compiler_sha256"}
     if not isinstance(provenance, dict) or set(provenance) != expected_fields:
@@ -325,6 +394,8 @@ def _validate_program_provenance(
     compiler = _read_once(repository_root / "scripts" / "ontology_compiler.py", code=MISSING)
     if provenance.get("compiler_sha256") != hashlib.sha256(compiler).hexdigest():
         raise _error(STALE, "Runtime program compiler digest does not match the active compiler")
+    if program.get("source_hash") != _source_set_hash(manifest, source_bytes):
+        raise _error(STALE, "Runtime program source-set hash does not match locked sources")
 
 
 def _source_set_hash(manifest: Mapping[str, object], source_bytes: Mapping[str, bytes]) -> str:
@@ -526,16 +597,14 @@ def _safe_relative(value: str, kind: str) -> str:
     return normalized
 
 
-def _contained_path(base: Path, relative: str, *, source_kind: str) -> Path:
+def _contained_path(base: Path, relative: str, *, path_role: str) -> Path:
     candidate = base / relative
     try:
         candidate.resolve().relative_to(base.resolve())
     except ValueError as error:
-        raise _error(
-            UNSAFE_PATH, f"{source_kind.title()} path escapes ontology root: {relative!r}", candidate
-        ) from error
+        raise _error(UNSAFE_PATH, f"{path_role.title()} path escapes ontology root: {relative!r}", candidate) from error
     if _has_symlink_component(candidate):
-        raise _error(UNSAFE_PATH, f"Symlinked {source_kind} path is not trusted: {candidate}", candidate)
+        raise _error(UNSAFE_PATH, f"Symlinked {path_role} path is not trusted: {candidate}", candidate)
     return candidate
 
 
@@ -583,6 +652,7 @@ def _validate_declared_format(relative: str, decoded: object) -> None:
     if relative in {
         "card.schema.json",
         "dashboard.schema.json",
+        "pillboxes.schema.json",
         "product.schema.json",
         "relations.schema.json",
         "schema.json",

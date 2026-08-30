@@ -49,8 +49,25 @@ def test_v2_contract_decodes_exactly_and_excludes_retired_objective_inputs() -> 
     assert contract.publication_statuses == IMPLEMENTED_PUBLICATION_STATUSES
     projection = cast(dict[str, object], payload["projection"])
     assert "effect_scoring" not in projection
-    assert "prefer_with_policy" not in projection
     assert "constraint_execution_policies" not in projection
+
+
+def test_authored_stack_partition_is_closed_and_reproduces_active_membership() -> None:
+    payload = _payload()
+    runtime = decode_runtime_program(payload)
+    partition = runtime.glue_contract.stack_partition
+
+    assert partition.routable_stack_names == ("daily", "training")
+    assert partition.excluded_stack_names == ("inactive",)
+    assert partition.tracked_unassigned_partition_name == "tracked_unassigned"
+    assert not (set(partition.routable_stack_names) & set(partition.excluded_stack_names))
+
+    projection = cast(dict[str, object], payload["projection"])
+    glue = cast(dict[str, object], projection["glue_contract"])
+    partition_payload = cast(dict[str, object], glue["stack_partition"])
+    partition_payload["excluded_stack_names"] = ["daily"]
+    with pytest.raises(OntologyInfrastructureError, match="disjoint"):
+        decode_runtime_program(payload)
 
 
 def test_v1_contract_is_rejected_without_compatibility_fallback() -> None:
@@ -85,10 +102,3 @@ def test_retired_objective_and_pair_fields_are_rejected(retired_field: str) -> N
 
     with pytest.raises(OntologyInfrastructureError, match="invalid closed shape"):
         decode_runtime_program(payload)
-
-
-def test_source_policy_review_annotations_remain_source_data() -> None:
-    # Removing the online effect scorer must not erase source-facing review
-    # annotations, which are compiled into the vocabulary for non-objective UI.
-    source = (ROOT / "ontology/policies.yaml").read_text(encoding="utf-8")
-    assert "level:" in source

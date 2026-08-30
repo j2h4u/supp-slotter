@@ -63,8 +63,7 @@ class MaintenanceContract:
     product_path: str
     stack_path: str
     product_substance: ReferenceResolution
-    substance_preferences: tuple[ReferenceResolution, ...]
-    stack_products: ReferenceResolution
+    stack_products: tuple[ReferenceResolution, ...]
 
 
 def load_reference_resolutions(bundle: OntologyBundle) -> tuple[ReferenceResolution, ...]:  # noqa: C901, PLR0914
@@ -176,16 +175,16 @@ def load_maintenance_contract(bundle: OntologyBundle) -> MaintenanceContract:
         for key in (substance_source, product_source, stack_source)
     }
     product_substance = _unique_resolution(resolutions, source_id=product_source, target_source_id=substance_source)
-    preferences = tuple(
-        item for item in resolutions if item.source_id == substance_source and item.target_source_id == substance_source
+    stack_products = _resolutions(
+        resolutions,
+        source_id=stack_source,
+        target_source_id=product_source,
     )
-    stack_products = _unique_resolution(resolutions, source_id=stack_source, target_source_id=product_source)
     return MaintenanceContract(
         substance_path=source_paths[substance_source],
         product_path=source_paths[product_source],
         stack_path=source_paths[stack_source],
         product_substance=product_substance,
-        substance_preferences=preferences,
         stack_products=stack_products,
     )
 
@@ -317,7 +316,7 @@ def _load_identities(
         try:
             card = cast(dict[str, object], load_card_mapping(path, resolution.target_entity_class.casefold()))
         except CardLoadError as error:
-            _append_resolution_error(errors, f"auto-maintenance: could not read {strip_root_prefix(error.message)}")
+            _append_resolution_error(errors, f"normalize: could not read {strip_root_prefix(error.message)}")
             continue
         raw_identity = card.get(resolution.identity_field)
         identity = raw_identity if isinstance(raw_identity, str) else identity_renames.get(path.stem)
@@ -472,6 +471,26 @@ def _unique_resolution(
             f"Repository projection must declare exactly one maintenance relation {source_id!r} -> {target_source_id!r}"
         )
     return matches[0]
+
+
+def _resolutions(
+    resolutions: tuple[ReferenceResolution, ...], *, source_id: str, target_source_id: str
+) -> tuple[ReferenceResolution, ...]:
+    """Return all structural paths for one declared maintenance relation.
+
+    A product catalog has one component reference path, while a stack has one
+    path per explicit product partition.  They are a single semantic
+    source-to-target relation for maintenance purposes, and every structural
+    path must be rewritten when product identities change.
+    """
+    matches = tuple(
+        item for item in resolutions if item.source_id == source_id and item.target_source_id == target_source_id
+    )
+    if not matches:
+        raise OntologyInfrastructureError(
+            f"Repository projection must declare a maintenance relation {source_id!r} -> {target_source_id!r}"
+        )
+    return matches
 
 
 def _instruction_list(mapping: Mapping[str, object]) -> list[Mapping[str, object]]:

@@ -23,7 +23,6 @@ class PlannerFixtureInput:
 
 @dataclass(frozen=True, slots=True)
 class PlannerFixtureOptions:
-    substance_prefer_with: dict[str, list[str]] = field(default_factory=dict)
     substance_relations: dict[str, list[dict[str, object]]] = field(default_factory=dict)
 
 
@@ -118,7 +117,6 @@ def write_minimal_planner_fixture(
 ) -> None:
     stack_items = fixture_input.stack_items
     products = fixture_input.products
-    substance_prefer_with = options.substance_prefer_with
     substance_relations = options.substance_relations
 
     substance_ids = {
@@ -187,11 +185,10 @@ def write_minimal_planner_fixture(
         tmp_path,
         products,
         substance_ids,
-        substance_prefer_with or {},
     )
-    _write_scheduling_constraint_reference_cards(tmp_path)
     _write_product_cards(tmp_path, products, substance_ids, product_ids)
     _write_complete_canonical_catalog_fixture_cards(tmp_path)
+    _track_fixture_dependency_products(tmp_path)
 
 
 def _write_complete_canonical_catalog_fixture_cards(tmp_path: Path) -> None:
@@ -204,9 +201,31 @@ def _write_complete_canonical_catalog_fixture_cards(tmp_path: Path) -> None:
     already provides the same stable substance ID.
     """
     catalog = _load_yaml_dict(_ONTOLOGY_ROOT / "canonical-facts.yaml")
-    roles = cast(list[dict[str, object]], catalog["composition_roles"])
-    product_ids = {cast(str, row["product"]) for row in roles}
-    substance_ids = {cast(str, row["substance"]) for row in roles}
+    facts = [
+        fact
+        for family in (
+            "food_effects",
+            "acute_alertness_effects",
+            "acute_sleep_effects",
+            "pre_exercise_performance_effects",
+            "post_exercise_recovery_effects",
+        )
+        for fact in cast(list[dict[str, object]], catalog[family])
+    ]
+    substance_ids = {
+        cast(str, target["substance"])
+        for fact in facts
+        for target in (cast(dict[str, object], fact["subject"]), cast(dict[str, object], fact["applicability"]))
+        if isinstance(target.get("substance"), str)
+    }
+    role_ids = {
+        cast(str, target["composition_role"])
+        for fact in facts
+        for target in (cast(dict[str, object], fact["subject"]), cast(dict[str, object], fact["applicability"]))
+        if isinstance(target.get("composition_role"), str)
+    }
+    product_ids = {role_id.removeprefix("cmp_").split("__", 1)[0] for role_id in role_ids}
+    substance_ids.update(role_id.split("__", 1)[1] for role_id in role_ids)
     source_products = _ONTOLOGY_ROOT.parents[0] / "data/products"
     source_substances = _ONTOLOGY_ROOT.parents[0] / "data/substances"
 
@@ -226,6 +245,32 @@ def _write_complete_canonical_catalog_fixture_cards(tmp_path: Path) -> None:
             continue
         source = _card_path_for_id(source_substances, substance_id)
         copy2(source, fixture_substances / source.name)
+
+
+def _track_fixture_dependency_products(tmp_path: Path) -> None:
+    """Give copied canonical catalog products explicit fixture-only ownership."""
+    stacks_path = tmp_path / "data/stacks.yaml"
+    stacks = _load_yaml_dict(stacks_path)
+    assigned = {
+        product_id
+        for stack in ("daily", "training", "inactive")
+        for product_id in cast(list[str], stacks.get(stack, []))
+    }
+    tracked = stacks.setdefault("tracked_unassigned", [])
+    assert isinstance(tracked, list)
+    for entry in tracked:
+        if isinstance(entry, dict) and isinstance(entry.get("product"), str):
+            assigned.add(entry["product"])
+    product_ids = {
+        card_id
+        for path in (tmp_path / "data/products").glob("*.yaml")
+        if isinstance((card_id := _load_yaml_dict(path).get("id")), str)
+    }
+    tracked.extend(
+        {"product": product_id, "reason": "Fixture-only canonical catalog dependency."}
+        for product_id in sorted(product_ids - assigned)
+    )
+    write_yaml(stacks_path, stacks)
 
 
 def _card_path_for_id(directory: Path, card_id: str) -> Path:
@@ -262,12 +307,11 @@ def _write_substance_cards(
     tmp_path: Path,
     products: dict[str, list[tuple[str, list[str]]]],
     substance_ids: dict[str, str],
-    substance_prefer_with: dict[str, list[str]],
 ) -> None:
     substance_components: dict[str, list[str]] = {
         component_id: trait_ids for component_ids in products.values() for component_id, trait_ids in component_ids
     }
-    schedule_namespaces, knowledge_namespaces = _fixture_card_namespaces()
+    knowledge_namespaces = _fixture_knowledge_namespaces()
     for substance_id, trait_ids in substance_components.items():
         normalized_substance_id = substance_ids[substance_id]
         substance: dict[str, object] = {
@@ -275,24 +319,14 @@ def _write_substance_cards(
             "name": substance_id.replace("_", " ").title(),
         }
         grouped = group_trait_ids(trait_ids)
-        schedule: dict[str, list[str]] = {}
         knowledge: dict[str, list[str]] = {}
         for namespace, slugs in grouped.items():
-            schedule_namespace = namespace.removeprefix("schedule.")
-            if schedule_namespace in schedule_namespaces:
-                schedule[schedule_namespace] = slugs
-            elif namespace in knowledge_namespaces:
+            if namespace in knowledge_namespaces:
                 knowledge[namespace] = slugs
             else:
                 knowledge[namespace] = slugs
         # Preserve unknown namespaces in the card.  The generated schema is
         # the normal validation boundary and must reject them explicitly.
-        if substance_id in substance_prefer_with:
-            schedule["prefer_with"] = [
-                substance_ids.get(target, target) for target in substance_prefer_with[substance_id]
-            ]
-        if schedule:
-            substance["schedule"] = schedule
         if knowledge:
             substance["knowledge"] = knowledge
         write_yaml(
@@ -301,33 +335,7 @@ def _write_substance_cards(
         )
 
 
-def _write_scheduling_constraint_reference_cards(tmp_path: Path) -> None:
-    """Include canonical constraint anchors in the isolated mini-corpus.
-
-    The planner intentionally compiles every canonical scheduling constraint
-    against the loaded substance corpus and fails closed when a required
-    selector is empty.  Fixture products need not contain these anchors, but
-    the mini-corpus must still represent the six authored entities used by
-    the constraint catalog so an empty fixture is not mistaken for malformed
-    ontology data.
-    """
-
-    anchors = (
-        ("sub_8554n79hve", "Zinc", "citrate"),
-        ("sub_844a0cc551", "Copper", "bisglycinate"),
-        ("sub_vvmld46dbz", "Calcium", "calcium ascorbate"),
-        ("sub_ses5czfzi1", "Iron", "Ferrochel ferrous bisglycinate chelate"),
-        ("sub_844a87d72b", "Vitamin E", "tocopherol"),
-        ("sub_5723eafac4", "Vitamin E", "tocotrienols"),
-    )
-    for substance_id, name, form in anchors:
-        write_yaml(
-            tmp_path / "data/substances" / f"constraint_anchor__{substance_id}.yaml",
-            {"id": substance_id, "name": name, "form": form},
-        )
-
-
-def _fixture_card_namespaces() -> tuple[set[str], set[str]]:
+def _fixture_knowledge_namespaces() -> set[str]:
     """Read fixture card containers from authored ontology catalogs.
 
     The helper intentionally has no fallback vocabulary.  An unknown fixture
@@ -336,13 +344,6 @@ def _fixture_card_namespaces() -> tuple[set[str], set[str]]:
     the term.
     """
 
-    runtime = cast(dict[str, object], yaml.safe_load((_ONTOLOGY_ROOT / "runtime-policy.yaml").read_text()))
-    axes = runtime.get("assignment_axes", [])
-    schedule = {
-        cast(str, row["assignment_field"])
-        for row in axes
-        if isinstance(row, dict) and isinstance(row.get("assignment_field"), str)
-    }
     vocabulary = cast(dict[str, object], yaml.safe_load((_ONTOLOGY_ROOT / "vocabulary.yaml").read_text()))
     categories = vocabulary.get("semantic_categories", {})
     knowledge: set[str] = set()
@@ -353,7 +354,7 @@ def _fixture_card_namespaces() -> tuple[set[str], set[str]]:
             for predicate in cast(list[object], raw["allowed_predicates"]):
                 if isinstance(predicate, str) and predicate.startswith("knowledge."):
                     knowledge.add(predicate.removeprefix("knowledge."))
-    return schedule, knowledge
+    return knowledge
 
 
 def _write_product_cards(

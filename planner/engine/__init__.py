@@ -1,5 +1,7 @@
 """Engine subpackage: re-exports cmd_* and result dataclasses for the CLI entrypoint."""
 
+from pathlib import Path
+
 from planner.engine.check import cmd_check
 from planner.engine.find import cmd_find
 from planner.engine.grooming import cmd_groom
@@ -7,12 +9,7 @@ from planner.engine.plan import cmd_plan
 from planner.engine.results import (
     CheckResult,
     FindResult,
-    GroomAssessment,
-    GroomKnowledge,
-    GroomProduct,
-    GroomRelation,
     GroomResult,
-    GroomSchedule,
     GroomWorkItem,
     PlanResult,
     ReviewResult,
@@ -21,7 +18,7 @@ from planner.engine.results import (
 from planner.engine.show import cmd_show
 
 
-def cmd_review(data_root=None):  # type: ignore[no-untyped-def]
+def cmd_review(data_root: Path | None = None) -> ReviewResult:
     """Load legacy review dependencies only when the review command is used."""
     from planner.engine.review import cmd_review as _cmd_review
 
@@ -31,12 +28,7 @@ def cmd_review(data_root=None):  # type: ignore[no-untyped-def]
 __all__ = [
     "CheckResult",
     "FindResult",
-    "GroomAssessment",
-    "GroomKnowledge",
-    "GroomProduct",
-    "GroomRelation",
     "GroomResult",
-    "GroomSchedule",
     "GroomWorkItem",
     "PlanResult",
     "ReviewResult",

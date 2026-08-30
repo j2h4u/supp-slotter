@@ -28,13 +28,17 @@ def test_reviewer_only_knowledge_does_not_change_slot_assignment(tmp_path: Path)
     fixture = PlannerFixtureInput(
         stack_items={"product": {"stack": "daily"}, "active_product": {"stack": "daily"}},
         products={
-            "product": [("component", ["intake:food_preferred"])],
+            "product": [("component", ["effect:circulation_support"])],
             "active_product": [
                 ("epa_component", ["risk:bleeding_med_interaction", "effect:platelet_aggregation_modulation"])
             ],
         },
         traits={
-            "intake:food_preferred": {"label": "Food preferred", "description": "Fixture", "applies_when": "Fixture"},
+            "effect:circulation_support": {
+                "label": "Circulation support",
+                "description": "Fixture",
+                "applies_when": "Fixture",
+            },
             "risk:bleeding_med_interaction": {
                 "label": "Bleeding medication interaction",
                 "description": "Fixture",
@@ -53,7 +57,7 @@ def test_reviewer_only_knowledge_does_not_change_slot_assignment(tmp_path: Path)
         PlannerFixtureInput(
             stack_items=fixture.stack_items,
             products={
-                "product": [("component", ["intake:food_preferred", "risk:manual_review"])],
+                "product": [("component", ["effect:circulation_support", "risk:manual_review"])],
                 "active_product": fixture.products["active_product"],
             },
             traits={
@@ -67,6 +71,4 @@ def test_reviewer_only_knowledge_does_not_change_slot_assignment(tmp_path: Path)
     reviewer_slot = _scheduled_slot(reviewer_schedule, "Product")
     assert base_slot == reviewer_slot
     active_fact_index = cast(list[dict[str, object]], reviewer_schedule["active_fact_index"])
-    assert [(entry["namespace"], entry["fact"]) for entry in active_fact_index] == [
-        ("effect", "platelet_aggregation_modulation")
-    ]
+    assert active_fact_index == []

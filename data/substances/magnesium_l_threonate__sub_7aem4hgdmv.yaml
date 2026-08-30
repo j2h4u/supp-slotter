@@ -7,9 +7,6 @@ aliases:
 notes: 'Knowledge-only popular brain-marketed magnesium form. Added because the repository has several magnesium forms but
   not the commonly marketed L-threonate/Magtein form. Keep cognition claims as review context rather than stronger evidence.
   Sources checked: EFSA magnesium L-threonate novel-food safety opinion; NIH ODS magnesium fact sheet.'
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - sleep_recovery

@@ -5,21 +5,18 @@ from __future__ import annotations
 from planner.contracts import Product, Relation, Substance
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.policies import project_ontology_assertions
-from planner.query_model.data import ReadModelContext, ReadModelData
+from planner.query_model.data import ReadModelData
 from planner.query_model.facts import (
     active_fact_index,
     active_substance_ids,
     inactive_substance_ids,
 )
-from planner.query_model.projections import ontology_assertion_record
-from planner.query_model.relation_matches import collect_substance_relation_matches
 from planner.query_model.relation_warnings import (
     RelationWarningRow,
     collect_relation_warnings,
 )
-from planner.query_model.relations import (
-    classify_relations,
-)
+from planner.query_model.relations import classify_relations, resolve_relation_queries
+from planner.query_model.types import RelationReviewRow
 from planner.schedule_types import ActiveFactIndexEntry
 
 
@@ -42,16 +39,7 @@ class StackReadModel:
         self,
         active_substances: set[str],
     ) -> list[RelationWarningRow]:
-        return collect_relation_warnings(
-            self._data.assertions, active_substances, self._ontology_bundle.runtime_program
-        )
-
-    def substance_relation_matches(
-        self,
-        substance_id: str,
-        substance_name: str,
-    ) -> list[tuple[dict[str, object], list[str]]]:
-        return collect_substance_relation_matches(self._data.assertions, substance_id, substance_name)
+        return collect_relation_warnings(self._data.relations, active_substances, self._ontology_bundle.runtime_program)
 
     def active_substance_ids(self) -> set[str]:
         return active_substance_ids(self._data, self._ontology_bundle.runtime_program.glue_contract.inactive_stack_name)
@@ -64,8 +52,8 @@ class StackReadModel:
     def classify_relations(
         self,
         active_substances: set[str],
-    ) -> dict[str, list[dict[str, object]]]:
-        return classify_relations(self._data.assertions, active_substances, self._ontology_bundle.runtime_program)
+    ) -> dict[str, list[RelationReviewRow]]:
+        return classify_relations(self._data.relations, active_substances, self._ontology_bundle.runtime_program)
 
     def active_fact_index(
         self,
@@ -84,22 +72,42 @@ class StackReadModel:
 def build_stack_read_model(
     substances: dict[str, Substance],
     relations: list[Relation],
-    products: dict[str, Product] | None = None,
+    products: dict[str, Product],
+    stacks: dict[str, list[str]],
     *,
-    context: ReadModelContext | None = None,
     ontology_bundle: OntologyBundle,
 ) -> StackReadModel:
     """Build the command-scoped read model from loaded YAML/domain objects."""
-    loaded_context = context or ReadModelContext(None, None, None, None)
+    _validate_catalog_references(substances, products, stacks)
     assertions = project_ontology_assertions(relations, ontology_bundle)
     return StackReadModel(
         ReadModelData(
             substances=substances,
-            products=products or {},
-            stacks=loaded_context.stacks_data or {},
-            assertions=tuple(
-                ontology_assertion_record(assertion, substances, ontology_bundle) for assertion in assertions
-            ),
+            products=products,
+            stacks=stacks,
+            relations=resolve_relation_queries(assertions, substances, ontology_bundle),
         ),
         ontology_bundle,
     )
+
+
+def _validate_catalog_references(
+    substances: dict[str, Substance],
+    products: dict[str, Product],
+    stacks: dict[str, list[str]],
+) -> None:
+    """Reject dangling stack and composition references before query projection."""
+    for stack_name, product_ids in stacks.items():
+        if not stack_name:
+            raise ValueError("read-model stack name must be non-empty")
+        for index, product_id in enumerate(product_ids):
+            if product_id not in products:
+                raise ValueError(f"read-model stack {stack_name!r}[{index}] references missing product {product_id!r}")
+
+    for product_id, product in products.items():
+        for index, component in enumerate(product.components):
+            if component.substance not in substances:
+                raise ValueError(
+                    f"read-model product {product_id!r}.components[{index}] "
+                    f"references missing substance {component.substance!r}"
+                )

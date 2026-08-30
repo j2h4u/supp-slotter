@@ -13,7 +13,6 @@ from planner.ontology.artifacts import load_runtime_program
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
     IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
-    IMPLEMENTED_SOURCE_KIND_ROLES,
 )
 from planner.ontology.runtime_program import decode_runtime_program
 
@@ -87,12 +86,6 @@ def test_committed_runtime_program_decodes() -> None:
     assert runtime.engine_contract.protocol_version == "supp-slotter.engine-contract/v2"
     assert runtime.engine_contract.pressure_identity == ("item_id", "dimension", "value")
     assert runtime.engine_contract.publication_statuses == ("Optimal", "Indeterminate")
-    assert not hasattr(runtime, "effect_scoring")
-    assert not hasattr(runtime, "constraint_execution_policies")
-    assert not hasattr(runtime, "prefer_with_policy")
-    declared_roles = set(runtime.glue_contract.source_kind_roles)
-    assert runtime.glue_contract.source_kind_roles == IMPLEMENTED_SOURCE_KIND_ROLES
-    assert all(set(row.applies_to) <= declared_roles for row in runtime.source_kind_values)
 
 
 def test_dashboard_state_rows_are_role_free_and_truth_table_driven() -> None:
@@ -119,31 +112,6 @@ def test_runtime_decode_rejects_duplicate_dashboard_state_labels() -> None:
         decode_runtime_program(payload)
 
 
-def test_slot_near_values_are_authored_runtime_observations() -> None:
-    runtime = load_runtime_program(ONTOLOGY)
-
-    assert runtime.slot_near_values == (
-        "wake",
-        "breakfast",
-        "day_meal",
-        "sleep",
-        "workout_before",
-        "workout_after",
-    )
-
-
-def test_runtime_decode_rejects_invalid_slot_near_values() -> None:
-    payload = cast(
-        dict[str, object],
-        json.loads((ONTOLOGY / "generated/runtime-program.json").read_text(encoding="utf-8")),
-    )
-    projection = cast(dict[str, object], payload["projection"])
-    projection["slot_near_values"] = []
-
-    with pytest.raises(OntologyInfrastructureError, match="slot_near_values"):
-        decode_runtime_program(payload)
-
-
 def test_runtime_decode_rejects_unimplemented_canonical_engine_contract() -> None:
     payload = cast(
         dict[str, object],
@@ -155,21 +123,6 @@ def test_runtime_decode_rejects_unimplemented_canonical_engine_contract() -> Non
 
     with pytest.raises(OntologyInfrastructureError, match="must maximize unique pressure satisfaction"):
         decode_runtime_program(payload)
-
-
-def test_runtime_decode_rejects_legacy_score_pair_or_default_compatibility_fields() -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    projection["effect_scoring"] = {}
-    with pytest.raises(OntologyInfrastructureError, match="invalid closed shape"):
-        decode_runtime_program(payload)
-
-    for field in ("constraint_execution_policies", "prefer_with_policy", "default_assignment"):
-        payload = _runtime_payload()
-        projection = cast(dict[str, object], payload["projection"])
-        projection[field] = []
-        with pytest.raises(OntologyInfrastructureError, match="invalid closed shape"):
-            decode_runtime_program(payload)
 
 
 def test_runtime_decode_requires_exact_executable_capability_parity() -> None:
@@ -199,22 +152,6 @@ def _runtime_payload() -> dict[str, object]:
         dict[str, object],
         json.loads((ONTOLOGY / "generated/runtime-program.json").read_text(encoding="utf-8")),
     )
-
-
-@pytest.mark.parametrize(
-    ("section",),
-    [
-        ("source_kind_values",),
-    ],
-)
-def test_runtime_decode_rejects_duplicate_semantic_keys_with_distinct_ids(section: str) -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    rows = cast(list[dict[str, object]], projection[section])
-    rows.append({**rows[0], "id": f"{rows[0]['id']}_collision"})
-
-    with pytest.raises(OntologyInfrastructureError, match="duplicate semantic key"):
-        decode_runtime_program(payload)
 
 
 def test_runtime_decode_rejects_duplicate_relation_rule_match_with_distinct_id() -> None:

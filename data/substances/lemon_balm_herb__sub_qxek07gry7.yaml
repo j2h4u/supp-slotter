@@ -5,9 +5,6 @@ aliases:
 - Melissa officinalis
 notes: 'Lemon balm herb listed in the Natural Balance Happy Sleeper proprietary blend. Review context: commonly used as a
   calming sleep-stack botanical, but this card does not assert a strong standalone insomnia effect.'
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - sleep_recovery

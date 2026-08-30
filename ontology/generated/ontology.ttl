@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 0b0a964282d91b024ef666590d244de581b7c9c3f6fc350f705bea5d2145c673
+# source-hash: 4d96fc948208fcf7aa77753532bc98010ac00a2ca9f88e57c2446ee5694f775d
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -37,9 +37,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/CardKnowledge> a ss:SchemaClass ;
   ss:name "CardKnowledge" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/CardSchedule> a ss:SchemaClass ;
-  ss:name "CardSchedule" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/Catalog> a ss:SchemaClass ;
   ss:name "Catalog" .
 
@@ -66,6 +63,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/EvidenceSource> a ss:SchemaClass ;
   ss:name "EvidenceSource" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/FactApplicability> a ss:SchemaClass ;
+  ss:name "FactApplicability" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/FactSubject> a ss:SchemaClass ;
   ss:name "FactSubject" .
@@ -142,9 +142,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RelationCatalog> a ss:SchemaClass ;
   ss:name "RelationCatalog" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeAssignmentAxisPolicy> a ss:SchemaClass ;
-  ss:name "RuntimeAssignmentAxisPolicy" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConcernCatalogEntry> a ss:SchemaClass ;
   ss:name "RuntimeConcernCatalogEntry" .
 
@@ -163,9 +160,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDashboardUsageTruthState> a ss:SchemaClass ;
   ss:name "RuntimeDashboardUsageTruthState" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectMatchDimensionPolicy> a ss:SchemaClass ;
-  ss:name "RuntimeEffectMatchDimensionPolicy" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEngineConformanceScenario> a ss:SchemaClass ;
   ss:name "RuntimeEngineConformanceScenario" .
 
@@ -177,12 +171,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGlueContract> a ss:SchemaClass ;
   ss:name "RuntimeGlueContract" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGroomingPolicy> a ss:SchemaClass ;
-  ss:name "RuntimeGroomingPolicy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeGroomingRankFieldPolicy> a ss:SchemaClass ;
-  ss:name "RuntimeGroomingRankFieldPolicy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog> a ss:SchemaClass ;
   ss:name "RuntimePolicyCatalog" .
@@ -202,71 +190,11 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSelectorFormCapability> a ss:SchemaClass ;
   ss:name "RuntimeSelectorFormCapability" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeSourceKindValuePolicy> a ss:SchemaClass ;
-  ss:name "RuntimeSourceKindValuePolicy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningEmitterPolicy> a ss:SchemaClass ;
-  ss:name "RuntimeWarningEmitterPolicy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningTraitActionPolicy> a ss:SchemaClass ;
-  ss:name "RuntimeWarningTraitActionPolicy" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeStackPartition> a ss:SchemaClass ;
+  ss:name "RuntimeStackPartition" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeWarningTypePolicy> a ss:SchemaClass ;
   ss:name "RuntimeWarningTypePolicy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/ScheduleAssertion> a ss:SchemaClass ;
-  ss:name "ScheduleAssertion" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationActiveFactIndex> a ss:SchemaClass ;
-  ss:name "SchedulePresentationActiveFactIndex" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationConcernAnnotations> a ss:SchemaClass ;
-  ss:name "SchedulePresentationConcernAnnotations" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationLabel> a ss:SchemaClass ;
-  ss:name "SchedulePresentationLabel" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationPolicy> a ss:SchemaClass ;
-  ss:name "SchedulePresentationPolicy" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationReviewTags> a ss:SchemaClass ;
-  ss:name "SchedulePresentationReviewTags" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulePresentationZeroEffect> a ss:SchemaClass ;
-  ss:name "SchedulePresentationZeroEffect" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingAssessment> a ss:SchemaClass ;
-  ss:name "SchedulingAssessment" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingAssessmentRecord> a ss:SchemaClass ;
-  ss:name "SchedulingAssessmentRecord" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraint> a ss:SchemaClass ;
-  ss:name "SchedulingConstraint" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintCatalog> a ss:SchemaClass ;
-  ss:name "SchedulingConstraintCatalog" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintEntitySelector> a ss:SchemaClass ;
-  ss:name "SchedulingConstraintEntitySelector" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintRecord> a ss:SchemaClass ;
-  ss:name "SchedulingConstraintRecord" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingConstraintSelector> a ss:SchemaClass ;
-  ss:name "SchedulingConstraintSelector" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicyCatalog> a ss:SchemaClass ;
-  ss:name "SchedulingPolicyCatalog" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicyEffectMatch> a ss:SchemaClass ;
-  ss:name "SchedulingPolicyEffectMatch" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicyEffectRecord> a ss:SchemaClass ;
-  ss:name "SchedulingPolicyEffectRecord" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/SchedulingPolicyRecord> a ss:SchemaClass ;
-  ss:name "SchedulingPolicyRecord" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/Selector> a ss:SchemaClass ;
   ss:name "Selector" .
@@ -295,6 +223,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/TermSelector> a ss:SchemaClass ;
   ss:name "TermSelector" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/TrackedUnassignedEntry> a ss:SchemaClass ;
+  ss:name "TrackedUnassignedEntry" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/VocabularyCatalog> a ss:SchemaClass ;
   ss:name "VocabularyCatalog" .
 
@@ -307,17 +238,11 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/action_text> a ss:SchemaSlot ;
   ss:name "action_text" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/active_fact_index> a ss:SchemaSlot ;
-  ss:name "active_fact_index" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/active_side> a ss:SchemaSlot ;
   ss:name "active_side" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/active_stack_membership> a ss:SchemaSlot ;
   ss:name "active_stack_membership" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/activity> a ss:SchemaSlot ;
-  ss:name "activity" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/acute_alertness_effect_laws> a ss:SchemaSlot ;
   ss:name "acute_alertness_effect_laws" .
@@ -343,32 +268,11 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/applicability> a ss:SchemaSlot ;
   ss:name "applicability" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/applies_to> a ss:SchemaSlot ;
-  ss:name "applies_to" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/applies_when> a ss:SchemaSlot ;
-  ss:name "applies_when" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/assertion_kind> a ss:SchemaSlot ;
   ss:name "assertion_kind" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/assignment_axes> a ss:SchemaSlot ;
-  ss:name "assignment_axes" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/assignment_field> a ss:SchemaSlot ;
-  ss:name "assignment_field" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/assignment_source> a ss:SchemaSlot ;
-  ss:name "assignment_source" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/axis> a ss:SchemaSlot ;
-  ss:name "axis" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/benefit_description> a ss:SchemaSlot ;
   ss:name "benefit_description" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/blocks_slots> a ss:SchemaSlot ;
-  ss:name "blocks_slots" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/brand> a ss:SchemaSlot ;
   ss:name "brand" .
@@ -397,12 +301,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/composition_role> a ss:SchemaSlot ;
   ss:name "composition_role" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/composition_roles> a ss:SchemaSlot ;
-  ss:name "composition_roles" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/concern_annotations> a ss:SchemaSlot ;
-  ss:name "concern_annotations" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/concern_catalog> a ss:SchemaSlot ;
   ss:name "concern_catalog" .
 
@@ -415,9 +313,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/concerns> a ss:SchemaSlot ;
   ss:name "concerns" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/conclusion> a ss:SchemaSlot ;
-  ss:name "conclusion" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/condition> a ss:SchemaSlot ;
   ss:name "condition" .
 
@@ -426,9 +321,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/conformance_scenarios> a ss:SchemaSlot ;
   ss:name "conformance_scenarios" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraints> a ss:SchemaSlot ;
-  ss:name "constraints" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/context> a ss:SchemaSlot ;
   ss:name "context" .
@@ -448,9 +340,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/description> a ss:SchemaSlot ;
   ss:name "description" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/direction> a ss:SchemaSlot ;
-  ss:name "direction" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/directional> a ss:SchemaSlot ;
   ss:name "directional" .
 
@@ -459,12 +348,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/effect> a ss:SchemaSlot ;
   ss:name "effect" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/effect_match_dimensions> a ss:SchemaSlot ;
-  ss:name "effect_match_dimensions" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/effects> a ss:SchemaSlot ;
-  ss:name "effects" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/emitter> a ss:SchemaSlot ;
   ss:name "emitter" .
@@ -487,17 +370,14 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_sources> a ss:SchemaSlot ;
   ss:name "evidence_sources" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/exclude_policy_ids> a ss:SchemaSlot ;
-  ss:name "exclude_policy_ids" .
+<https://j2h4u.github.io/supp-slotter/ontology/v1/excluded_stack_names> a ss:SchemaSlot ;
+  ss:name "excluded_stack_names" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/exercise_anchor> a ss:SchemaSlot ;
   ss:name "exercise_anchor" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/expected> a ss:SchemaSlot ;
   ss:name "expected" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/expression> a ss:SchemaSlot ;
-  ss:name "expression" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/fact_value> a ss:SchemaSlot ;
   ss:name "fact_value" .
@@ -514,9 +394,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/fixture> a ss:SchemaSlot ;
   ss:name "fixture" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/food> a ss:SchemaSlot ;
-  ss:name "food" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/food_effect_laws> a ss:SchemaSlot ;
   ss:name "food_effect_laws" .
 
@@ -529,9 +406,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/glue_contract> a ss:SchemaSlot ;
   ss:name "glue_contract" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/grooming_policy> a ss:SchemaSlot ;
-  ss:name "grooming_policy" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/id> a ss:SchemaSlot ;
   ss:name "id" .
 
@@ -540,15 +414,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/inactive_stack_name> a ss:SchemaSlot ;
   ss:name "inactive_stack_name" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/include_kinds> a ss:SchemaSlot ;
-  ss:name "include_kinds" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/include_namespaces> a ss:SchemaSlot ;
-  ss:name "include_namespaces" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/intake> a ss:SchemaSlot ;
-  ss:name "intake" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/key> a ss:SchemaSlot ;
   ss:name "key" .
@@ -571,20 +436,11 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/label> a ss:SchemaSlot ;
   ss:name "label" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/labels> a ss:SchemaSlot ;
-  ss:name "labels" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/left> a ss:SchemaSlot ;
   ss:name "left" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/level> a ss:SchemaSlot ;
-  ss:name "level" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/locator> a ss:SchemaSlot ;
   ss:name "locator" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/match> a ss:SchemaSlot ;
-  ss:name "match" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/maximum_cardinality> a ss:SchemaSlot ;
   ss:name "maximum_cardinality" .
@@ -604,9 +460,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/name> a ss:SchemaSlot ;
   ss:name "name" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/near> a ss:SchemaSlot ;
-  ss:name "near" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/notes> a ss:SchemaSlot ;
   ss:name "notes" .
 
@@ -616,12 +469,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean_profiles> a ss:SchemaSlot ;
   ss:name "ontoclean_profiles" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/open_research_state> a ss:SchemaSlot ;
-  ss:name "open_research_state" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/operation> a ss:SchemaSlot ;
-  ss:name "operation" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/operator> a ss:SchemaSlot ;
   ss:name "operator" .
 
@@ -630,9 +477,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/pathway> a ss:SchemaSlot ;
   ss:name "pathway" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy> a ss:SchemaSlot ;
-  ss:name "policy" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/post_exercise_recovery_effect_laws> a ss:SchemaSlot ;
   ss:name "post_exercise_recovery_effect_laws" .
@@ -645,12 +489,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/pre_exercise_performance_effects> a ss:SchemaSlot ;
   ss:name "pre_exercise_performance_effects" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/precedence> a ss:SchemaSlot ;
-  ss:name "precedence" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/prefer_with> a ss:SchemaSlot ;
-  ss:name "prefer_with" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/pressure_identity> a ss:SchemaSlot ;
   ss:name "pressure_identity" .
@@ -685,12 +523,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/rank> a ss:SchemaSlot ;
   ss:name "rank" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/rank_fields> a ss:SchemaSlot ;
-  ss:name "rank_fields" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/rationale> a ss:SchemaSlot ;
-  ss:name "rationale" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/reason> a ss:SchemaSlot ;
   ss:name "reason" .
 
@@ -699,12 +531,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_kind> a ss:SchemaSlot ;
   ss:name "relation_kind" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_owner_direction> a ss:SchemaSlot ;
-  ss:name "relation_owner_direction" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/relation_owner_field> a ss:SchemaSlot ;
-  ss:name "relation_owner_field" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation_presence_active_sides> a ss:SchemaSlot ;
   ss:name "relation_presence_active_sides" .
@@ -736,9 +562,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relations> a ss:SchemaSlot ;
   ss:name "relations" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/require_active_reachable> a ss:SchemaSlot ;
-  ss:name "require_active_reachable" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/research_state> a ss:SchemaSlot ;
   ss:name "research_state" .
 
@@ -750,9 +573,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/reverse_output> a ss:SchemaSlot ;
   ss:name "reverse_output" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/review_tags> a ss:SchemaSlot ;
-  ss:name "review_tags" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/right> a ss:SchemaSlot ;
   ss:name "right" .
@@ -769,6 +589,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/role> a ss:SchemaSlot ;
   ss:name "role" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/routable_stack_names> a ss:SchemaSlot ;
+  ss:name "routable_stack_names" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/rule> a ss:SchemaSlot ;
   ss:name "rule" .
 
@@ -778,47 +601,11 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/runtime_value> a ss:SchemaSlot ;
   ss:name "runtime_value" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/schedule> a ss:SchemaSlot ;
-  ss:name "schedule" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_assertions> a ss:SchemaSlot ;
-  ss:name "schedule_assertions" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_axis> a ss:SchemaSlot ;
-  ss:name "schedule_axis" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_presentation> a ss:SchemaSlot ;
-  ss:name "schedule_presentation" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/schedule_value> a ss:SchemaSlot ;
-  ss:name "schedule_value" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_assessment> a ss:SchemaSlot ;
-  ss:name "scheduling_assessment" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_constraints> a ss:SchemaSlot ;
-  ss:name "scheduling_constraints" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling_policies> a ss:SchemaSlot ;
-  ss:name "scheduling_policies" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/schema_version> a ss:SchemaSlot ;
   ss:name "schema_version" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/scope> a ss:SchemaSlot ;
-  ss:name "scope" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/score_delta> a ss:SchemaSlot ;
-  ss:name "score_delta" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/scores_advisory> a ss:SchemaSlot ;
-  ss:name "scores_advisory" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/secondary_objective> a ss:SchemaSlot ;
   ss:name "secondary_objective" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/selection_count> a ss:SchemaSlot ;
-  ss:name "selection_count" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/selector> a ss:SchemaSlot ;
   ss:name "selector" .
@@ -865,9 +652,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/slot_field> a ss:SchemaSlot ;
   ss:name "slot_field" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/slot_near_values> a ss:SchemaSlot ;
-  ss:name "slot_near_values" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/slots> a ss:SchemaSlot ;
   ss:name "slots" .
 
@@ -879,18 +663,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/source_active> a ss:SchemaSlot ;
   ss:name "source_active" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/source_kind> a ss:SchemaSlot ;
-  ss:name "source_kind" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/source_kind_roles> a ss:SchemaSlot ;
-  ss:name "source_kind_roles" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/source_kind_values> a ss:SchemaSlot ;
-  ss:name "source_kind_values" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/source_kinds> a ss:SchemaSlot ;
-  ss:name "source_kinds" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/source_of_truth> a ss:SchemaSlot ;
   ss:name "source_of_truth" .
@@ -907,6 +679,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/stack> a ss:SchemaSlot ;
   ss:name "stack" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/stack_partition> a ss:SchemaSlot ;
+  ss:name "stack_partition" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/state> a ss:SchemaSlot ;
   ss:name "state" .
 
@@ -918,9 +693,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/substance> a ss:SchemaSlot ;
   ss:name "substance" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/summary> a ss:SchemaSlot ;
-  ss:name "summary" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/supplies_identity> a ss:SchemaSlot ;
   ss:name "supplies_identity" .
@@ -937,9 +709,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/target_selector_forms> a ss:SchemaSlot ;
   ss:name "target_selector_forms" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/template> a ss:SchemaSlot ;
-  ss:name "template" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/term> a ss:SchemaSlot ;
   ss:name "term" .
 
@@ -952,14 +721,17 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/tie_break> a ss:SchemaSlot ;
   ss:name "tie_break" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/timing> a ss:SchemaSlot ;
-  ss:name "timing" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/trace_key> a ss:SchemaSlot ;
   ss:name "trace_key" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/tracked_entries> a ss:SchemaSlot ;
+  ss:name "tracked_entries" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/tracked_product_presence> a ss:SchemaSlot ;
   ss:name "tracked_product_presence" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/tracked_unassigned_partition_name> a ss:SchemaSlot ;
+  ss:name "tracked_unassigned_partition_name" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/trait_id> a ss:SchemaSlot ;
   ss:name "trait_id" .
@@ -979,35 +751,14 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/value> a ss:SchemaSlot ;
   ss:name "value" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/value_type> a ss:SchemaSlot ;
-  ss:name "value_type" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/values> a ss:SchemaSlot ;
   ss:name "values" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/warning> a ss:SchemaSlot ;
-  ss:name "warning" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/warning_emitter_ids> a ss:SchemaSlot ;
-  ss:name "warning_emitter_ids" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/warning_emitters> a ss:SchemaSlot ;
-  ss:name "warning_emitters" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/warning_trait_actions> a ss:SchemaSlot ;
-  ss:name "warning_trait_actions" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/warning_type> a ss:SchemaSlot ;
   ss:name "warning_type" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/warning_types> a ss:SchemaSlot ;
   ss:name "warning_types" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/weight> a ss:SchemaSlot ;
-  ss:name "weight" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/zero_effect> a ss:SchemaSlot ;
-  ss:name "zero_effect" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/assertions> a ss:Catalog ;
   ss:catalog_role "assertions" ;
@@ -1024,20 +775,10 @@
   ss:catalog_path "ontology/canonical-laws.yaml" ;
   ss:catalog_root_class "CanonicalLawCatalog" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/constraints> a ss:Catalog ;
-  ss:catalog_role "constraints" ;
-  ss:catalog_path "ontology/scheduling-constraints.yaml" ;
-  ss:catalog_root_class "SchedulingConstraintCatalog" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/ontoclean> a ss:Catalog ;
   ss:catalog_role "ontoclean" ;
   ss:catalog_path "ontology/ontoclean.yaml" ;
   ss:catalog_root_class "OntoCleanCatalog" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/policies> a ss:Catalog ;
-  ss:catalog_role "policies" ;
-  ss:catalog_path "ontology/policies.yaml" ;
-  ss:catalog_root_class "SchedulingPolicyCatalog" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/relation_types> a ss:Catalog ;
   ss:catalog_role "relation_types" ;
@@ -1077,12 +818,6 @@
   ss:supplies_identity true ;
   ss:dependence "independent" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/activity> a ss:SemanticCategory ;
-  ss:id "activity" ;
-  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
-  ss:allowed_predicates
-  "schedule.activity" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/context> a ss:SemanticCategory ;
   ss:id "context" ;
   ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
@@ -1094,12 +829,6 @@
   ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
   ss:allowed_predicates
   "knowledge.effect" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/intake> a ss:SemanticCategory ;
-  ss:id "intake" ;
-  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
-  ss:allowed_predicates
-  "schedule.intake" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/kind> a ss:SemanticCategory ;
   ss:id "kind" ;
@@ -1131,12 +860,6 @@
   ss:allowed_predicates
   "knowledge.role" .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/timing> a ss:SemanticCategory ;
-  ss:id "timing" ;
-  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
-  ss:allowed_predicates
-  "schedule.timing" .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/balance> a ss:OperationalRelationType ;
   ss:id "balance" ;
   ss:label "Balance pairing" ;
@@ -1164,46 +887,6 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/supports> ss:source_selector_forms "entity" .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/supports> ss:target_selector_forms "term" .
 <https://j2h4u.github.io/supp-slotter/ontology/v1/relation-type/supports> ss:target_selector_forms "entity" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/assignment-axis/assignment_axis_intake> ss:id "assignment_axis_intake" ;
-  ss:axis "intake" ;
-  ss:assignment_source "schedule" ;
-  ss:assignment_field "intake" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/assignment-axis/assignment_axis_timing> ss:id "assignment_axis_timing" ;
-  ss:axis "timing" ;
-  ss:assignment_source "schedule" ;
-  ss:assignment_field "timing" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/assignment-axis/assignment_axis_activity> ss:id "assignment_axis_activity" ;
-  ss:axis "activity" ;
-  ss:assignment_source "schedule" ;
-  ss:assignment_field "activity" .
-
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/term/activity/any_workout> a ss:OntologyTerm ;
-  ss:id "activity:any_workout" ;
-  ss:slug "any_workout" ;
-  ss:semantic_category ss:activity ;
-  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
-  ss:label "Any workout slot" ;
-  ss:description "Training-adjacent marker where pre/post timing is flexible." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/term/activity/post_workout> a ss:OntologyTerm ;
-  ss:id "activity:post_workout" ;
-  ss:slug "post_workout" ;
-  ss:semantic_category ss:activity ;
-  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
-  ss:label "Post-workout" ;
-  ss:description "Timing marker for substances intended after training." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/term/activity/pre_workout> a ss:OntologyTerm ;
-  ss:id "activity:pre_workout" ;
-  ss:slug "pre_workout" ;
-  ss:semantic_category ss:activity ;
-  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
-  ss:label "Pre-workout" ;
-  ss:description "Timing marker for substances intended before training." .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/term/context/antioxidant_protection> a ss:OntologyTerm ;
   ss:id "context:antioxidant_protection" ;
@@ -2125,46 +1808,6 @@
   ss:label "Wound Healing Support" ;
   ss:description "Supports wound-healing biology such as collagen formation, epithelial repair, immune function, or zinc-dependent repair processes." .
 
-<https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/empty_preferred> a ss:OntologyTerm ;
-  ss:id "intake:empty_preferred" ;
-  ss:slug "empty_preferred" ;
-  ss:semantic_category ss:intake ;
-  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
-  ss:label "Prefers empty stomach" ;
-  ss:description "Works or absorbs better away from food, without a hard food block." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/fat_meal_required> a ss:OntologyTerm ;
-  ss:id "intake:fat_meal_required" ;
-  ss:slug "fat_meal_required" ;
-  ss:semantic_category ss:intake ;
-  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
-  ss:label "Requires fat-containing meal" ;
-  ss:description "Fat-containing food is the real intake target; current slot model approximates this as food=true." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/food_neutral> a ss:OntologyTerm ;
-  ss:id "intake:food_neutral" ;
-  ss:slug "food_neutral" ;
-  ss:semantic_category ss:intake ;
-  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
-  ss:label "Food neutral" ;
-  ss:description "Food state is not a meaningful scheduling driver." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/food_preferred> a ss:OntologyTerm ;
-  ss:id "intake:food_preferred" ;
-  ss:slug "food_preferred" ;
-  ss:semantic_category ss:intake ;
-  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
-  ss:label "Prefers food" ;
-  ss:description "Food improves tolerance or practical use, but empty-stomach intake remains acceptable." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/food_required> a ss:OntologyTerm ;
-  ss:id "intake:food_required" ;
-  ss:slug "food_required" ;
-  ss:semantic_category ss:intake ;
-  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
-  ss:label "Requires food" ;
-  ss:description "Active substance requires food for absorption, stomach tolerance, or reliable effect." .
-
 <https://j2h4u.github.io/supp-slotter/ontology/v1/term/kind/alkaloid> a ss:OntologyTerm ;
   ss:id "kind:alkaloid" ;
   ss:slug "alkaloid" ;
@@ -2668,413 +2311,3 @@
   ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/anti_rigid_dependent> ;
   ss:label "Pharmaceutical" ;
   ss:description "Prescription or OTC pharmaceutical drug (not a supplement)." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/term/timing/energy_like> a ss:OntologyTerm ;
-  ss:id "timing:energy_like" ;
-  ss:slug "energy_like" ;
-  ss:semantic_category ss:timing ;
-  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
-  ss:label "Energy-like" ;
-  ss:description "Direct wake-promoting or activating effect." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/term/timing/sleep_disruptive> a ss:OntologyTerm ;
-  ss:id "timing:sleep_disruptive" ;
-  ss:slug "sleep_disruptive" ;
-  ss:semantic_category ss:timing ;
-  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
-  ss:label "Sleep disruptive" ;
-  ss:description "Likely to disrupt sleep and should not be placed near bedtime." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/term/timing/sleep_support> a ss:OntologyTerm ;
-  ss:id "timing:sleep_support" ;
-  ss:slug "sleep_support" ;
-  ss:semantic_category ss:timing ;
-  ss:ontoclean_profile <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean-profile/dependent_assertion> ;
-  ss:label "Sleep support" ;
-  ss:description "Directly supports sleep onset or sleep quality." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout> a ss:SchedulingPolicyRecord ;
-  ss:id "activity:any_workout" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/activity/any_workout> ;
-  ss:applies_when "Prefer either observable workout slot." ;
-  ss:warning false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/0> a ss:SchedulingPolicyEffectRecord .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/0> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/0> ss:level "prefer" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/0/match> a ss:SchedulingPolicyEffectMatch .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/0/match> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/0/match> ss:near "workout_before" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/1> a ss:SchedulingPolicyEffectRecord .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/1> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/1> ss:level "prefer" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/1/match> a ss:SchedulingPolicyEffectMatch .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/1> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/1/match> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Aany_workout/effect/1/match> ss:near "workout_after" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout> a ss:SchedulingPolicyRecord ;
-  ss:id "activity:post_workout" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/activity/post_workout> ;
-  ss:applies_when "Prefer the observable post-workout slot." ;
-  ss:warning false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout/effect/0> a ss:SchedulingPolicyEffectRecord .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout/effect/0> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout/effect/0> ss:level "prefer" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout/effect/0/match> a ss:SchedulingPolicyEffectMatch .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout/effect/0/match> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apost_workout/effect/0/match> ss:near "workout_after" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout> a ss:SchedulingPolicyRecord ;
-  ss:id "activity:pre_workout" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/activity/pre_workout> ;
-  ss:applies_when "Prefer the observable pre-workout slot." ;
-  ss:warning false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout/effect/0> a ss:SchedulingPolicyEffectRecord .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout/effect/0> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout/effect/0> ss:level "prefer" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout/effect/0/match> a ss:SchedulingPolicyEffectMatch .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout/effect/0/match> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/activity%3Apre_workout/effect/0/match> ss:near "workout_before" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred> a ss:SchedulingPolicyRecord ;
-  ss:id "intake:empty_preferred" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/empty_preferred> ;
-  ss:applies_when "Prefer a slot without food when feasible." ;
-  ss:warning false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/0> a ss:SchedulingPolicyEffectRecord .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/0> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/0> ss:level "prefer" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/0/match> a ss:SchedulingPolicyEffectMatch .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/0/match> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/0/match> ss:food false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/1> a ss:SchedulingPolicyEffectRecord .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/1> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/1> ss:level "avoid" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/1/match> a ss:SchedulingPolicyEffectMatch .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/1> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/1/match> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Aempty_preferred/effect/1/match> ss:food true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required> a ss:SchedulingPolicyRecord ;
-  ss:id "intake:fat_meal_required" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/fat_meal_required> ;
-  ss:applies_when "Prefer a slot with food as the current approximation of a fat-containing meal." ;
-  ss:warning false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/0> a ss:SchedulingPolicyEffectRecord .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/0> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/0> ss:level "prefer_strong" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/0/match> a ss:SchedulingPolicyEffectMatch .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/0/match> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/0/match> ss:food true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/1> a ss:SchedulingPolicyEffectRecord .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/1> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/1> ss:level "avoid" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/1/match> a ss:SchedulingPolicyEffectMatch .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/1> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/1/match> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afat_meal_required/effect/1/match> ss:food false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_neutral> a ss:SchedulingPolicyRecord ;
-  ss:id "intake:food_neutral" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/food_neutral> ;
-  ss:applies_when "Food state does not drive slot assignment." ;
-  ss:warning false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred> a ss:SchedulingPolicyRecord ;
-  ss:id "intake:food_preferred" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/food_preferred> ;
-  ss:applies_when "Prefer a slot with food when feasible." ;
-  ss:warning false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred/effect/0> a ss:SchedulingPolicyEffectRecord .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred/effect/0> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred/effect/0> ss:level "prefer" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred/effect/0/match> a ss:SchedulingPolicyEffectMatch .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred/effect/0/match> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_preferred/effect/0/match> ss:food true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required> a ss:SchedulingPolicyRecord ;
-  ss:id "intake:food_required" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/intake/food_required> ;
-  ss:applies_when "Prefer a slot with food; retain the soft preference when food is unavailable." ;
-  ss:warning false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/0> a ss:SchedulingPolicyEffectRecord .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/0> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/0> ss:level "prefer_strong" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/0/match> a ss:SchedulingPolicyEffectMatch .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/0/match> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/0/match> ss:food true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/1> a ss:SchedulingPolicyEffectRecord .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/1> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/1> ss:level "avoid" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/1/match> a ss:SchedulingPolicyEffectMatch .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/1> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/1/match> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/intake%3Afood_required/effect/1/match> ss:food false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Ab6_neuropathy_long_term> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:b6_neuropathy_long_term" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/b6_neuropathy_long_term> ;
-  ss:applies_when "Use for supplemental vitamin B6 forms when long-term exposure warrants review across forms and products." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Ab6_neuropathy_long_term> ss:action "Review cumulative supplemental B6 intake across all forms and products, plus duration." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Abiotin_lab_interference> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:biotin_lab_interference" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/biotin_lab_interference> ;
-  ss:applies_when "Use for supplemental biotin/B7 forms where lab-test interpretation should include a biotin-interference check." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Abiotin_lab_interference> ss:action "Ask about biotin before interpreting thyroid, troponin, or other immunoassay results; pause timing should follow the lab or clinician's guidance." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Ableeding_med_interaction> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:bleeding_med_interaction" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/bleeding_med_interaction> ;
-  ss:applies_when "Use for nattokinase, high-signal omega-3 sources, antiplatelet botanicals, and other substances where anticoagulant/antiplatelet context should be reviewed." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Acyp450_med_interaction> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:cyp450_med_interaction" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/cyp450_med_interaction> ;
-  ss:applies_when "Use when a substance has credible CYP interaction context, especially when product review should look for narrow-therapeutic-index or CNS medications." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Acyp450_med_interaction> ss:action "Review medication list for CYP-sensitive drugs before treating this as routine background support." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aglucose_med_interaction> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:glucose_med_interaction" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/glucose_med_interaction> ;
-  ss:applies_when "Use for substances or supplement contexts where glucose-lowering, insulin-sensitizing, or insulin-mimetic effects make antidiabetes-medication review practical." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aglucose_med_interaction> ss:action "Review antidiabetes medication context and hypoglycemia risk before treating this as routine background support." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Ahyperkalemia_med_interaction> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:hyperkalemia_med_interaction" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/hyperkalemia_med_interaction> ;
-  ss:applies_when "Use for potassium-containing substances or formulas where ACEi, ARB, NSAID, or K-sparing diuretic context matters." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Ahypotension_med_interaction> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:hypotension_med_interaction" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/hypotension_med_interaction> ;
-  ss:applies_when "Use for PDE5 inhibitors, nitric-oxide precursors, and direct vasodilator substances where additive hypotension is the practical concern." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aincretin_drug_medical_review> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:incretin_drug_medical_review" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/incretin_drug_medical_review> ;
-  ss:applies_when "Use for semaglutide, tirzepatide, liraglutide, dulaglutide, exenatide, retatrutide, and similar incretin-mimetic drugs; do not use for ordinary glucose-support supplements." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aincretin_drug_medical_review> ss:action "Review prescribing context, glycemic medications, GI tolerance, pancreatitis/gallbladder history, kidney dehydration risk, pregnancy planning, and product quality before any practical use discussion." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Airon_overdose_review> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:iron_overdose_review" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/iron_overdose_review> ;
-  ss:applies_when "Use for iron supplement forms, regardless of source salt or chelate." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Airon_overdose_review> ss:action "Review iron indication, ferritin/iron status, hemochromatosis context, and child-safety storage before treating iron as routine background support." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aliver_injury_review> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:liver_injury_review" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/liver_injury_review> ;
-  ss:applies_when "Use for concentrated botanical extracts with credible liver-injury reports, such as green tea extract, especially when extract potency is unknown." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aliver_injury_review> ss:action "Review liver disease, symptoms, extract potency, dose, and food timing before treating this as routine background antioxidant support." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Amanual_review> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:manual_review" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/manual_review> ;
-  ss:applies_when "Use when no more specific practical risk trait exists yet." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Anarrow_therapeutic_window> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:narrow_therapeutic_window" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/narrow_therapeutic_window> ;
-  ss:applies_when "Use for selenium, copper, and similar narrow-window minerals." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aretinol_accumulation_review> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:retinol_accumulation_review" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/retinol_accumulation_review> ;
-  ss:applies_when "Use for preformed vitamin A/retinol forms, not demand-regulated provitamin-A carotenoids." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aretinol_accumulation_review> ss:action "Review cumulative preformed vitamin A intake, liver context, and pregnancy relevance before treating retinol as routine background support." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aseizure_threshold_review> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:seizure_threshold_review" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/seizure_threshold_review> ;
-  ss:applies_when "Use for substances where credible clinical references advise caution in people with seizure history or interacting seizure-threshold-lowering drugs." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Aserotonergic_med_interaction> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:serotonergic_med_interaction" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/serotonergic_med_interaction> ;
-  ss:applies_when "Use for 5-HTP and botanicals/adaptogens with documented or review-relevant serotonergic modulation where antidepressant or serotonin-syndrome-like context should be reviewed." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Astatin_like_monacolin_review> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:statin_like_monacolin_review" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/statin_like_monacolin_review> ;
-  ss:applies_when "Use for red yeast rice products when monacolin content is unknown or when statin-like lipid-lowering activity is part of the intended rationale." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Astatin_like_monacolin_review> ss:action "Review monacolin/statin-like exposure, liver and muscle symptoms, and medication interaction context." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Atmao_cardiometabolic_review> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:tmao_cardiometabolic_review" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/tmao_cardiometabolic_review> ;
-  ss:applies_when "Use for supplemental L-carnitine forms and related precursors when the reviewer should surface TMAO/cardiometabolic context." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Avitamin_k_anticoagulant_review> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:vitamin_k_anticoagulant_review" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/vitamin_k_anticoagulant_review> ;
-  ss:applies_when "Use for K1 and K2 forms where warfarin or related anticoagulant context should be reviewed." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Avitamin_k_anticoagulant_review> ss:action "Review warfarin/vitamin-K-antagonist therapy and intake consistency before changing vitamin K exposure." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Azinc_copper_balance_review> a ss:SchedulingPolicyRecord ;
-  ss:id "risk:zinc_copper_balance_review" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/risk/zinc_copper_balance_review> ;
-  ss:applies_when "Use for zinc supplement forms when cumulative zinc and copper balance should be surfaced." ;
-  ss:warning true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/risk%3Azinc_copper_balance_review> ss:action "Review cumulative zinc intake and copper status/context for long-term use." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like> a ss:SchedulingPolicyRecord ;
-  ss:id "timing:energy_like" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/timing/energy_like> ;
-  ss:applies_when "Prefer wake/day slots and avoid sleep when feasible." ;
-  ss:warning false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/0> a ss:SchedulingPolicyEffectRecord .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/0> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/0> ss:level "prefer" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/0/match> a ss:SchedulingPolicyEffectMatch .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/0/match> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/0/match> ss:near "wake" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/1> a ss:SchedulingPolicyEffectRecord .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/1> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/1> ss:level "prefer" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/1/match> a ss:SchedulingPolicyEffectMatch .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/1> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/1/match> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/1/match> ss:near "day_meal" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/2> a ss:SchedulingPolicyEffectRecord .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/2> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/2> ss:level "avoid" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/2/match> a ss:SchedulingPolicyEffectMatch .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/2> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/2/match> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Aenergy_like/effect/2/match> ss:near "sleep" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive> a ss:SchedulingPolicyRecord ;
-  ss:id "timing:sleep_disruptive" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/timing/sleep_disruptive> ;
-  ss:applies_when "Avoid the observable sleep slot when feasible." ;
-  ss:warning false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive/effect/0> a ss:SchedulingPolicyEffectRecord .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive/effect/0> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive/effect/0> ss:level "avoid" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive/effect/0/match> a ss:SchedulingPolicyEffectMatch .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive/effect/0/match> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_disruptive/effect/0/match> ss:near "sleep" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support> a ss:SchedulingPolicyRecord ;
-  ss:id "timing:sleep_support" ;
-  ss:term <https://j2h4u.github.io/supp-slotter/ontology/v1/term/timing/sleep_support> ;
-  ss:applies_when "Prefer the observable sleep slot." ;
-  ss:warning false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support/effect/0> a ss:SchedulingPolicyEffectRecord .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support> ss:effects <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support/effect/0> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support/effect/0> ss:level "prefer" .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support/effect/0/match> a ss:SchedulingPolicyEffectMatch .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support/effect/0> ss:match <https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support/effect/0/match> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/policy/timing%3Asleep_support/effect/0/match> ss:near "sleep" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots> a ss:SchedulingConstraintRecord ;
-  ss:id "sc_calcium_iron_separate_slots" ;
-  ss:operation "separate_products_same_slot" ;
-  ss:rationale "Calcium and iron evidence is dose- and context-dependent; dose is unknown, so no hard rule or computable 2-4 hour promise is justified." ;
-  ss:action "Prefer different slots for calcium and iron when feasible; no calculated separation interval." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots> ss:blocks_slots false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots> ss:scores_advisory true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots> ss:score_delta -1 .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/source_selector> a ss:SchedulingConstraintSelector .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots> ss:source_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/source_selector> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/source_selector/entity> a ss:SchedulingConstraintEntitySelector .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/source_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/source_selector/entity> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/source_selector/entity> ss:name "Calcium" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/target_selector> a ss:SchedulingConstraintSelector .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots> ss:target_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/target_selector> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/target_selector/entity> a ss:SchedulingConstraintEntitySelector .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/target_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/target_selector/entity> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_iron_separate_slots/target_selector/entity> ss:name "Iron" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots> a ss:SchedulingConstraintRecord ;
-  ss:id "sc_calcium_zinc_separate_slots" ;
-  ss:operation "separate_products_same_slot" ;
-  ss:rationale "Calcium can compete with zinc for absorption when co-administered." ;
-  ss:action "Keep calcium and zinc away from the same slot when they are in separate products." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots> ss:blocks_slots false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots> ss:scores_advisory true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots> ss:score_delta -1 .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/source_selector> a ss:SchedulingConstraintSelector .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots> ss:source_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/source_selector> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/source_selector/entity> a ss:SchedulingConstraintEntitySelector .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/source_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/source_selector/entity> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/source_selector/entity> ss:name "Calcium" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/target_selector> a ss:SchedulingConstraintSelector .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots> ss:target_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/target_selector> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/target_selector/entity> a ss:SchedulingConstraintEntitySelector .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/target_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/target_selector/entity> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_calcium_zinc_separate_slots/target_selector/entity> ss:name "Zinc" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots> a ss:SchedulingConstraintRecord ;
-  ss:id "sc_zinc_copper_separate_slots" ;
-  ss:operation "separate_products_same_slot" ;
-  ss:rationale "Zinc and copper can compete for absorption when co-administered." ;
-  ss:action "Keep zinc and copper away from the same slot when they are in separate products." .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots> ss:blocks_slots false .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots> ss:scores_advisory true .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots> ss:score_delta -1 .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/source_selector> a ss:SchedulingConstraintSelector .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots> ss:source_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/source_selector> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/source_selector/entity> a ss:SchedulingConstraintEntitySelector .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/source_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/source_selector/entity> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/source_selector/entity> ss:name "Zinc" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/target_selector> a ss:SchedulingConstraintSelector .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots> ss:target_selector <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/target_selector> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/target_selector/entity> a ss:SchedulingConstraintEntitySelector .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/target_selector> ss:entity <https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/target_selector/entity> .
-<https://j2h4u.github.io/supp-slotter/ontology/v1/constraint/sc_zinc_copper_separate_slots/target_selector/entity> ss:name "Copper" .

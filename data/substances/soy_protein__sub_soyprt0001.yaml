@@ -9,9 +9,6 @@ concerns:
 - kind: data_quality
   text: Product cards should distinguish whole soy foods, soy protein isolate, and isoflavone-only products; do not transfer
     the same LDL-C expectation across all forms.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - lipid_metabolism_support

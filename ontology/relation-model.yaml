@@ -139,6 +139,11 @@ slots:
   assertion_kind:
   semantic_family:
   relation_type: {range: RelationType}
+  entity:
+    range: RelationAssertionEntitySelector
+    inlined: true
+  category: {range: string}
+  term: {range: string}
   severity:
     range: Severity
   reason:

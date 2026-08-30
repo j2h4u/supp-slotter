@@ -5,17 +5,22 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
+import planner.engine.plan as plan_module
 import pytest
+from planner.canonical_optimizer_result import Diagnostic
 from planner.contracts import MealContext, Product, ProductComponent, Slot
 from planner.engine._canonical_optimizer import Indeterminate, Optimal, optimize_canonical_layout
 from planner.engine._plan_output import CanonicalScheduleOutputInput, build_canonical_schedule_output
+from planner.engine.show import cmd_show
 from planner.ontology.canonical_inference import Success, UnaryPressureIdentity
+from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.runtime_program import (
     RuntimeCanonicalFactCatalog,
     RuntimeCanonicalLaw,
     RuntimeCompositionRole,
     RuntimeEvidenceProvenance,
     RuntimeEvidenceSource,
+    RuntimeFactApplicability,
     RuntimeFactSubject,
     RuntimeFoodEffect,
 )
@@ -28,7 +33,6 @@ def _slot(slot_id: str, order: int, *, meal: str | None = None) -> Slot:
         slot_id,
         slot_id,
         order,
-        (),
         "daily",
         "daily",
         "daily",
@@ -41,13 +45,12 @@ def _slot(slot_id: str, order: int, *, meal: str | None = None) -> Slot:
 def _inference() -> Success:
     role = RuntimeCompositionRole("cmp_prd_demo__sub_demo", "prd_demo", "sub_demo")
     catalog = RuntimeCanonicalFactCatalog(
-        composition_roles=(role,),
         evidence_sources=(RuntimeEvidenceSource("src_demo"),),
         food_effects=(
             RuntimeFoodEffect(
                 "fact_food",
                 RuntimeFactSubject("sub_demo", None),
-                role.id,
+                RuntimeFactApplicability("sub_demo", None),
                 (RuntimeEvidenceProvenance("src_demo", "paper#demo", "quote"),),
                 "bioavailability_increases",
             ),
@@ -66,7 +69,7 @@ def _inference() -> Success:
     )
     from planner.ontology.canonical_inference import execute_canonical_inference
 
-    result = execute_canonical_inference(catalog, {"item_demo": "prd_demo"}, (law,))
+    result = execute_canonical_inference(catalog, {"item_demo": "prd_demo"}, (law,), composition_roles=(role,))
     assert isinstance(result, Success)
     return result
 
@@ -120,7 +123,9 @@ def test_not_every_day_is_a_presentation_group_for_the_proved_assignment() -> No
         (UnaryPressureIdentity("item_demo", "meal_context", "with_food"),),
     )
     assert isinstance(result, Optimal)
-    product = Product("prd_demo", "Demo", (ProductComponent("sub_demo"),), use_pattern="not_every_day")
+    product = Product(
+        "prd_demo", "Demo", (ProductComponent("sub_demo", "cmp_prd_demo__sub_demo"),), use_pattern="not_every_day"
+    )
     publication = build_canonical_schedule_output(
         CanonicalScheduleOutputInput(
             result=result,
@@ -134,17 +139,17 @@ def test_not_every_day_is_a_presentation_group_for_the_proved_assignment() -> No
 
     document = cast(dict[str, object], publication.document)
     summary = cast(dict[str, object], document["summary"])
-    groups = cast(dict[str, list[str]], summary["usage_groups"])
+    groups = cast(dict[str, list[str]], summary["placement_groups"])
     pillboxes = cast(dict[str, dict[str, object]], document["pillboxes"])
     slots_out = cast(dict[str, dict[str, object]], pillboxes["daily"]["slots"])
-    assert groups == {"daily_base": [], "not_every_day": ["Demo"]}
+    assert groups == {"routine": [], "episodic": ["Demo"]}
     assert slots_out["food"]["products"] == ["Demo"]
     assert slots_out["plain"]["products"] == []
 
 
 def test_publication_boundary_refuses_indeterminate_and_legacy_documents(tmp_path: Path) -> None:
     target = tmp_path / "schedule.yaml"
-    indeterminate = Indeterminate(("timeout",))
+    indeterminate = Indeterminate(Diagnostic("timeout", "timeout"))
     with pytest.raises(TypeError, match="only an Optimal"):
         OptimalPublication(indeterminate, _inference(), {}, {})  # type: ignore[arg-type]
     with pytest.raises(TypeError, match="OptimalPublication"):
@@ -159,12 +164,11 @@ def test_publication_boundary_refuses_indeterminate_and_legacy_documents(tmp_pat
 
 
 @pytest.mark.parametrize("error", [OSError("simulated write failure"), KeyboardInterrupt()])
-def test_atomic_write_failure_preserves_existing_document_and_cleans_temp_files(
+def test_atomic_write_failure_invalidates_current_document_and_cleans_temp_files(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, error: BaseException
 ) -> None:
     target = tmp_path / "schedule.yaml"
-    original = b"pre-existing schedule\n"
-    target.write_bytes(original)
+    target.write_text("pre-existing schedule\n", encoding="utf-8")
 
     def fail_fsync(_fd: int) -> None:
         raise error
@@ -174,19 +178,71 @@ def test_atomic_write_failure_preserves_existing_document_and_cleans_temp_files(
     monkeypatch.setattr(schedule_writer.os, "fsync", fail_fsync)
     with pytest.raises(type(error)):
         write_schedule_file(target, _publication())
-    assert target.read_bytes() == original
+    assert not target.exists()
     assert list(tmp_path.glob("schedule.yaml.tmp.*")) == []
 
 
-def test_writer_revalidates_a_mutated_publication_before_touching_target(tmp_path: Path) -> None:
+def test_writer_revalidation_failure_invalidates_current_document(tmp_path: Path) -> None:
     target = tmp_path / "schedule.yaml"
-    original = b"pre-existing schedule\n"
-    target.write_bytes(original)
+    target.write_text("pre-existing schedule\n", encoding="utf-8")
     publication = _publication()
     publication.document["pressure_matches"][0]["law_ids"] = ["law_mutated"]
 
     with pytest.raises(ValueError, match="canonical pressure proof"):
         write_schedule_file(target, publication)
 
-    assert target.read_bytes() == original
+    assert not target.exists()
     assert list(tmp_path.glob("schedule.yaml.tmp.*")) == []
+
+
+def test_successful_publication_replaces_lease_with_complete_optimal_document(tmp_path: Path) -> None:
+    target = tmp_path / "schedule.yaml"
+    target.write_text("status: Optimal\nassignments: {stale: stale}\n", encoding="utf-8")
+
+    write_schedule_file(target, _publication())
+
+    rendered = target.read_text(encoding="utf-8")
+    assert "status: Optimal" in rendered
+    assert "satisfied_pressures: 1" in rendered
+    assert "optimizer_proof:" in rendered
+    assert "stale" not in rendered
+
+
+@pytest.mark.parametrize(
+    ("error", "code"),
+    [(KeyboardInterrupt(), "interrupted"), (MemoryError(), "resource_exhausted")],
+)
+def test_public_plan_boundary_invalidates_stale_lease_before_interruption(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, error: BaseException, code: str
+) -> None:
+    target = tmp_path / "schedule.yaml"
+    target.write_text("status: Optimal\nassignments: {stale: stale}\n", encoding="utf-8")
+    monkeypatch.setattr(plan_module, "load_ontology", lambda _path: object())
+
+    def interrupt(*_args: object) -> object:
+        raise error
+
+    monkeypatch.setattr(plan_module, "_cmd_plan_inner", interrupt)
+
+    result = plan_module.cmd_plan(data_root=tmp_path)
+
+    assert result.status == "Indeterminate"
+    assert result.diagnostic is not None
+    assert result.diagnostic.code == code
+    assert not target.exists()
+
+
+def test_show_cannot_emit_a_stale_layout_after_plan_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    target = tmp_path / "schedule.yaml"
+    target.write_text("status: Optimal\nassignments: {stale: stale}\n", encoding="utf-8")
+
+    def fail_ontology(_path: Path) -> object:
+        raise OntologyInfrastructureError("simulated ontology failure")
+
+    monkeypatch.setattr(plan_module, "load_ontology", fail_ontology)
+
+    result = cmd_show(tmp_path)
+
+    assert result.exit_code == 1
+    assert result.output == ""
+    assert not target.exists()

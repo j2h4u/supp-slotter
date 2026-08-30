@@ -25,7 +25,7 @@ def _write_minimal_data_root(tmp: Path) -> None:
     # One substance carrying knowledge.risk: [manual_review]
     # ID pattern: ^sub_[a-z0-9]{10}$ — 'aabbccdd01' = 10 chars
     (substances_dir / "test_risk__sub_aabbccdd01.yaml").write_text(
-        "id: sub_aabbccdd01\nname: Test Risk Sub\nschedule: {}\nconcerns:\n- kind: safety\n  text: Active concern\nknowledge:\n  risk:\n  - manual_review\n"
+        "id: sub_aabbccdd01\nname: Test Risk Sub\nconcerns:\n- kind: safety\n  text: Active concern\nknowledge:\n  risk:\n  - manual_review\n"
     )
     (substances_dir / "inactive_concern__sub_aabbccdd03.yaml").write_text(
         "id: sub_aabbccdd03\nname: Inactive Concern\nconcerns:\n- kind: safety\n  text: Inactive concern\n"
@@ -43,9 +43,12 @@ def _write_minimal_data_root(tmp: Path) -> None:
         "id: prd_aabbccdd02\n"
         "name: Test Risk Product\n"
         "components:\n"
-        "- substance: sub_aabbccdd01\n"
-        "- substance: sub_aabbccdd08\n"
-        "- substance: sub_aabbccdd09\n"
+        "- id: cmp_prd_aabbccdd02__sub_aabbccdd01\n"
+        "  substance: sub_aabbccdd01\n"
+        "- id: cmp_prd_aabbccdd02__sub_aabbccdd08\n"
+        "  substance: sub_aabbccdd08\n"
+        "- id: cmp_prd_aabbccdd02__sub_aabbccdd09\n"
+        "  substance: sub_aabbccdd09\n"
     )
 
     # Minimal stacks.yaml — product in daily stack (plain string format)
@@ -60,28 +63,8 @@ def _write_minimal_data_root(tmp: Path) -> None:
         "    morning_food:\n"
         "      label: Morning / with breakfast\n"
         "      order: 1\n"
-        "      near: breakfast\n"
-        "      food: true\n"
-    )
-
-    traits_dir = tmp / "data" / "traits"
-    traits_dir.mkdir()
-    # Minimal trait registry — just enough for check_substances to parse
-    (traits_dir / "fixture.yaml").write_text(
-        "intake:\n"
-        "  food_preferred:\n"
-        "    label: Food preferred\n"
-        "    description: Take with food for best absorption.\n"
-        "    applies_when: always\n"
-        "effect:\n"
-        "  nitric_oxide_support:\n"
-        "    label: Nitric Oxide Support\n"
-        "    description: Fixture source endpoint for review_with matching.\n"
-        "    applies_when: Fixture only.\n"
-        "  pde5_inhibition:\n"
-        "    label: PDE5 Inhibition\n"
-        "    description: Fixture target endpoint for review_with matching.\n"
-        "    applies_when: Fixture only.\n"
+        "      meal_context: with_food\n"
+        "      circadian_anchor: wake\n"
     )
 
     # Canonical typed selector relation for concrete endpoint matching.

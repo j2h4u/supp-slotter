@@ -10,9 +10,6 @@ concerns:
 - kind: safety
   text: Review nitroglycerin, anticoagulant/antiplatelet, chemotherapy, asthma/bronchospasm, and GI-tolerance context before
     treating NAC as routine antioxidant support.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - antioxidant_protection

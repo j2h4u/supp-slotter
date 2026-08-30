@@ -5,26 +5,6 @@ notes: TiM Electrolyte Caps reports 24 mg total calcium split across dicalcium p
   contribution unresolved. Calcium supports bone/tooth mineral structure and mediates muscle function, blood clotting, nerve
   transmission, vascular contraction/dilation, and hormone secretion; vitamin D supports active calcium absorption. No
   lactate-specific benefit or scheduling rule is established.
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/
-    - https://ods.od.nih.gov/factsheets/Calcium-Consumer/
-    - https://pubmed.ncbi.nlm.nih.gov/3614304/
-    - https://pubmed.ncbi.nlm.nih.gov/12059174/
-    summary: Calcium food guidance is salt-specific; the available evidence does not establish a meal preference for this exact calcium lactate component, and TiM's 24 mg calcium is split across dicalcium phosphate and lactate with source contributions unresolved.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/
-    summary: No comparative clock-time rule was demonstrated for calcium lactate.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/
-    - https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-HealthProfessional/
-    summary: Training-stack reachability does not establish a pre-, during-, or post-workout calcium placement.
 knowledge:
   context:
   - value: workout_performance

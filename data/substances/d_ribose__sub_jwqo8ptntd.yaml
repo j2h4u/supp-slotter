@@ -8,9 +8,6 @@ concerns:
 - kind: safety
   text: Review glucose-control context, gastrointestinal tolerance, dose, and whether the user is treating D-ribose as exercise
     support, fatigue support, or cardiac/clinical nutrition support.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - exercise_recovery_support

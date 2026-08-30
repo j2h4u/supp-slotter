@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import textwrap
 
-from planner.engine._types import RelationReviewRow
 from planner.engine.review_model import ConcernEntry, ReviewModel
+from planner.query_model.types import RelationReviewRow
 from planner.schedule_types import DashboardMember, DashboardReviewEntryWithMembers
 
 SEPARATOR = "─" * 41

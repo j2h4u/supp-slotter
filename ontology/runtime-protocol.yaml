@@ -21,15 +21,6 @@ enums:
       both:
       source:
       target:
-  GroomingRankField:
-    permissible_values:
-      active_unique_product_count:
-      open_owned_item_count:
-      substance_id:
-  GroomingRankDirection:
-    permissible_values:
-      ascending:
-      descending:
   PublicationStatus:
     permissible_values:
       Optimal:
@@ -46,49 +37,45 @@ classes:
     slots: [operator, field, value, trace_key]
   RuntimePolicyCatalog:
     description: Typed executable policy contract consumed by planner runtime.
-    slots: [id, engine_contract, glue_contract, source_kind_values, effect_match_dimensions, assignment_axes, slot_near_values, warning_types, warning_emitters, warning_trait_actions, concern_catalog, relation_warning_rules, relation_presence_statuses, selector_form_capabilities, dashboard_state_catalog, grooming_policy, runtime_projection]
+    slots: [id, engine_contract, glue_contract, warning_types, concern_catalog, relation_warning_rules, relation_presence_statuses, selector_form_capabilities, dashboard_state_catalog, runtime_projection]
     slot_usage:
-      source_kind_values: {required: true, inlined: true, inlined_as_list: true}
       engine_contract: {required: true, inlined: true}
-      effect_match_dimensions: {required: true, inlined: true, inlined_as_list: true}
-      assignment_axes: {required: true, inlined: true, inlined_as_list: true}
-      slot_near_values: {required: true, multivalued: true}
       warning_types: {required: true, inlined: true, inlined_as_list: true}
-      warning_emitters: {required: true, inlined: true, inlined_as_list: true}
-      warning_trait_actions: {required: true, inlined: true, inlined_as_list: true}
       concern_catalog: {required: true, inlined: true, inlined_as_list: true}
       relation_warning_rules: {required: true, inlined: true, inlined_as_list: true}
       relation_presence_statuses: {required: true, inlined: true, inlined_as_list: true}
       selector_form_capabilities: {required: true, inlined: true, inlined_as_list: true}
       dashboard_state_catalog: {required: true, inlined: true}
-      grooming_policy: {required: true, inlined: true}
       runtime_projection: {required: true, inlined: true, inlined_as_list: true}
       glue_contract: {required: true, inlined: true}
   RuntimeGlueContract:
     slots:
       - id
       - inactive_stack_name
-      - source_kinds
-      - source_kind_roles
+      - stack_partition
       - relation_warning_filter_fields
       - relation_warning_active_sides
       - relation_presence_active_sides
       - relation_presence_truth_table
       - relation_endpoint_selector_kinds
       - relation_selector_forms
-      - warning_emitter_ids
     slot_usage:
       id: {required: true}
       inactive_stack_name: {required: true}
-      source_kinds: {required: true, multivalued: true}
-      source_kind_roles: {required: true, multivalued: true}
+      stack_partition: {required: true, inlined: true}
       relation_warning_filter_fields: {required: true, multivalued: true, range: RelationWarningFilterField}
       relation_warning_active_sides: {required: true, multivalued: true, range: RelationWarningActiveSide}
       relation_presence_active_sides: {required: true, multivalued: true}
       relation_presence_truth_table: {required: true, multivalued: true, range: RuntimeRelationPresenceTruthState, inlined: true, inlined_as_list: true}
       relation_endpoint_selector_kinds: {required: true, multivalued: true}
       relation_selector_forms: {required: true, multivalued: true}
-      warning_emitter_ids: {required: true, multivalued: true}
+  RuntimeStackPartition:
+    slots: [id, routable_stack_names, excluded_stack_names, tracked_unassigned_partition_name]
+    slot_usage:
+      id: {required: true}
+      routable_stack_names: {required: true, multivalued: true}
+      excluded_stack_names: {required: true, multivalued: true}
+      tracked_unassigned_partition_name: {required: true}
   RuntimeEngineContract:
     description: Versioned observable scheduler contract. Values describe the generic execution protocol; they are not supplement facts.
     slots: [id, protocol_version, result_mode, pressure_identity, domain_feasibility, primary_objective, secondary_objective, tie_break, publication_statuses, semantics, conformance_scenarios]
@@ -123,32 +110,9 @@ classes:
     slot_usage:
       target: {required: true}
       children: {inlined: true, inlined_as_list: true, range: RuntimeProjectionDescriptor}
-  RuntimeSourceKindValuePolicy:
-    slots: [id, source_kind, applies_to]
-    slot_usage:
-      source_kind: {required: true}
-      applies_to: {required: true}
-  RuntimeEffectMatchDimensionPolicy:
-    slots: [id, key, slot_field, value_type]
-    slot_usage: {key: {required: true}, slot_field: {required: true}, value_type: {required: true}}
-  RuntimeAssignmentAxisPolicy:
-    slots: [id, axis, order, assignment_source, assignment_field, minimum_cardinality, maximum_cardinality]
-    slot_usage:
-      axis: {required: true}
-      order: {required: true}
-      assignment_source: {required: true}
-      assignment_field: {required: true}
-      minimum_cardinality: {required: true}
-      maximum_cardinality: {required: true}
   RuntimeWarningTypePolicy:
     slots: [id, warning_type, label, action_text]
     slot_usage: {warning_type: {required: true}, label: {required: true}, action_text: {required: true}}
-  RuntimeWarningEmitterPolicy:
-    slots: [id, emitter, warning_type, default_message]
-    slot_usage: {emitter: {required: true}, warning_type: {required: true}, default_message: {required: true}}
-  RuntimeWarningTraitActionPolicy:
-    slots: [id, trait_id, action_text]
-    slot_usage: {trait_id: {required: true}, action_text: {required: true}}
   RuntimeConcernCatalogEntry:
     slots: [id, concern_kind, warning_type]
     slot_usage:
@@ -212,33 +176,9 @@ classes:
     slot_usage:
       tracked_product_presence: {required: true}
       state: {required: true}
-  RuntimeGroomingRankFieldPolicy:
-    slots: [id, field, direction]
-    slot_usage:
-      field: {required: true, range: GroomingRankField}
-      direction: {required: true, range: GroomingRankDirection}
-  RuntimeGroomingPolicy:
-    slots: [id, require_active_reachable, open_research_state, rank_fields, selection_count, relation_owner_field, relation_owner_direction]
-    slot_usage:
-      id: {required: true}
-      require_active_reachable: {required: true}
-      open_research_state: {required: true, range: ResearchState}
-      rank_fields: {required: true, multivalued: true, inlined: true, inlined_as_list: true, range: RuntimeGroomingRankFieldPolicy}
-      selection_count: {required: true}
-      relation_owner_field: {required: true, range: GroomingRankField}
-      relation_owner_direction: {required: true, range: GroomingRankDirection}
-
 slots:
   id: {identifier: true, required: true}
   operator: {required: true}
-  # These fields belong to source SchedulingConstraintRecord data imported by
-  # scheduling-model.yaml.  RuntimePolicyCatalog does not admit or project
-  # them, so the online v2 engine cannot execute pair blocking or advisory
-  # scoring from this schema surface.
-  operation:
-  blocks_slots: {range: boolean}
-  scores_advisory: {range: boolean}
-  score_delta: {range: integer}
   field:
   runtime_value:
   values: {multivalued: true}
@@ -252,34 +192,28 @@ slots:
   slot_field:
   rank: {range: integer}
   result:
-  source_kind:
-  applies_to: {multivalued: true}
   minimum_cardinality: {range: integer}
   maximum_cardinality: {range: integer}
-  source_kind_values: {multivalued: true, range: RuntimeSourceKindValuePolicy, inlined: true, inlined_as_list: true}
-  effect_match_dimensions: {multivalued: true, range: RuntimeEffectMatchDimensionPolicy, inlined: true, inlined_as_list: true}
   warning_types: {multivalued: true, range: RuntimeWarningTypePolicy, inlined: true, inlined_as_list: true}
-  warning_emitters: {multivalued: true, range: RuntimeWarningEmitterPolicy, inlined: true, inlined_as_list: true}
-  warning_trait_actions: {multivalued: true, range: RuntimeWarningTraitActionPolicy, inlined: true, inlined_as_list: true}
   concern_catalog: {multivalued: true, range: RuntimeConcernCatalogEntry, inlined: true, inlined_as_list: true}
   relation_warning_rules: {multivalued: true, range: RuntimeRelationWarningRule, inlined: true, inlined_as_list: true}
   relation_presence_statuses: {multivalued: true, range: RuntimeRelationPresenceStatusPolicy, inlined: true, inlined_as_list: true}
   selector_form_capabilities: {multivalued: true, range: RuntimeSelectorFormCapability, inlined: true, inlined_as_list: true}
   dashboard_state_catalog: {range: RuntimeDashboardStateCatalog, inlined: true}
   runtime_projection: {multivalued: true, range: RuntimeProjectionDescriptor, inlined: true, inlined_as_list: true}
-  assignment_axes: {multivalued: true, range: RuntimeAssignmentAxisPolicy, inlined: true, inlined_as_list: true}
   glue_contract: {range: RuntimeGlueContract, inlined: true}
   engine_contract: {range: RuntimeEngineContract, inlined: true}
   inactive_stack_name:
-  source_kinds: {multivalued: true}
-  source_kind_roles: {multivalued: true}
+  stack_partition: {range: RuntimeStackPartition, inlined: true}
+  routable_stack_names: {multivalued: true}
+  excluded_stack_names: {multivalued: true}
+  tracked_unassigned_partition_name:
   relation_warning_filter_fields: {multivalued: true, range: RelationWarningFilterField}
   relation_warning_active_sides: {multivalued: true, range: RelationWarningActiveSide}
   relation_presence_active_sides: {multivalued: true}
   relation_presence_truth_table: {multivalued: true, range: RuntimeRelationPresenceTruthState}
   relation_endpoint_selector_kinds: {multivalued: true}
   relation_selector_forms: {multivalued: true}
-  warning_emitter_ids: {multivalued: true}
   protocol_version:
   result_mode:
   pressure_identity: {multivalued: true}
@@ -296,26 +230,10 @@ slots:
   semantic:
   fixture:
   expected:
-  grooming_policy: {range: RuntimeGroomingPolicy, inlined: true}
-  require_active_reachable: {range: boolean}
-  open_research_state: {range: ResearchState}
-  rank_fields: {multivalued: true, range: RuntimeGroomingRankFieldPolicy, inlined: true, inlined_as_list: true}
-  relation_owner_field: {range: GroomingRankField}
-  relation_owner_direction: {range: GroomingRankDirection}
-  direction: {range: GroomingRankDirection}
-  selection_count: {range: integer}
   target:
   source:
   children: {multivalued: true, range: RuntimeProjectionDescriptor, inlined: true, inlined_as_list: true}
-  assignment_source:
-  assignment_field:
   order: {range: integer}
-  # Source-facing scheduling-policy review metadata.  It is not part of the
-  # RuntimePolicyCatalog projection or the online v2 objective.
-  level:
-  value_type:
-  slot_near_values: {multivalued: true}
-  near:
   model:
   warning_type:
   emitter:

@@ -12,9 +12,6 @@ concerns:
 - kind: safety
   text: Review antidiabetes medications and hypoglycemia risk; distinguish Ceylon from cassia cinnamon because coumarin exposure
     and liver-safety context can differ.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - insulin_signaling_context

@@ -6,9 +6,6 @@ aliases:
 - glucosamine sulfate
 notes: Glucosamine sulfate stabilized with 2 KCl; clinical-evidence form for joint support and cartilage/glycosaminoglycan
   context. Used in Animal Flex Joint Construction Complex alongside the HCl form.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - connective_tissue_support

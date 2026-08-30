@@ -11,9 +11,6 @@ concerns:
 - kind: safety
   text: Review sitosterolemia/familial phytosterolemia context and fat-soluble carotenoid status before treating chronic high-dose
     phytosterol use as routine.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - lipid_metabolism_support

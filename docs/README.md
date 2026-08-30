@@ -17,11 +17,9 @@ Use this page as the map. The README is the product front door; these docs are t
 
 ## Maintainers
 
-- [Canonical Instance and Inference Boundary](decisions/canonical-instance-inference-boundary-20260822.md) — governing target, migration boundary, and V-model acceptance matrix.
-- [Ontology Cutover Decision And Completion Plan](decisions/ontology-cutover-decision-20260821.md) — historical evidence for the previous cutover; its ownership clauses are superseded.
-- [Execution-Engine Boundary Audit](decisions/execution-engine-boundary-audit-20260821.md) — historical audit of the pre-migration runtime boundary.
+- [Canonical Instance and Inference Boundary](decisions/canonical-instance-inference-boundary-20260822.md) — governing decision for canonical scheduler inputs, inference, optimization, and publication.
 - [Ontology Facts](ontology-facts.md) — current unresolved ontology pressure points only.
-- [Evidence Coverage Grooming](evidence-coverage-grooming.md) — current card-level grooming contract and evidence-state boundaries.
+- [Evidence Coverage Grooming](evidence-coverage-grooming.md) — receipt-based canonical-evidence queue.
 - [MCP Position](mcp-position.md) — why an MCP server is deferred until the product surface is clearer.
 - [planner/](../planner/) — CLI/runtime package.
 - [tests/](../tests/) — regression tests for validation, review, scheduling, and maintenance behavior.

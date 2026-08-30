@@ -13,9 +13,6 @@ concerns:
 - kind: safety
   text: Review medication interactions for citrus-derived concentrated extracts, especially if statins, calcium-channel blockers,
     or other CYP-sensitive drugs are present.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
   - antioxidant_protection

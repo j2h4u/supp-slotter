@@ -5,9 +5,6 @@ aliases:
 - Na2SeO4
 notes: Inorganic selenate form. Kept separate from organic selenium and sodium selenite because source form can matter for
   reviewer context; NIH ODS lists sodium selenate among common selenium supplement forms.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - antioxidant_enzyme_cofactor

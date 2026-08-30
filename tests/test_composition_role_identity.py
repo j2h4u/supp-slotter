@@ -90,15 +90,17 @@ def test_authored_component_identity_survives_reorder_and_notes_edit(tmp_path: P
     )
     after = _component_nodes(_project_repository_with_projection(tmp_path, _product_projection()))
 
-    assert before == after == {
-        URIRef(BASE + "productComponent/cmp_prd_demo__sub_a"),
-        URIRef(BASE + "productComponent/cmp_prd_demo__sub_b"),
-    }
+    assert (
+        before
+        == after
+        == {
+            URIRef(BASE + "productComponent/cmp_prd_demo__sub_a"),
+            URIRef(BASE + "productComponent/cmp_prd_demo__sub_b"),
+        }
+    )
 
 
-def test_product_formula_validator_rejects_dangling_mismatched_and_duplicate_roles(
-    tmp_path: Path, monkeypatch
-) -> None:
+def test_product_formula_validator_rejects_dangling_mismatched_and_duplicate_roles(tmp_path: Path, monkeypatch) -> None:
     import planner.cards.product_validation as validation
 
     monkeypatch.setattr(validation, "schema_errors", lambda *_args: [])
@@ -111,8 +113,7 @@ def test_product_formula_validator_rejects_dangling_mismatched_and_duplicate_rol
         encoding="utf-8",
     )
     second.write_text(
-        "id: prd_second\nname: Second\ncomponents:\n"
-        "  - id: cmp_prd_first__sub_a\n    substance: sub_a\n",
+        "id: prd_second\nname: Second\ncomponents:\n  - id: cmp_prd_first__sub_a\n    substance: sub_a\n",
         encoding="utf-8",
     )
 

@@ -10,9 +10,6 @@ concerns:
 - kind: safety
   text: Review liver/gallbladder disease, bile-acid medication context, pregnancy, gastrointestinal tolerance, and product
     quality before practical use discussion.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
   - bile_acid_conjugation_context

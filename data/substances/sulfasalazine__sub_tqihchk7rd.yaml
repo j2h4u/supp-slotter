@@ -6,9 +6,6 @@ concerns:
 - kind: safety
   text: Prescription anti-inflammatory medication context; folate-related supplement decisions should be reviewed against
     the prescribing indication, medication tolerance, and clinician-directed plan.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   risk:
   - manual_review

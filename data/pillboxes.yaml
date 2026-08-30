@@ -2,9 +2,9 @@
 # data/pillboxes.yaml — Pillboxes and their time slots
 # =============================================================================
 #
-# A pillbox is a physical container with named compartments (slots). Each top-level
-# key here must match a stack key in stacks.yaml. The planner assigns each active
-# product to exactly one slot within its stack's pillbox.
+# A pillbox is a logical intake group with named slots. Each top-level key here
+# must match a stack key in stacks.yaml. The planner assigns each active product
+# to exactly one slot within its stack's logical group.
 #
 # SLOT FIELDS
 # -----------

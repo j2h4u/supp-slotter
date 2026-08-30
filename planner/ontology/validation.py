@@ -33,7 +33,6 @@ class _RegistrySelection:
     terms: set[Node]
     categories: set[Node]
     profiles: set[Node]
-    axes: set[Node]
     base: str
 
 
@@ -51,29 +50,26 @@ def _record_phase(
 
 
 def build_validation_registry(ontology_root: Path) -> ValidationRegistry:
-    """Load generated term/category/profile and placement metadata.
+    """Load generated term/category/profile metadata.
 
     The generated ontology also contains catalog and schema metadata.  Those
     records are not repository cards and must not become SHACL data targets.
-    Keeping the registry slice explicit makes authored vocabulary, its
-    OntoClean relationships, and runtime assignment metadata the only sources
-    of placement during validation.
+    Keeping the registry slice explicit makes authored vocabulary and its
+    OntoClean relationships available during validation.
     """
 
     canonical = _load_canonical_ontology(ontology_root)
     base = _canonical_base(canonical)
     ontology_term = URIRef(f"{base}OntologyTerm")
-    terms, category_nodes, profile_nodes, axis_nodes = _registry_nodes(canonical, base)
-    metadata = category_nodes | profile_nodes | axis_nodes
+    terms, category_nodes, profile_nodes = _registry_nodes(canonical, base)
+    metadata = category_nodes | profile_nodes
     if not terms:
         raise OntologyInfrastructureError("Generated ontology has no canonical OntologyTerm registry")
     if not metadata:
         raise OntologyInfrastructureError("Generated ontology has no canonical placement metadata")
 
     registry = Graph()
-    _copy_registry_nodes(
-        registry, _RegistrySelection(canonical, terms, category_nodes, profile_nodes, axis_nodes, base)
-    )
+    _copy_registry_nodes(registry, _RegistrySelection(canonical, terms, category_nodes, profile_nodes, base))
 
     # Entity selectors use the same authored substance identity registry as
     # the compiler/runtime.  Keep this registry in the composed SHACL graph so
@@ -113,38 +109,24 @@ def _canonical_base(canonical: Graph) -> str:
     return base
 
 
-def _registry_nodes(canonical: Graph, base: str) -> tuple[set[Node], set[Node], set[Node], set[Node]]:
+def _registry_nodes(canonical: Graph, base: str) -> tuple[set[Node], set[Node], set[Node]]:
     ontology_term = URIRef(f"{base}OntologyTerm")
     semantic_category = URIRef(f"{base}semantic_category")
     ontoclean_profile = URIRef(f"{base}ontoclean_profile")
     category_class = URIRef(f"{base}SemanticCategory")
     profile_class = URIRef(f"{base}OntoCleanProfile")
-    assignment_source = URIRef(f"{base}assignment_source")
-    axis_predicate = URIRef(f"{base}axis")
     terms = set(canonical.subjects(RDF.type, ontology_term))
     categories = set(canonical.subjects(RDF.type, category_class))
     categories.update(obj for term in terms for obj in canonical.objects(term, semantic_category))
-    axes = {
-        subject
-        for subject in canonical.subjects(assignment_source, None)
-        if (subject, axis_predicate, None) in canonical
-    }
     profiles = set(canonical.subjects(RDF.type, profile_class))
     profiles.update(obj for category in categories for obj in canonical.objects(category, ontoclean_profile))
-    return terms, categories, profiles, axes
+    return terms, categories, profiles
 
 
 def _copy_registry_nodes(registry: Graph, selection: _RegistrySelection) -> None:
     for node in selection.terms | selection.categories | selection.profiles:
         for triple in selection.canonical.triples((node, None, None)):
             registry.add(triple)
-    axis_predicate = URIRef(f"{selection.base}axis")
-    assignment_source = URIRef(f"{selection.base}assignment_source")
-    assignment_field = URIRef(f"{selection.base}assignment_field")
-    for axis in selection.axes:
-        for predicate in (axis_predicate, assignment_source, assignment_field):
-            for value in selection.canonical.objects(axis, predicate):
-                registry.add((axis, predicate, value))
 
 
 def _append_substance_registry(registry: Graph, ontology_root: Path, base: str) -> None:

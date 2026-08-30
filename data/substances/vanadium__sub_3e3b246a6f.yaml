@@ -4,28 +4,6 @@ notes: Generic elemental vanadium contribution. The active trace-mineral product
 concerns:
 - kind: safety
   text: Review GI intolerance, renal context, and antidiabetes medication use before treating vanadium as routine support; the 750 mcg elemental exposure is below the 1.8 mg/day adult UL, but the UL is animal renal-toxicity-derived with uncertainty. Glucose/insulin concerns are conditional and mechanistic; no demonstrated interaction, efficacy, contraindication, or timing schedule is established.
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://www.ncbi.nlm.nih.gov/books/NBK222322/
-    - https://pubmed.ncbi.nlm.nih.gov/18319296/
-    - https://doi.org/10.2903/j.efsa.2008.634
-    summary: No fed-versus-fasted comparison at the active 750 mcg elemental exposure establishes an intake preference; any food direction on a product label is product-level and does not generalize across vanadium forms or doses.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://www.ncbi.nlm.nih.gov/books/NBK222322/
-    - https://pubmed.ncbi.nlm.nih.gov/18319296/
-    - https://doi.org/10.2903/j.efsa.2008.634
-    summary: No comparative clock-time evidence establishes a timing rule for the active vanadium exposure or across vanadium forms and doses.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://www.ncbi.nlm.nih.gov/books/NBK222322/
-    - https://pubmed.ncbi.nlm.nih.gov/18319296/
-    - https://doi.org/10.2903/j.efsa.2008.634
-    summary: No evidence establishes a workout- or activity-linked timing rule for the active vanadium exposure; no activity placement is supported.
 knowledge:
   kind:
   - value: mineral
