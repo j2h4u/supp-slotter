@@ -205,8 +205,22 @@ This checklist never substitutes a summary for that source.
   detect false or premature checkmarks, and confirm that no required work was
   silently dropped. Save its prompt, reviewed commit SHA, per-item verdicts,
   discrepancies, and final `COMPLETE` or `INCOMPLETE` decision in
-  `docs/decisions/`. This is the last action in the plan; only `COMPLETE` closes
-  the spike.
+  `docs/decisions/`. Only `COMPLETE` allows the final convergence panel to run.
+- [ ] **Repeat the original expert-panel review as the final convergence
+  check.** Use the same product, ontology, architecture, portability, data-loss,
+  and complexity optics as the panel that produced this checklist. Give the
+  panel the original findings, this completed checklist and its item-specific
+  evidence, the fresh-context auditor report, and the exact committed head.
+  Require it to compare the original and current problem sets, state which
+  severities and problem classes disappeared or remain, and decide whether the
+  work is demonstrably converging rather than merely producing different
+  findings. Save the prompt, reviewed commit SHA, individual model findings,
+  comparison, and convergence verdict in `docs/decisions/`. If the panel finds
+  any actionable problem, append every recommendation to this document as a
+  new unchecked item with acceptance criteria and required evidence, then keep
+  the checklist open for another implementation, audit, and convergence-review
+  cycle. The spike closes only when this panel confirms convergence and returns
+  `SHIP` without actionable reservations.
 
 ## Execution order
 
@@ -217,7 +231,9 @@ This checklist never substitutes a summary for that source.
 5. Surreal residue, runtime artifact split, and read-only validation.
 6. Data integrity, grooming, presentation, and test-harness cleanup.
 7. Final release evidence and independent panel review.
-8. Fresh-context checklist audit and final completion decision.
+8. Fresh-context checklist audit and `COMPLETE` decision.
+9. Same-optics expert-panel review, convergence comparison, and either `SHIP`
+   or another explicitly checklisted remediation cycle.
 
 Within each step, schema/data identity and its negative validation fixture come
 before runtime consumption; runtime implementation comes before real-scenario
