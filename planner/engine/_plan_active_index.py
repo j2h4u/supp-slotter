@@ -47,6 +47,7 @@ def build_active_index(
     canonical_inference = execute_canonical_inference(
         index_input.runtime_program.canonical_scheduling,
         item_products,
+        applicability_expansion_strategy=index_input.runtime_program.engine_contract.applicability_expansion_strategy,
         composition_roles=composition_roles_for_products(index_input.products),
         known_products=index_input.products,
     )

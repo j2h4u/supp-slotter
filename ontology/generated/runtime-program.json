@@ -413,6 +413,7 @@
       ]
     },
     "engine_contract": {
+      "applicability_expansion_strategy": "exact_role_or_all_roles_with_equal_substance",
       "domain_feasibility": "unbounded_logical_domain",
       "id": "planner_engine_contract",
       "pressure_identity": [
@@ -420,6 +421,7 @@
         "dimension",
         "value"
       ],
+      "pressure_satisfaction_strategy": "slot_anchor_at_pressure_dimension_equals_pressure_value",
       "primary_objective": "maximize_unique_pressure_satisfaction",
       "protocol_version": "supp-slotter.engine-contract/v2",
       "publication_statuses": [
@@ -517,8 +519,8 @@
     "compiler_sha256": "ce8b3ef0a1b698a1e8c037e5b0f3b6c9ab53f1cd8363a196a8f93821c30b0406",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "0c96829eff5ce1f700c316c946c70bf1eb557fc767a0719c4006d0f42ea1a171"
+    "source_sha256": "09669cccb6e9d100d96299cd7bb3a6f42d47acd61931d90d6422f9fd1401c066"
   },
   "schema_version": "2",
-  "source_hash": "aff7792c60d5ad88cafd48aaa3f4c58659fe59517b8533b326a8fc790f846c73"
+  "source_hash": "8a46d04ee965da6222db1871d650d0b5c8a9511b6bbb144dec7bccde0eeaadf6"
 }

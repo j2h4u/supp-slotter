@@ -13,6 +13,7 @@ from dataclasses import dataclass
 
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.runtime_program import (
+    IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY,
     RuntimeCanonicalLaw,
     RuntimeCanonicalScheduling,
     RuntimeCanonicalSchedulingFact,
@@ -204,7 +205,10 @@ def _law_for(
 def _roles_for_fact(
     fact: RuntimeCanonicalSchedulingFact,
     roles: Mapping[str, RuntimeCompositionRole],
+    applicability_expansion_strategy: str,
 ) -> tuple[RuntimeCompositionRole, ...]:
+    if applicability_expansion_strategy != IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY:
+        raise OntologyInfrastructureError("canonical inference has an unsupported applicability expansion strategy")
     target = fact.applicability
     if target.substance is not None:
         if fact.subject.substance != target.substance:
@@ -221,6 +225,7 @@ def _derivations_for_fact(
     law_index: Mapping[tuple[str, str], RuntimeCanonicalLaw],
     roles: Mapping[str, RuntimeCompositionRole],
     selected_by_product: Mapping[str, tuple[str, ...]],
+    applicability_expansion_strategy: str,
 ) -> tuple[tuple[UnaryPressureIdentity, PressureDerivation], ...]:
     family = fact.family
     fact_value = fact.value
@@ -228,7 +233,7 @@ def _derivations_for_fact(
     if law is None:
         raise OntologyInfrastructureError(f"canonical law missing for family={family!r}, fact_value={fact_value!r}")
     derivations: list[tuple[UnaryPressureIdentity, PressureDerivation]] = []
-    for role in _roles_for_fact(fact, roles):
+    for role in _roles_for_fact(fact, roles, applicability_expansion_strategy):
         for item_id in selected_by_product.get(role.product, ()):
             identity = UnaryPressureIdentity(item_id, law.dimension, law.pressure_value)
             derivations.append((
@@ -251,6 +256,7 @@ def _collect_derivations(
     laws: Mapping[tuple[str, str], RuntimeCanonicalLaw],
     roles: Mapping[str, RuntimeCompositionRole],
     selected: Mapping[str, str],
+    applicability_expansion_strategy: str,
 ) -> dict[UnaryPressureIdentity, list[PressureDerivation]]:
     selected_by_product: dict[str, tuple[str, ...]] = {}
     for product_id in set(selected.values()):
@@ -259,7 +265,13 @@ def _collect_derivations(
         )
     by_identity: dict[UnaryPressureIdentity, list[PressureDerivation]] = {}
     for fact in catalog.facts:
-        for identity, derivation in _derivations_for_fact(fact, laws, roles, selected_by_product):
+        for identity, derivation in _derivations_for_fact(
+            fact,
+            laws,
+            roles,
+            selected_by_product,
+            applicability_expansion_strategy,
+        ):
             by_identity.setdefault(identity, []).append(derivation)
     return by_identity
 
@@ -315,6 +327,7 @@ def execute_canonical_inference(
     catalog: RuntimeCanonicalScheduling,
     selected_items: Iterable[object] | Mapping[object, object],
     *,
+    applicability_expansion_strategy: str,
     composition_roles: Iterable[RuntimeCompositionRole] = (),
     known_products: Iterable[str] = (),
 ) -> InferenceResult:
@@ -327,6 +340,8 @@ def execute_canonical_inference(
     """
     if not isinstance(catalog, RuntimeCanonicalScheduling):
         raise TypeError("canonical inference requires RuntimeCanonicalScheduling")
+    if applicability_expansion_strategy != IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY:
+        raise OntologyInfrastructureError("canonical inference has an unsupported applicability expansion strategy")
     selected = _selected_items(selected_items)
     roles: dict[str, RuntimeCompositionRole] = {}
     for role in composition_roles:
@@ -343,7 +358,15 @@ def execute_canonical_inference(
         raise OntologyInfrastructureError(
             f"canonical inference selected unknown products: {', '.join(sorted(unknown))}"
         )
-    normalized = _normalized_pressures(_collect_derivations(catalog, catalog.laws_by_key, roles, selected))
+    normalized = _normalized_pressures(
+        _collect_derivations(
+            catalog,
+            catalog.laws_by_key,
+            roles,
+            selected,
+            applicability_expansion_strategy,
+        )
+    )
     conflicts = _same_dimension_conflicts(normalized)
     if conflicts:
         return Conflict(conflicts)
@@ -354,6 +377,7 @@ def infer_canonical_pressures(
     catalog: RuntimeCanonicalScheduling,
     selected_items: Iterable[object] | Mapping[object, object],
     *,
+    applicability_expansion_strategy: str,
     composition_roles: Iterable[RuntimeCompositionRole] = (),
     known_products: Iterable[str] = (),
 ) -> InferenceResult:
@@ -361,6 +385,7 @@ def infer_canonical_pressures(
     return execute_canonical_inference(
         catalog,
         selected_items,
+        applicability_expansion_strategy=applicability_expansion_strategy,
         composition_roles=composition_roles,
         known_products=known_products,
     )

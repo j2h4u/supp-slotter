@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from planner.canonical_optimizer_result import Optimal
 from planner.contracts import Product, Slot
 from planner.ontology.canonical_inference import NormalizedUnaryPressure
+from planner.ontology.runtime_program import IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY
 from planner.schedule_types import (
     CanonicalDomainLoadProof,
     CanonicalPlacementExplanation,
@@ -61,13 +62,21 @@ def _pressure_matches(
     source: CanonicalPublicationSource, assignments: Mapping[str, str]
 ) -> list[CanonicalPressureMatch]:
     matches = [
-        _pressure_match(pressure, source.slots[assignments[pressure.item_id]])
+        _pressure_match(
+            pressure,
+            source.slots[assignments[pressure.item_id]],
+            source.pressure_satisfaction_strategy,
+        )
         for pressure in source.inference.pressures
     ]
     return sorted(matches, key=lambda row: (row["item_id"], row["dimension"], row["value"]))
 
 
-def _pressure_match(pressure: NormalizedUnaryPressure, slot: Slot) -> CanonicalPressureMatch:
+def _pressure_match(
+    pressure: NormalizedUnaryPressure,
+    slot: Slot,
+    pressure_satisfaction_strategy: str,
+) -> CanonicalPressureMatch:
     provenance: dict[tuple[str, str, str | None], CanonicalProvenanceRef] = {}
     for derivation in pressure.derivations:
         for ref in derivation.provenance:
@@ -83,12 +92,18 @@ def _pressure_match(pressure: NormalizedUnaryPressure, slot: Slot) -> CanonicalP
         "value": pressure.value,
         "slot_id": slot.slot_id,
         "slot_anchor": anchor,
-        "satisfied": anchor == pressure.value,
+        "satisfied": _pressure_is_satisfied(anchor, pressure.value, pressure_satisfaction_strategy),
         "fact_ids": sorted({derivation.fact_id for derivation in pressure.derivations}),
         "law_ids": sorted({derivation.law_id for derivation in pressure.derivations}),
         "applicability_role_ids": sorted({derivation.path.role_id for derivation in pressure.derivations}),
         "provenance_refs": [provenance[key] for key in sorted(provenance)],
     }
+
+
+def _pressure_is_satisfied(anchor: str | None, value: str, pressure_satisfaction_strategy: str) -> bool:
+    if pressure_satisfaction_strategy != IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY:
+        raise ValueError("canonical output has an unsupported pressure satisfaction strategy")
+    return anchor == value
 
 
 def _domain_loads(

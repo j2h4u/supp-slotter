@@ -18,6 +18,7 @@ from planner.ontology.canonical_inference import (
 )
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.runtime_program import (
+    IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY,
     RuntimeCanonicalLaw,
     RuntimeCanonicalScheduling,
     RuntimeCanonicalSchedulingFact,
@@ -107,6 +108,7 @@ def _execute(
     return execute_canonical_inference(
         catalog,
         selected_items,  # type: ignore[arg-type]
+        applicability_expansion_strategy=IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY,
         composition_roles=roles,
         known_products={role.product for role in roles},
     )
@@ -262,7 +264,12 @@ def test_incomplete_law_graph_fails_closed_at_runtime_catalog_boundary() -> None
 
 def test_inference_rejects_duck_typed_runtime_programs() -> None:
     with pytest.raises(TypeError, match="RuntimeCanonicalScheduling"):
-        execute_canonical_inference(object(), ("prd_demo",), composition_roles=(ROLE,))  # type: ignore[arg-type]
+        execute_canonical_inference(  # type: ignore[arg-type]
+            object(),
+            ("prd_demo",),
+            applicability_expansion_strategy=IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY,
+            composition_roles=(ROLE,),
+        )
 
 
 @pytest.mark.parametrize("selected", (("",), (42,), {"item": ""}, {"": "prd_demo"}, ("prd_unknown",)))
@@ -275,6 +282,7 @@ def test_valid_neutral_product_yields_no_pressures() -> None:
     result = execute_canonical_inference(
         _catalog(),
         ("prd_neutral",),
+        applicability_expansion_strategy=IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY,
         known_products=("prd_neutral",),
     )
     assert isinstance(result, Success)

@@ -15,6 +15,11 @@ from planner.ontology.glue_capabilities import (
 )
 
 IMPLEMENTED_TIE_BREAK = "stable_item_id_then_(slot.order,slot_id)"
+IMPLEMENTED_RUNTIME_PROGRAM_SCHEMA_VERSION = "2"
+IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY = "exact_role_or_all_roles_with_equal_substance"
+IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY = "slot_anchor_at_pressure_dimension_equals_pressure_value"
+_RUNTIME_PROGRAM_PROVENANCE_SOURCE = "ontology/runtime-policy.yaml"
+_SHA256_HEX = frozenset("0123456789abcdef")
 
 
 def _error(label: str, message: str) -> OntologyInfrastructureError:
@@ -43,9 +48,16 @@ def _exact_map(value: object, label: str, expected: frozenset[str]) -> Mapping[s
 
 
 def _str(value: object, label: str) -> str:
-    if not isinstance(value, str) or not value:
-        raise _error(label, "must be a non-empty string")
+    if not isinstance(value, str) or not value.strip() or value != value.strip():
+        raise _error(label, "must be a non-blank, unpadded string")
     return value
+
+
+def _sha256(value: object, label: str) -> str:
+    result = _str(value, label)
+    if len(result) != 64 or any(character not in _SHA256_HEX for character in result):
+        raise _error(label, "must be a lowercase SHA-256 digest")
+    return result
 
 
 def _bool(value: object, label: str) -> bool:
@@ -160,6 +172,8 @@ class RuntimeEngineContract:
     protocol_version: str
     result_mode: str
     pressure_identity: tuple[str, ...]
+    applicability_expansion_strategy: str
+    pressure_satisfaction_strategy: str
     domain_feasibility: str
     primary_objective: str
     secondary_objective: str
@@ -909,13 +923,31 @@ def _decode_program_payload(payload: Mapping[str, object]) -> tuple[str, str, st
     expected_root = {"format_version", "schema_version", "source_hash", "provenance", "projection"}
     if set(root) != expected_root:
         raise _error("", "has an invalid top-level shape")
+    schema_version = _str(root["schema_version"], "schema_version")
+    if schema_version != IMPLEMENTED_RUNTIME_PROGRAM_SCHEMA_VERSION:
+        raise _error("schema_version", f"is not implemented: {schema_version!r}")
+    _runtime_program_provenance(root["provenance"], schema_version)
     projection = _exact_map(root.get("projection"), "projection", RUNTIME_PROGRAM_FIELDS[""])
     return (
         _str(root["format_version"], "format_version"),
-        _str(root["schema_version"], "schema_version"),
-        _str(root["source_hash"], "source_hash"),
+        schema_version,
+        _sha256(root["source_hash"], "source_hash"),
         projection,
     )
+
+
+def _runtime_program_provenance(value: object, schema_version: str) -> None:
+    provenance = _exact_map(
+        value,
+        "provenance",
+        frozenset({"source", "source_sha256", "manifest_schema_version", "compiler_sha256"}),
+    )
+    if _str(provenance["source"], "provenance.source") != _RUNTIME_PROGRAM_PROVENANCE_SOURCE:
+        raise _error("provenance.source", f"must be {_RUNTIME_PROGRAM_PROVENANCE_SOURCE!r}")
+    _sha256(provenance["source_sha256"], "provenance.source_sha256")
+    if _str(provenance["manifest_schema_version"], "provenance.manifest_schema_version") != schema_version:
+        raise _error("provenance.manifest_schema_version", "must match schema_version")
+    _sha256(provenance["compiler_sha256"], "provenance.compiler_sha256")
 
 
 def _decode_engine_contract(projection: Mapping[str, object]) -> RuntimeEngineContract:
@@ -939,6 +971,16 @@ def _decode_engine_contract(projection: Mapping[str, object]) -> RuntimeEngineCo
         _str(engine_raw["protocol_version"], "engine_contract.protocol_version"),
         _str(engine_raw["result_mode"], "engine_contract.result_mode"),
         _strings(engine_raw["pressure_identity"], "engine_contract.pressure_identity"),
+        _closed_value(
+            engine_raw["applicability_expansion_strategy"],
+            "engine_contract.applicability_expansion_strategy",
+            frozenset({IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY}),
+        ),
+        _closed_value(
+            engine_raw["pressure_satisfaction_strategy"],
+            "engine_contract.pressure_satisfaction_strategy",
+            frozenset({IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY}),
+        ),
         _str(engine_raw["domain_feasibility"], "engine_contract.domain_feasibility"),
         _str(engine_raw["primary_objective"], "engine_contract.primary_objective"),
         _str(engine_raw["secondary_objective"], "engine_contract.secondary_objective"),

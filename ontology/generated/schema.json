@@ -2025,6 +2025,9 @@
       "additionalProperties": false,
       "description": "Versioned observable scheduler contract. Values describe the generic execution protocol; they are not supplement facts.",
       "properties": {
+        "applicability_expansion_strategy": {
+          "type": "string"
+        },
         "domain_feasibility": {
           "type": "string"
         },
@@ -2036,6 +2039,9 @@
             "type": "string"
           },
           "type": "array"
+        },
+        "pressure_satisfaction_strategy": {
+          "type": "string"
         },
         "primary_objective": {
           "type": "string"
@@ -2070,6 +2076,8 @@
         "protocol_version",
         "result_mode",
         "pressure_identity",
+        "applicability_expansion_strategy",
+        "pressure_satisfaction_strategy",
         "domain_feasibility",
         "primary_objective",
         "secondary_objective",

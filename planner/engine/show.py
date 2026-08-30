@@ -4,17 +4,12 @@ from __future__ import annotations
 
 import contextlib
 import io as _io
-import sys
 from collections.abc import Iterable, Mapping
 from pathlib import Path
-from typing import cast
 
-from planner.contracts import CardLoadError
 from planner.engine.plan import cmd_plan
 from planner.engine.results import ShowResult
-from planner.paths import Paths
 from planner.schedule_types import CanonicalScheduleData, SchedulePillbox, ScheduleProductEntry, ScheduleSlotEntry
-from planner.yaml_io import load_yaml
 
 SEPARATOR = "─" * 41
 
@@ -31,25 +26,20 @@ def cmd_show(data_root: Path | None = None) -> ShowResult:
     Returns ShowResult with exit_code 0 on success. When data_root is not None,
     captures printed output into ShowResult.output; otherwise prints to real stdout.
     """
-    paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
     plan_result = cmd_plan(data_root=data_root)
-    if plan_result.exit_code != 0:
+    if plan_result.exit_code != 0 or plan_result.schedule is None:
         return ShowResult(exit_code=plan_result.exit_code, output="")
 
     if data_root is not None:
         stdout_buf = _io.StringIO()
         with contextlib.redirect_stdout(stdout_buf):
-            exit_code = _show_inner(paths.schedule_file)
+            exit_code = _show_inner(plan_result.schedule)
         return ShowResult(exit_code=exit_code, output=stdout_buf.getvalue())
-    exit_code = _show_inner(paths.schedule_file)
+    exit_code = _show_inner(plan_result.schedule)
     return ShowResult(exit_code=exit_code, output="")
 
 
-def _show_inner(schedule_path: Path) -> int:
-    schedule = _load_schedule(schedule_path)
-    if schedule is None:
-        return 1
-
+def _show_inner(schedule: CanonicalScheduleData) -> int:
     pillboxes = schedule["pillboxes"]
     balance_only_items = _balance_only_items(schedule)
 
@@ -131,19 +121,6 @@ def _group_slots(
         for slot_key, slot in _non_empty_slots(pillbox)
         if any(product["item_id"] in wanted for product in slot["products"])
     ]
-
-
-def _load_schedule(schedule_path: Path) -> CanonicalScheduleData | None:
-    try:
-        data = cast(object, load_yaml(schedule_path))
-    except CardLoadError as e:
-        print(f"show: {e.message}", file=sys.stderr)
-        return None
-
-    if not isinstance(data, dict):
-        print(f"show: {schedule_path}: expected mapping", file=sys.stderr)
-        return None
-    return cast(CanonicalScheduleData, data)
 
 
 def _non_empty_slots(pillbox: SchedulePillbox) -> list[tuple[str, ScheduleSlotEntry]]:

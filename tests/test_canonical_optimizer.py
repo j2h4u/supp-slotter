@@ -13,6 +13,7 @@ from planner.canonical_optimizer import (
 from planner.canonical_optimizer import optimize_canonical_layout as _optimize_canonical_layout
 from planner.contracts import Slot
 from planner.ontology.canonical_inference import UnaryPressureIdentity
+from planner.ontology.runtime_program import IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY
 
 from tests.oracles.exhaustive_layout import exhaustive_layout
 
@@ -27,7 +28,14 @@ def optimize_canonical_layout(
     item_domains: dict[str, str], slots: dict[str, Slot], pressures: tuple[UnaryPressureIdentity, ...], **kwargs: object
 ) -> Optimal | Indeterminate:
     return _optimize_canonical_layout(
-        CanonicalOptimizerInput(item_domains, slots, pressures, PRESSURE_VALUES, **kwargs)  # type: ignore[arg-type]
+        CanonicalOptimizerInput(
+            item_domains,
+            slots,
+            pressures,
+            PRESSURE_VALUES,
+            IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY,
+            **kwargs,
+        )  # type: ignore[arg-type]
     )
 
 
@@ -97,7 +105,13 @@ def test_tie_break_uses_slot_id_after_order_and_is_domain_independent() -> None:
         )
     }
     result = _optimize_canonical_layout(
-        CanonicalOptimizerInput({"item-z": "one", "item-a": "one", "item-b": "two"}, slots, (), PRESSURE_VALUES)
+        CanonicalOptimizerInput(
+            {"item-z": "one", "item-a": "one", "item-b": "two"},
+            slots,
+            (),
+            PRESSURE_VALUES,
+            IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY,
+        )
     )
     assert isinstance(result, Optimal)
     assert result.assignments == {"item-a": "a", "item-b": "other", "item-z": "z"}

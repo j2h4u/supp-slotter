@@ -185,13 +185,15 @@ def test_annotation_and_manifest_ranges_admit_a_new_family_without_python_change
     for path, payload in ((model_path, model), (scheduling_path, scheduling), (facts_path, facts), (laws_path, laws)):
         path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
 
-    runtime = decode_runtime_program(
+    runtime_program = decode_runtime_program(
         cast(dict[str, object], json.loads(compile_ontology(ontology)[Path("runtime-program.json")]))
-    ).canonical_scheduling
+    )
+    runtime = runtime_program.canonical_scheduling
     assert "SyntheticEffect" in runtime.families_by_id
     result = execute_canonical_inference(
         runtime,
         {"item_synthetic": "prd_synthetic"},
+        applicability_expansion_strategy=runtime_program.engine_contract.applicability_expansion_strategy,
         composition_roles=(RuntimeCompositionRole("cmp_synthetic", "prd_synthetic", "sub_synthetic"),),
         known_products=("prd_synthetic",),
     )

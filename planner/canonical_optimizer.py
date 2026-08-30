@@ -27,6 +27,7 @@ from planner.canonical_optimizer_result import (
 )
 from planner.contracts import Slot
 from planner.ontology.canonical_inference import NormalizedUnaryPressure, UnaryPressureIdentity
+from planner.ontology.runtime_program import IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY
 
 Pressure = UnaryPressureIdentity | NormalizedUnaryPressure
 InterruptCheck = Callable[[], bool]
@@ -50,6 +51,7 @@ class CanonicalOptimizerInput:
     slots: Mapping[str, Slot]
     pressures: Sequence[Pressure]
     pressure_values_by_dimension: Mapping[str, frozenset[str]]
+    pressure_satisfaction_strategy: str
     deadline_monotonic_ns: int | None = None
     interruption: InterruptCheck | None = None
     state_bound: int | None = None
@@ -142,7 +144,12 @@ def _prepare(optimizer_input: CanonicalOptimizerInput) -> _PreparedInput:
     dimensions = _validated_dimensions(optimizer_input.pressure_values_by_dimension)
     slots_by_domain = _validated_slots_by_domain(optimizer_input.slots, dimensions)
     pressures = _pressure_identities(optimizer_input.pressures, domains, dimensions)
-    items = _prepared_items(domains, slots_by_domain, pressures)
+    items = _prepared_items(
+        domains,
+        slots_by_domain,
+        pressures,
+        optimizer_input.pressure_satisfaction_strategy,
+    )
     return _PreparedInput(
         items,
         slots_by_domain,
@@ -166,6 +173,8 @@ def _validate_run_limits(optimizer_input: CanonicalOptimizerInput) -> None:
         raise _IndeterminateError("invalid_input", "item_domains must be a mapping")
     if not isinstance(optimizer_input.slots, Mapping):
         raise _IndeterminateError("invalid_input", "slots must be a mapping")
+    if optimizer_input.pressure_satisfaction_strategy != IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY:
+        raise _IndeterminateError("invalid_input", "unsupported pressure satisfaction strategy")
 
 
 def _validated_item_domains(item_domains: Mapping[str, str]) -> dict[str, str]:
@@ -225,6 +234,7 @@ def _prepared_items(
     domains: Mapping[str, str],
     slots_by_domain: Mapping[str, Sequence[Slot]],
     pressures: Sequence[UnaryPressureIdentity],
+    pressure_satisfaction_strategy: str,
 ) -> tuple[_PreparedItem, ...]:
     pressure_by_item: dict[str, list[UnaryPressureIdentity]] = {}
     for pressure in pressures:
@@ -235,7 +245,10 @@ def _prepared_items(
         if not domain_slots:
             raise _IndeterminateError("invalid_input", f"item {item_id!r} has no slots in domain {domain!r}")
         item_pressures = pressure_by_item.get(item_id, [])
-        scores = {slot.slot_id: _satisfied_count(slot, item_pressures) for slot in domain_slots}
+        scores = {
+            slot.slot_id: _satisfied_count(slot, item_pressures, pressure_satisfaction_strategy)
+            for slot in domain_slots
+        }
         maximum = max(scores.values())
         prepared_items.append(
             _PreparedItem(
@@ -272,8 +285,26 @@ def _pressure_identities(
     return tuple(sorted(identities, key=lambda row: (row.item_id, row.dimension, row.value)))
 
 
-def _satisfied_count(slot: Slot, pressures: Sequence[UnaryPressureIdentity]) -> int:
-    return sum(1 for pressure in pressures if slot.anchors[pressure.dimension] == pressure.value)
+def _satisfied_count(
+    slot: Slot,
+    pressures: Sequence[UnaryPressureIdentity],
+    pressure_satisfaction_strategy: str,
+) -> int:
+    return sum(
+        1
+        for pressure in pressures
+        if _pressure_is_satisfied(slot, pressure, pressure_satisfaction_strategy)
+    )
+
+
+def _pressure_is_satisfied(
+    slot: Slot,
+    pressure: UnaryPressureIdentity,
+    pressure_satisfaction_strategy: str,
+) -> bool:
+    if pressure_satisfaction_strategy != IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY:
+        raise _IndeterminateError("invalid_input", "unsupported pressure satisfaction strategy")
+    return slot.anchors[pressure.dimension] == pressure.value
 
 
 def _solve_domain(
@@ -327,7 +358,12 @@ def _verify_solution(
 
     loads_by_domain = _assignment_loads(optimizer_input, assignment)
     if (
-        _satisfied_pressure_count(optimizer_input.slots, assignment, prepared.pressures)
+        _satisfied_pressure_count(
+            optimizer_input.slots,
+            assignment,
+            prepared.pressures,
+            optimizer_input.pressure_satisfaction_strategy,
+        )
         != objective.satisfied_pressures
     ):
         raise _IndeterminateError("proof_failed", "proof_incomplete: pressure count mismatch")
@@ -359,10 +395,18 @@ def _assignment_loads(
 
 
 def _satisfied_pressure_count(
-    slots: Mapping[str, Slot], assignment: Mapping[str, str], pressures: Sequence[UnaryPressureIdentity]
+    slots: Mapping[str, Slot],
+    assignment: Mapping[str, str],
+    pressures: Sequence[UnaryPressureIdentity],
+    pressure_satisfaction_strategy: str,
 ) -> int:
     return sum(
-        slots[assignment[identity.item_id]].anchors[identity.dimension] == identity.value for identity in pressures
+        _pressure_is_satisfied(
+            slots[assignment[identity.item_id]],
+            identity,
+            pressure_satisfaction_strategy,
+        )
+        for identity in pressures
     )
 
 

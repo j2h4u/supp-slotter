@@ -52,7 +52,8 @@ layout-free `Indeterminate`.
    a reviewer conclusion into a law.
 6. Run `uv run python -m planner check`, then `uv run python -m planner`.
    Inspect either the proof-bearing `Optimal` output or the `Indeterminate`
-   diagnostics before making another source change.
+   diagnostics before making another source change. The command always
+   recomputes the layout; never consume `schedule.yaml` directly as an input.
 
 ## Fact-admission rules
 

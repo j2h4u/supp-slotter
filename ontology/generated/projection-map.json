@@ -1849,6 +1849,14 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
+          "name": "applicability_expansion_strategy",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
           "name": "domain_feasibility",
           "range": "string",
           "required": true
@@ -1866,6 +1874,14 @@
           "inlined_as_list": false,
           "multivalued": true,
           "name": "pressure_identity",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "pressure_satisfaction_strategy",
           "range": "string",
           "required": true
         },

@@ -140,6 +140,9 @@ def _publish_plan(
             inference=inference,
             products=runtime.inputs.products,
             pressure_values_by_dimension=runtime.inputs.runtime_program.canonical_scheduling.pressure_values_by_dimension,
+            pressure_satisfaction_strategy=(
+                runtime.inputs.runtime_program.engine_contract.pressure_satisfaction_strategy
+            ),
         )
         published = write_schedule_file(paths.schedule_file, source)
         if isinstance(published, Indeterminate):
@@ -150,6 +153,7 @@ def _publish_plan(
             exit_code=0,
             schedule_written=True,
             slot_loads=slot_loads,
+            schedule=published.document,
         )
     except KeyboardInterrupt, MemoryError:
         raise

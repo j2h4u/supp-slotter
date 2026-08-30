@@ -192,6 +192,7 @@ class CanonicalPublicationSource:
     inference: Success
     products: Mapping[str, Product]
     pressure_values_by_dimension: Mapping[str, frozenset[str]]
+    pressure_satisfaction_strategy: str
 
     def __post_init__(self) -> None:
         item_products = dict(sorted(self.item_products.items()))

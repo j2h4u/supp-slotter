@@ -47,12 +47,14 @@ classes:
       tracked_unassigned_partition_name: {required: true}
   RuntimeEngineContract:
     description: Versioned observable scheduler contract. Values describe the generic execution protocol; they are not supplement facts.
-    slots: [id, protocol_version, result_mode, pressure_identity, domain_feasibility, primary_objective, secondary_objective, tie_break, publication_statuses, semantics]
+    slots: [id, protocol_version, result_mode, pressure_identity, applicability_expansion_strategy, pressure_satisfaction_strategy, domain_feasibility, primary_objective, secondary_objective, tie_break, publication_statuses, semantics]
     slot_usage:
       id: {required: true}
       protocol_version: {required: true}
       result_mode: {required: true}
       pressure_identity: {required: true, multivalued: true}
+      applicability_expansion_strategy: {required: true}
+      pressure_satisfaction_strategy: {required: true}
       domain_feasibility: {required: true}
       primary_objective: {required: true}
       secondary_objective: {required: true}
@@ -119,6 +121,8 @@ slots:
   protocol_version:
   result_mode:
   pressure_identity: {multivalued: true}
+  applicability_expansion_strategy:
+  pressure_satisfaction_strategy:
   domain_feasibility:
   primary_objective:
   secondary_objective:

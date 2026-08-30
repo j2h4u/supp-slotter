@@ -266,6 +266,7 @@ def test_show_and_review_do_not_mutate_authored_inputs(tmp_path: Path, command: 
         result = cmd_show(data_root=tmp_path)
         assert result.exit_code == 0
         assert (tmp_path / "schedule.yaml").exists()
+        assert "Current plan:" in result.output
     else:
         result = cmd_review(data_root=tmp_path)
         assert result.exit_code == 0, result.stderr

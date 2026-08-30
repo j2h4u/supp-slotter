@@ -4,6 +4,8 @@ engine_contract:
   protocol_version: supp-slotter.engine-contract/v2
   result_mode: exact_assignment
   pressure_identity: [item_id, dimension, value]
+  applicability_expansion_strategy: exact_role_or_all_roles_with_equal_substance
+  pressure_satisfaction_strategy: slot_anchor_at_pressure_dimension_equals_pressure_value
   domain_feasibility: unbounded_logical_domain
   primary_objective: maximize_unique_pressure_satisfaction
   secondary_objective: minimize_integer_squared_load_per_domain

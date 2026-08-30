@@ -226,6 +226,9 @@
     "applicability": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/applicability"
     },
+    "applicability_expansion_strategy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/applicability_expansion_strategy"
+    },
     "assertion_kind": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/assertion_kind"
     },
@@ -405,6 +408,9 @@
     },
     "pressure_identity": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/pressure_identity"
+    },
+    "pressure_satisfaction_strategy": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/pressure_satisfaction_strategy"
     },
     "primary_objective": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/primary_objective"

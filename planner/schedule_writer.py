@@ -74,6 +74,7 @@ def write_schedule_file(schedule_file: Path, source: CanonicalPublicationSource)
                 slots=source.slots,
                 pressures=source.inference.pressures,
                 pressure_values_by_dimension=source.pressure_values_by_dimension,
+                pressure_satisfaction_strategy=source.pressure_satisfaction_strategy,
             )
         )
         if isinstance(result, Indeterminate):

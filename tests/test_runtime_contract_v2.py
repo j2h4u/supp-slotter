@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from copy import deepcopy
 from functools import cache
 from pathlib import Path
@@ -11,9 +12,11 @@ from typing import cast
 import pytest
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.runtime_program import (
+    IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY,
     IMPLEMENTED_DOMAIN_FEASIBILITY,
     IMPLEMENTED_ENGINE_CONTRACT_PROTOCOL,
     IMPLEMENTED_PRESSURE_IDENTITY,
+    IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY,
     IMPLEMENTED_PRIMARY_OBJECTIVE,
     IMPLEMENTED_PUBLICATION_STATUSES,
     IMPLEMENTED_SECONDARY_OBJECTIVE,
@@ -35,6 +38,20 @@ def _payload() -> dict[str, object]:
     return cast(dict[str, object], json.loads(deepcopy(_compiled_payload())))
 
 
+def _blank_first_canonical_fact_id(payload: dict[str, object]) -> None:
+    projection = cast(dict[str, object], payload["projection"])
+    scheduling = cast(dict[str, object], projection["canonical_scheduling"])
+    facts = cast(list[dict[str, object]], scheduling["facts"])
+    facts[0]["id"] = "   "
+
+
+def _pad_first_canonical_fact_id(payload: dict[str, object]) -> None:
+    projection = cast(dict[str, object], payload["projection"])
+    scheduling = cast(dict[str, object], projection["canonical_scheduling"])
+    facts = cast(list[dict[str, object]], scheduling["facts"])
+    facts[0]["id"] = f" {facts[0]['id']}"
+
+
 def test_v2_contract_decodes_exactly_and_excludes_retired_objective_inputs() -> None:
     payload = _payload()
     runtime = decode_runtime_program(payload)
@@ -42,6 +59,8 @@ def test_v2_contract_decodes_exactly_and_excludes_retired_objective_inputs() -> 
 
     assert contract.protocol_version == IMPLEMENTED_ENGINE_CONTRACT_PROTOCOL
     assert contract.pressure_identity == IMPLEMENTED_PRESSURE_IDENTITY
+    assert contract.applicability_expansion_strategy == IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY
+    assert contract.pressure_satisfaction_strategy == IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY
     assert contract.domain_feasibility == IMPLEMENTED_DOMAIN_FEASIBILITY
     assert contract.primary_objective == IMPLEMENTED_PRIMARY_OBJECTIVE
     assert contract.secondary_objective == IMPLEMENTED_SECONDARY_OBJECTIVE
@@ -77,6 +96,42 @@ def test_v1_contract_is_rejected_without_compatibility_fallback() -> None:
     contract["protocol_version"] = "supp-slotter.engine-contract/v1"
 
     with pytest.raises(OntologyInfrastructureError, match="not implemented"):
+        decode_runtime_program(payload)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("applicability_expansion_strategy", "all_roles"),
+        ("pressure_satisfaction_strategy", "anchor_contains_value"),
+    ),
+)
+def test_engine_semantic_strategies_are_closed_exact_values(field: str, value: str) -> None:
+    payload = _payload()
+    projection = cast(dict[str, object], payload["projection"])
+    contract = cast(dict[str, object], projection["engine_contract"])
+    contract[field] = value
+
+    with pytest.raises(OntologyInfrastructureError, match="not an admitted value"):
+        decode_runtime_program(payload)
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    (
+        lambda payload: cast(dict[str, object], payload["provenance"]).__setitem__("source", "runtime-policy.yaml"),
+        lambda payload: cast(dict[str, object], payload["provenance"]).__setitem__("source_sha256", "A" * 64),
+        lambda payload: cast(dict[str, object], payload["provenance"]).__setitem__("manifest_schema_version", "3"),
+        lambda payload: payload.__setitem__("source_hash", " "),
+        _blank_first_canonical_fact_id,
+        _pad_first_canonical_fact_id,
+    ),
+)
+def test_runtime_envelope_and_canonical_ids_fail_closed(mutate: Callable[[dict[str, object]], None]) -> None:
+    payload = _payload()
+    mutate(payload)
+
+    with pytest.raises(OntologyInfrastructureError):
         decode_runtime_program(payload)
 
 

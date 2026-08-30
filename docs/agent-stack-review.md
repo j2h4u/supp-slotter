@@ -18,9 +18,10 @@ concerns, relation review, active knowledge membership, and dashboard coverage
 summary. Use the detailed sections below it for concerns, relations, active
 knowledge memberships, and dashboard counts.
 
-Use `schedule.yaml` for generated slot placement and proof-backed explanations.
-Warnings, review notes, and dashboard benefits/risks belong to `planner review`.
-Do not edit generated output directly.
+Invoke `uv run python -m planner` for generated slot placement and proof-backed
+explanations. It recomputes the layout and replaces `schedule.yaml`; never
+consume or edit that disposable output directly. Warnings, review notes, and
+dashboard benefits/risks belong to `planner review`.
 
 Use `planner check` to validate source-data references before the current review.
 
@@ -79,7 +80,7 @@ as informational review, not diagnosis or treatment.
 Pass to the review:
 
 - `planner review` brief and relevant detailed sections;
-- slot layout from `schedule.yaml`;
+- slot layout from a fresh `uv run python -m planner` invocation;
 - user context from `docs/private/`;
 - explicit framing that this is informational analysis, not medical advice.
 

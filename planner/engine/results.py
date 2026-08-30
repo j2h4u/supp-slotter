@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from planner.canonical_optimizer_result import Diagnostic
+from planner.schedule_types import CanonicalScheduleData
 
 
 @dataclass(frozen=True)
@@ -28,6 +29,7 @@ class PlanResult:
     exit_code: int
     schedule_written: bool
     slot_loads: dict[str, int]
+    schedule: CanonicalScheduleData | None = None
     errors: list[str] = field(default_factory=list[str])
     diagnostic: Diagnostic | None = None
 

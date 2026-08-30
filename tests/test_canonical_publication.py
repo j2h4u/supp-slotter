@@ -4,13 +4,11 @@ from __future__ import annotations
 
 import inspect
 from pathlib import Path
-
 import planner.canonical_optimizer as optimizer_module
 import planner.schedule_writer as schedule_writer
 import pytest
 from planner.canonical_optimizer_result import Indeterminate, Optimal
 from planner.contracts import Product, ProductComponent, Slot
-from planner.engine.show import _show_inner
 from planner.ontology.canonical_inference import (
     CompositionApplicabilityPath,
     NormalizedUnaryPressure,
@@ -19,6 +17,7 @@ from planner.ontology.canonical_inference import (
     UnaryPressureIdentity,
 )
 from planner.ontology.runtime_program import (
+    IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY,
     RuntimeCanonicalLaw,
     RuntimeCanonicalSchedulingFact,
     RuntimeEvidenceProvenance,
@@ -43,6 +42,7 @@ def _source(*, anchors: tuple[str | None, str | None] = (None, None)) -> Canonic
         inference=Success(()),
         products={"prd_a": product_a, "prd_b": product_b},
         pressure_values_by_dimension={"meal": frozenset({"with_food", "without_food"})},
+        pressure_satisfaction_strategy=IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY,
     )
 
 
@@ -79,6 +79,7 @@ def _single_item_pressure_source(
         inference=Success(pressures),
         products={"prd_a": Product("prd_a", "Alpha", ())},
         pressure_values_by_dimension={key: frozenset({"wanted", "other"}) for key in anchors},
+        pressure_satisfaction_strategy=IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY,
     )
 
 
@@ -123,7 +124,13 @@ def test_snapshot_is_immutable_after_source_input_mutation(tmp_path: Path) -> No
         "prd_b": Product("prd_b", "Beta", ()),
     }
     source = CanonicalPublicationSource(
-        item_products, item_domains, slots, Success(()), products, {"meal": frozenset({"with_food", "without_food"})}
+        item_products,
+        item_domains,
+        slots,
+        Success(()),
+        products,
+        {"meal": frozenset({"with_food", "without_food"})},
+        IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY,
     )
     item_products["item_a"] = "prd_b"
     item_domains["item_a"] = "other"
@@ -205,32 +212,3 @@ def test_failed_or_interrupted_write_removes_stale_lease(
         assert isinstance(write_schedule_file(target, _source()), Indeterminate)
     assert not target.exists()
     assert not list(tmp_path.glob("schedule.yaml.tmp.*"))
-
-
-def test_show_marks_only_balance_only_product_in_mixed_slot(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
-    target = tmp_path / "schedule.yaml"
-    target.write_text(
-        """status: Optimal
-objective: {satisfied_pressures: 1, squared_load: 2, assignment_key: []}
-assignments: {item_a: first, item_b: first}
-pressure_matches: []
-domain_loads: {}
-optimizer_proof: []
-canonical_explanations:
-  item_a: {item_id: item_a, slot_id: first, placement_basis: pressure_evidence, slot_anchors: {}, pressure_matches: [], optimizer_proof: []}
-  item_b: {item_id: item_b, slot_id: first, placement_basis: balance_and_tie_break_only, slot_anchors: {}, pressure_matches: [], optimizer_proof: []}
-summary: {placement_groups: {routine: [item_a, item_b], episodic: []}}
-pillboxes:
-  daily:
-    label: Daily
-    slots:
-      first:
-        label: First
-        products: [{item_id: item_a, label: Alpha}, {item_id: item_b, label: Beta}]
-""",
-        encoding="utf-8",
-    )
-    assert _show_inner(target) == 0
-    rendered = capsys.readouterr().out
-    assert "Alpha [balance-only]" not in rendered
-    assert "Beta [balance-only]" in rendered
