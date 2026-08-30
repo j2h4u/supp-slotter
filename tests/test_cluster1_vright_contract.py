@@ -124,13 +124,12 @@ def test_canonical_catalog_and_topology_are_closed(schema: dict[str, Any]) -> No
     assert _errors(schema, "CanonicalLawCatalog", {})
 
 
-def test_canonical_catalog_and_topology_have_one_runtime_boundary() -> None:
+def test_runtime_program_is_the_only_plan_input_ontology_authority() -> None:
     manifest = cast(dict[str, Any], yaml.safe_load((ONTOLOGY / "manifest.yaml").read_text(encoding="utf-8")))
     catalogs = cast(list[dict[str, Any]], manifest["catalogs"])
     assert {catalog["root_class"] for catalog in catalogs}.isdisjoint({"LogicalSlotTopology"})
     assert "CanonicalLawCatalog" in {catalog["root_class"] for catalog in catalogs}
-    # The verified generic scheduling projection is the sole plan input;
-    # topology remains independently authored and is not duplicated there.
-    assert {field for field in PlanInputs._fields if "scheduling" in field or "topology" in field} == {
-        "canonical_scheduling"
-    }
+    # Scheduling and topology are reached through the one runtime program;
+    # PlanInputs must not offer a second, injectable ontology authority.
+    assert PlanInputs._fields.count("runtime_program") == 1
+    assert not {field for field in PlanInputs._fields if "scheduling" in field or "topology" in field}
