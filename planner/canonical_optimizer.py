@@ -290,11 +290,7 @@ def _satisfied_count(
     pressures: Sequence[UnaryPressureIdentity],
     pressure_satisfaction_strategy: str,
 ) -> int:
-    return sum(
-        1
-        for pressure in pressures
-        if _pressure_is_satisfied(slot, pressure, pressure_satisfaction_strategy)
-    )
+    return sum(1 for pressure in pressures if _pressure_is_satisfied(slot, pressure, pressure_satisfaction_strategy))
 
 
 def _pressure_is_satisfied(
