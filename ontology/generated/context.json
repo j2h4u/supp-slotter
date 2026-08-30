@@ -4,6 +4,18 @@
     "Action": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/Action"
     },
+    "AcuteAlertnessEffect": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteAlertnessEffect"
+    },
+    "AcuteSleepEffect": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteSleepEffect"
+    },
+    "CanonicalFactCatalog": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/CanonicalFactCatalog"
+    },
+    "CanonicalSchedulingFact": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/CanonicalSchedulingFact"
+    },
     "CardConcern": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/CardConcern"
     },
@@ -15,6 +27,9 @@
     },
     "Catalog": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/Catalog"
+    },
+    "CompositionRole": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/CompositionRole"
     },
     "Concern": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/Concern"
@@ -31,11 +46,29 @@
     "EntitySelector": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/EntitySelector"
     },
+    "EvidenceProvenance": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/EvidenceProvenance"
+    },
+    "EvidenceSource": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/EvidenceSource"
+    },
+    "FactSubject": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/FactSubject"
+    },
+    "FoodEffect": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/FoodEffect"
+    },
     "IdentifiedNode": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/IdentifiedNode"
     },
     "KnowledgeAssertion": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/KnowledgeAssertion"
+    },
+    "LogicalSlot": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/LogicalSlot"
+    },
+    "LogicalSlotTopology": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/LogicalSlotTopology"
     },
     "OntoCleanCatalog": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/OntoCleanCatalog"
@@ -54,6 +87,12 @@
     },
     "Pillbox": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/Pillbox"
+    },
+    "PostExerciseRecoveryEffect": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/PostExerciseRecoveryEffect"
+    },
+    "PreExercisePerformanceEffect": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/PreExercisePerformanceEffect"
     },
     "Product": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/Product"
@@ -268,6 +307,12 @@
     "activity": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/activity"
     },
+    "acute_alertness_effects": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/acute_alertness_effects"
+    },
+    "acute_sleep_effects": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/acute_sleep_effects"
+    },
     "aggregation": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/aggregation"
     },
@@ -282,6 +327,9 @@
     },
     "amount": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/amount"
+    },
+    "applicability": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/applicability"
     },
     "applies_to": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/applies_to"
@@ -334,8 +382,17 @@
     "children": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/children"
     },
+    "circadian_anchor": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/circadian_anchor"
+    },
     "components": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/components"
+    },
+    "composition_role": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/composition_role"
+    },
+    "composition_roles": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/composition_roles"
     },
     "concern_annotations": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/concern_annotations"
@@ -424,11 +481,17 @@
     "entries": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/entries"
     },
+    "evidence_sources": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/evidence_sources"
+    },
     "exclude_policy_ids": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/exclude_policy_ids"
     },
     "executable": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/executable"
+    },
+    "exercise_anchor": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/exercise_anchor"
     },
     "expected": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/expected"
@@ -450,6 +513,9 @@
     },
     "food": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/food"
+    },
+    "food_effects": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/food_effects"
     },
     "form": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/form"
@@ -508,6 +574,9 @@
     "level": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/level"
     },
+    "locator": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/locator"
+    },
     "match": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/match"
     },
@@ -516,6 +585,9 @@
     },
     "maximum_cardinality": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/maximum_cardinality"
+    },
+    "meal_context": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/meal_context"
     },
     "minimum_cardinality": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/minimum_cardinality"
@@ -565,6 +637,12 @@
     "policy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/policy"
     },
+    "post_exercise_recovery_effects": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/post_exercise_recovery_effects"
+    },
+    "pre_exercise_performance_effects": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/pre_exercise_performance_effects"
+    },
     "precedence": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/precedence"
     },
@@ -598,8 +676,14 @@
     "protocol_version": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/protocol_version"
     },
+    "provenance": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/provenance"
+    },
     "quality": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/quality"
+    },
+    "quotation": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/quotation"
     },
     "rank": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/rank"

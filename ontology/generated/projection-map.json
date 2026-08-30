@@ -97,6 +97,198 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Action"
     },
     {
+      "name": "AcuteAlertnessEffect",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "applicability",
+          "range": "CompositionRole",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "provenance",
+          "range": "EvidenceProvenance",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "subject",
+          "range": "FactSubject",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "value",
+          "range": "AcuteAlertnessEffectValue",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteAlertnessEffect"
+    },
+    {
+      "name": "AcuteSleepEffect",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "applicability",
+          "range": "CompositionRole",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "provenance",
+          "range": "EvidenceProvenance",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "subject",
+          "range": "FactSubject",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "value",
+          "range": "AcuteSleepEffectValue",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteSleepEffect"
+    },
+    {
+      "name": "CanonicalFactCatalog",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "acute_alertness_effects",
+          "range": "AcuteAlertnessEffect",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "acute_sleep_effects",
+          "range": "AcuteSleepEffect",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "composition_roles",
+          "range": "CompositionRole",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "evidence_sources",
+          "range": "EvidenceSource",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "food_effects",
+          "range": "FoodEffect",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "post_exercise_recovery_effects",
+          "range": "PostExerciseRecoveryEffect",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "pre_exercise_performance_effects",
+          "range": "PreExercisePerformanceEffect",
+          "required": false
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/CanonicalFactCatalog"
+    },
+    {
+      "name": "CanonicalSchedulingFact",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "applicability",
+          "range": "CompositionRole",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "provenance",
+          "range": "EvidenceProvenance",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "subject",
+          "range": "FactSubject",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/CanonicalSchedulingFact"
+    },
+    {
       "name": "CardConcern",
       "slots": [
         {
@@ -247,6 +439,36 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Catalog"
+    },
+    {
+      "name": "CompositionRole",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "product",
+          "range": "Product",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "substance",
+          "range": "Substance",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/CompositionRole"
     },
     {
       "name": "Concern",
@@ -447,6 +669,118 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/EntitySelector"
     },
     {
+      "name": "EvidenceProvenance",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "locator",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "quotation",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "source",
+          "range": "EvidenceSource",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/EvidenceProvenance"
+    },
+    {
+      "name": "EvidenceSource",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/EvidenceSource"
+    },
+    {
+      "name": "FactSubject",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "composition_role",
+          "range": "CompositionRole",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "substance",
+          "range": "Substance",
+          "required": false
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/FactSubject"
+    },
+    {
+      "name": "FoodEffect",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "applicability",
+          "range": "CompositionRole",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "provenance",
+          "range": "EvidenceProvenance",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "subject",
+          "range": "FactSubject",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "value",
+          "range": "FoodEffectValue",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/FoodEffect"
+    },
+    {
       "name": "IdentifiedNode",
       "slots": [
         {
@@ -513,6 +847,90 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/KnowledgeAssertion"
+    },
+    {
+      "name": "LogicalSlot",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "circadian_anchor",
+          "range": "CircadianAnchor",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "exercise_anchor",
+          "range": "ExerciseAnchor",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "label",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "meal_context",
+          "range": "MealContext",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "order",
+          "range": "integer",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/LogicalSlot"
+    },
+    {
+      "name": "LogicalSlotTopology",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "label",
+          "range": "string",
+          "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "slots",
+          "range": "LogicalSlot",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/LogicalSlotTopology"
     },
     {
       "name": "OntoCleanCatalog",
@@ -733,6 +1151,98 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Pillbox"
+    },
+    {
+      "name": "PostExerciseRecoveryEffect",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "applicability",
+          "range": "CompositionRole",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "provenance",
+          "range": "EvidenceProvenance",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "subject",
+          "range": "FactSubject",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "value",
+          "range": "PostExerciseRecoveryEffectValue",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/PostExerciseRecoveryEffect"
+    },
+    {
+      "name": "PreExercisePerformanceEffect",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "applicability",
+          "range": "CompositionRole",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "provenance",
+          "range": "EvidenceProvenance",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "subject",
+          "range": "FactSubject",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "value",
+          "range": "PreExercisePerformanceEffectValue",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/PreExercisePerformanceEffect"
     },
     {
       "name": "Product",

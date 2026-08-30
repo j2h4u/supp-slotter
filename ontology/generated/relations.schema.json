@@ -38,6 +38,195 @@
       "title": "Action",
       "type": "object"
     },
+    "AcuteAlertnessEffect": {
+      "additionalProperties": false,
+      "description": "Closed acute alertness effect fact family.",
+      "properties": {
+        "applicability": {
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_:-]*$",
+          "type": "string"
+        },
+        "provenance": {
+          "items": {
+            "$ref": "#/$defs/EvidenceProvenance"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "subject": {
+          "$ref": "#/$defs/FactSubject"
+        },
+        "value": {
+          "$ref": "#/$defs/AcuteAlertnessEffectValue"
+        }
+      },
+      "required": [
+        "value",
+        "id",
+        "subject",
+        "applicability",
+        "provenance"
+      ],
+      "title": "AcuteAlertnessEffect",
+      "type": "object"
+    },
+    "AcuteAlertnessEffectValue": {
+      "description": "Closed values admitted by the AcuteAlertnessEffect fact family.",
+      "enum": [
+        "acute_alertness_increases"
+      ],
+      "title": "AcuteAlertnessEffectValue",
+      "type": "string"
+    },
+    "AcuteSleepEffect": {
+      "additionalProperties": false,
+      "description": "Closed acute sleep effect fact family.",
+      "properties": {
+        "applicability": {
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_:-]*$",
+          "type": "string"
+        },
+        "provenance": {
+          "items": {
+            "$ref": "#/$defs/EvidenceProvenance"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "subject": {
+          "$ref": "#/$defs/FactSubject"
+        },
+        "value": {
+          "$ref": "#/$defs/AcuteSleepEffectValue"
+        }
+      },
+      "required": [
+        "value",
+        "id",
+        "subject",
+        "applicability",
+        "provenance"
+      ],
+      "title": "AcuteSleepEffect",
+      "type": "object"
+    },
+    "AcuteSleepEffectValue": {
+      "description": "Closed values admitted by the AcuteSleepEffect fact family.",
+      "enum": [
+        "onset_latency_decreases",
+        "continuity_improves"
+      ],
+      "title": "AcuteSleepEffectValue",
+      "type": "string"
+    },
+    "CanonicalFactCatalog": {
+      "additionalProperties": false,
+      "description": "Shadow catalog of scheduler-consumable canonical evidence facts.",
+      "properties": {
+        "acute_alertness_effects": {
+          "items": {
+            "$ref": "#/$defs/AcuteAlertnessEffect"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "acute_sleep_effects": {
+          "items": {
+            "$ref": "#/$defs/AcuteSleepEffect"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "composition_roles": {
+          "items": {
+            "$ref": "#/$defs/CompositionRole"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "evidence_sources": {
+          "items": {
+            "$ref": "#/$defs/EvidenceSource"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "food_effects": {
+          "items": {
+            "$ref": "#/$defs/FoodEffect"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "post_exercise_recovery_effects": {
+          "items": {
+            "$ref": "#/$defs/PostExerciseRecoveryEffect"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "pre_exercise_performance_effects": {
+          "items": {
+            "$ref": "#/$defs/PreExercisePerformanceEffect"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        }
+      },
+      "title": "CanonicalFactCatalog",
+      "type": "object"
+    },
+    "CanonicalSchedulingFact": {
+      "additionalProperties": false,
+      "description": "Shared evidence boundary for one typed, admitted scheduling fact.  The concrete subclasses below are the only scheduler fact families.",
+      "properties": {
+        "applicability": {
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_:-]*$",
+          "type": "string"
+        },
+        "provenance": {
+          "items": {
+            "$ref": "#/$defs/EvidenceProvenance"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "subject": {
+          "$ref": "#/$defs/FactSubject"
+        }
+      },
+      "required": [
+        "id",
+        "subject",
+        "applicability",
+        "provenance"
+      ],
+      "title": "CanonicalSchedulingFact",
+      "type": "object"
+    },
     "CardConcern": {
       "additionalProperties": false,
       "description": "A validation-ready concern embedded in a source card.",
@@ -414,6 +603,38 @@
       "title": "Catalog",
       "type": "object"
     },
+    "CircadianAnchor": {
+      "description": "Independent logical circadian anchor for a canonical slot.",
+      "enum": [
+        "wake",
+        "sleep"
+      ],
+      "title": "CircadianAnchor",
+      "type": "string"
+    },
+    "CompositionRole": {
+      "additionalProperties": false,
+      "description": "Stable composition identity joining one product to one substance.",
+      "properties": {
+        "id": {
+          "pattern": "^cmp_[a-z0-9][a-z0-9_:-]*$",
+          "type": "string"
+        },
+        "product": {
+          "type": "string"
+        },
+        "substance": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "product",
+        "substance"
+      ],
+      "title": "CompositionRole",
+      "type": "object"
+    },
     "Concern": {
       "additionalProperties": false,
       "description": "",
@@ -626,6 +847,153 @@
       "title": "EntitySelector",
       "type": "object"
     },
+    "EvidenceProvenance": {
+      "additionalProperties": false,
+      "description": "Admitted evidence witness for one fact. Source identity is referenced separately from this witness's locator and optional raw quotation.",
+      "properties": {
+        "locator": {
+          "pattern": "^\\S+$",
+          "type": "string"
+        },
+        "quotation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "locator"
+      ],
+      "title": "EvidenceProvenance",
+      "type": "object"
+    },
+    "EvidenceSource": {
+      "additionalProperties": false,
+      "description": "Stable source identity; witness locators do not live here.",
+      "properties": {
+        "id": {
+          "pattern": "^src_[a-z0-9][a-z0-9_:-]*$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "EvidenceSource",
+      "type": "object"
+    },
+    "ExerciseAnchor": {
+      "description": "Independent logical exercise anchor for a canonical slot.",
+      "enum": [
+        "before",
+        "after"
+      ],
+      "title": "ExerciseAnchor",
+      "type": "string"
+    },
+    "FactSubject": {
+      "additionalProperties": false,
+      "description": "Typed subject role for a canonical fact. The role points to the stable composition identity; no inline component payload or free EAV subject exists.",
+      "oneOf": [
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "composition_role"
+                ]
+              }
+            ]
+          },
+          "properties": {
+            "composition_role": {},
+            "substance": {}
+          },
+          "required": [
+            "substance"
+          ]
+        },
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "substance"
+                ]
+              }
+            ]
+          },
+          "properties": {
+            "composition_role": {},
+            "substance": {}
+          },
+          "required": [
+            "composition_role"
+          ]
+        }
+      ],
+      "properties": {
+        "composition_role": {
+          "type": "string"
+        },
+        "substance": {
+          "type": "string"
+        }
+      },
+      "title": "FactSubject",
+      "type": "object"
+    },
+    "FoodEffect": {
+      "additionalProperties": false,
+      "description": "Closed food-context effect fact family.",
+      "properties": {
+        "applicability": {
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_:-]*$",
+          "type": "string"
+        },
+        "provenance": {
+          "items": {
+            "$ref": "#/$defs/EvidenceProvenance"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "subject": {
+          "$ref": "#/$defs/FactSubject"
+        },
+        "value": {
+          "$ref": "#/$defs/FoodEffectValue"
+        }
+      },
+      "required": [
+        "value",
+        "id",
+        "subject",
+        "applicability",
+        "provenance"
+      ],
+      "title": "FoodEffect",
+      "type": "object"
+    },
+    "FoodEffectValue": {
+      "description": "Closed values admitted by the FoodEffect fact family.",
+      "enum": [
+        "bioavailability_increases",
+        "bioavailability_decreases",
+        "tolerability_improves",
+        "tolerability_worsens"
+      ],
+      "title": "FoodEffectValue",
+      "type": "string"
+    },
     "GroomingRankDirection": {
       "description": "",
       "enum": [
@@ -700,6 +1068,79 @@
       },
       "title": "KnowledgeAssertion",
       "type": "object"
+    },
+    "LogicalSlot": {
+      "additionalProperties": false,
+      "description": "Shadow canonical logical intake group with independent optional anchors.",
+      "properties": {
+        "circadian_anchor": {
+          "$ref": "#/$defs/CircadianAnchor"
+        },
+        "exercise_anchor": {
+          "$ref": "#/$defs/ExerciseAnchor"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_:-]*$",
+          "type": "string"
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "meal_context": {
+          "$ref": "#/$defs/MealContext"
+        },
+        "order": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "order"
+      ],
+      "title": "LogicalSlot",
+      "type": "object"
+    },
+    "LogicalSlotTopology": {
+      "additionalProperties": false,
+      "description": "Shadow canonical topology containing unbounded logical intake groups.",
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9_:-]*$",
+          "type": "string"
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "slots": {
+          "items": {
+            "$ref": "#/$defs/LogicalSlot"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "slots"
+      ],
+      "title": "LogicalSlotTopology",
+      "type": "object"
+    },
+    "MealContext": {
+      "description": "Independent logical meal-context anchor for a canonical slot.",
+      "enum": [
+        "with_food",
+        "without_food"
+      ],
+      "title": "MealContext",
+      "type": "string"
     },
     "OntoCleanCatalog": {
       "additionalProperties": false,
@@ -913,6 +1354,92 @@
       ],
       "title": "Pillbox",
       "type": "object"
+    },
+    "PostExerciseRecoveryEffect": {
+      "additionalProperties": false,
+      "description": "Closed post-exercise recovery effect fact family.",
+      "properties": {
+        "applicability": {
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_:-]*$",
+          "type": "string"
+        },
+        "provenance": {
+          "items": {
+            "$ref": "#/$defs/EvidenceProvenance"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "subject": {
+          "$ref": "#/$defs/FactSubject"
+        },
+        "value": {
+          "$ref": "#/$defs/PostExerciseRecoveryEffectValue"
+        }
+      },
+      "required": [
+        "value",
+        "id",
+        "subject",
+        "applicability",
+        "provenance"
+      ],
+      "title": "PostExerciseRecoveryEffect",
+      "type": "object"
+    },
+    "PostExerciseRecoveryEffectValue": {
+      "description": "Closed values admitted by the PostExerciseRecoveryEffect fact family.",
+      "enum": [
+        "recovery_improves"
+      ],
+      "title": "PostExerciseRecoveryEffectValue",
+      "type": "string"
+    },
+    "PreExercisePerformanceEffect": {
+      "additionalProperties": false,
+      "description": "Closed pre-exercise performance effect fact family.",
+      "properties": {
+        "applicability": {
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9_:-]*$",
+          "type": "string"
+        },
+        "provenance": {
+          "items": {
+            "$ref": "#/$defs/EvidenceProvenance"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "subject": {
+          "$ref": "#/$defs/FactSubject"
+        },
+        "value": {
+          "$ref": "#/$defs/PreExercisePerformanceEffectValue"
+        }
+      },
+      "required": [
+        "value",
+        "id",
+        "subject",
+        "applicability",
+        "provenance"
+      ],
+      "title": "PreExercisePerformanceEffect",
+      "type": "object"
+    },
+    "PreExercisePerformanceEffectValue": {
+      "description": "Closed values admitted by the PreExercisePerformanceEffect fact family.",
+      "enum": [
+        "performance_improves"
+      ],
+      "title": "PreExercisePerformanceEffectValue",
+      "type": "string"
     },
     "Product": {
       "additionalProperties": false,
@@ -2728,17 +3255,11 @@
       "properties": {
         "entity_id": {
           "pattern": "\\S",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "name": {
           "pattern": "\\S",
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         }
       },
       "title": "SchedulingConstraintEntitySelector",
@@ -2912,10 +3433,7 @@
       ],
       "properties": {
         "category": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         },
         "entity": {
           "anyOf": [
@@ -2931,10 +3449,7 @@
           "$ref": "#/$defs/SchedulingConstraintScope"
         },
         "term": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string"
         }
       },
       "title": "SchedulingConstraintSelector",

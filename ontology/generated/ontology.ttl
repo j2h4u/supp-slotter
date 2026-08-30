@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 6055f3056ae5df176c379d49ca7a87c2837ceb8fa7464a15b58d58b7c9b6b58c
+# source-hash: e068f2e555c4df5d7dbc3d056c2725b6dd34e8b0ff1d817e9879a3cf8168de32
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -9,6 +9,18 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/Action> a ss:SchemaClass ;
   ss:name "Action" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteAlertnessEffect> a ss:SchemaClass ;
+  ss:name "AcuteAlertnessEffect" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteSleepEffect> a ss:SchemaClass ;
+  ss:name "AcuteSleepEffect" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/CanonicalFactCatalog> a ss:SchemaClass ;
+  ss:name "CanonicalFactCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/CanonicalSchedulingFact> a ss:SchemaClass ;
+  ss:name "CanonicalSchedulingFact" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/CardConcern> a ss:SchemaClass ;
   ss:name "CardConcern" .
@@ -21,6 +33,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/Catalog> a ss:SchemaClass ;
   ss:name "Catalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/CompositionRole> a ss:SchemaClass ;
+  ss:name "CompositionRole" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/Concern> a ss:SchemaClass ;
   ss:name "Concern" .
@@ -37,11 +52,29 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/EntitySelector> a ss:SchemaClass ;
   ss:name "EntitySelector" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/EvidenceProvenance> a ss:SchemaClass ;
+  ss:name "EvidenceProvenance" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/EvidenceSource> a ss:SchemaClass ;
+  ss:name "EvidenceSource" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/FactSubject> a ss:SchemaClass ;
+  ss:name "FactSubject" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/FoodEffect> a ss:SchemaClass ;
+  ss:name "FoodEffect" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/IdentifiedNode> a ss:SchemaClass ;
   ss:name "IdentifiedNode" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/KnowledgeAssertion> a ss:SchemaClass ;
   ss:name "KnowledgeAssertion" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/LogicalSlot> a ss:SchemaClass ;
+  ss:name "LogicalSlot" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/LogicalSlotTopology> a ss:SchemaClass ;
+  ss:name "LogicalSlotTopology" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/OntoCleanCatalog> a ss:SchemaClass ;
   ss:name "OntoCleanCatalog" .
@@ -60,6 +93,12 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/Pillbox> a ss:SchemaClass ;
   ss:name "Pillbox" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/PostExerciseRecoveryEffect> a ss:SchemaClass ;
+  ss:name "PostExerciseRecoveryEffect" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/PreExercisePerformanceEffect> a ss:SchemaClass ;
+  ss:name "PreExercisePerformanceEffect" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/Product> a ss:SchemaClass ;
   ss:name "Product" .
@@ -274,6 +313,12 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/activity> a ss:SchemaSlot ;
   ss:name "activity" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/acute_alertness_effects> a ss:SchemaSlot ;
+  ss:name "acute_alertness_effects" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/acute_sleep_effects> a ss:SchemaSlot ;
+  ss:name "acute_sleep_effects" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/aggregation> a ss:SchemaSlot ;
   ss:name "aggregation" .
 
@@ -288,6 +333,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/amount> a ss:SchemaSlot ;
   ss:name "amount" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/applicability> a ss:SchemaSlot ;
+  ss:name "applicability" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/applies_to> a ss:SchemaSlot ;
   ss:name "applies_to" .
@@ -340,8 +388,17 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/children> a ss:SchemaSlot ;
   ss:name "children" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/circadian_anchor> a ss:SchemaSlot ;
+  ss:name "circadian_anchor" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/components> a ss:SchemaSlot ;
   ss:name "components" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/composition_role> a ss:SchemaSlot ;
+  ss:name "composition_role" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/composition_roles> a ss:SchemaSlot ;
+  ss:name "composition_roles" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/concern_annotations> a ss:SchemaSlot ;
   ss:name "concern_annotations" .
@@ -430,11 +487,17 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/entries> a ss:SchemaSlot ;
   ss:name "entries" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/evidence_sources> a ss:SchemaSlot ;
+  ss:name "evidence_sources" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/exclude_policy_ids> a ss:SchemaSlot ;
   ss:name "exclude_policy_ids" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/executable> a ss:SchemaSlot ;
   ss:name "executable" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/exercise_anchor> a ss:SchemaSlot ;
+  ss:name "exercise_anchor" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/expected> a ss:SchemaSlot ;
   ss:name "expected" .
@@ -456,6 +519,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/food> a ss:SchemaSlot ;
   ss:name "food" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/food_effects> a ss:SchemaSlot ;
+  ss:name "food_effects" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/form> a ss:SchemaSlot ;
   ss:name "form" .
@@ -514,6 +580,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/level> a ss:SchemaSlot ;
   ss:name "level" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/locator> a ss:SchemaSlot ;
+  ss:name "locator" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/match> a ss:SchemaSlot ;
   ss:name "match" .
 
@@ -522,6 +591,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/maximum_cardinality> a ss:SchemaSlot ;
   ss:name "maximum_cardinality" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/meal_context> a ss:SchemaSlot ;
+  ss:name "meal_context" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/minimum_cardinality> a ss:SchemaSlot ;
   ss:name "minimum_cardinality" .
@@ -571,6 +643,12 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/policy> a ss:SchemaSlot ;
   ss:name "policy" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/post_exercise_recovery_effects> a ss:SchemaSlot ;
+  ss:name "post_exercise_recovery_effects" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/pre_exercise_performance_effects> a ss:SchemaSlot ;
+  ss:name "pre_exercise_performance_effects" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/precedence> a ss:SchemaSlot ;
   ss:name "precedence" .
 
@@ -604,8 +682,14 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/protocol_version> a ss:SchemaSlot ;
   ss:name "protocol_version" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/provenance> a ss:SchemaSlot ;
+  ss:name "provenance" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/quality> a ss:SchemaSlot ;
   ss:name "quality" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/quotation> a ss:SchemaSlot ;
+  ss:name "quotation" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/rank> a ss:SchemaSlot ;
   ss:name "rank" .
