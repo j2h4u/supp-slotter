@@ -7,10 +7,20 @@ notes: Hormone-modulating berry extract used for prostate/men's-health context; 
   symptoms when used alone. May interact with anti-androgens, anticoagulants, and hormonal medications.
 knowledge:
   effect:
-  - prostate_urinary_context
-  - androgen_context
+  - value: prostate_urinary_context
+    research_state: unassessed
+    sources: []
+  - value: androgen_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - bleeding_med_interaction
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: bleeding_med_interaction
+    research_state: unassessed
+    sources: []

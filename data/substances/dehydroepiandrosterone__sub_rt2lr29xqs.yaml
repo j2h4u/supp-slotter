@@ -12,9 +12,15 @@ concerns:
     use-case discussion.
 knowledge:
   effect:
-  - androgen_context
+  - value: androgen_context
+    research_state: unassessed
+    sources: []
   kind:
-  - hormone
+  - value: hormone
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_rt2lr29xqs

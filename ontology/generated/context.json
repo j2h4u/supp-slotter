@@ -154,9 +154,6 @@
     "RuntimeDashboardUsageTruthState": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeDashboardUsageTruthState"
     },
-    "RuntimeEngineConformanceScenario": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEngineConformanceScenario"
-    },
     "RuntimeEngineContract": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEngineContract"
     },
@@ -313,9 +310,6 @@
     "conditions": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/conditions"
     },
-    "conformance_scenarios": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/conformance_scenarios"
-    },
     "context": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/context"
     },
@@ -370,9 +364,6 @@
     "exercise_anchor": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/exercise_anchor"
     },
-    "expected": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/expected"
-    },
     "fact_value": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/fact_value"
     },
@@ -384,9 +375,6 @@
     },
     "filter_value": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/filter_value"
-    },
-    "fixture": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/fixture"
     },
     "food_effect_laws": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/food_effect_laws"
@@ -621,9 +609,6 @@
     },
     "selectors": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/selectors"
-    },
-    "semantic": {
-      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/semantic"
     },
     "semantic_categories": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/semantic_categories"

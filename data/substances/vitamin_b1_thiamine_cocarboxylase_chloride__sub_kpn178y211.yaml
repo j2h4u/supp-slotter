@@ -9,8 +9,14 @@ notes: Active phosphorylated coenzyme form of thiamine; active in transketolase 
   Life Core Daily-1 alongside thiamine HCl.
 knowledge:
   context:
-  - mitochondrial_health
+  - value: mitochondrial_health
+    research_state: unassessed
+    sources: []
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: unassessed
+    sources: []
   pathway:
-  - thiamine_energy_metabolism
+  - value: thiamine_energy_metabolism
+    research_state: unassessed
+    sources: []

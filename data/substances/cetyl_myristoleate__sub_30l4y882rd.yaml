@@ -7,9 +7,17 @@ notes: Cetylated fatty acid blend with joint-lubrication positioning. Used in An
   blend component.
 knowledge:
   context:
-  - connective_tissue_support
+  - value: connective_tissue_support
+    research_state: unassessed
+    sources: []
   effect:
-  - joint_lubrication_context
-  - joint_comfort_context
+  - value: joint_lubrication_context
+    research_state: unassessed
+    sources: []
+  - value: joint_comfort_context
+    research_state: unassessed
+    sources: []
   kind:
-  - fatty_acid_derivative
+  - value: fatty_acid_derivative
+    research_state: unassessed
+    sources: []

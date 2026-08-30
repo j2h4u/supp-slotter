@@ -8,12 +8,24 @@ notes: 'Stabilized R-lipoic acid salt form listed on Doctor''s Best Stabilized R
   preferably on an empty stomach. Review context: lipoic acid is a mitochondrial redox cofactor for oxidative metabolism.'
 knowledge:
   context:
-  - mitochondrial_health
-  - antioxidant_protection
+  - value: mitochondrial_health
+    research_state: unassessed
+    sources: []
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - mitochondrial_redox_cofactor
-  - redox_metabolism_support
+  - value: mitochondrial_redox_cofactor
+    research_state: unassessed
+    sources: []
+  - value: redox_metabolism_support
+    research_state: unassessed
+    sources: []
   pathway:
-  - glutathione_metabolism
+  - value: glutathione_metabolism
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

@@ -8,7 +8,13 @@ notes: Product-level fiber and seed blend for Garden of Life Super Seed Beyond F
   review; do not infer specific seed-level effects from the blend card.
 knowledge:
   effect:
-  - bowel_regularity_context
-  - gut_microbiome_context
+  - value: bowel_regularity_context
+    research_state: unassessed
+    sources: []
+  - value: gut_microbiome_context
+    research_state: unassessed
+    sources: []
   kind:
-  - fiber
+  - value: fiber
+    research_state: unassessed
+    sources: []

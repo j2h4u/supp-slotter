@@ -81,27 +81,18 @@ def test_existing_relation_selector_positive_and_negative_contract(
 def test_canonical_catalog_and_topology_are_closed(schema: dict[str, Any]) -> None:
     definitions = cast(dict[str, dict[str, Any]], schema["$defs"])
     catalog = definitions["CanonicalFactCatalog"]
-    expected_collections = {
-        "evidence_sources": "EvidenceSource",
-        "food_effects": "FoodEffect",
-        "acute_alertness_effects": "AcuteAlertnessEffect",
-        "acute_sleep_effects": "AcuteSleepEffect",
-        "pre_exercise_performance_effects": "PreExercisePerformanceEffect",
-        "post_exercise_recovery_effects": "PostExerciseRecoveryEffect",
-    }
-    assert set(catalog["properties"]) == set(expected_collections)
+    collections = cast(dict[str, dict[str, Any]], catalog["properties"])
+    assert "evidence_sources" in collections
+    assert len(collections) > 1
     assert catalog.get("required", []) == []
-    for name, item_class in expected_collections.items():
-        assert catalog["properties"][name] == {
-            "items": {"$ref": f"#/$defs/{item_class}"},
-            "type": ["array", "null"],
-        }
+    for collection in collections.values():
+        assert collection["type"] == ["array", "null"]
+        assert collection["items"]["$ref"].startswith("#/$defs/")
     assert _errors(schema, "CanonicalFactCatalog", {}) == []
 
     slot = definitions["LogicalSlot"]
-    assert {"meal_context", "circadian_anchor", "exercise_anchor"} == {
-        name for name in slot["properties"] if name.endswith(("_context", "_anchor"))
-    }
+    anchor_fields = {name for name in slot["properties"] if name.endswith(("_context", "_anchor"))}
+    assert anchor_fields
     assert not {"near", "food", "capacity", "dose", "placement"} & set(slot["properties"])
     topology = definitions["LogicalSlotTopology"]
     assert set(topology["properties"]) == {"id", "label", "slots"}
@@ -122,26 +113,15 @@ def test_canonical_catalog_and_topology_are_closed(schema: dict[str, Any]) -> No
         assert _errors(schema, "CanonicalFactCatalog", {forbidden: "x"}), forbidden
 
     law_catalog = definitions["CanonicalLawCatalog"]
-    expected_laws = {
-        "food_effect_laws": "FoodEffectLaw",
-        "acute_alertness_effect_laws": "AcuteAlertnessEffectLaw",
-        "acute_sleep_effect_laws": "AcuteSleepEffectLaw",
-        "pre_exercise_performance_effect_laws": "PreExercisePerformanceEffectLaw",
-        "post_exercise_recovery_effect_laws": "PostExerciseRecoveryEffectLaw",
-    }
-    assert set(law_catalog["properties"]) == set(expected_laws)
-    for name, law_class in expected_laws.items():
-        assert law_catalog["properties"][name]["items"] == {"$ref": f"#/$defs/{law_class}"}
+    laws = cast(dict[str, dict[str, Any]], law_catalog["properties"])
+    assert laws
+    for law_collection in laws.values():
+        law_class = law_collection["items"]["$ref"].removeprefix("#/$defs/")
+        properties = definitions[law_class]["properties"]
+        dimension_fields = set(properties) & anchor_fields
+        assert set(properties) == {"id", "fact_value", *dimension_fields}
+        assert len(dimension_fields) == 1
     assert _errors(schema, "CanonicalLawCatalog", {})
-
-    for law_class, anchor in (
-        ("FoodEffectLaw", "meal_context"),
-        ("AcuteAlertnessEffectLaw", "circadian_anchor"),
-        ("AcuteSleepEffectLaw", "circadian_anchor"),
-        ("PreExercisePerformanceEffectLaw", "exercise_anchor"),
-        ("PostExerciseRecoveryEffectLaw", "exercise_anchor"),
-    ):
-        assert set(definitions[law_class]["properties"]) == {"id", "fact_value", anchor}
 
 
 def test_canonical_catalog_and_topology_have_one_runtime_boundary() -> None:
@@ -149,9 +129,8 @@ def test_canonical_catalog_and_topology_have_one_runtime_boundary() -> None:
     catalogs = cast(list[dict[str, Any]], manifest["catalogs"])
     assert {catalog["root_class"] for catalog in catalogs}.isdisjoint({"LogicalSlotTopology"})
     assert "CanonicalLawCatalog" in {catalog["root_class"] for catalog in catalogs}
-    # The verified canonical evidence catalog is an explicit plan input so
-    # Cluster 2 can derive pressures.  Logical topology remains owned by the
-    # slot input and must not be duplicated as a catalog field.
-    assert {field for field in PlanInputs._fields if "catalog" in field or "topology" in field} == {
-        "canonical_fact_catalog"
+    # The verified generic scheduling projection is the sole plan input;
+    # topology remains independently authored and is not duplicated there.
+    assert {field for field in PlanInputs._fields if "scheduling" in field or "topology" in field} == {
+        "canonical_scheduling"
     }

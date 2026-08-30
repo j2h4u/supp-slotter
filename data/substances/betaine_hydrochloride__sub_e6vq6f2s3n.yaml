@@ -15,10 +15,18 @@ concerns:
     enzymes are co-formulated.
 knowledge:
   effect:
-  - digestive_comfort_context
-  - protein_digestion_support
+  - value: digestive_comfort_context
+    research_state: unassessed
+    sources: []
+  - value: protein_digestion_support
+    research_state: unassessed
+    sources: []
   kind:
-  - amino
+  - value: amino
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_e6vq6f2s3n

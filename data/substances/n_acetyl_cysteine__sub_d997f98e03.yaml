@@ -12,14 +12,28 @@ concerns:
     treating NAC as routine antioxidant support.
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - glutathione_precursor_support
-  - mucolytic_context
-  - sulfur_amino_acid_metabolism
+  - value: glutathione_precursor_support
+    research_state: unassessed
+    sources: []
+  - value: mucolytic_context
+    research_state: unassessed
+    sources: []
+  - value: sulfur_amino_acid_metabolism
+    research_state: unassessed
+    sources: []
   pathway:
-  - glutathione_metabolism
+  - value: glutathione_metabolism
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

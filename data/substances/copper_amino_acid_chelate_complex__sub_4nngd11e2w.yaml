@@ -6,7 +6,13 @@ notes: Copper amino acid chelate complex as listed on Solaray Zinc Copper and Co
   ODS.
 knowledge:
   kind:
-  - mineral
+  - value: mineral
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - narrow_therapeutic_window
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: narrow_therapeutic_window
+    research_state: unassessed
+    sources: []

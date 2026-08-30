@@ -19,24 +19,23 @@ from planner.yaml_io import YamlValue, load_yaml
 
 
 def load_schema(name: str, bundle: OntologyBundle) -> dict[str, object]:
+    generated_name: str | None = None
     if name == "pillboxes":
-        generated = bundle.decoded.get("pillboxes.schema.json")
-        if not isinstance(generated, dict):
-            raise RuntimeError("verified ontology bundle is missing generated pillboxes.schema.json")
-        return cast(dict[str, object], generated)
-    generated_names = {
-        "dashboard": "dashboard.schema.json",
-        "substance": "card.schema.json",
-        "product": "product.schema.json",
-        "relations": "relations.schema.json",
-        "stacks": "stacks.schema.json",
-    }
-    generated_name = generated_names.get(name)
+        generated_name = "pillboxes.schema.json"
+    else:
+        generated_names = {
+            "dashboard": "dashboard.schema.json",
+            "substance": "card.schema.json",
+            "product": "product.schema.json",
+            "relations": "relations.schema.json",
+            "stacks": "stacks.schema.json",
+        }
+        generated_name = generated_names.get(name)
     if generated_name is not None:
         generated = bundle.decoded.get(generated_name)
         if not isinstance(generated, dict):
             raise RuntimeError(f"verified ontology bundle is missing generated {generated_name}")
-        return cast(dict[str, object], generated)
+        return _resolved_generated_schema(cast(Mapping[str, object], generated), bundle)
     schema_path = SCHEMA_DIR / f"{name}.schema.json"
     try:
         text = schema_path.read_text(encoding="utf-8")
@@ -46,6 +45,28 @@ def load_schema(name: str, bundle: OntologyBundle) -> dict[str, object]:
         return cast(dict[str, object], json.loads(text))
     except json.JSONDecodeError as e:
         raise RuntimeError(f"could not parse schema {schema_path}: {e}") from e
+
+
+def _resolved_generated_schema(schema: Mapping[str, object], bundle: OntologyBundle) -> dict[str, object]:
+    """Supply the generated LinkML definitions to its rooted schema views.
+
+    Manifest-facing schemas are intentionally narrow projections.  LinkML may
+    express one of their typed fields with a local ``#/$defs`` reference, whose
+    definition resides in the verified complete generated schema.  Reattach
+    that verified definition namespace generically at validation time; this
+    adds no domain vocabulary or compatibility interpretation.
+    """
+    resolved = dict(schema)
+    if "$defs" in resolved:
+        return resolved
+    raw_complete = bundle.decoded.get("schema.json")
+    if not isinstance(raw_complete, Mapping):
+        raise RuntimeError("verified ontology bundle is missing generated schema.json")
+    complete = cast(Mapping[str, object], raw_complete)
+    definitions: object = complete.get("$defs")
+    if isinstance(definitions, Mapping):
+        resolved["$defs"] = definitions
+    return resolved
 
 
 def schema_errors(

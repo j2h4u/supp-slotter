@@ -11,13 +11,27 @@ concerns:
     discussion.
 knowledge:
   effect:
-  - stimulant_context
-  - alertness_context
-  - cognitive_performance_context
+  - value: stimulant_context
+    research_state: unassessed
+    sources: []
+  - value: alertness_context
+    research_state: unassessed
+    sources: []
+  - value: cognitive_performance_context
+    research_state: unassessed
+    sources: []
   risk:
-  - cyp450_med_interaction
-  - manual_review
+  - value: cyp450_med_interaction
+    research_state: unassessed
+    sources: []
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - pharmaceutical
-  - nootropic
+  - value: pharmaceutical
+    research_state: unassessed
+    sources: []
+  - value: nootropic
+    research_state: unassessed
+    sources: []
 id: sub_w6o6xv877y

@@ -14,17 +14,12 @@ from typing import cast
 
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.runtime_program import (
-    RuntimeAcuteAlertnessEffect,
-    RuntimeAcuteSleepEffect,
-    RuntimeCanonicalFactCatalog,
     RuntimeCanonicalLaw,
+    RuntimeCanonicalScheduling,
     RuntimeCanonicalSchedulingFact,
     RuntimeCompositionRole,
     RuntimeEvidenceProvenance,
     RuntimeFactSubject,
-    RuntimeFoodEffect,
-    RuntimePostExerciseRecoveryEffect,
-    RuntimePreExercisePerformanceEffect,
 )
 
 
@@ -157,22 +152,6 @@ class Conflict:
 InferenceResult = Success | Conflict
 
 
-_FACT_TYPES: tuple[tuple[type[RuntimeCanonicalSchedulingFact], str], ...] = (
-    (RuntimeFoodEffect, "FoodEffect"),
-    (RuntimeAcuteAlertnessEffect, "AcuteAlertnessEffect"),
-    (RuntimeAcuteSleepEffect, "AcuteSleepEffect"),
-    (RuntimePreExercisePerformanceEffect, "PreExercisePerformanceEffect"),
-    (RuntimePostExerciseRecoveryEffect, "PostExerciseRecoveryEffect"),
-)
-
-
-def _fact_family(fact: RuntimeCanonicalSchedulingFact) -> str | None:
-    for fact_type, family in _FACT_TYPES:
-        if isinstance(fact, fact_type):
-            return family
-    return None
-
-
 def _stable_id(value: object) -> str | None:
     if isinstance(value, str):
         return value
@@ -244,20 +223,20 @@ def _law_for(
 
 
 def _catalog_and_laws(
-    catalog: RuntimeCanonicalFactCatalog | object,
+    catalog: RuntimeCanonicalScheduling | object,
     laws: Iterable[RuntimeCanonicalLaw] | Mapping[tuple[str, str], RuntimeCanonicalLaw] | None,
 ) -> tuple[
-    RuntimeCanonicalFactCatalog,
+    RuntimeCanonicalScheduling,
     Iterable[RuntimeCanonicalLaw] | Mapping[tuple[str, str], RuntimeCanonicalLaw],
 ]:
-    if isinstance(catalog, RuntimeCanonicalFactCatalog):
+    if isinstance(catalog, RuntimeCanonicalScheduling):
         if laws is None:
             raise OntologyInfrastructureError("canonical inference requires compiler-emitted canonical laws")
         return catalog, laws
-    runtime_catalog = getattr(catalog, "canonical_fact_catalog", None)
-    if not isinstance(runtime_catalog, RuntimeCanonicalFactCatalog):
-        raise TypeError("canonical inference requires RuntimeCanonicalFactCatalog or RuntimeProgram")
-    runtime_laws = laws if laws is not None else getattr(catalog, "canonical_laws", None)
+    runtime_catalog = getattr(catalog, "canonical_scheduling", None)
+    if not isinstance(runtime_catalog, RuntimeCanonicalScheduling):
+        raise TypeError("canonical inference requires RuntimeCanonicalScheduling or RuntimeProgram")
+    runtime_laws = laws if laws is not None else runtime_catalog.laws
     if runtime_laws is None:
         raise OntologyInfrastructureError("canonical inference requires compiler-emitted canonical laws")
     return runtime_catalog, runtime_laws
@@ -270,18 +249,6 @@ def _indexed_laws(
         dict(cast(Mapping[tuple[str, str], RuntimeCanonicalLaw], laws))
         if isinstance(laws, Mapping)
         else _law_index(laws)
-    )
-
-
-def _facts_with_families(
-    catalog: RuntimeCanonicalFactCatalog,
-) -> tuple[Sequence[RuntimeCanonicalSchedulingFact], ...]:
-    return (
-        catalog.food_effects,
-        catalog.acute_alertness_effects,
-        catalog.acute_sleep_effects,
-        catalog.pre_exercise_performance_effects,
-        catalog.post_exercise_recovery_effects,
     )
 
 
@@ -306,10 +273,8 @@ def _derivations_for_fact(
     roles: Mapping[str, RuntimeCompositionRole],
     selected_by_product: Mapping[str, tuple[str, ...]],
 ) -> tuple[tuple[UnaryPressureIdentity, PressureDerivation], ...]:
-    family = _fact_family(fact)
-    fact_value = getattr(fact, "value", None)
-    if family is None or not isinstance(fact_value, str):
-        return ()
+    family = fact.family
+    fact_value = fact.value
     law = _law_for(law_index, family, fact_value)
     if law is None:
         raise OntologyInfrastructureError(f"canonical law missing for family={family!r}, fact_value={fact_value!r}")
@@ -333,7 +298,7 @@ def _derivations_for_fact(
 
 
 def _collect_derivations(
-    catalog: RuntimeCanonicalFactCatalog,
+    catalog: RuntimeCanonicalScheduling,
     laws: Mapping[tuple[str, str], RuntimeCanonicalLaw],
     roles: Mapping[str, RuntimeCompositionRole],
     selected: Mapping[str, str],
@@ -344,10 +309,9 @@ def _collect_derivations(
             sorted(item_id for item_id, product in selected.items() if product == product_id)
         )
     by_identity: dict[UnaryPressureIdentity, list[PressureDerivation]] = {}
-    for facts in _facts_with_families(catalog):
-        for fact in facts:
-            for identity, derivation in _derivations_for_fact(fact, laws, roles, selected_by_product):
-                by_identity.setdefault(identity, []).append(derivation)
+    for fact in catalog.facts:
+        for identity, derivation in _derivations_for_fact(fact, laws, roles, selected_by_product):
+            by_identity.setdefault(identity, []).append(derivation)
     return by_identity
 
 
@@ -399,7 +363,7 @@ def _same_dimension_conflicts(
 
 
 def execute_canonical_inference(
-    catalog: RuntimeCanonicalFactCatalog | object,
+    catalog: RuntimeCanonicalScheduling | object,
     selected_items: Iterable[object] | Mapping[object, object],
     laws: Iterable[RuntimeCanonicalLaw] | Mapping[tuple[str, str], RuntimeCanonicalLaw] | None = None,
     *,
@@ -424,7 +388,7 @@ def execute_canonical_inference(
 
 
 def infer_canonical_pressures(
-    catalog: RuntimeCanonicalFactCatalog | object,
+    catalog: RuntimeCanonicalScheduling | object,
     selected_items: Iterable[object] | Mapping[object, object],
     laws: Iterable[RuntimeCanonicalLaw] | Mapping[tuple[str, str], RuntimeCanonicalLaw] | None = None,
 ) -> InferenceResult:

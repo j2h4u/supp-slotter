@@ -5,7 +5,13 @@ notes: Amino sulfonic acid added as a known substance for future relation modeli
   physiology without assuming dose adequacy.
 knowledge:
   effect:
-  - calming_context
-  - bile_acid_conjugation_context
+  - value: calming_context
+    research_state: unassessed
+    sources: []
+  - value: bile_acid_conjugation_context
+    research_state: unassessed
+    sources: []
   kind:
-  - amino
+  - value: amino
+    research_state: unassessed
+    sources: []

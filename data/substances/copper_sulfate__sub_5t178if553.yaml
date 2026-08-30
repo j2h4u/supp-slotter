@@ -7,7 +7,13 @@ notes: Inorganic copper salt used in Optimum Nutrition Opti-Men. Kept separate f
   is a practical tolerance/review distinction; copper dose and zinc balance need manual review per NIH ODS.
 knowledge:
   kind:
-  - mineral
+  - value: mineral
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - narrow_therapeutic_window
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: narrow_therapeutic_window
+    research_state: unassessed
+    sources: []

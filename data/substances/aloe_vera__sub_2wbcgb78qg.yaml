@@ -16,13 +16,27 @@ concerns:
     and whether the product is a drink, capsule, gel, or blended formula.
 knowledge:
   effect:
-  - digestive_comfort_context
-  - gut_barrier_context
-  - skin_barrier_context
-  - wound_healing_support
+  - value: digestive_comfort_context
+    research_state: unassessed
+    sources: []
+  - value: gut_barrier_context
+    research_state: unassessed
+    sources: []
+  - value: skin_barrier_context
+    research_state: unassessed
+    sources: []
+  - value: wound_healing_support
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - liver_injury_review
-  - manual_review
+  - value: liver_injury_review
+    research_state: unassessed
+    sources: []
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_2wbcgb78qg

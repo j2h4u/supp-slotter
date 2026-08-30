@@ -6,18 +6,9 @@ from planner.contracts import Product, Relation, Substance
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.policies import project_ontology_assertions
 from planner.query_model.data import ReadModelData
-from planner.query_model.facts import (
-    active_fact_index,
-    active_substance_ids,
-    inactive_substance_ids,
-)
-from planner.query_model.relation_warnings import (
-    RelationWarningRow,
-    collect_relation_warnings,
-)
+from planner.query_model.facts import active_substance_ids, inactive_substance_ids
 from planner.query_model.relations import classify_relations, resolve_relation_queries
 from planner.query_model.types import RelationReviewRow
-from planner.schedule_types import ActiveFactIndexEntry
 
 
 class StackReadModel:
@@ -35,12 +26,6 @@ class StackReadModel:
         """The verified ontology bundle used to build this command read model."""
         return self._ontology_bundle
 
-    def collect_relation_warnings(
-        self,
-        active_substances: set[str],
-    ) -> list[RelationWarningRow]:
-        return collect_relation_warnings(self._data.relations, active_substances, self._ontology_bundle.runtime_program)
-
     def active_substance_ids(self) -> set[str]:
         return active_substance_ids(self._data, self._ontology_bundle.runtime_program.glue_contract.inactive_stack_name)
 
@@ -54,19 +39,6 @@ class StackReadModel:
         active_substances: set[str],
     ) -> dict[str, list[RelationReviewRow]]:
         return classify_relations(self._data.relations, active_substances, self._ontology_bundle.runtime_program)
-
-    def active_fact_index(
-        self,
-        *,
-        item_id_sequence: list[str],
-        item_products: dict[str, str],
-    ) -> list[ActiveFactIndexEntry]:
-        return active_fact_index(
-            self._data,
-            self._ontology_bundle,
-            item_id_sequence=item_id_sequence,
-            item_products=item_products,
-        )
 
 
 def build_stack_read_model(

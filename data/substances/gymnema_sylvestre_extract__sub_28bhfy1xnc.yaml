@@ -11,10 +11,18 @@ concerns:
     use discussion.
 knowledge:
   effect:
-  - insulin_signaling_context
+  - value: insulin_signaling_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - glucose_med_interaction
-  - manual_review
+  - value: glucose_med_interaction
+    research_state: unassessed
+    sources: []
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_28bhfy1xnc

@@ -38,7 +38,6 @@ FAST_UNIT_MODULES = frozenset({
     Path("tests/test_cli_surface.py"),
     Path("tests/test_crap_gate.py"),
     Path("tests/test_dashboard_schema.py"),
-    Path("tests/test_fact_labels.py"),
     Path("tests/test_logical_slot_topology.py"),
     Path("tests/test_canonical_fact_catalog_integration.py"),
     Path("tests/test_canonical_inference.py"),
@@ -115,9 +114,8 @@ CANONICAL_RUNTIME_CAPABILITY_NODES: dict[str, tuple[str, ...]] = {
     "no_publication_failures": (
         "tests/test_canonical_optimizer.py::test_conflicts_and_invalid_inputs_are_layout_free_indeterminate",
         "tests/test_canonical_optimizer.py::test_abort_during_final_expansion_or_pre_return_cannot_publish",
-        "tests/test_canonical_publication.py::test_atomic_write_failure_invalidates_current_document_and_cleans_temp_files",
-        "tests/test_canonical_publication.py::test_writer_revalidation_failure_invalidates_current_document",
-        "tests/test_canonical_optimizer_plan_integration.py::test_keyboard_interrupt_during_publication_is_indeterminate_and_does_not_write",
+        "tests/test_canonical_publication.py::test_invalid_source_mapping_product_domain_or_slot_publishes_nothing",
+        "tests/test_canonical_publication.py::test_failed_or_interrupted_write_removes_stale_lease",
     ),
 }
 ONTOLOGY_CONTRACT_GROUPS: tuple[tuple[str, tuple[Path, ...]], ...] = (

@@ -4,10 +4,18 @@ notes: Ingredient listed on California Gold Nutrition Nicotinamide Riboside Tart
   antioxidant with transporter-mediated tissue accumulation research context; do not infer disease-specific benefit.
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - redox_metabolism_support
+  - value: redox_metabolism_support
+    research_state: unassessed
+    sources: []
   kind:
-  - amino
+  - value: amino
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

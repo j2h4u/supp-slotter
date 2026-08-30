@@ -5,11 +5,21 @@ notes: Pre-workout amino acid in this stack context. Added as a known substance 
   and not computed by the planner.
 knowledge:
   context:
-  - workout_performance
+  - value: workout_performance
+    research_state: unassessed
+    sources: []
   effect:
-  - carnosine_buffer_context
-  - exercise_performance_context
+  - value: carnosine_buffer_context
+    research_state: unassessed
+    sources: []
+  - value: exercise_performance_context
+    research_state: unassessed
+    sources: []
   kind:
-  - amino
+  - value: amino
+    research_state: unassessed
+    sources: []
   role:
-  - ergogenic
+  - value: ergogenic
+    research_state: unassessed
+    sources: []

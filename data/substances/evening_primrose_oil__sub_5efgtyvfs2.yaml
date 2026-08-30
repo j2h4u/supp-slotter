@@ -16,10 +16,18 @@ concerns:
     the product is evening primrose, borage, black currant seed, or a mixed GLA oil.
 knowledge:
   effect:
-  - reproductive_hormone_context
-  - skin_barrier_context
+  - value: reproductive_hormone_context
+    research_state: unassessed
+    sources: []
+  - value: skin_barrier_context
+    research_state: unassessed
+    sources: []
   kind:
-  - fatty_acid_derivative
+  - value: fatty_acid_derivative
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_5efgtyvfs2

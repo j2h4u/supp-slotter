@@ -15,16 +15,34 @@ concerns:
     than treating L-carnitine as directly harmful in isolation.
 knowledge:
   context:
-  - mitochondrial_health
-  - neurocognitive_support
+  - value: mitochondrial_health
+    research_state: unassessed
+    sources: []
+  - value: neurocognitive_support
+    research_state: unassessed
+    sources: []
   effect:
-  - mitochondrial_fatty_acid_transport
-  - cholinergic_support
+  - value: mitochondrial_fatty_acid_transport
+    research_state: unassessed
+    sources: []
+  - value: cholinergic_support
+    research_state: unassessed
+    sources: []
   pathway:
-  - carnitine_shuttle
-  - tmao_precursor
+  - value: carnitine_shuttle
+    research_state: unassessed
+    sources: []
+  - value: tmao_precursor
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - tmao_cardiometabolic_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: tmao_cardiometabolic_review
+    research_state: unassessed
+    sources: []
   role:
-  - ergogenic
+  - value: ergogenic
+    research_state: unassessed
+    sources: []

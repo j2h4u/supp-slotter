@@ -36,9 +36,11 @@ def test_loader_projects_independent_topology_fields(tmp_path: Path) -> None:
 
     slot = load_pillboxes(path, _runtime())["daily"].slots["morning"]
 
-    assert slot.meal_context == "without_food"
-    assert slot.circadian_anchor == "wake"
-    assert slot.exercise_anchor is None
+    assert slot.anchors == {
+        "meal_context": "without_food",
+        "circadian_anchor": "wake",
+        "exercise_anchor": None,
+    }
 
 
 @pytest.mark.parametrize(
@@ -126,4 +128,4 @@ second:
     )
 
     with pytest.raises(CardLoadError, match="duplicate pillbox stack reference"):
-        load_pillboxes(path, None)  # type: ignore[arg-type]
+        load_pillboxes(path, _runtime())

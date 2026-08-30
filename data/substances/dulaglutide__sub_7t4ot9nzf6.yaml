@@ -10,10 +10,18 @@ concerns:
     supplements, delayed gastric emptying/oral-med absorption, pregnancy planning, and compounded/unapproved product risk.
 knowledge:
   context:
-  - incretin_drug_context
+  - value: incretin_drug_context
+    research_state: unassessed
+    sources: []
   risk:
-  - incretin_drug_medical_review
-  - manual_review
+  - value: incretin_drug_medical_review
+    research_state: unassessed
+    sources: []
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - pharmaceutical
+  - value: pharmaceutical
+    research_state: unassessed
+    sources: []
 id: sub_7t4ot9nzf6

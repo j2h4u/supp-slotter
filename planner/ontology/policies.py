@@ -60,6 +60,7 @@ def _load_ontology_assertion(
         bundle, assertion_id, raw, relation_types
     )
     action, severity = _assertion_metadata(bundle, assertion_id, raw, severity_values)
+    research_state, sources = _assertion_research_metadata(bundle, assertion_id, raw)
     return OntologyAssertion(
         id=assertion_id,
         relation_type=cast(RelationType, relation_type),
@@ -70,8 +71,8 @@ def _load_ontology_assertion(
         target_selector=target,
         action=action,
         severity=cast(Severity | None, severity),
-        research_state=cast(str, raw.get("research_state", "unassessed")),
-        sources=tuple(item for item in cast(list[object], raw.get("sources", [])) if isinstance(item, str)),
+        research_state=research_state,
+        sources=sources,
     )
 
 
@@ -119,6 +120,23 @@ def _assertion_metadata(
     if severity is not None and severity not in severity_values:
         raise _policy_error(bundle, f"assertion {assertion_id!r} has invalid severity")
     return (action if isinstance(action, str) else None), severity
+
+
+def _assertion_research_metadata(
+    bundle: OntologyBundle,
+    assertion_id: str,
+    raw: dict[str, object],
+) -> tuple[str, tuple[str, ...]]:
+    state = raw.get("research_state")
+    sources = raw.get("sources")
+    state_values = frozenset(schema_enum_values(bundle, "ResearchState"))
+    if not isinstance(state, str) or state not in state_values:
+        raise _policy_error(bundle, f"assertion {assertion_id!r} lacks a valid explicit research_state")
+    if not isinstance(sources, list) or any(not isinstance(source, str) or not source.strip() for source in sources):
+        raise _policy_error(bundle, f"assertion {assertion_id!r} lacks explicit sources")
+    if state != "unassessed" and not sources:
+        raise _policy_error(bundle, f"assertion {assertion_id!r} requires sources for research_state {state!r}")
+    return state, tuple(cast(list[str], sources))
 
 
 def project_ontology_assertions(

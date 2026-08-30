@@ -8,7 +8,13 @@ notes: Low-dose 81 mg enteric-coated aspirin / acetylsalicylic acid drug-like pr
   substances.
 knowledge:
   risk:
-  - manual_review
-  - bleeding_med_interaction
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: bleeding_med_interaction
+    research_state: unassessed
+    sources: []
   role:
-  - pharmaceutical
+  - value: pharmaceutical
+    research_state: unassessed
+    sources: []

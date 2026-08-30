@@ -15,10 +15,18 @@ concerns:
     and whether the product is a blend or single-herb preparation.
 knowledge:
   effect:
-  - reproductive_hormone_context
+  - value: reproductive_hormone_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - liver_injury_review
-  - manual_review
+  - value: liver_injury_review
+    research_state: unassessed
+    sources: []
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_prx6ddszzi

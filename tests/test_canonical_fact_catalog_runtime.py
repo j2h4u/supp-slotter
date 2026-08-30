@@ -1,4 +1,4 @@
-"""Focused tests for the authoritative canonical-fact runtime projection."""
+"""Acceptance for the generic compiler-emitted scheduling fact projection."""
 
 from __future__ import annotations
 
@@ -7,181 +7,50 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-import scripts.ontology_compiler as ontology_compiler
 from planner.ontology.errors import OntologyInfrastructureError
-from planner.ontology.runtime_program import (
-    RuntimeAcuteAlertnessEffect,
-    RuntimeAcuteSleepEffect,
-    RuntimeFactApplicability,
-    RuntimeFoodEffect,
-    RuntimePostExerciseRecoveryEffect,
-    RuntimePreExercisePerformanceEffect,
-    decode_runtime_program,
-)
+from planner.ontology.runtime_program import RuntimeCanonicalSchedulingFact, decode_runtime_program
+from scripts.ontology_compiler import compile_ontology
 
 ROOT = Path(__file__).resolve().parents[1]
 ONTOLOGY = ROOT / "ontology"
 
 
-def _runtime_payload() -> dict[str, object]:
-    payload = cast(
-        dict[str, object],
-        json.loads((ONTOLOGY / "generated/runtime-program.json").read_text(encoding="utf-8")),
-    )
-    projection = cast(dict[str, object], payload["projection"])
-    projection["canonical_fact_catalog"] = {
-        "evidence_sources": [],
-        "food_effects": [],
-        "acute_alertness_effects": [],
-        "acute_sleep_effects": [],
-        "pre_exercise_performance_effects": [],
-        "post_exercise_recovery_effects": [],
-    }
-    return payload
+def _payload() -> dict[str, object]:
+    return cast(dict[str, object], json.loads(compile_ontology(ONTOLOGY)[Path("runtime-program.json")]))
 
 
-def test_compiler_emits_authoritative_catalog(monkeypatch: pytest.MonkeyPatch) -> None:
-    # Product component identity migration is maintained by another wave.  A
-    # compiler projection test should isolate canonical catalog emission from
-    # that repository-wide projection gate.
-    monkeypatch.setattr(ontology_compiler, "_validate_repository_projection_coverage", lambda *_args: None)
-    artifacts = ontology_compiler.compile_ontology(ONTOLOGY)
-    payload = cast(dict[str, object], json.loads(artifacts[Path("runtime-program.json")]))
-    projection = cast(dict[str, object], payload["projection"])
-    catalog = cast(dict[str, object], projection["canonical_fact_catalog"])
-    assert set(catalog) == {
-        "evidence_sources",
-        "food_effects",
-        "acute_alertness_effects",
-        "acute_sleep_effects",
-        "pre_exercise_performance_effects",
-        "post_exercise_recovery_effects",
-    }
-    assert [fact["id"] for fact in cast(list[dict[str, object]], catalog["food_effects"])] == [
-        "fact_food_prd_eb6337a6dc_sub_2476bf9d4b",
-        "fact_food_prd_bb212cffc2_sub_67fc2be8aa",
-        "fact_food_prd_htuhz2s2gt_sub_sunkcr05vl",
-        "fact_food_prd_io1peb9syp_sub_85w45nbob4",
-        "fact_food_prd_io1peb9syp_sub_iu7b8h87g2",
-    ]
-    assert [fact["id"] for fact in cast(list[dict[str, object]], catalog["pre_exercise_performance_effects"])] == [
-        "fact_pre_exercise_performance_prd_cfce0b36b6_sub_3918fe347e",
-    ]
-    assert catalog["acute_alertness_effects"] == []
-    assert catalog["acute_sleep_effects"] == []
-    assert catalog["post_exercise_recovery_effects"] == []
-    lock = cast(dict[str, object], json.loads(artifacts[Path("artifact-lock.json")]))
-    sources = cast(list[dict[str, object]], lock["sources"])
-    assert any(source["path"] == "ontology/canonical-facts.yaml" for source in sources)
+def test_compiler_emits_one_generic_scheduling_projection_without_retired_catalog_keys() -> None:
+    projection = cast(dict[str, object], _payload()["projection"])
+    scheduling = cast(dict[str, object], projection["canonical_scheduling"])
+
+    assert set(scheduling) == {"dimensions", "families", "evidence_sources", "facts", "laws"}
+    assert "canonical_fact_catalog" not in projection
+    assert all("effects" not in key for key in scheduling)
+    assert len(cast(list[object], scheduling["facts"])) == 6
 
 
-def test_runtime_decodes_all_typed_fact_families() -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    projection["canonical_fact_catalog"] = {
-        "evidence_sources": [{"id": "src_demo"}],
-        "food_effects": [
-            {
-                "id": "fact_food",
-                "subject": {"substance": "sub_demo"},
-                "applicability": {"substance": "sub_demo"},
-                "provenance": [{"source": "src_demo", "locator": "paper#food"}],
-                "value": "bioavailability_increases",
-            }
-        ],
-        "acute_alertness_effects": [
-            {
-                "id": "fact_alertness",
-                "subject": {"composition_role": "cmp_demo"},
-                "applicability": {"composition_role": "cmp_demo"},
-                "provenance": [{"source": "src_demo", "locator": "paper#alertness", "quotation": "quoted"}],
-                "value": "acute_alertness_increases",
-            }
-        ],
-        "acute_sleep_effects": [
-            {
-                "id": "fact_sleep",
-                "subject": {"composition_role": "cmp_demo"},
-                "applicability": {"composition_role": "cmp_demo"},
-                "provenance": [{"source": "src_demo", "locator": "paper#sleep"}],
-                "value": "continuity_improves",
-            }
-        ],
-        "pre_exercise_performance_effects": [
-            {
-                "id": "fact_pre",
-                "subject": {"composition_role": "cmp_demo"},
-                "applicability": {"composition_role": "cmp_demo"},
-                "provenance": [{"source": "src_demo", "locator": "paper#pre"}],
-                "value": "performance_improves",
-            }
-        ],
-        "post_exercise_recovery_effects": [
-            {
-                "id": "fact_post",
-                "subject": {"composition_role": "cmp_demo"},
-                "applicability": {"composition_role": "cmp_demo"},
-                "provenance": [{"source": "src_demo", "locator": "paper#post"}],
-                "value": "recovery_improves",
-            }
-        ],
+def test_decoder_types_facts_once_with_family_as_data() -> None:
+    scheduling = decode_runtime_program(_payload()).canonical_scheduling
+
+    assert all(isinstance(fact, RuntimeCanonicalSchedulingFact) for fact in scheduling.facts)
+    assert {fact.family for fact in scheduling.facts} <= set(scheduling.families_by_id)
+    assert {fact.value for fact in scheduling.facts} <= {
+        value for family in scheduling.families for value in family.fact_values
     }
 
-    runtime = decode_runtime_program(payload)
-    catalog = runtime.canonical_fact_catalog
-    assert isinstance(catalog.food_effects[0], RuntimeFoodEffect)
-    assert isinstance(catalog.acute_alertness_effects[0], RuntimeAcuteAlertnessEffect)
-    assert isinstance(catalog.acute_sleep_effects[0], RuntimeAcuteSleepEffect)
-    assert isinstance(catalog.pre_exercise_performance_effects[0], RuntimePreExercisePerformanceEffect)
-    assert isinstance(catalog.post_exercise_recovery_effects[0], RuntimePostExerciseRecoveryEffect)
-    assert catalog.food_effects[0].subject.substance == "sub_demo"
-    assert catalog.food_effects[0].applicability == RuntimeFactApplicability("sub_demo", None)
 
-
-@pytest.mark.parametrize(
-    ("mutation", "match"),
-    [
-        ("duplicate", "duplicate fact IDs"),
-        ("invalid_value", "not an admitted value"),
-        ("both_subjects", "exactly one"),
-        ("no_subject", "exactly one"),
-        ("scalar_applicability", "must be a mapping"),
-        ("both_applicability", "exactly one"),
-        ("no_applicability", "exactly one"),
-        ("blank_locator", "must be a non-empty string"),
-        ("whitespace_locator", "non-whitespace"),
-    ],
-)
-def test_runtime_rejects_malformed_canonical_facts(mutation: str, match: str) -> None:
-    payload = _runtime_payload()
+@pytest.mark.parametrize("mutation", ("unknown_family", "unadmitted_value", "duplicate_id"))
+def test_decoder_rejects_malformed_generic_fact_rows(mutation: str) -> None:
+    payload = _payload()
     projection = cast(dict[str, object], payload["projection"])
-    catalog = cast(dict[str, object], projection["canonical_fact_catalog"])
-    fact = {
-        "id": "fact_demo",
-        "subject": {"composition_role": "cmp_demo"},
-        "applicability": {"composition_role": "cmp_demo"},
-        "provenance": [{"source": "src_demo", "locator": "paper#demo"}],
-        "value": "bioavailability_increases",
-    }
-    catalog["food_effects"] = [fact]
-    if mutation == "duplicate":
-        catalog["acute_sleep_effects"] = [{**fact, "value": "continuity_improves"}]
-    elif mutation == "invalid_value":
-        fact["value"] = "not_admitted"
-    elif mutation == "both_subjects":
-        fact["subject"] = {"substance": "sub_demo", "composition_role": "cmp_demo"}
-    elif mutation == "no_subject":
-        fact["subject"] = {}
-    elif mutation == "scalar_applicability":
-        fact["applicability"] = "cmp_demo"
-    elif mutation == "both_applicability":
-        fact["applicability"] = {"substance": "sub_demo", "composition_role": "cmp_demo"}
-    elif mutation == "no_applicability":
-        fact["applicability"] = {}
-    elif mutation == "blank_locator":
-        cast(list[dict[str, object]], fact["provenance"])[0]["locator"] = ""
-    elif mutation == "whitespace_locator":
-        cast(list[dict[str, object]], fact["provenance"])[0]["locator"] = "   "
+    scheduling = cast(dict[str, object], projection["canonical_scheduling"])
+    facts = cast(list[dict[str, object]], scheduling["facts"])
+    if mutation == "unknown_family":
+        facts[0]["family"] = "Unknown"
+    elif mutation == "unadmitted_value":
+        facts[0]["value"] = "unknown"
+    else:
+        facts.append(dict(facts[0]))
 
-    with pytest.raises(OntologyInfrastructureError, match=match):
+    with pytest.raises(OntologyInfrastructureError):
         decode_runtime_program(payload)

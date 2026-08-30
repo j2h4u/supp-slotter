@@ -150,6 +150,8 @@ def test_relation_loader_rejects_non_list_and_invalid_selector_entry(tmp_path: P
                     "source_selector": {"category": "context"},
                     "target_selector": {"category": "context", "term": "foo"},
                     "reason": "invalid selector",
+                    "research_state": "unassessed",
+                    "sources": [],
                 }
             ]
         }),
@@ -164,7 +166,7 @@ def test_relation_loader_rejects_non_list_and_invalid_selector_entry(tmp_path: P
         load_global_relations(Paths.from_root(tmp_path), ontology_bundle(), {})
 
 
-def test_relation_loader_normalizes_legacy_and_reads_research_state_metadata(tmp_path: Path) -> None:
+def test_relation_loader_requires_explicit_research_state_metadata(tmp_path: Path) -> None:
     path = tmp_path / "data" / "relations.yaml"
     path.parent.mkdir()
     relation = {
@@ -181,9 +183,8 @@ def test_relation_loader_normalizes_legacy_and_reads_research_state_metadata(tmp
         "sub_known000": Substance("sub_known000", "Known"),
         "sub_target00": Substance("sub_target00", "Target"),
     }
-    legacy = load_global_relations(Paths.from_root(tmp_path), ontology_bundle(), substances)[0]
-    assert legacy.research_state == "unassessed"
-    assert legacy.sources == ()
+    with pytest.raises(CardLoadError, match=r"missing required field\(s\): research_state, sources"):
+        load_global_relations(Paths.from_root(tmp_path), ontology_bundle(), substances)
 
     relation.update({"research_state": "mechanistic_only", "sources": ["https://example.test/mechanism"]})
     path.write_text(yaml.safe_dump({"relations": [relation]}), encoding="utf-8")
@@ -223,6 +224,8 @@ def test_relation_loader_enforces_per_side_selector_forms(
                             else {"entity": {"name": "Known"}}
                         ),
                         "reason": "selector form probe",
+                        "research_state": "unassessed",
+                        "sources": [],
                     }
                 ]
             },
@@ -243,6 +246,8 @@ def test_relation_loader_rejects_reversed_directionless_duplicate(tmp_path: Path
         "assertion_kind": "clinical_review_signal",
         "semantic_family": "test",
         "reason": "direction probe",
+        "research_state": "unassessed",
+        "sources": [],
     }
     path.write_text(
         yaml.safe_dump(
@@ -311,6 +316,8 @@ def test_relation_loader_rejects_unresolved_selector_references(
                         "source_selector": selector,
                         "target_selector": {"entity": {"entity_id": "sub_known000"}},
                         "reason": "unresolved selector must not be omitted",
+                        "research_state": "unassessed",
+                        "sources": [],
                     }
                 ]
             },
@@ -339,7 +346,7 @@ def test_substance_loader_rejects_unknown_canonical_terms(
             {
                 "id": "sub_zz0000zzzz",
                 "name": "Unknown term probe",
-                section: {field: ["not_a_registered_term"]},
+                section: {field: [{"value": "not_a_registered_term", "research_state": "unassessed", "sources": []}]},
             },
             sort_keys=False,
         ),
@@ -359,7 +366,7 @@ def test_substance_loader_accepts_known_and_registered_unused_terms(tmp_path: Pa
             {
                 "id": "sub_zz0000zzzz",
                 "name": "Known term probe",
-                "knowledge": {"kind": ["mineral"]},
+                "knowledge": {"kind": [{"value": "mineral", "research_state": "unassessed", "sources": []}]},
             },
             sort_keys=False,
         ),
@@ -372,15 +379,14 @@ def test_substance_loader_accepts_known_and_registered_unused_terms(tmp_path: Pa
     assert substance.knowledge_assertions[0].value == "mineral"
 
 
-def test_substance_loader_normalizes_legacy_and_reads_research_state_metadata(tmp_path: Path) -> None:
+def test_substance_loader_requires_explicit_research_state_metadata(tmp_path: Path) -> None:
     legacy_path = tmp_path / "legacy.yaml"
     legacy_path.write_text(
         yaml.safe_dump({"id": "sub_zz0000zzzz", "name": "Legacy", "knowledge": {"kind": ["mineral"]}}),
         encoding="utf-8",
     )
-    legacy = load_substance(legacy_path, ontology_bundle())
-    assert legacy.knowledge_assertions[0].research_state == "unassessed"
-    assert legacy.knowledge_assertions[0].sources == ()
+    with pytest.raises(CardLoadError, match="must be a mapping with explicit research metadata"):
+        load_substance(legacy_path, ontology_bundle())
 
     structured_path = tmp_path / "structured.yaml"
     structured_path.write_text(

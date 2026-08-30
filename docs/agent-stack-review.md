@@ -14,12 +14,13 @@ uv run python -m planner
 ```
 
 Use `planner review` first. Its `Review brief` is the intake surface: authored
-concerns, relation review, active fact membership, and dashboard coverage
+concerns, relation review, active knowledge membership, and dashboard coverage
 summary. Use the detailed sections below it for concerns, relations, active
-fact memberships, and dashboard counts.
+knowledge memberships, and dashboard counts.
 
-Use `schedule.yaml` for generated slot placement, humanized warnings, placement
-notes, and explanations. Do not edit it directly.
+Use `schedule.yaml` for generated slot placement and proof-backed explanations.
+Warnings, review notes, and dashboard benefits/risks belong to `planner review`.
+Do not edit generated output directly.
 
 Use `planner check` to validate source-data references before the current review.
 

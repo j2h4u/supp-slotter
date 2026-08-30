@@ -51,7 +51,7 @@ _JSON_SCHEMA_FORMAT = "https://json-schema.org/draft/2020-12/schema"
 _ARTIFACT_LOCK_FORMAT = "ontology-artifact-lock-v1"
 _RUNTIME_LOCK_FORMAT = "ontology-runtime-lock-v1"
 _PROJECTION_MAP_FORMAT = "ontology-projection-map-v1"
-_RUNTIME_PROGRAM_FORMAT = "ontology-runtime-program-v1"
+_RUNTIME_PROGRAM_FORMAT = "ontology-runtime-program-v2"
 _REPOSITORY_PROJECTION_FORMAT = "repository-projection-v1"
 _RDF_TRIPLE_SIZE = 3
 _EXPECTED_ARTIFACTS = {
@@ -873,7 +873,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     _validate_linkml_instance(schema_view, "CanonicalFactCatalog", canonical_fact_catalog)
     canonical_law_catalog = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "canonical_laws"))
     _validate_linkml_instance(schema_view, "CanonicalLawCatalog", canonical_law_catalog)
-    canonical_laws = _normalize_canonical_laws(canonical_law_catalog)
+    canonical_scheduling = _canonical_scheduling(schema_view, canonical_fact_catalog, canonical_law_catalog)
     ontoclean_profiles = _load_ontoclean_profiles(ontology_root, manifest, schema_view)
     categories = _required_mapping(vocabulary, "semantic_categories")
     _validate_semantic_categories(categories, ontoclean_profiles)
@@ -928,9 +928,8 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         ontology_root,
         manifest,
         runtime.authored,
-        canonical_fact_catalog,
         source_hash,
-        canonical_laws=canonical_laws,
+        canonical_scheduling=canonical_scheduling,
     )
     artifacts: dict[Path, bytes] = {
         Path("card.schema.json"): _json_bytes_no_header(card_schema),
@@ -1265,32 +1264,19 @@ def _pillboxes_schema(
         raise OntologyInfrastructureError("Pillbox model must require label, stack, and slots")
     if not {"label", "order"}.issubset(set(required_slot)):
         raise OntologyInfrastructureError("Slot model must require label and order")
-    # Topology is canonical source data, not a projection of the legacy
-    # compound effect-match dimensions.  Keep these three axes independent and
-    # optional exactly as declared by the active Slot class.
-    dimensions: dict[str, dict[str, object]] = {}
-    for field in ("meal_context", "circadian_anchor", "exercise_anchor"):
-        property_schema = slot_properties.get(field)
+    dimensions: dict[str, object] = {}
+    for definition in schema_view.all_enums().values():
+        dimension = _annotation_value(definition, "canonical_pressure_dimension")
+        if dimension is None:
+            continue
+        property_schema = slot_properties.get(dimension)
         if not isinstance(property_schema, Mapping):
-            raise OntologyInfrastructureError(f"Generated Slot definition is missing {field}")
-        property_schema = cast(Mapping[str, object], property_schema)
-        # The standalone pillboxes schema cannot resolve references into the
-        # full generated schema's ``$defs``.  Inline the enum definition while
-        # retaining the canonical enum authored by the active Slot class.
-        reference = property_schema.get("$ref")
-        if isinstance(reference, str) and reference.startswith("#/$defs/"):
-            definitions = generated_schema.get("$defs")
-            definition_name = reference.removeprefix("#/$defs/")
-            definition = definitions.get(definition_name) if isinstance(definitions, Mapping) else None
-            if not isinstance(definition, Mapping):
-                raise OntologyInfrastructureError(f"Generated Slot definition cannot resolve {field}")
-            dimensions[field] = dict(cast(Mapping[str, object], definition))
-        else:
-            dimensions[field] = dict(property_schema)
+            raise OntologyInfrastructureError(f"Generated Slot definition is missing annotated dimension {dimension!r}")
+        dimensions[dimension] = dict(property_schema)
     source_slot_properties: dict[str, object] = {
         "label": {**cast(Mapping[str, object], slot_properties["label"]), "minLength": 1},
         "order": cast(object, slot_properties["order"]),
-        **dict(dimensions),
+        **dimensions,
     }
     pillbox_label_property = {**cast(Mapping[str, object], pillbox_properties["label"]), "minLength": 1}
     slot_order = schema_view.induced_slot("order", "Slot")
@@ -1933,129 +1919,136 @@ def _runtime_records(source: Mapping[str, object], slot: str) -> list[dict[str, 
     return out
 
 
-# This table is the complete universal-law truth table from
-# ``docs/domain-model.md`` and the canonical-instance ADR.  It is deliberately
-# compiler-owned metadata: no item, product, or authored policy can extend it.
-_CANONICAL_LAW_SPECS: tuple[tuple[str, str, str, str, tuple[tuple[str, str], ...]], ...] = (
-    (
-        "food_effect_laws",
-        "FoodEffect",
-        "meal_context",
-        "MealContext",
-        (
-            ("bioavailability_increases", "with_food"),
-            ("bioavailability_decreases", "without_food"),
-            ("tolerability_improves", "with_food"),
-            ("tolerability_worsens", "without_food"),
-        ),
-    ),
-    (
-        "acute_alertness_effect_laws",
-        "AcuteAlertnessEffect",
-        "circadian_anchor",
-        "CircadianAnchor",
-        (("acute_alertness_increases", "wake"),),
-    ),
-    (
-        "acute_sleep_effect_laws",
-        "AcuteSleepEffect",
-        "circadian_anchor",
-        "CircadianAnchor",
-        (("onset_latency_decreases", "sleep"), ("continuity_improves", "sleep")),
-    ),
-    (
-        "pre_exercise_performance_effect_laws",
-        "PreExercisePerformanceEffect",
-        "exercise_anchor",
-        "ExerciseAnchor",
-        (("performance_improves", "before"),),
-    ),
-    (
-        "post_exercise_recovery_effect_laws",
-        "PostExerciseRecoveryEffect",
-        "exercise_anchor",
-        "ExerciseAnchor",
-        (("recovery_improves", "after"),),
-    ),
-)
+def _annotation_value(definition: object, name: str) -> str | None:
+    annotations = getattr(definition, "annotations", None)
+    value = annotations.get(name) if isinstance(annotations, Mapping) else None
+    extracted = getattr(value, "value", value)
+    return extracted if isinstance(extracted, str) and extracted else None
 
 
-def _normalize_canonical_laws(catalog: Mapping[str, object]) -> tuple[dict[str, object], ...]:
-    """Normalize the closed authored law catalog to runtime law records.
+def _class_slot_range(schema_view: SchemaView, class_name: str, slot_name: str) -> str:
+    definition = schema_view.get_class(class_name)
+    usage = getattr(definition, "slot_usage", {})
+    slot = usage.get(slot_name) if isinstance(usage, Mapping) else None
+    value = getattr(slot, "range", None)
+    if not isinstance(value, str) or not value:
+        raise OntologyInfrastructureError(f"Canonical class {class_name} must type {slot_name}")
+    return value
 
-    LinkML proves the per-family typed shape.  This second, explicit boundary
-    proves the finite table itself: every admitted value appears exactly once,
-    maps to the prescribed dimension/value, and no duplicate technical IDs or
-    executable meanings can enter the runtime program.
-    """
-    normalized: list[dict[str, object]] = []
-    seen_ids: set[str] = set()
-    seen_meanings: set[tuple[str, str, str, str]] = set()
-    expected_collections = {spec[0] for spec in _CANONICAL_LAW_SPECS}
-    if set(catalog) != expected_collections:
-        raise OntologyInfrastructureError(
-            "Canonical law catalog has an invalid closed shape; expected " + ", ".join(sorted(expected_collections))
-        )
-    for collection, family, dimension, _anchor_type, expected_pairs in _CANONICAL_LAW_SPECS:
-        rows = catalog.get(collection)
+
+def _enum_values(schema_view: SchemaView, enum_name: str) -> tuple[str, ...]:
+    definition = schema_view.all_enums().get(enum_name)
+    values = getattr(definition, "permissible_values", None)
+    if not isinstance(values, Mapping) or not values or not all(isinstance(value, str) for value in values):
+        raise OntologyInfrastructureError(f"Canonical enum {enum_name} has no closed values")
+    return tuple(sorted(cast(Mapping[str, object], values)))
+
+
+def _canonical_scheduling(
+    schema_view: SchemaView, fact_catalog: Mapping[str, object], law_catalog: Mapping[str, object]
+) -> dict[str, object]:
+    """Derive all scheduling metadata from LinkML annotations and catalog rows."""
+    slot_definition = schema_view.get_class("Slot")
+    slot_names = set(getattr(slot_definition, "slots", ()) if slot_definition is not None else ())
+    dimensions = {
+        dimension: _enum_values(schema_view, enum_name)
+        for enum_name, definition in schema_view.all_enums().items()
+        if (dimension := _annotation_value(definition, "canonical_pressure_dimension")) is not None
+        and dimension in slot_names
+    }
+    if not dimensions or len(dimensions) != len(set(dimensions)):
+        raise OntologyInfrastructureError("Canonical pressure dimensions must be unique and non-empty")
+    families: dict[str, tuple[str, str]] = {}
+    law_families: dict[str, tuple[str, str, str]] = {}
+    for class_name, definition in schema_view.all_classes().items():
+        family = _annotation_value(definition, "canonical_fact_family")
+        collection = _annotation_value(definition, "canonical_catalog_slot")
+        if family is None or collection is None:
+            continue
+        if class_name.endswith("Law"):
+            dimension = _annotation_value(definition, "canonical_pressure_dimension")
+            if dimension not in dimensions:
+                raise OntologyInfrastructureError(f"Canonical law class {class_name} has unknown pressure dimension")
+            if family in law_families:
+                raise OntologyInfrastructureError(f"Canonical law family {family!r} is declared more than once")
+            law_families[family] = (collection, dimension, _class_slot_range(schema_view, class_name, "fact_value"))
+        else:
+            if family in families:
+                raise OntologyInfrastructureError(f"Canonical fact family {family!r} is declared more than once")
+            families[family] = (collection, _class_slot_range(schema_view, class_name, "value"))
+    if not families or set(families) != set(law_families):
+        raise OntologyInfrastructureError("Canonical fact and law annotations must have exact family coverage")
+    if any(families[family][1] != law_families[family][2] for family in families):
+        raise OntologyInfrastructureError("Canonical fact and law families must use the same value enum")
+    facts: list[dict[str, object]] = []
+    fact_ids: set[str] = set()
+    for family, (collection, value_enum) in sorted(families.items()):
+        rows = fact_catalog.get(collection, [])
+        admitted = set(_enum_values(schema_view, value_enum))
         if not isinstance(rows, list):
-            raise OntologyInfrastructureError(f"Canonical law catalog {collection!r} must be a list")
-        if len(rows) != len(expected_pairs):
-            raise OntologyInfrastructureError(
-                f"Canonical law catalog {collection!r} must contain exactly {len(expected_pairs)} rows"
-            )
-        expected_values = dict(expected_pairs)
-        expected_fields = {"id", "fact_value", dimension}
-        observed_values: set[str] = set()
+            raise OntologyInfrastructureError(f"Canonical fact collection {collection!r} must be a list")
         for index, raw in enumerate(rows):
-            if not isinstance(raw, Mapping):
-                raise OntologyInfrastructureError(f"Canonical law {collection}[{index}] must be a mapping")
-            row = dict(cast(Mapping[str, object], raw))
-            if set(row) != expected_fields:
-                raise OntologyInfrastructureError(
-                    f"Canonical law {collection}[{index}] has invalid fields; expected {sorted(expected_fields)}"
-                )
-            identifier = row.get("id")
-            fact_value = row.get("fact_value")
-            pressure_value = row.get(dimension)
-            if not isinstance(identifier, str) or not identifier:
-                raise OntologyInfrastructureError(f"Canonical law {collection}[{index}].id must be non-empty")
-            if identifier in seen_ids:
-                raise OntologyInfrastructureError(f"Canonical law catalog has duplicate id {identifier!r}")
-            if not isinstance(fact_value, str) or fact_value not in expected_values:
-                raise OntologyInfrastructureError(
-                    f"Canonical law {collection}[{index}].fact_value is not admitted for family {family}"
-                )
-            if fact_value in observed_values:
-                raise OntologyInfrastructureError(
-                    f"Canonical law catalog {collection} has duplicate fact value {fact_value!r}"
-                )
-            expected_pressure = expected_values[fact_value]
-            if pressure_value != expected_pressure:
-                raise OntologyInfrastructureError(
-                    f"Canonical law {collection}[{index}] maps {fact_value!r} to {pressure_value!r}; "
-                    f"expected {expected_pressure!r}"
-                )
-            meaning = (family, fact_value, dimension, expected_pressure)
-            if meaning in seen_meanings:
-                raise OntologyInfrastructureError(f"Canonical law catalog has duplicate meaning {meaning!r}")
-            seen_ids.add(identifier)
-            observed_values.add(fact_value)
-            seen_meanings.add(meaning)
-            normalized.append({
+            if not isinstance(raw, Mapping) or set(raw) != {"id", "subject", "applicability", "provenance", "value"}:
+                raise OntologyInfrastructureError(f"Canonical fact {collection}[{index}] has an invalid closed shape")
+            identifier, value = raw["id"], raw["value"]
+            if not isinstance(identifier, str) or not identifier or identifier in fact_ids:
+                raise OntologyInfrastructureError(f"Canonical facts have duplicate or invalid id {identifier!r}")
+            if not isinstance(value, str) or value not in admitted:
+                raise OntologyInfrastructureError(f"Canonical fact {identifier!r} has an unadmitted value")
+            fact_ids.add(identifier)
+            facts.append({
                 "id": identifier,
                 "family": family,
-                "fact_value": fact_value,
-                "dimension": dimension,
-                "pressure_value": expected_pressure,
+                **{key: raw[key] for key in ("subject", "applicability", "provenance", "value")},
             })
-        if observed_values != set(expected_values):
-            raise OntologyInfrastructureError(
-                f"Canonical law catalog {collection} does not cover the complete family value table"
-            )
-    if len(normalized) != 9:
-        raise OntologyInfrastructureError("Canonical law catalog must normalize to exactly nine laws")
-    return tuple(normalized)
+    laws: list[dict[str, object]] = []
+    law_ids: set[str] = set()
+    for family, (collection, dimension, value_enum) in sorted(law_families.items()):
+        rows = law_catalog.get(collection)
+        admitted = set(_enum_values(schema_view, value_enum))
+        observed: set[str] = set()
+        if not isinstance(rows, list):
+            raise OntologyInfrastructureError(f"Canonical law collection {collection!r} must be a list")
+        for index, raw in enumerate(rows):
+            if not isinstance(raw, Mapping) or set(raw) != {"id", "fact_value", dimension}:
+                raise OntologyInfrastructureError(f"Canonical law {collection}[{index}] has an invalid closed shape")
+            identifier, value, pressure = raw["id"], raw["fact_value"], raw[dimension]
+            if not isinstance(identifier, str) or not identifier or identifier in law_ids:
+                raise OntologyInfrastructureError(f"Canonical laws have duplicate or invalid id {identifier!r}")
+            if not isinstance(value, str) or value not in admitted or value in observed:
+                raise OntologyInfrastructureError(f"Canonical law {collection}[{index}] has invalid fact coverage")
+            if not isinstance(pressure, str) or pressure not in dimensions[dimension]:
+                raise OntologyInfrastructureError(f"Canonical law {collection}[{index}] has unadmitted pressure value")
+            law_ids.add(identifier)
+            observed.add(value)
+            laws.append({
+                "id": identifier,
+                "family": family,
+                "fact_value": value,
+                "dimension": dimension,
+                "pressure_value": pressure,
+            })
+        if observed != admitted:
+            raise OntologyInfrastructureError(f"Canonical law {collection!r} lacks exact fact-value coverage")
+    if {law["dimension"] for law in laws} != set(dimensions):
+        raise OntologyInfrastructureError("Canonical laws must use every declared pressure dimension")
+    sources = fact_catalog.get("evidence_sources", [])
+    if not isinstance(sources, list):
+        raise OntologyInfrastructureError("Canonical evidence_sources must be a list")
+    return {
+        "dimensions": [{"id": key, "pressure_values": list(values)} for key, values in sorted(dimensions.items())],
+        "families": [
+            {
+                "id": family,
+                "fact_values": list(_enum_values(schema_view, value_enum)),
+                "dimension": law_families[family][1],
+            }
+            for family, (_, value_enum) in sorted(families.items())
+        ],
+        "evidence_sources": sources,
+        "facts": facts,
+        "laws": laws,
+    }
 
 
 # These are the semantic identities consumed by runtime lookup and matching.
@@ -2626,10 +2619,9 @@ def _runtime_program(
     ontology_root: Path,
     manifest: Mapping[str, object],
     policy: Mapping[str, object],
-    canonical_fact_catalog: Mapping[str, object],
     source_hash: str,
     *,
-    canonical_laws: Sequence[Mapping[str, object]],
+    canonical_scheduling: Mapping[str, object],
 ) -> dict[str, object]:
     """Render a deterministic, provenance-bearing executable runtime program."""
     policy_path = _catalog_path(ontology_root, manifest, "runtime_policy")
@@ -2638,28 +2630,14 @@ def _runtime_program(
         relative_source = policy_path.relative_to(ontology_root.parent).as_posix()
     except ValueError as error:
         raise OntologyInfrastructureError("Manifest runtime policy path must be repository-relative") from error
-    # Canonical facts are an independent manifest catalog, but the runtime
-    # program remains the single verified online contract.  Inject the catalog
-    # into the local projection namespace so the existing closed descriptor
-    # machinery emits it without making it policy-authored.
     projection_policy = dict(policy)
-    projection_policy["canonical_fact_catalog"] = canonical_fact_catalog
-    projection_policy["canonical_laws"] = [dict(row) for row in canonical_laws]
+    projection_policy["canonical_scheduling"] = dict(canonical_scheduling)
     descriptors = policy.get("runtime_projection")
     if not isinstance(descriptors, list):
         raise OntologyInfrastructureError("Runtime policy requires runtime_projection descriptors")
     projection_descriptors = [
         *descriptors,
-        {
-            "id": "canonical_fact_catalog",
-            "target": "canonical_fact_catalog",
-            "source": "canonical_fact_catalog",
-        },
-        {
-            "id": "canonical_laws",
-            "target": "canonical_laws",
-            "source": "canonical_laws",
-        },
+        {"id": "canonical_scheduling", "target": "canonical_scheduling", "source": "canonical_scheduling"},
     ]
     projected = _runtime_projection_tree(projection_policy, projection_descriptors)
     program = {

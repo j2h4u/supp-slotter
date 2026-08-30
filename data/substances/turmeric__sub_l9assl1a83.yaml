@@ -8,12 +8,24 @@ notes: Curcuminoid-bearing rhizome with anti-inflammatory and joint-comfort posi
   modulate CYP enzymes. Relevant to bleeding-load review.
 knowledge:
   effect:
-  - anti_inflammatory_context
-  - joint_comfort_context
+  - value: anti_inflammatory_context
+    research_state: unassessed
+    sources: []
+  - value: joint_comfort_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - bleeding_med_interaction
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: bleeding_med_interaction
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

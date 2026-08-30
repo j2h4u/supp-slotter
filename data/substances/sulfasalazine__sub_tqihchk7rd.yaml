@@ -8,6 +8,10 @@ concerns:
     the prescribing indication, medication tolerance, and clinician-directed plan.
 knowledge:
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - pharmaceutical
+  - value: pharmaceutical
+    research_state: unassessed
+    sources: []

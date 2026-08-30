@@ -8,7 +8,7 @@ coverage:
   original_atom_count: 2161
   original_sol_adjudication_count: 1786
   original_atom_id_sha256: 4317ed5b5541763460ccb57cdd85aa8d17bea932723a7ffc6cad6fb0c980db8b
-  crosswalk_sha256: be0cd7b87a086cfc67dddc4305b038b45e1ca45a763000295c39f78c1c6faf75
+  crosswalk_sha256: 404cd4964a77a1d6b6a15d841b25a38b2bbac94b981083ee3fbf0eb1b7c4eccd
   classification_rules_sha256: a5b3594a61bf0367b567b736b294f121640d2ae25b5f46c5280c7e45253f217a
   category_counts:
     component_notes: 39
@@ -24,15 +24,15 @@ coverage:
     source_metadata: 322
     substance_notes: 256
   final_disposition_counts:
-    explicit_exclusion: 771
-    retained_unchanged: 1129
+    explicit_exclusion: 777
+    retained_unchanged: 1123
     source_metadata: 255
     typed_fact: 6
   closed_exclusion_counts:
     generated_action_not_canonical_evidence: 27
     operational_presentation_prose: 376
     stored_pair_answer: 1
-    superseded_runtime_mechanism: 367
+    superseded_runtime_mechanism: 373
 canonical_fact_links:
   count: 6
   fact_ids_sha256: 7335083df87eb2b58f81fbe545a2fc47bd6d44fd0c20957841a0a776ca13b6c8

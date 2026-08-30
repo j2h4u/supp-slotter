@@ -12,10 +12,20 @@ concerns:
     nettle as routine men's-health support.
 knowledge:
   effect:
-  - prostate_urinary_context
-  - diuretic_context
-  - androgen_context
+  - value: prostate_urinary_context
+    research_state: unassessed
+    sources: []
+  - value: diuretic_context
+    research_state: unassessed
+    sources: []
+  - value: androgen_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []

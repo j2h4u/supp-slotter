@@ -10,9 +10,15 @@ concerns:
     non-enteric products can worsen reflux or upper-GI irritation.
 knowledge:
   effect:
-  - digestive_comfort_context
+  - value: digestive_comfort_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_hpqw0esbgo

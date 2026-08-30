@@ -10,11 +10,21 @@ concerns:
     status is disputed and requires manual review.
 knowledge:
   effect:
-  - circulation_support
-  - vascular_tone_context
+  - value: circulation_support
+    research_state: unassessed
+    sources: []
+  - value: vascular_tone_context
+    research_state: unassessed
+    sources: []
   risk:
-  - hypotension_med_interaction
-  - manual_review
+  - value: hypotension_med_interaction
+    research_state: unassessed
+    sources: []
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []
 id: sub_8oms77d62l

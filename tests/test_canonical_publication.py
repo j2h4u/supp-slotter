@@ -1,293 +1,237 @@
-"""Focused V-right checks for the closed canonical publication boundary."""
+"""V-right checks for the solver-owned canonical publication boundary."""
 
 from __future__ import annotations
 
+import inspect
 from pathlib import Path
-from typing import cast
 
-import planner.engine.plan as plan_module
+import planner.canonical_optimizer as optimizer_module
+import planner.schedule_writer as schedule_writer
 import pytest
-from planner.canonical_optimizer_result import Diagnostic
-from planner.contracts import MealContext, Product, ProductComponent, Slot
-from planner.engine._canonical_optimizer import Indeterminate, Optimal, optimize_canonical_layout
-from planner.engine._plan_output import CanonicalScheduleOutputInput, build_canonical_schedule_output
-from planner.engine.show import cmd_show
-from planner.ontology.canonical_inference import Success, UnaryPressureIdentity
-from planner.ontology.errors import OntologyInfrastructureError
+from planner.canonical_optimizer_result import Indeterminate, Optimal
+from planner.contracts import Product, ProductComponent, Slot
+from planner.engine.show import _show_inner
+from planner.ontology.canonical_inference import (
+    CompositionApplicabilityPath,
+    NormalizedUnaryPressure,
+    PressureDerivation,
+    Success,
+    UnaryPressureIdentity,
+)
 from planner.ontology.runtime_program import (
-    RuntimeCanonicalFactCatalog,
     RuntimeCanonicalLaw,
-    RuntimeCompositionRole,
+    RuntimeCanonicalSchedulingFact,
     RuntimeEvidenceProvenance,
-    RuntimeEvidenceSource,
     RuntimeFactApplicability,
     RuntimeFactSubject,
-    RuntimeFoodEffect,
 )
-from planner.schedule_types import OptimalPublication
+from planner.schedule_types import CanonicalPublicationSource
 from planner.schedule_writer import write_schedule_file
 
 
-def _slot(slot_id: str, order: int, *, meal: str | None = None) -> Slot:
-    return Slot(
-        slot_id,
-        slot_id,
-        order,
-        "daily",
-        "daily",
-        "daily",
-        cast(MealContext | None, meal),
-        None,
-        None,
+def _slot(slot_id: str, order: int, anchor: str | None = None) -> Slot:
+    return Slot(slot_id, slot_id, order, "daily", "Daily", "daily", {"meal": anchor})
+
+
+def _source(*, anchors: tuple[str | None, str | None] = (None, None)) -> CanonicalPublicationSource:
+    product_a = Product("prd_a", "Alpha", (ProductComponent("sub_a", "cmp_a"),))
+    product_b = Product("prd_b", "Beta", (ProductComponent("sub_b", "cmp_b"),), use_pattern="not_every_day")
+    return CanonicalPublicationSource(
+        item_products={"item_a": "prd_a", "item_b": "prd_b"},
+        item_domains={"item_a": "daily", "item_b": "daily"},
+        slots={"first": _slot("first", 1, anchors[0]), "second": _slot("second", 2, anchors[1])},
+        inference=Success(()),
+        products={"prd_a": product_a, "prd_b": product_b},
+        pressure_values_by_dimension={"meal": frozenset({"with_food", "without_food"})},
     )
 
 
-def _inference() -> Success:
-    role = RuntimeCompositionRole("cmp_prd_demo__sub_demo", "prd_demo", "sub_demo")
-    catalog = RuntimeCanonicalFactCatalog(
-        evidence_sources=(RuntimeEvidenceSource("src_demo"),),
-        food_effects=(
-            RuntimeFoodEffect(
-                "fact_food",
-                RuntimeFactSubject("sub_demo", None),
-                RuntimeFactApplicability("sub_demo", None),
-                (RuntimeEvidenceProvenance("src_demo", "paper#demo", "quote"),),
-                "bioavailability_increases",
-            ),
-        ),
-        acute_alertness_effects=(),
-        acute_sleep_effects=(),
-        pre_exercise_performance_effects=(),
-        post_exercise_recovery_effects=(),
-    )
-    law = RuntimeCanonicalLaw(
-        "law_food",
+def _pressure(item_id: str, dimension: str, value: str) -> NormalizedUnaryPressure:
+    subject = RuntimeFactSubject("sub_a", None)
+    law = RuntimeCanonicalLaw(f"law_{dimension}", "FoodEffect", "effect", dimension, value)
+    fact = RuntimeCanonicalSchedulingFact(
+        f"fact_{dimension}",
         "FoodEffect",
-        "bioavailability_increases",
-        "meal_context",
-        "with_food",
+        subject,
+        RuntimeFactApplicability("sub_a", None),
+        (RuntimeEvidenceProvenance("source", f"locator#{dimension}", None),),
+        "effect",
     )
-    from planner.ontology.canonical_inference import execute_canonical_inference
-
-    result = execute_canonical_inference(catalog, {"item_demo": "prd_demo"}, (law,), composition_roles=(role,))
-    assert isinstance(result, Success)
-    return result
-
-
-def _publication() -> OptimalPublication:
-    slots = {"plain": _slot("plain", 1), "food": _slot("food", 2, meal="with_food")}
-    result = optimize_canonical_layout(
-        {"item_demo": "daily"},
-        slots,
-        (UnaryPressureIdentity("item_demo", "meal_context", "with_food"),),
+    derivation = PressureDerivation(
+        law,
+        "FoodEffect",
+        fact,
+        "effect",
+        subject,
+        CompositionApplicabilityPath("substance", "sub_a", "cmp_a", "prd_a", "sub_a"),
+        fact.provenance,
     )
-    assert isinstance(result, Optimal)
-    return build_canonical_schedule_output(
-        CanonicalScheduleOutputInput(
-            result=result,
-            slots=slots,
-            inference=_inference(),
-            item_products={"item_demo": "prd_demo"},
-        )
-    )
+    return NormalizedUnaryPressure(UnaryPressureIdentity(item_id, dimension, value), (derivation,))
 
 
-def test_canonical_document_contains_typed_proofs_and_no_legacy_explanations() -> None:
-    publication = _publication()
-    document = cast(dict[str, object], publication.document)
-    assert document["status"] == "Optimal"
-    objective = cast(dict[str, object], document["objective"])
-    assert objective["satisfied_pressures"] == 1
-    assert document["assignments"] == {"item_demo": "food"}
-    match = cast(list[dict[str, object]], document["pressure_matches"])[0]
-    assert match["satisfied"] is True
-    assert match["fact_ids"] == ["fact_food"]
-    assert match["law_ids"] == ["law_food"]
-    assert match["applicability_role_ids"] == ["cmp_prd_demo__sub_demo"]
-    assert match["provenance_refs"] == [{"source": "src_demo", "locator": "paper#demo", "quotation": "quote"}]
-    explanation = cast(dict[str, object], document["canonical_explanations"])["item_demo"]
-    assert explanation["placement_basis"] == "pressure_evidence"
-    assert "pairwise_journal" not in document
-    assert "explanations" not in document
-    assert "policy_contributions" not in document
-    assert "advisory_penalty" not in document
-    assert "advisory_constraint_ids" not in document
-    assert "canonical_explanations" in document
-    domain_loads = cast(dict[str, dict[str, object]], document["domain_loads"])
-    assert domain_loads["daily"]["proof"]
-
-
-def test_not_every_day_is_a_presentation_group_for_the_proved_assignment() -> None:
-    slots = {"plain": _slot("plain", 1), "food": _slot("food", 2, meal="with_food")}
-    result = optimize_canonical_layout(
-        {"item_demo": "daily"},
-        slots,
-        (UnaryPressureIdentity("item_demo", "meal_context", "with_food"),),
-    )
-    assert isinstance(result, Optimal)
-    product = Product(
-        "prd_demo", "Demo", (ProductComponent("sub_demo", "cmp_prd_demo__sub_demo"),), use_pattern="not_every_day"
-    )
-    publication = build_canonical_schedule_output(
-        CanonicalScheduleOutputInput(
-            result=result,
-            slots=slots,
-            inference=_inference(),
-            item_products={"item_demo": "prd_demo"},
-            item_stacks={"item_demo": "daily"},
-            products={"prd_demo": product},
-        )
+def _single_item_pressure_source(
+    pressures: tuple[NormalizedUnaryPressure, ...], anchors: dict[str, str | None]
+) -> CanonicalPublicationSource:
+    return CanonicalPublicationSource(
+        item_products={"item_a": "prd_a"},
+        item_domains={"item_a": "daily"},
+        slots={"only": Slot("only", "Only", 1, "daily", "Daily", "daily", anchors)},
+        inference=Success(pressures),
+        products={"prd_a": Product("prd_a", "Alpha", ())},
+        pressure_values_by_dimension={key: frozenset({"wanted", "other"}) for key in anchors},
     )
 
-    document = cast(dict[str, object], publication.document)
-    summary = cast(dict[str, object], document["summary"])
-    groups = cast(dict[str, list[str]], summary["placement_groups"])
-    pillboxes = cast(dict[str, dict[str, object]], document["pillboxes"])
-    slots_out = cast(dict[str, dict[str, object]], pillboxes["daily"]["slots"])
-    assert groups == {"routine": [], "episodic": ["Demo"]}
-    assert slots_out["food"]["products"] == ["Demo"]
-    assert slots_out["plain"]["products"] == []
+
+def test_writer_owns_exact_solve_and_projects_two_items_with_squared_load_two(tmp_path: Path) -> None:
+    published = write_schedule_file(tmp_path / "schedule.yaml", _source())
+
+    assert not isinstance(published, Indeterminate)
+    assert published.result.objective.squared_load == 2
+    assert published.document["summary"]["placement_groups"] == {
+        "routine": ["item_a"],
+        "episodic": ["item_b"],
+    }
+    product_entries = [
+        product
+        for pillbox in published.document["pillboxes"].values()
+        for slot in pillbox["slots"].values()
+        for product in slot["products"]
+    ]
+    assert product_entries == [{"item_id": "item_a", "label": "Alpha"}, {"item_id": "item_b", "label": "Beta"}]
 
 
-def test_publication_boundary_refuses_indeterminate_and_legacy_documents(tmp_path: Path) -> None:
+def test_writer_calls_exact_optimizer_once(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    real_optimize = optimizer_module.optimize_canonical_layout
+    calls = 0
+
+    def counted(*args: object, **kwargs: object) -> Optimal | Indeterminate:
+        nonlocal calls
+        calls += 1
+        return real_optimize(*args, **kwargs)
+
+    monkeypatch.setattr(optimizer_module, "optimize_canonical_layout", counted)
+    assert not isinstance(write_schedule_file(tmp_path / "schedule.yaml", _source()), Indeterminate)
+    assert calls == 1
+
+
+def test_snapshot_is_immutable_after_source_input_mutation(tmp_path: Path) -> None:
+    item_products = {"item_a": "prd_a", "item_b": "prd_b"}
+    item_domains = {"item_a": "daily", "item_b": "daily"}
+    slots = {"first": _slot("first", 1), "second": _slot("second", 2)}
+    products = {
+        "prd_a": Product("prd_a", "Alpha", ()),
+        "prd_b": Product("prd_b", "Beta", ()),
+    }
+    source = CanonicalPublicationSource(
+        item_products, item_domains, slots, Success(()), products, {"meal": frozenset({"with_food", "without_food"})}
+    )
+    item_products["item_a"] = "prd_b"
+    item_domains["item_a"] = "other"
+    slots["first"] = _slot("first", 1, "with_food")
+    products["prd_a"] = Product("prd_a", "Mutated", ())
+    published = write_schedule_file(tmp_path / "schedule.yaml", source)
+    assert not isinstance(published, Indeterminate)
+    assert published.document["pillboxes"]["daily"]["slots"]["first"]["products"][0]["label"] == "Alpha"
+
+
+def test_unsatisfied_pressure_keeps_match_but_uses_balance_only_basis(tmp_path: Path) -> None:
+    source = _single_item_pressure_source((_pressure("item_a", "meal", "wanted"),), {"meal": "other"})
+    published = write_schedule_file(tmp_path / "schedule.yaml", source)
+    assert not isinstance(published, Indeterminate)
+    explanation = published.document["canonical_explanations"]["item_a"]
+    assert explanation["placement_basis"] == "balance_and_tie_break_only"
+    assert explanation["pressure_matches"][0]["satisfied"] is False
+
+
+def test_any_satisfied_match_makes_mixed_evidence_pressure_basis(tmp_path: Path) -> None:
+    source = _single_item_pressure_source(
+        (_pressure("item_a", "meal", "wanted"), _pressure("item_a", "timing", "wanted")),
+        {"meal": "wanted", "timing": "other"},
+    )
+    published = write_schedule_file(tmp_path / "schedule.yaml", source)
+    assert not isinstance(published, Indeterminate)
+    matches = published.document["canonical_explanations"]["item_a"]["pressure_matches"]
+    assert published.document["canonical_explanations"]["item_a"]["placement_basis"] == "pressure_evidence"
+    assert [match["satisfied"] for match in matches] == [True, False]
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"item_products": {"item_a": "missing"}, "item_domains": {"item_a": "daily"}},
+        {"item_products": {"item_a": "prd_a"}, "item_domains": {"other": "daily"}},
+        {"slots": {"wrong": _slot("first", 1)}},
+    ],
+)
+def test_invalid_source_mapping_product_domain_or_slot_publishes_nothing(
+    tmp_path: Path, kwargs: dict[str, object]
+) -> None:
     target = tmp_path / "schedule.yaml"
-    indeterminate = Indeterminate(Diagnostic("timeout", "timeout"))
-    with pytest.raises(TypeError, match="only an Optimal"):
-        OptimalPublication(indeterminate, _inference(), {}, {})  # type: ignore[arg-type]
-    with pytest.raises(TypeError, match="OptimalPublication"):
-        write_schedule_file(target, {})  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="non-canonical fields"):
-        OptimalPublication(  # type: ignore[arg-type]
-            _publication().result,
-            _inference(),
-            {},
-            {"status": "Optimal", "assignments": {}, "pairwise_journal": []},
-        )
+    target.write_text("stale", encoding="utf-8")
+    source = _source()
+    values = {
+        "item_products": source.item_products,
+        "item_domains": source.item_domains,
+        "slots": source.slots,
+        "inference": source.inference,
+        "products": source.products,
+        "pressure_values_by_dimension": source.pressure_values_by_dimension,
+    }
+    values.update(kwargs)
+    with pytest.raises((TypeError, ValueError)):
+        CanonicalPublicationSource(**values)  # type: ignore[arg-type]
+    assert target.read_text(encoding="utf-8") == "stale"
 
 
-@pytest.mark.parametrize("error", [OSError("simulated write failure"), KeyboardInterrupt()])
-def test_atomic_write_failure_invalidates_current_document_and_cleans_temp_files(
+def test_writer_does_not_accept_forged_projection_or_precomputed_optimal(tmp_path: Path) -> None:
+    signature = inspect.signature(write_schedule_file)
+    assert set(signature.parameters) == {"schedule_file", "source"}
+    forged = write_schedule_file(tmp_path / "schedule.yaml", {"document": {}, "result": object()})  # type: ignore[arg-type]
+    assert isinstance(forged, Indeterminate)
+    assert not (tmp_path / "schedule.yaml").exists()
+
+
+@pytest.mark.parametrize("error", [OSError("fsync failed"), KeyboardInterrupt()])
+def test_failed_or_interrupted_write_removes_stale_lease(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, error: BaseException
 ) -> None:
     target = tmp_path / "schedule.yaml"
-    target.write_text("pre-existing schedule\n", encoding="utf-8")
-
-    def fail_fsync(_fd: int) -> None:
-        raise error
-
-    import planner.schedule_writer as schedule_writer
-
-    monkeypatch.setattr(schedule_writer.os, "fsync", fail_fsync)
-    with pytest.raises(type(error)):
-        write_schedule_file(target, _publication())
+    target.write_text("stale", encoding="utf-8")
+    monkeypatch.setattr(schedule_writer.os, "fsync", lambda _fd: (_ for _ in ()).throw(error))
+    if isinstance(error, KeyboardInterrupt):
+        with pytest.raises(KeyboardInterrupt):
+            write_schedule_file(target, _source())
+    else:
+        assert isinstance(write_schedule_file(target, _source()), Indeterminate)
     assert not target.exists()
-    assert list(tmp_path.glob("schedule.yaml.tmp.*")) == []
+    assert not list(tmp_path.glob("schedule.yaml.tmp.*"))
 
 
-def test_writer_revalidation_failure_invalidates_current_document(tmp_path: Path) -> None:
+def test_show_marks_only_balance_only_product_in_mixed_slot(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     target = tmp_path / "schedule.yaml"
-    target.write_text("pre-existing schedule\n", encoding="utf-8")
-    publication = _publication()
-    publication.document["pressure_matches"][0]["law_ids"] = ["law_mutated"]
-
-    with pytest.raises(ValueError, match="canonical pressure proof"):
-        write_schedule_file(target, publication)
-
-    assert not target.exists()
-    assert list(tmp_path.glob("schedule.yaml.tmp.*")) == []
-
-
-@pytest.mark.parametrize(
-    ("mutate", "message"),
-    [
-        (
-            lambda publication: publication.document["pressure_matches"][0].pop("law_ids"),
-            "missing typed proof fields",
-        ),
-        (
-            lambda publication: publication.document["pressure_matches"][0].__setitem__("fact_ids", ["", "fact_food"]),
-            "fact_ids must contain typed IDs",
-        ),
-        (
-            lambda publication: publication.document["pressure_matches"][0]["provenance_refs"][0].__setitem__(
-                "locator", None
-            ),
-            "provenance reference is malformed",
-        ),
-        (
-            lambda publication: publication.document["domain_loads"]["daily"].__setitem__("squared_load", True),
-            "domain squared load is malformed",
-        ),
-        (
-            lambda publication: publication.document["canonical_explanations"]["item_demo"]["slot_anchors"].__setitem__(
-                "meal_context", None
-            ),
-            "placement explanation is missing slot anchors",
-        ),
-        (
-            lambda publication: publication.document["canonical_explanations"]["item_demo"].__setitem__(
-                "placement_basis", "balance_and_tie_break_only"
-            ),
-            "invalid placement basis",
-        ),
-    ],
-)
-def test_publication_revalidation_rejects_each_malformed_proof_section(mutate, message: str) -> None:
-    publication = _publication()
-    mutate(publication)
-
-    with pytest.raises(ValueError, match=message):
-        publication.validate()
-
-
-def test_successful_publication_replaces_lease_with_complete_optimal_document(tmp_path: Path) -> None:
-    target = tmp_path / "schedule.yaml"
-    target.write_text("status: Optimal\nassignments: {stale: stale}\n", encoding="utf-8")
-
-    write_schedule_file(target, _publication())
-
-    rendered = target.read_text(encoding="utf-8")
-    assert "status: Optimal" in rendered
-    assert "satisfied_pressures: 1" in rendered
-    assert "optimizer_proof:" in rendered
-    assert "stale" not in rendered
-
-
-@pytest.mark.parametrize(
-    ("error", "code"),
-    [(KeyboardInterrupt(), "interrupted"), (MemoryError(), "resource_exhausted")],
-)
-def test_public_plan_boundary_invalidates_stale_lease_before_interruption(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, error: BaseException, code: str
-) -> None:
-    target = tmp_path / "schedule.yaml"
-    target.write_text("status: Optimal\nassignments: {stale: stale}\n", encoding="utf-8")
-    monkeypatch.setattr(plan_module, "load_ontology", lambda _path: object())
-
-    def interrupt(*_args: object) -> object:
-        raise error
-
-    monkeypatch.setattr(plan_module, "_cmd_plan_inner", interrupt)
-
-    result = plan_module.cmd_plan(data_root=tmp_path)
-
-    assert result.status == "Indeterminate"
-    assert result.diagnostic is not None
-    assert result.diagnostic.code == code
-    assert not target.exists()
-
-
-def test_show_cannot_emit_a_stale_layout_after_plan_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    target = tmp_path / "schedule.yaml"
-    target.write_text("status: Optimal\nassignments: {stale: stale}\n", encoding="utf-8")
-
-    def fail_ontology(_path: Path) -> object:
-        raise OntologyInfrastructureError("simulated ontology failure")
-
-    monkeypatch.setattr(plan_module, "load_ontology", fail_ontology)
-
-    result = cmd_show(tmp_path)
-
-    assert result.exit_code == 1
-    assert result.output == ""
-    assert not target.exists()
+    target.write_text(
+        """status: Optimal
+objective: {satisfied_pressures: 1, squared_load: 2, assignment_key: []}
+assignments: {item_a: first, item_b: first}
+pressure_matches: []
+domain_loads: {}
+optimizer_proof: []
+canonical_explanations:
+  item_a: {item_id: item_a, slot_id: first, placement_basis: pressure_evidence, slot_anchors: {}, pressure_matches: [], optimizer_proof: []}
+  item_b: {item_id: item_b, slot_id: first, placement_basis: balance_and_tie_break_only, slot_anchors: {}, pressure_matches: [], optimizer_proof: []}
+summary: {placement_groups: {routine: [item_a, item_b], episodic: []}}
+pillboxes:
+  daily:
+    label: Daily
+    slots:
+      first:
+        label: First
+        products: [{item_id: item_a, label: Alpha}, {item_id: item_b, label: Beta}]
+        substances: []
+""",
+        encoding="utf-8",
+    )
+    assert _show_inner(target) == 0
+    rendered = capsys.readouterr().out
+    assert "Alpha [balance-only]" not in rendered
+    assert "Beta [balance-only]" in rendered

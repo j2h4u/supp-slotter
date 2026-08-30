@@ -75,9 +75,11 @@ def test_marked_daily_product_is_an_episodic_current_plan_placement(tmp_path: Pa
     schedule = plan_in_temp_dir(tmp_path)
     summary = schedule["summary"]
     assert isinstance(summary, dict)
-    assert summary["placement_groups"] == {"routine": [], "episodic": ["Marked"]}
+    assert summary["placement_groups"] == {"routine": [], "episodic": [fixture_id("prd", "marked")]}
     assert any(
-        "Marked" in slot["products"] for pillbox in schedule["pillboxes"].values() for slot in pillbox["slots"].values()
+        any(product["label"] == "Marked" for product in slot["products"])
+        for pillbox in schedule["pillboxes"].values()
+        for slot in pillbox["slots"].values()
     )
 
     shown = run_planner(root=tmp_path)

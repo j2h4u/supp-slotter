@@ -669,7 +669,7 @@ def _validate_declared_format(relative: str, decoded: object) -> None:
         return
     expected: dict[str, tuple[str, str]] = {
         "projection-map.json": ("format_version", "ontology-projection-map-v1"),
-        "runtime-program.json": ("format_version", "ontology-runtime-program-v1"),
+        "runtime-program.json": ("format_version", "ontology-runtime-program-v2"),
         "runtime-vocabulary.yaml": ("format", RUNTIME_VOCABULARY_FORMAT),
     }
     declaration = expected.get(relative)

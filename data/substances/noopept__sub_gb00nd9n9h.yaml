@@ -11,11 +11,21 @@ concerns:
     routine supplement coverage.
 knowledge:
   effect:
-  - neurotrophic_support
-  - learning_context
-  - memory_recall_context
+  - value: neurotrophic_support
+    research_state: unassessed
+    sources: []
+  - value: learning_context
+    research_state: unassessed
+    sources: []
+  - value: memory_recall_context
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []
 id: sub_gb00nd9n9h

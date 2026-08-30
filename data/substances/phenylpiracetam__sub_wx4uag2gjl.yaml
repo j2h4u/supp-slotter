@@ -12,12 +12,24 @@ concerns:
     and product quality before any use-case discussion.
 knowledge:
   effect:
-  - stimulant_context
-  - alertness_context
-  - cognitive_performance_context
+  - value: stimulant_context
+    research_state: unassessed
+    sources: []
+  - value: alertness_context
+    research_state: unassessed
+    sources: []
+  - value: cognitive_performance_context
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
-  - ergogenic
+  - value: nootropic
+    research_state: unassessed
+    sources: []
+  - value: ergogenic
+    research_state: unassessed
+    sources: []
 id: sub_wx4uag2gjl

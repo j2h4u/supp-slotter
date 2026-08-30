@@ -8,11 +8,21 @@ notes: Berry source of proanthocyanidins; commonly used for urinary-tract and an
   mild antiplatelet potential at concentrated extract doses.
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - urinary_tract_context
-  - urinary_adhesion_context
+  - value: urinary_tract_context
+    research_state: unassessed
+    sources: []
+  - value: urinary_adhesion_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

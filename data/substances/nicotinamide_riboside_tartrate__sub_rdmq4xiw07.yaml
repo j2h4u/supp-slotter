@@ -8,13 +8,25 @@ notes: 'NAD precursor form listed on California Gold Nutrition Nicotinamide Ribo
   and mitochondrial function.'
 knowledge:
   context:
-  - mitochondrial_health
+  - value: mitochondrial_health
+    research_state: unassessed
+    sources: []
   effect:
-  - nad_precursor_support
-  - redox_metabolism_support
+  - value: nad_precursor_support
+    research_state: unassessed
+    sources: []
+  - value: redox_metabolism_support
+    research_state: unassessed
+    sources: []
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: unassessed
+    sources: []
   pathway:
-  - nad_metabolism
+  - value: nad_metabolism
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []

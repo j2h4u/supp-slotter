@@ -11,13 +11,27 @@ concerns:
     and other CYP/P-gp-sensitive medications; product dose and extract standardization are not captured on the current label.
 knowledge:
   context:
-  - neurocognitive_support
+  - value: neurocognitive_support
+    research_state: unassessed
+    sources: []
   effect:
-  - circulation_support
+  - value: circulation_support
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - bleeding_med_interaction
-  - cyp450_med_interaction
-  - seizure_threshold_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: bleeding_med_interaction
+    research_state: unassessed
+    sources: []
+  - value: cyp450_med_interaction
+    research_state: unassessed
+    sources: []
+  - value: seizure_threshold_review
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []

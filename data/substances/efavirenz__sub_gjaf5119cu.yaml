@@ -7,6 +7,10 @@ concerns:
     using supplement interaction notes operationally.
 knowledge:
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - pharmaceutical
+  - value: pharmaceutical
+    research_state: unassessed
+    sources: []

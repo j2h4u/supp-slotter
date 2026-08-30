@@ -11,12 +11,22 @@ concerns:
     medication context and product standardization before practical use discussion.
 knowledge:
   context:
-  - sleep_recovery
+  - value: sleep_recovery
+    research_state: unassessed
+    sources: []
   effect:
-  - calming_context
-  - sleep_context
+  - value: calming_context
+    research_state: unassessed
+    sources: []
+  - value: sleep_context
+    research_state: unassessed
+    sources: []
   kind:
-  - flavonoid
+  - value: flavonoid
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_gxy6q1ir1o

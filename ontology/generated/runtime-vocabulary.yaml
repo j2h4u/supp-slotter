@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: 4d96fc948208fcf7aa77753532bc98010ac00a2ca9f88e57c2446ee5694f775d
+source_hash: 7ca48a9e49015ceb90cefe37810bdea8112175cda59ea548f84573a384237f58
 categories:
   kind:
     allowed_predicates: &id003
@@ -1378,47 +1378,6 @@ runtime_policy:
         stacks; classify all four endpoint states; apply authored filters and active
         sides; preserve reverse output; deduplicate by endpoint/type key.
       source_of_truth: ontology/runtime-policy.yaml + relation assertion projection
-    conformance_scenarios:
-    - id: selector_exact_form
-      semantic: selector_resolution
-      fixture: selector_exact_form
-      expected: one entity_id resolves one ID; an unscoped sibling collision fails
-        closed
-    - id: selector_empty_term
-      semantic: selector_resolution
-      fixture: selector_empty_term
-      expected: known canonical term with no matching card returns empty
-    - id: stack_and_episodic
-      semantic: stack_partition
-      fixture: stack_and_episodic
-      expected: only authored daily/training partitions route, inactive and tracked_unassigned
-        remain excluded, absent membership is unassigned, daily not_every_day is presented
-        separately
-    - id: episodic_presentation
-      semantic: episodic_presentation
-      fixture: episodic_presentation
-      expected: not_every_day remains in daily assignment and changes presentation
-        grouping only
-    - id: candidate_feasibility
-      semantic: candidate_feasibility
-      fixture: candidate_feasibility
-      expected: every selected item is feasible in every slot of its unbounded logical
-        domain
-    - id: objective_tie
-      semantic: canonical_objective_and_tie_break
-      fixture: objective_tie
-      expected: unique pressure maximum wins; equal pressure count uses integer per-domain
-        squared loads, then stable item-ID and slot-order tuple
-    - id: publication_status
-      semantic: publication_boundary
-      fixture: publication_status
-      expected: only globally proved Optimal publishes a layout; every unproved result
-        is layout-free Indeterminate
-    - id: relation_presence
-      semantic: relation_warning_truth
-      fixture: relation_presence
-      expected: all four source/target active combinations map to declared statuses
-        and warning sides
   glue_contract:
     id: planner_glue_contract
     inactive_stack_name: inactive
@@ -1824,6 +1783,8 @@ ontology_assertions:
     reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors;
       review together when vitamin E is active.
     severity: medium
+    research_state: unassessed
+    sources: []
   rel_review_with_007:
     id: rel_review_with_007
     relation_type: review_with
@@ -1838,6 +1799,8 @@ ontology_assertions:
     reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors;
       review together when vitamin E is active.
     severity: medium
+    research_state: unassessed
+    sources: []
   rel_review_with_008:
     id: rel_review_with_008
     relation_type: review_with
@@ -1855,6 +1818,8 @@ ontology_assertions:
       dose. Beta-carotene is intentionally excluded because it is provitamin A and
       not treated as preformed retinol exposure in this ontology.
     severity: medium
+    research_state: unassessed
+    sources: []
   rel_review_with_009:
     id: rel_review_with_009
     relation_type: review_with
@@ -1872,6 +1837,8 @@ ontology_assertions:
       dose. Beta-carotene is intentionally excluded because it is provitamin A and
       not treated as preformed retinol exposure in this ontology.
     severity: medium
+    research_state: unassessed
+    sources: []
   rel_review_with_010:
     id: rel_review_with_010
     relation_type: review_with
@@ -1886,6 +1853,8 @@ ontology_assertions:
     reason: Ginkgo can induce CYP metabolism and may reduce efavirenz exposure; review
       medication context.
     severity: medium
+    research_state: unassessed
+    sources: []
   rel_review_with_011:
     id: rel_review_with_011
     relation_type: review_with
@@ -1899,6 +1868,8 @@ ontology_assertions:
         entity_id: sub_ug92bkq5dh
     reason: Ginkgo can alter CYP3A substrate exposure; review medication context.
     severity: medium
+    research_state: unassessed
+    sources: []
   rel_review_with_012:
     id: rel_review_with_012
     relation_type: review_with
@@ -1965,6 +1936,8 @@ ontology_assertions:
     action: Review prescribing context, GI tolerance, hydration, B12 status, renal
       context, and glucose monitoring rather than treating the pair as independent.
     severity: low
+    research_state: unassessed
+    sources: []
   rel_review_with_015:
     id: rel_review_with_015
     relation_type: review_with
@@ -1982,6 +1955,8 @@ ontology_assertions:
     action: Review fiber type, dose titration, water intake, constipation/bloating,
       and medication separation timing.
     severity: low
+    research_state: unassessed
+    sources: []
   rel_review_with_016:
     id: rel_review_with_016
     relation_type: review_with
@@ -2176,6 +2151,8 @@ ontology_assertions:
         entity_id: sub_d997f98e03
     reason: Selenium is required for glutathione peroxidases; NAC supplies cysteine
       for glutathione synthesis.
+    research_state: unassessed
+    sources: []
   rel_supports_002:
     id: rel_supports_002
     relation_type: supports
@@ -2248,6 +2225,8 @@ ontology_assertions:
         name: Vitamin A
     reason: Vitamin E can improve vitamin A bioavailability/absorption in supplement
       context.
+    research_state: unassessed
+    sources: []
   rel_supports_007:
     id: rel_supports_007
     relation_type: supports
@@ -2280,6 +2259,8 @@ ontology_assertions:
     reason: Selenium-dependent deiodinases support thyroid hormone activation and
       metabolism; iodine and selenium should be reviewed together in thyroid-axis
       context.
+    research_state: unassessed
+    sources: []
   rel_supports_009:
     id: rel_supports_009
     relation_type: supports
@@ -2320,3 +2301,5 @@ ontology_assertions:
     action: Review total dietary protein and resistance-training context before treating
       a GLP-assisted weight-loss stack as metabolically complete.
     severity: low
+    research_state: unassessed
+    sources: []

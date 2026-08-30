@@ -5,10 +5,18 @@ notes: Carotenoid commonly sourced from marigold flower / Tagetes erecta in eye-
   is a non-provitamin-A carotenoid that accumulates in retina/macular pigment context.
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - ocular_retina_context
+  - value: ocular_retina_context
+    research_state: unassessed
+    sources: []
   kind:
-  - carotenoid
+  - value: carotenoid
+    research_state: unassessed
+    sources: []
   quality:
-  - fat_soluble
+  - value: fat_soluble
+    research_state: unassessed
+    sources: []

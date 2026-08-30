@@ -6,16 +6,10 @@ import sys
 from pathlib import Path
 from typing import NamedTuple
 
+from planner.canonical_optimizer import Indeterminate
 from planner.canonical_optimizer_result import Diagnostic, DiagnosticCode
-from planner.engine._canonical_optimizer import (
-    CanonicalOptimizerInput,
-    Indeterminate,
-    Optimal,
-    optimize_canonical_layout,
-)
 from planner.engine._plan_active_index import ActiveIndexInput, build_active_index
 from planner.engine._plan_inputs import load_plan_inputs
-from planner.engine._plan_output import CanonicalScheduleOutputInput, build_canonical_schedule_output
 from planner.engine._plan_types import ActiveIndex, PlanInputs
 from planner.engine.check import _cmd_check_inner
 from planner.engine.results import PlanResult
@@ -23,6 +17,7 @@ from planner.ontology.artifacts import OntologyBundle, load_ontology
 from planner.ontology.canonical_inference import Conflict, SameDimensionPressureConflict, Success
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.paths import ROOT, Paths
+from planner.schedule_types import CanonicalPublicationSource
 from planner.schedule_writer import invalidate_schedule_file, schedule_slot_loads, write_schedule_file
 
 
@@ -61,7 +56,6 @@ def _failed_plan_result(exit_code: int, errors: list[str], diagnostic: Diagnosti
     return PlanResult(
         exit_code=exit_code,
         schedule_written=False,
-        warnings=[],
         slot_loads={},
         errors=errors,
         diagnostic=diagnostic,
@@ -76,10 +70,7 @@ def _cmd_plan_inner(paths: Paths, bundle: OntologyBundle) -> PlanResult:
     runtime_or_failure = _build_plan_runtime(paths, errors, inputs_or_failure)
     if isinstance(runtime_or_failure, PlanResult):
         return runtime_or_failure
-    optimization = _run_successful_plan_search(errors, runtime_or_failure)
-    if isinstance(optimization, PlanResult):
-        return optimization
-    return _write_successful_plan(paths, errors, runtime_or_failure, optimization)
+    return _publish_plan(paths, errors, runtime_or_failure)
 
 
 def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> _PlanRuntime | PlanResult:
@@ -92,8 +83,7 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
                 runtime_program=inputs.runtime_program,
                 products=inputs.products,
                 substances=inputs.substances,
-                canonical_fact_catalog=inputs.canonical_fact_catalog,
-                canonical_laws=inputs.runtime_program.canonical_laws,
+                canonical_scheduling=inputs.canonical_scheduling,
             ),
         )
     except KeyboardInterrupt, MemoryError:
@@ -128,76 +118,40 @@ def _canonical_inference_conflict_diagnostic(conflict: SameDimensionPressureConf
     )
 
 
-def _canonical_optimizer_input(runtime: _PlanRuntime) -> CanonicalOptimizerInput:
-    active = runtime.active
-    objective_items = active.item_stacks
-    objective_slots = {
-        slot_id: slot for slot_id, slot in runtime.inputs.slots.items() if slot.stack in set(objective_items.values())
-    }
-    inference = active.canonical_inference
-    if not isinstance(inference, Success):
-        raise ValueError("canonical inference did not produce a successful result")
-    return CanonicalOptimizerInput(
-        item_domains=objective_items,
-        slots=objective_slots,
-        pressures=inference.pressures,
-    )
-
-
-def _run_successful_plan_search(errors: list[str], runtime: _PlanRuntime) -> Optimal | PlanResult:
-    """Run the exact canonical optimizer and discard every non-proof result."""
-    try:
-        result = optimize_canonical_layout(_canonical_optimizer_input(runtime))
-    except KeyboardInterrupt, MemoryError:
-        raise
-    except Exception as error:  # noqa: BLE001
-        message = f"plan: canonical optimization failed closed: {error}"
-        print(message, file=sys.stderr)
-        errors.append(message)
-        return _failed_plan_result(1, errors, Diagnostic("infrastructure_failed", message))
-    if isinstance(result, Indeterminate):
-        errors.append(f"plan: {result.diagnostic.message}")
-        return _failed_plan_result(1, errors, result.diagnostic)
-    if not isinstance(result, Optimal):
-        message = "plan: canonical optimization returned an invalid result"
-        errors.append(message)
-        return _failed_plan_result(1, errors, Diagnostic("proof_failed", message))
-    return result
-
-
-def _write_successful_plan(
+def _publish_plan(
     paths: Paths,
     errors: list[str],
     runtime: _PlanRuntime,
-    result: Optimal,
 ) -> PlanResult:
-    """Assemble and publish only an ``OptimalPublication``."""
+    """Freeze answer-free facts and hand them to the solver-owned writer."""
     inference = runtime.active.canonical_inference
     if not isinstance(inference, Success):
         message = "plan: canonical publication requires successful inference"
         errors.append(message)
         return _failed_plan_result(1, errors, Diagnostic("proof_failed", message))
     try:
-        publication = build_canonical_schedule_output(
-            CanonicalScheduleOutputInput(
-                result=result,
-                slots=runtime.inputs.slots,
-                inference=inference,
-                item_products=runtime.active.item_products,
-                item_stacks=runtime.active.item_stacks,
-                products=runtime.inputs.products,
-                pillboxes=runtime.inputs.pillboxes,
-            )
+        source = CanonicalPublicationSource(
+            item_products=runtime.active.item_products,
+            item_domains=runtime.active.item_stacks,
+            slots={
+                slot_id: slot
+                for slot_id, slot in runtime.inputs.slots.items()
+                if slot.stack in set(runtime.active.item_stacks.values())
+            },
+            inference=inference,
+            products=runtime.inputs.products,
+            pressure_values_by_dimension=runtime.inputs.canonical_scheduling.pressure_values_by_dimension,
         )
-        slot_loads = schedule_slot_loads(publication.document)
-        plan_result = PlanResult(
+        published = write_schedule_file(paths.schedule_file, source)
+        if isinstance(published, Indeterminate):
+            errors.append(f"plan: {published.diagnostic.message}")
+            return _failed_plan_result(1, errors, published.diagnostic)
+        slot_loads = schedule_slot_loads(published.document)
+        return PlanResult(
             exit_code=0,
             schedule_written=True,
-            warnings=[],
             slot_loads=slot_loads,
         )
-        write_schedule_file(paths.schedule_file, publication)
-        return plan_result
     except KeyboardInterrupt, MemoryError:
         raise
     except Exception as error:  # noqa: BLE001

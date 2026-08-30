@@ -8,6 +8,10 @@ concerns:
     indication and clinician-directed rescue/supplementation plan.
 knowledge:
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - pharmaceutical
+  - value: pharmaceutical
+    research_state: unassessed
+    sources: []

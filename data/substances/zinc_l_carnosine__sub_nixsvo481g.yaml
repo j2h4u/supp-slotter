@@ -15,12 +15,24 @@ concerns:
     and whether other mucosal-support botanicals are co-formulated.
 knowledge:
   effect:
-  - gut_barrier_context
-  - digestive_comfort_context
-  - wound_healing_support
+  - value: gut_barrier_context
+    research_state: unassessed
+    sources: []
+  - value: digestive_comfort_context
+    research_state: unassessed
+    sources: []
+  - value: wound_healing_support
+    research_state: unassessed
+    sources: []
   kind:
-  - mineral
+  - value: mineral
+    research_state: unassessed
+    sources: []
   risk:
-  - zinc_copper_balance_review
-  - manual_review
+  - value: zinc_copper_balance_review
+    research_state: unassessed
+    sources: []
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_nixsvo481g

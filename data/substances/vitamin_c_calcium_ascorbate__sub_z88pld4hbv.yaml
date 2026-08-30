@@ -6,9 +6,17 @@ notes: Buffered vitamin C form listed on NOW Foods Vitamin C-1000 Complex. Produ
   roles without treating the calcium salt as a separate collagen substrate.
 knowledge:
   context:
-  - connective_tissue_support
-  - skin_support
+  - value: connective_tissue_support
+    research_state: unassessed
+    sources: []
+  - value: skin_support
+    research_state: unassessed
+    sources: []
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

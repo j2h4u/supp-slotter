@@ -11,9 +11,15 @@ concerns:
     context because rare Saccharomyces fungemia has been reported with probiotic yeast use.
 knowledge:
   effect:
-  - gut_microbiome_context
+  - value: gut_microbiome_context
+    research_state: unassessed
+    sources: []
   kind:
-  - probiotic
+  - value: probiotic
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_2gjf5yx7cz

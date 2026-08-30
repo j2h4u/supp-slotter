@@ -16,35 +16,17 @@
             "additionalProperties": false,
             "properties": {
               "circadian_anchor": {
-                "description": "Independent logical circadian anchor for a canonical slot.",
-                "enum": [
-                  "wake",
-                  "sleep"
-                ],
-                "title": "CircadianAnchor",
-                "type": "string"
+                "$ref": "#/$defs/CircadianAnchor"
               },
               "exercise_anchor": {
-                "description": "Independent logical exercise anchor for a canonical slot.",
-                "enum": [
-                  "before",
-                  "after"
-                ],
-                "title": "ExerciseAnchor",
-                "type": "string"
+                "$ref": "#/$defs/ExerciseAnchor"
               },
               "label": {
                 "minLength": 1,
                 "type": "string"
               },
               "meal_context": {
-                "description": "Independent logical meal-context anchor for a canonical slot.",
-                "enum": [
-                  "with_food",
-                  "without_food"
-                ],
-                "title": "MealContext",
-                "type": "string"
+                "$ref": "#/$defs/MealContext"
               },
               "order": {
                 "minimum": 1,

@@ -13,13 +13,25 @@ concerns:
     before treating this form as routine background antioxidant coverage.
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - lipid_antioxidant_support
-  - immune_function_support
+  - value: lipid_antioxidant_support
+    research_state: unassessed
+    sources: []
+  - value: immune_function_support
+    research_state: unassessed
+    sources: []
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: unassessed
+    sources: []
   quality:
-  - fat_soluble
+  - value: fat_soluble
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []

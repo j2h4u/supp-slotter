@@ -11,6 +11,10 @@ concerns:
     the same LDL-C expectation across all forms.
 knowledge:
   effect:
-  - lipid_metabolism_support
+  - value: lipid_metabolism_support
+    research_state: unassessed
+    sources: []
   kind:
-  - protein
+  - value: protein
+    research_state: unassessed
+    sources: []

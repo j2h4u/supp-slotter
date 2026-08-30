@@ -38,15 +38,6 @@ engine_contract:
       category: warnings
       rule: "active endpoint truth is intersection with components of products in non-inactive stacks; classify all four endpoint states; apply authored filters and active sides; preserve reverse output; deduplicate by endpoint/type key."
       source_of_truth: ontology/runtime-policy.yaml + relation assertion projection
-  conformance_scenarios:
-    - {id: selector_exact_form, semantic: selector_resolution, fixture: selector_exact_form, expected: "one entity_id resolves one ID; an unscoped sibling collision fails closed"}
-    - {id: selector_empty_term, semantic: selector_resolution, fixture: selector_empty_term, expected: "known canonical term with no matching card returns empty"}
-    - {id: stack_and_episodic, semantic: stack_partition, fixture: stack_and_episodic, expected: "only authored daily/training partitions route, inactive and tracked_unassigned remain excluded, absent membership is unassigned, daily not_every_day is presented separately"}
-    - {id: episodic_presentation, semantic: episodic_presentation, fixture: episodic_presentation, expected: "not_every_day remains in daily assignment and changes presentation grouping only"}
-    - {id: candidate_feasibility, semantic: candidate_feasibility, fixture: candidate_feasibility, expected: "every selected item is feasible in every slot of its unbounded logical domain"}
-    - {id: objective_tie, semantic: canonical_objective_and_tie_break, fixture: objective_tie, expected: "unique pressure maximum wins; equal pressure count uses integer per-domain squared loads, then stable item-ID and slot-order tuple"}
-    - {id: publication_status, semantic: publication_boundary, fixture: publication_status, expected: "only globally proved Optimal publishes a layout; every unproved result is layout-free Indeterminate"}
-    - {id: relation_presence, semantic: relation_warning_truth, fixture: relation_presence, expected: "all four source/target active combinations map to declared statuses and warning sides"}
 glue_contract:
   id: planner_glue_contract
   inactive_stack_name: inactive

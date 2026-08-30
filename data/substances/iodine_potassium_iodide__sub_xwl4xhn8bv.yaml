@@ -11,8 +11,14 @@ concerns:
     thyroid effects in susceptible people.
 knowledge:
   kind:
-  - mineral
+  - value: mineral
+    research_state: unassessed
+    sources: []
   pathway:
-  - thyroid_hormone_axis
+  - value: thyroid_hormone_axis
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []

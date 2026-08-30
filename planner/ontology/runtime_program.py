@@ -182,16 +182,6 @@ class RuntimeEngineSemantic:
 
 
 @dataclass(frozen=True, slots=True)
-class RuntimeEngineConformanceScenario:
-    """A stable fixture identity and expected protocol outcome."""
-
-    id: str
-    semantic: str
-    fixture: str
-    expected: str
-
-
-@dataclass(frozen=True, slots=True)
 class RuntimeEngineContract:
     """Versioned protocol metadata for independent scheduler implementations."""
 
@@ -205,7 +195,6 @@ class RuntimeEngineContract:
     tie_break: str
     publication_statuses: tuple[str, ...]
     semantics: tuple[RuntimeEngineSemantic, ...]
-    conformance_scenarios: tuple[RuntimeEngineConformanceScenario, ...]
 
 
 IMPLEMENTED_ENGINE_CONTRACT_PROTOCOL = "supp-slotter.engine-contract/v2"
@@ -405,33 +394,10 @@ class RuntimeEvidenceProvenance:
 @dataclass(frozen=True, slots=True)
 class RuntimeCanonicalSchedulingFact:
     id: str
+    family: str
     subject: RuntimeFactSubject
     applicability: RuntimeFactApplicability
     provenance: tuple[RuntimeEvidenceProvenance, ...]
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeFoodEffect(RuntimeCanonicalSchedulingFact):
-    value: str
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeAcuteAlertnessEffect(RuntimeCanonicalSchedulingFact):
-    value: str
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeAcuteSleepEffect(RuntimeCanonicalSchedulingFact):
-    value: str
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimePreExercisePerformanceEffect(RuntimeCanonicalSchedulingFact):
-    value: str
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimePostExerciseRecoveryEffect(RuntimeCanonicalSchedulingFact):
     value: str
 
 
@@ -452,15 +418,43 @@ class RuntimeCanonicalLaw:
 
 
 @dataclass(frozen=True, slots=True)
-class RuntimeCanonicalFactCatalog:
-    """Strict typed view of the authoritative canonical evidence catalog."""
+class RuntimePressureDimension:
+    id: str
+    pressure_values: tuple[str, ...]
 
+
+@dataclass(frozen=True, slots=True)
+class RuntimeCanonicalFactFamily:
+    id: str
+    fact_values: tuple[str, ...]
+    dimension: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeCanonicalScheduling:
+    """Closed, data-derived scheduler evidence and universal laws."""
+
+    dimensions: tuple[RuntimePressureDimension, ...]
+    families: tuple[RuntimeCanonicalFactFamily, ...]
     evidence_sources: tuple[RuntimeEvidenceSource, ...]
-    food_effects: tuple[RuntimeFoodEffect, ...]
-    acute_alertness_effects: tuple[RuntimeAcuteAlertnessEffect, ...]
-    acute_sleep_effects: tuple[RuntimeAcuteSleepEffect, ...]
-    pre_exercise_performance_effects: tuple[RuntimePreExercisePerformanceEffect, ...]
-    post_exercise_recovery_effects: tuple[RuntimePostExerciseRecoveryEffect, ...]
+    facts: tuple[RuntimeCanonicalSchedulingFact, ...]
+    laws: tuple[RuntimeCanonicalLaw, ...]
+
+    @property
+    def dimensions_by_id(self) -> Mapping[str, RuntimePressureDimension]:
+        return MappingProxyType({row.id: row for row in self.dimensions})
+
+    @property
+    def families_by_id(self) -> Mapping[str, RuntimeCanonicalFactFamily]:
+        return MappingProxyType({row.id: row for row in self.families})
+
+    @property
+    def laws_by_key(self) -> Mapping[tuple[str, str], RuntimeCanonicalLaw]:
+        return MappingProxyType({(row.family, row.fact_value): row for row in self.laws})
+
+    @property
+    def pressure_values_by_dimension(self) -> Mapping[str, frozenset[str]]:
+        return MappingProxyType({row.id: frozenset(row.pressure_values) for row in self.dimensions})
 
 
 @dataclass(frozen=True, slots=True)
@@ -476,8 +470,7 @@ class RuntimeProgram:
     relation_presence_statuses: tuple[RuntimeRelationPresenceStatusPolicy, ...]
     selector_form_capabilities: tuple[RuntimeSelectorFormCapability, ...]
     dashboard_state_catalog: RuntimeDashboardStateCatalog
-    canonical_fact_catalog: RuntimeCanonicalFactCatalog
-    canonical_laws: tuple[RuntimeCanonicalLaw, ...]
+    canonical_scheduling: RuntimeCanonicalScheduling
 
     @property
     def warning_types_by_type(self) -> Mapping[str, RuntimeWarningTypePolicy]:
@@ -508,7 +501,6 @@ class RuntimeProgram:
 _PROJECTION_RECORDS: Mapping[str, type[object]] = {
     "engine_contract": RuntimeEngineContract,
     "engine_contract.semantics": RuntimeEngineSemantic,
-    "engine_contract.conformance_scenarios": RuntimeEngineConformanceScenario,
     "glue_contract": RuntimeGlueContract,
     "glue_contract.stack_partition": RuntimeStackPartition,
     "warning_types": RuntimeWarningTypePolicy,
@@ -521,21 +513,19 @@ _PROJECTION_RECORDS: Mapping[str, type[object]] = {
     "dashboard_state_catalog.product_tracking_states": RuntimeDashboardProductTrackingStateDefinition,
     "dashboard_state_catalog.usage_truth_table": RuntimeDashboardUsageTruthState,
     "dashboard_state_catalog.product_tracking_truth_table": RuntimeDashboardProductTrackingTruthState,
-    "canonical_fact_catalog": RuntimeCanonicalFactCatalog,
-    "canonical_fact_catalog.evidence_sources": RuntimeEvidenceSource,
-    "canonical_fact_catalog.food_effects": RuntimeFoodEffect,
-    "canonical_fact_catalog.acute_alertness_effects": RuntimeAcuteAlertnessEffect,
-    "canonical_fact_catalog.acute_sleep_effects": RuntimeAcuteSleepEffect,
-    "canonical_fact_catalog.pre_exercise_performance_effects": RuntimePreExercisePerformanceEffect,
-    "canonical_fact_catalog.post_exercise_recovery_effects": RuntimePostExerciseRecoveryEffect,
-    "canonical_laws": RuntimeCanonicalLaw,
+    "canonical_scheduling": RuntimeCanonicalScheduling,
+    "canonical_scheduling.dimensions": RuntimePressureDimension,
+    "canonical_scheduling.families": RuntimeCanonicalFactFamily,
+    "canonical_scheduling.evidence_sources": RuntimeEvidenceSource,
+    "canonical_scheduling.facts": RuntimeCanonicalSchedulingFact,
+    "canonical_scheduling.laws": RuntimeCanonicalLaw,
 }
 _MAPPING_RECORD_PATHS = frozenset({
     "engine_contract",
     "glue_contract",
     "glue_contract.stack_partition",
     "dashboard_state_catalog",
-    "canonical_fact_catalog",
+    "canonical_scheduling",
 })
 RUNTIME_PROJECTION_FIELDS: Mapping[str, frozenset[str]] = MappingProxyType({
     "": frozenset(
@@ -579,15 +569,6 @@ def _engine_semantic(row: Mapping[str, object], label: str) -> RuntimeEngineSema
         _str(row["category"], f"{label}.category"),
         _str(row["rule"], f"{label}.rule"),
         _str(row["source_of_truth"], f"{label}.source_of_truth"),
-    )
-
-
-def _engine_scenario(row: Mapping[str, object], label: str) -> RuntimeEngineConformanceScenario:
-    return RuntimeEngineConformanceScenario(
-        _str(row["id"], f"{label}.id"),
-        _str(row["semantic"], f"{label}.semantic"),
-        _str(row["fixture"], f"{label}.fixture"),
-        _str(row["expected"], f"{label}.expected"),
     )
 
 
@@ -758,66 +739,6 @@ def _fact_provenance(value: object, label: str) -> tuple[RuntimeEvidenceProvenan
     return tuple(result)
 
 
-_FOOD_EFFECT_VALUES = frozenset({
-    "bioavailability_increases",
-    "bioavailability_decreases",
-    "tolerability_improves",
-    "tolerability_worsens",
-})
-_ACUTE_ALERTNESS_EFFECT_VALUES = frozenset({"acute_alertness_increases"})
-_ACUTE_SLEEP_EFFECT_VALUES = frozenset({"onset_latency_decreases", "continuity_improves"})
-_PRE_EXERCISE_PERFORMANCE_EFFECT_VALUES = frozenset({"performance_improves"})
-_POST_EXERCISE_RECOVERY_EFFECT_VALUES = frozenset({"recovery_improves"})
-
-
-def _canonical_fact(
-    row: Mapping[str, object],
-    label: str,
-    factory: Callable[
-        [str, RuntimeFactSubject, RuntimeFactApplicability, tuple[RuntimeEvidenceProvenance, ...], str], object
-    ],
-    values: frozenset[str],
-) -> object:
-    return factory(
-        _str(row["id"], f"{label}.id"),
-        _fact_subject(row["subject"], f"{label}.subject"),
-        _fact_applicability(row["applicability"], f"{label}.applicability"),
-        _fact_provenance(row["provenance"], f"{label}.provenance"),
-        _closed_value(row["value"], f"{label}.value", values),
-    )
-
-
-def _food_effect(row: Mapping[str, object], label: str) -> RuntimeFoodEffect:
-    return cast(RuntimeFoodEffect, _canonical_fact(row, label, RuntimeFoodEffect, _FOOD_EFFECT_VALUES))
-
-
-def _acute_alertness_effect(row: Mapping[str, object], label: str) -> RuntimeAcuteAlertnessEffect:
-    return cast(
-        RuntimeAcuteAlertnessEffect,
-        _canonical_fact(row, label, RuntimeAcuteAlertnessEffect, _ACUTE_ALERTNESS_EFFECT_VALUES),
-    )
-
-
-def _acute_sleep_effect(row: Mapping[str, object], label: str) -> RuntimeAcuteSleepEffect:
-    return cast(
-        RuntimeAcuteSleepEffect, _canonical_fact(row, label, RuntimeAcuteSleepEffect, _ACUTE_SLEEP_EFFECT_VALUES)
-    )
-
-
-def _pre_exercise_performance_effect(row: Mapping[str, object], label: str) -> RuntimePreExercisePerformanceEffect:
-    return cast(
-        RuntimePreExercisePerformanceEffect,
-        _canonical_fact(row, label, RuntimePreExercisePerformanceEffect, _PRE_EXERCISE_PERFORMANCE_EFFECT_VALUES),
-    )
-
-
-def _post_exercise_recovery_effect(row: Mapping[str, object], label: str) -> RuntimePostExerciseRecoveryEffect:
-    return cast(
-        RuntimePostExerciseRecoveryEffect,
-        _canonical_fact(row, label, RuntimePostExerciseRecoveryEffect, _POST_EXERCISE_RECOVERY_EFFECT_VALUES),
-    )
-
-
 def _canonical_law(row: Mapping[str, object], label: str) -> RuntimeCanonicalLaw:
     """Decode one closed compiler law row."""
     expected = frozenset({"id", "family", "fact_value", "dimension", "pressure_value"})
@@ -831,91 +752,97 @@ def _canonical_law(row: Mapping[str, object], label: str) -> RuntimeCanonicalLaw
     )
 
 
-def _canonical_laws(value: object, label: str = "canonical_laws") -> tuple[RuntimeCanonicalLaw, ...]:
-    rows = _rows(value, label)
-    result = tuple(_canonical_law(row, f"{label}[{index}]") for index, row in enumerate(rows))
-    if len(result) != 9:
-        raise _error(label, "must contain exactly nine laws")
-    keys = [(law.family, law.fact_value) for law in result]
-    if len(keys) != len(set(keys)):
-        raise _error(label, "has duplicate semantic keys (family, fact_value)")
-    expected_keys = frozenset({
-        ("FoodEffect", "bioavailability_increases"),
-        ("FoodEffect", "bioavailability_decreases"),
-        ("FoodEffect", "tolerability_improves"),
-        ("FoodEffect", "tolerability_worsens"),
-        ("AcuteAlertnessEffect", "acute_alertness_increases"),
-        ("AcuteSleepEffect", "onset_latency_decreases"),
-        ("AcuteSleepEffect", "continuity_improves"),
-        ("PreExercisePerformanceEffect", "performance_improves"),
-        ("PostExerciseRecoveryEffect", "recovery_improves"),
-    })
-    if frozenset(keys) != expected_keys:
-        raise _error(label, "does not cover the exact nine admitted family/value laws")
-    return result
+def _pressure_dimension(row: Mapping[str, object], label: str) -> RuntimePressureDimension:
+    _exact_map(row, label, RUNTIME_PROJECTION_ROW_FIELDS["canonical_scheduling.dimensions"])
+    return RuntimePressureDimension(
+        _str(row["id"], f"{label}.id"), _strings(row["pressure_values"], f"{label}.pressure_values")
+    )
 
 
-def _canonical_fact_catalog(value: object, label: str = "canonical_fact_catalog") -> RuntimeCanonicalFactCatalog:
-    catalog = _exact_map(value, label, RUNTIME_PROJECTION_FIELDS[label])
-    evidence_sources = _typed_rows(
-        catalog["evidence_sources"],
-        f"{label}.evidence_sources",
+def _fact_family(row: Mapping[str, object], label: str) -> RuntimeCanonicalFactFamily:
+    _exact_map(row, label, RUNTIME_PROJECTION_ROW_FIELDS["canonical_scheduling.families"])
+    return RuntimeCanonicalFactFamily(
+        _str(row["id"], f"{label}.id"),
+        _strings(row["fact_values"], f"{label}.fact_values"),
+        _str(row["dimension"], f"{label}.dimension"),
+    )
+
+
+def _canonical_fact(row: Mapping[str, object], label: str) -> RuntimeCanonicalSchedulingFact:
+    _exact_map(row, label, RUNTIME_PROJECTION_ROW_FIELDS["canonical_scheduling.facts"])
+    return RuntimeCanonicalSchedulingFact(
+        _str(row["id"], f"{label}.id"),
+        _str(row["family"], f"{label}.family"),
+        _fact_subject(row["subject"], f"{label}.subject"),
+        _fact_applicability(row["applicability"], f"{label}.applicability"),
+        _fact_provenance(row["provenance"], f"{label}.provenance"),
+        _str(row["value"], f"{label}.value"),
+    )
+
+
+def _canonical_scheduling(value: object) -> RuntimeCanonicalScheduling:
+    raw = _exact_map(value, "canonical_scheduling", RUNTIME_PROJECTION_FIELDS["canonical_scheduling"])
+    dimensions = _typed_rows(
+        raw["dimensions"],
+        "canonical_scheduling.dimensions",
+        _pressure_dimension,
+        semantic_keys=(("id",),),
+        fields=RUNTIME_PROJECTION_ROW_FIELDS["canonical_scheduling.dimensions"],
+    )
+    families = _typed_rows(
+        raw["families"],
+        "canonical_scheduling.families",
+        _fact_family,
+        semantic_keys=(("id",),),
+        fields=RUNTIME_PROJECTION_ROW_FIELDS["canonical_scheduling.families"],
+    )
+    sources = _typed_rows(
+        raw["evidence_sources"],
+        "canonical_scheduling.evidence_sources",
         _evidence_source,
         semantic_keys=(("id",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS[f"{label}.evidence_sources"],
+        fields=RUNTIME_PROJECTION_ROW_FIELDS["canonical_scheduling.evidence_sources"],
     )
-    food_effects = _typed_rows(
-        catalog["food_effects"],
-        f"{label}.food_effects",
-        _food_effect,
+    facts = _typed_rows(
+        raw["facts"],
+        "canonical_scheduling.facts",
+        _canonical_fact,
         semantic_keys=(("id",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS[f"{label}.food_effects"],
+        fields=RUNTIME_PROJECTION_ROW_FIELDS["canonical_scheduling.facts"],
     )
-    acute_alertness_effects = _typed_rows(
-        catalog["acute_alertness_effects"],
-        f"{label}.acute_alertness_effects",
-        _acute_alertness_effect,
-        semantic_keys=(("id",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS[f"{label}.acute_alertness_effects"],
+    laws = _typed_rows(
+        raw["laws"],
+        "canonical_scheduling.laws",
+        _canonical_law,
+        semantic_keys=(("family", "fact_value"),),
+        fields=RUNTIME_PROJECTION_ROW_FIELDS["canonical_scheduling.laws"],
     )
-    acute_sleep_effects = _typed_rows(
-        catalog["acute_sleep_effects"],
-        f"{label}.acute_sleep_effects",
-        _acute_sleep_effect,
-        semantic_keys=(("id",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS[f"{label}.acute_sleep_effects"],
-    )
-    pre_exercise_performance_effects = _typed_rows(
-        catalog["pre_exercise_performance_effects"],
-        f"{label}.pre_exercise_performance_effects",
-        _pre_exercise_performance_effect,
-        semantic_keys=(("id",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS[f"{label}.pre_exercise_performance_effects"],
-    )
-    post_exercise_recovery_effects = _typed_rows(
-        catalog["post_exercise_recovery_effects"],
-        f"{label}.post_exercise_recovery_effects",
-        _post_exercise_recovery_effect,
-        semantic_keys=(("id",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS[f"{label}.post_exercise_recovery_effects"],
-    )
-    families = (
-        food_effects,
-        acute_alertness_effects,
-        acute_sleep_effects,
-        pre_exercise_performance_effects,
-        post_exercise_recovery_effects,
-    )
-    fact_ids = [fact.id for family in families for fact in family]
-    if len(fact_ids) != len(set(fact_ids)):
-        raise _error(label, "has duplicate fact IDs across effect families")
-    return RuntimeCanonicalFactCatalog(
-        cast(tuple[RuntimeEvidenceSource, ...], evidence_sources),
-        cast(tuple[RuntimeFoodEffect, ...], food_effects),
-        cast(tuple[RuntimeAcuteAlertnessEffect, ...], acute_alertness_effects),
-        cast(tuple[RuntimeAcuteSleepEffect, ...], acute_sleep_effects),
-        cast(tuple[RuntimePreExercisePerformanceEffect, ...], pre_exercise_performance_effects),
-        cast(tuple[RuntimePostExerciseRecoveryEffect, ...], post_exercise_recovery_effects),
+    dimensions_by_id = {row.id: set(row.pressure_values) for row in dimensions}
+    families_by_id = {row.id: row for row in families}
+    if not dimensions_by_id or len(dimensions_by_id) != len(dimensions) or len(families_by_id) != len(families):
+        raise _error("canonical_scheduling", "has duplicate or empty dimensions/families")
+    for family in families:
+        if family.dimension not in dimensions_by_id:
+            raise _error("canonical_scheduling.families", "references an unknown dimension")
+    for fact in facts:
+        family = families_by_id.get(fact.family)
+        if family is None or fact.value not in family.fact_values:
+            raise _error("canonical_scheduling.facts", "references an unknown family or unadmitted value")
+    expected = {(family.id, value) for family in families for value in family.fact_values}
+    actual = {(law.family, law.fact_value) for law in laws}
+    if actual != expected or any(
+        law.dimension not in dimensions_by_id
+        or law.dimension != families_by_id[law.family].dimension
+        or law.pressure_value not in dimensions_by_id.get(law.dimension, set())
+        for law in laws
+    ):
+        raise _error("canonical_scheduling.laws", "does not have exact admissible coverage")
+    return RuntimeCanonicalScheduling(
+        cast(tuple[RuntimePressureDimension, ...], dimensions),
+        cast(tuple[RuntimeCanonicalFactFamily, ...], families),
+        cast(tuple[RuntimeEvidenceSource, ...], sources),
+        cast(tuple[RuntimeCanonicalSchedulingFact, ...], facts),
+        cast(tuple[RuntimeCanonicalLaw, ...], laws),
     )
 
 
@@ -1012,18 +939,6 @@ def _decode_program_payload(payload: Mapping[str, object]) -> tuple[str, str, st
     )
 
 
-def _validate_engine_scenario_coverage(
-    semantic_ids: set[str], scenarios: Sequence[RuntimeEngineConformanceScenario]
-) -> None:
-    scenario_semantics = {row.semantic for row in scenarios}
-    missing_scenario_semantics = sorted(semantic_ids - scenario_semantics)
-    if missing_scenario_semantics:
-        raise _error(
-            "engine_contract.conformance_scenarios",
-            "missing semantic coverage: " + ", ".join(missing_scenario_semantics),
-        )
-
-
 def _decode_engine_contract(projection: Mapping[str, object]) -> RuntimeEngineContract:
     """Decode and verify the closed exact-optimizer protocol section."""
     engine_raw = _exact_map(
@@ -1038,22 +953,8 @@ def _decode_engine_contract(projection: Mapping[str, object]) -> RuntimeEngineCo
         semantic_keys=(("id",),),
         fields=RUNTIME_PROJECTION_ROW_FIELDS["engine_contract.semantics"],
     )
-    engine_scenarios = _typed_rows(
-        engine_raw["conformance_scenarios"],
-        "engine_contract.conformance_scenarios",
-        _engine_scenario,
-        semantic_keys=(("id",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["engine_contract.conformance_scenarios"],
-    )
-    if not engine_semantics or not engine_scenarios:
-        raise _error("engine_contract", "requires non-empty semantics and conformance_scenarios")
-    semantic_ids = {row.id for row in engine_semantics}
-    unknown_scenario_semantics = sorted({row.semantic for row in engine_scenarios} - semantic_ids)
-    if unknown_scenario_semantics:
-        raise _error(
-            "engine_contract.conformance_scenarios",
-            "references unknown semantics: " + ", ".join(unknown_scenario_semantics),
-        )
+    if not engine_semantics:
+        raise _error("engine_contract", "requires non-empty semantics")
     engine_contract = RuntimeEngineContract(
         _str(engine_raw["id"], "engine_contract.id"),
         _str(engine_raw["protocol_version"], "engine_contract.protocol_version"),
@@ -1065,7 +966,6 @@ def _decode_engine_contract(projection: Mapping[str, object]) -> RuntimeEngineCo
         _str(engine_raw["tie_break"], "engine_contract.tie_break"),
         _strings(engine_raw["publication_statuses"], "engine_contract.publication_statuses"),
         cast(tuple[RuntimeEngineSemantic, ...], engine_semantics),
-        cast(tuple[RuntimeEngineConformanceScenario, ...], engine_scenarios),
     )
     if engine_contract.protocol_version != IMPLEMENTED_ENGINE_CONTRACT_PROTOCOL:
         raise _error(
@@ -1095,7 +995,6 @@ def _decode_engine_contract(projection: Mapping[str, object]) -> RuntimeEngineCo
             "engine_contract.publication_statuses",
             "must exactly be the closed Optimal/Indeterminate statuses",
         )
-    _validate_engine_scenario_coverage(semantic_ids, engine_scenarios)
     return engine_contract
 
 
@@ -1276,6 +1175,8 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     """Decode a compiler-verified runtime snapshot by its closed sections."""
 
     format_version, schema_version, source_hash, projection = _decode_program_payload(payload)
+    if format_version != "ontology-runtime-program-v2":
+        raise _error("format_version", "is unsupported")
     engine_contract = _decode_engine_contract(projection)
     glue_contract, presence_truth_table = _decode_glue_contract(projection)
     (
@@ -1286,8 +1187,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         selector_form_capabilities,
     ) = _decode_relation_review_catalog(projection, presence_truth_table)
     dashboard_state_catalog = _decode_dashboard_state_catalog(projection)
-    canonical_fact_catalog = _canonical_fact_catalog(projection["canonical_fact_catalog"])
-    canonical_laws = _canonical_laws(projection["canonical_laws"])
+    canonical_scheduling = _canonical_scheduling(projection["canonical_scheduling"])
     return RuntimeProgram(
         format_version,
         schema_version,
@@ -1300,8 +1200,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         relation_presence_statuses,
         selector_form_capabilities,
         dashboard_state_catalog,
-        canonical_fact_catalog,
-        canonical_laws,
+        canonical_scheduling,
     )
 
 

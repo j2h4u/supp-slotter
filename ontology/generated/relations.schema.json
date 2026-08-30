@@ -2153,42 +2153,10 @@
       "title": "RuntimeDashboardUsageTruthState",
       "type": "object"
     },
-    "RuntimeEngineConformanceScenario": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "expected": {
-          "type": "string"
-        },
-        "fixture": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "semantic": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "semantic",
-        "fixture",
-        "expected"
-      ],
-      "title": "RuntimeEngineConformanceScenario",
-      "type": "object"
-    },
     "RuntimeEngineContract": {
       "additionalProperties": false,
       "description": "Versioned observable scheduler contract. Values describe the generic execution protocol; they are not supplement facts.",
       "properties": {
-        "conformance_scenarios": {
-          "items": {
-            "$ref": "#/$defs/RuntimeEngineConformanceScenario"
-          },
-          "type": "array"
-        },
         "domain_feasibility": {
           "type": "string"
         },
@@ -2239,8 +2207,7 @@
         "secondary_objective",
         "tie_break",
         "publication_statuses",
-        "semantics",
-        "conformance_scenarios"
+        "semantics"
       ],
       "title": "RuntimeEngineContract",
       "type": "object"

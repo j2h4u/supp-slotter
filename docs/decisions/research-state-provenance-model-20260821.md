@@ -83,18 +83,19 @@ slots:
   sources: {multivalued: true}
 ~~~
 
-Keep the new fields optional at the raw compatibility boundary. Normalization
-exposes omission as research_state: unassessed and sources: []. Canonical new
-non-unassessed records require a non-empty source reference. References are
+Require both fields on every authored assertion. Canonical non-unassessed
+records require a non-empty source reference. References are
 URLs, DOI/PubMed/guideline identifiers, or similarly stable locators; this is
 not a source warehouse.
 
-Existing knowledge string shorthand remains valid:
+Every knowledge assertion has the same explicit shape:
 
 ~~~yaml
-# Legacy input: normalized to unassessed and empty sources
 knowledge:
-  kind: [mineral]
+  kind:
+    - value: mineral
+      research_state: unassessed
+      sources: []
 
 # Canonical enriched fact
 knowledge:
@@ -143,13 +144,14 @@ relation warning, changes severity, affects slot assignment, creates a
 scheduling constraint, or changes a planner score. There is no automatic state
 promotion.
 
-## Migration default
+## Migration
 
-Do not mass-edit existing facts or infer provenance from prose. Legacy
-knowledge strings and relation records lacking research_state normalize to
-unassessed. This conservatively records repository state, not proof that prior
-research did not happen. URLs embedded in relation reason remain readable
-context until explicitly extracted into sources and assigned a state.
+Mass-convert legacy scalar knowledge assertions and relations that lack
+metadata to explicit `research_state: unassessed` and `sources: []`. This
+records repository state, not proof that prior research did not happen. URLs
+embedded in relation reason remain readable context until explicitly extracted
+into sources and assigned a state. Loaders reject scalar assertions and any
+missing provenance metadata; there is no compatibility normalization.
 
 For new or materially revised reviewer facts, author research_state explicitly.
 A bounded search with no usable conclusion is searched_insufficient.
@@ -168,8 +170,8 @@ A bounded search with no usable conclusion is searched_insufficient.
 
 1. Generated card and relation schemas expose the closed five-value ResearchState
    vocabulary and repeated sources only on the two assertion classes.
-2. Legacy knowledge and relation inputs normalize to unassessed/empty sources;
-   no bulk rewrite is required.
+2. Every authored knowledge and relation assertion explicitly supplies
+   research_state and sources; scalar and incomplete records are rejected.
 3. Structured facts and relations validate, project to RDF/JSON/TypeDB-compatible
    scalar attributes, and preserve source lists.
 4. Non-unassessed assertions without a source are rejected; explicit

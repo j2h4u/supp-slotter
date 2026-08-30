@@ -7,6 +7,10 @@ notes: Marker polysaccharide component listed on Real Mushrooms Lion's Mane as b
   because the label exposes a concrete amount.
 knowledge:
   context:
-  - neurocognitive_support
+  - value: neurocognitive_support
+    research_state: unassessed
+    sources: []
   kind:
-  - fiber
+  - value: fiber
+    research_state: unassessed
+    sources: []

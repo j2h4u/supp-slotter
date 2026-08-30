@@ -7,9 +7,17 @@ notes: Conventional ferrous salt listed on Country Life Core Daily-1 for Women. 
   because iron form affects tolerability and review; iron products need overdose-risk review, especially around children.
 knowledge:
   effect:
-  - oxygen_transport_support
-  - red_blood_cell_support
+  - value: oxygen_transport_support
+    research_state: unassessed
+    sources: []
+  - value: red_blood_cell_support
+    research_state: unassessed
+    sources: []
   kind:
-  - mineral
+  - value: mineral
+    research_state: unassessed
+    sources: []
   risk:
-  - iron_overdose_review
+  - value: iron_overdose_review
+    research_state: unassessed
+    sources: []

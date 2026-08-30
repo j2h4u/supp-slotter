@@ -78,7 +78,7 @@ classes:
       tracked_unassigned_partition_name: {required: true}
   RuntimeEngineContract:
     description: Versioned observable scheduler contract. Values describe the generic execution protocol; they are not supplement facts.
-    slots: [id, protocol_version, result_mode, pressure_identity, domain_feasibility, primary_objective, secondary_objective, tie_break, publication_statuses, semantics, conformance_scenarios]
+    slots: [id, protocol_version, result_mode, pressure_identity, domain_feasibility, primary_objective, secondary_objective, tie_break, publication_statuses, semantics]
     slot_usage:
       id: {required: true}
       protocol_version: {required: true}
@@ -90,7 +90,6 @@ classes:
       tie_break: {required: true}
       publication_statuses: {required: true, multivalued: true, range: PublicationStatus}
       semantics: {required: true, inlined: true, inlined_as_list: true}
-      conformance_scenarios: {required: true, inlined: true, inlined_as_list: true}
   RuntimeEngineSemantic:
     slots: [id, category, rule, source_of_truth]
     slot_usage:
@@ -98,13 +97,6 @@ classes:
       category: {required: true}
       rule: {required: true}
       source_of_truth: {required: true}
-  RuntimeEngineConformanceScenario:
-    slots: [id, semantic, fixture, expected]
-    slot_usage:
-      id: {required: true}
-      semantic: {required: true}
-      fixture: {required: true}
-      expected: {required: true}
   RuntimeProjectionDescriptor:
     slots: [id, target, source, children]
     slot_usage:
@@ -223,13 +215,9 @@ slots:
   tie_break:
   publication_statuses: {multivalued: true}
   semantics: {multivalued: true, range: RuntimeEngineSemantic, inlined: true, inlined_as_list: true}
-  conformance_scenarios: {multivalued: true, range: RuntimeEngineConformanceScenario, inlined: true, inlined_as_list: true}
   category:
   rule:
   source_of_truth:
-  semantic:
-  fixture:
-  expected:
   target:
   source:
   children: {multivalued: true, range: RuntimeProjectionDescriptor, inlined: true, inlined_as_list: true}

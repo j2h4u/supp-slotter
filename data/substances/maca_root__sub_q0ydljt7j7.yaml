@@ -16,10 +16,18 @@ concerns:
     quality before practical use discussion.
 knowledge:
   effect:
-  - androgen_context
-  - fatigue_resilience_context
+  - value: androgen_context
+    research_state: unassessed
+    sources: []
+  - value: fatigue_resilience_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_q0ydljt7j7

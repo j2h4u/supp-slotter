@@ -29,8 +29,8 @@ def _scheduled_slot(schedule: dict[str, object], product_name: str) -> str:
         assert isinstance(slots, dict)
         for slot_id, entry in cast(Mapping[str, object], slots).items():
             assert isinstance(entry, dict)
-            products = cast(list[str], entry["products"])
-            if product_name in products:
+            products = cast(list[dict[str, str]], entry["products"])
+            if any(product["label"] == product_name for product in products):
                 return str(slot_id)
     raise AssertionError(f"product {product_name!r} was not scheduled")
 
@@ -83,8 +83,6 @@ def test_reviewer_only_knowledge_does_not_change_slot_assignment(tmp_path: Path)
     reviewer_schedule = plan_in_temp_dir(reviewer)
     reviewer_slot = _scheduled_slot(reviewer_schedule, "Product")
     assert base_slot == reviewer_slot
-    active_fact_index = cast(list[dict[str, object]], reviewer_schedule["active_fact_index"])
-    assert active_fact_index == []
 
 
 def test_review_only_relation_cannot_change_command_level_schedule(tmp_path: Path) -> None:
@@ -92,7 +90,7 @@ def test_review_only_relation_cannot_change_command_level_schedule(tmp_path: Pat
     base = tmp_path / "base"
     reviewer = tmp_path / "reviewer"
     fixture = PlannerFixtureInput(
-        stack_items={"product": {"stack": "daily"}, "active_product": {"stack": "inactive"}},
+        stack_items={"product": {"stack": "daily"}, "active_product": {"stack": "daily"}},
         products={
             "product": [("component", ["effect:circulation_support"])],
             "active_product": [("epa_component", ["effect:platelet_aggregation_modulation"])],
@@ -118,9 +116,9 @@ def test_review_only_relation_cannot_change_command_level_schedule(tmp_path: Pat
             substance_relations={
                 "component": [
                     {
-                        "relation_type": "balance",
+                        "relation_type": "review_with",
                         "substances": ["epa_component"],
-                        "reason": "Fixture review-only relation.",
+                        "reason": "Fixture explicit-metadata review_with relation.",
                     }
                 ]
             }
@@ -131,7 +129,9 @@ def test_review_only_relation_cannot_change_command_level_schedule(tmp_path: Pat
     assert isinstance(relations, dict)
     relation = cast(list[dict[str, object]], relations["relations"])[0]
     relation["assertion_kind"] = "clinical_review_signal"
-    relation["semantic_family"] = "nutrient_balance_review_signal"
+    relation["semantic_family"] = "clinical_review_signal"
+    relation["research_state"] = "unassessed"
+    relation["sources"] = []
     relations_path.write_text(yaml.safe_dump(relations, sort_keys=False), encoding="utf-8")
 
     assert cmd_plan(data_root=base).exit_code == 0
@@ -139,16 +139,23 @@ def test_review_only_relation_cannot_change_command_level_schedule(tmp_path: Pat
     base_schedule = yaml.safe_load((base / "schedule.yaml").read_text(encoding="utf-8"))
     reviewer_schedule = yaml.safe_load((reviewer / "schedule.yaml").read_text(encoding="utf-8"))
     assert isinstance(base_schedule, dict) and isinstance(reviewer_schedule, dict)
-    for field in ("status", "objective", "assignments", "pressure_matches", "domain_loads", "optimizer_proof"):
-        assert reviewer_schedule[field] == base_schedule[field]
-    assert reviewer_schedule["canonical_explanations"] == base_schedule["canonical_explanations"]
+    # Both review endpoints are active and routable; review-only metadata must
+    # leave the complete published schedule unchanged, not merely one product.
+    assert _scheduled_slot(base_schedule, "Product")
+    assert _scheduled_slot(base_schedule, "Active Product")
+    assert _scheduled_slot(reviewer_schedule, "Product")
+    assert _scheduled_slot(reviewer_schedule, "Active Product")
+    assert reviewer_schedule == base_schedule
 
     base_review = cmd_review(data_root=base)
     reviewer_review = cmd_review(data_root=reviewer)
     assert base_review.exit_code == reviewer_review.exit_code == 0
     assert base_review.output != reviewer_review.output
-    assert "Fixture review-only relation." in reviewer_review.output
-    assert "Fixture review-only relation." not in base_review.output
+    assert "Fixture explicit-metadata review_with relation." in reviewer_review.output
+    assert "Fixture explicit-metadata review_with relation." not in base_review.output
+    assert "[review_with]" in reviewer_review.output
+    assert "[warning: review_with_substance_present]" in reviewer_review.output
+    assert "[review_with]" not in base_review.output
 
 
 @pytest.mark.parametrize("command", ("plan", "find", "review"))

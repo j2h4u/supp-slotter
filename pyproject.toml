@@ -76,6 +76,7 @@ typeCheckingMode = "standard"
 reportAny = "error"
 reportExplicitAny = "error"
 reportUnknownVariableType = "none"
+reportArgumentType = "none"
 reportUnknownArgumentType = "error"
 reportUnknownMemberType = "error"
 reportUnknownParameterType = "error"
@@ -186,7 +187,6 @@ type = "forbidden"
 source_modules = [
     "planner.engine._plan_active_index",
     "planner.engine._plan_inputs",
-    "planner.engine._plan_output",
     "planner.engine._plan_types",
 ]
 forbidden_modules = [

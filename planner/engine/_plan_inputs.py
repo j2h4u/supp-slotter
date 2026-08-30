@@ -18,7 +18,7 @@ from planner.cards.substance import load_substance_registry
 from planner.contracts import CardLoadError, Slot
 from planner.engine._plan_types import PlanInputs
 from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.canonical_facts import validate_canonical_fact_catalog
+from planner.ontology.canonical_facts import validate_canonical_scheduling
 from planner.paths import Paths
 from planner.yaml_io import load_yaml
 
@@ -77,7 +77,7 @@ def load_plan_inputs(
         )
         if partition_errors or topology_errors:
             raise CardLoadError(paths.stacks_file, "\n".join((*partition_errors, *topology_errors)))
-        validate_canonical_fact_catalog(bundle.runtime_program.canonical_fact_catalog, substances, products)
+        validate_canonical_scheduling(bundle.runtime_program.canonical_scheduling, substances, products)
     except CardLoadError as e:
         print(f"plan: {e.message}", file=sys.stderr)
         return None
@@ -89,7 +89,7 @@ def load_plan_inputs(
 
     return PlanInputs(
         runtime_program=bundle.runtime_program,
-        canonical_fact_catalog=bundle.runtime_program.canonical_fact_catalog,
+        canonical_scheduling=bundle.runtime_program.canonical_scheduling,
         slots=slots,
         substances=substances,
         products=products,

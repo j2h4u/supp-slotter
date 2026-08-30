@@ -2,16 +2,15 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
+from types import MappingProxyType
 from typing import cast
 
 from planner.cards._common import load_card_mapping
 from planner.contracts import (
     CardLoadError,
-    CircadianAnchor,
-    ExerciseAnchor,
-    MealContext,
     Pillbox,
     Slot,
 )
@@ -19,11 +18,7 @@ from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.schema_validation import schema_errors
 
-_TOPOLOGY_FIELDS = frozenset({"meal_context", "circadian_anchor", "exercise_anchor"})
 _TECHNICAL_FIELDS = frozenset({"label", "order"})
-_MEAL_CONTEXTS = frozenset({"with_food", "without_food"})
-_CIRCADIAN_ANCHORS = frozenset({"wake", "sleep"})
-_EXERCISE_ANCHORS = frozenset({"before", "after"})
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,8 +43,10 @@ def load_pillboxes(path: Path, bundle: OntologyBundle | RuntimeProgram) -> dict[
         errors = schema_errors(data, "pillboxes", path, bundle)
         if errors:
             raise CardLoadError(path, errors[0])
+    runtime = bundle.runtime_program if isinstance(bundle, OntologyBundle) else bundle
+    dimensions = runtime.canonical_scheduling.pressure_values_by_dimension
     loaded = {
-        pillbox_name: _load_pillbox(path, pillbox_name, pillbox)
+        pillbox_name: _load_pillbox(path, pillbox_name, pillbox, dimensions)
         for pillbox_name, pillbox in sorted(data.items(), key=lambda item: str(item[0]))
     }
     seen_ids: set[str] = set()
@@ -76,6 +73,7 @@ def _load_pillbox(
     path: Path,
     pillbox_name: object,
     raw_pillbox: object,
+    dimensions: Mapping[str, frozenset[str]],
 ) -> Pillbox:
     if not isinstance(pillbox_name, str) or not pillbox_name.strip():
         raise CardLoadError(path, f"{path}: pillbox ids must be non-empty strings")
@@ -98,7 +96,7 @@ def _load_pillbox(
     if not isinstance(pillbox_slots_raw, dict) or not pillbox_slots_raw:
         raise CardLoadError(path, f"{path}: pillbox {pillbox_name!r} requires a non-empty slots mapping")
     slots = [
-        _load_slot(_SlotLoadContext(path, pillbox_name, pillbox_label, stack), slot_id, raw_slot)
+        _load_slot(_SlotLoadContext(path, pillbox_name, pillbox_label, stack), slot_id, raw_slot, dimensions)
         for slot_id, raw_slot in cast(dict[object, object], pillbox_slots_raw).items()
     ]
     return Pillbox(
@@ -113,6 +111,7 @@ def _load_slot(
     context: _SlotLoadContext,
     slot_id: object,
     raw_slot: object,
+    dimensions: Mapping[str, frozenset[str]],
 ) -> Slot:
     path = context.path
     if not isinstance(slot_id, str) or not slot_id.strip():
@@ -120,7 +119,7 @@ def _load_slot(
     if not isinstance(raw_slot, dict):
         raise CardLoadError(path, f"{path}: slot {slot_id!r} must be a mapping")
     slot = cast(dict[str, object], raw_slot)
-    unknown = set(slot) - _TECHNICAL_FIELDS - _TOPOLOGY_FIELDS
+    unknown = set(slot) - _TECHNICAL_FIELDS - set(dimensions)
     if unknown:
         raise CardLoadError(
             path, f"{path}: slot {slot_id!r} has unknown fields: {', '.join(sorted(map(str, unknown)))}"
@@ -134,20 +133,14 @@ def _load_slot(
         raise CardLoadError(path, f"{path}: slot {slot_id!r} requires a non-empty label")
     if isinstance(order, bool) or not isinstance(order, int) or order < 1:
         raise CardLoadError(path, f"{path}: slot {slot_id!r} order must be a positive integer")
-    topology: dict[str, str | None] = {}
-    for field, allowed in (
-        ("meal_context", _MEAL_CONTEXTS),
-        ("circadian_anchor", _CIRCADIAN_ANCHORS),
-        ("exercise_anchor", _EXERCISE_ANCHORS),
-    ):
-        if field not in slot:
-            topology[field] = None
-            continue
-        value = slot[field]
-        if not isinstance(value, str) or value not in allowed:
-            expected = ", ".join(sorted(allowed))
-            raise CardLoadError(path, f"{path}: slot {slot_id!r} {field} must be one of: {expected}")
-        topology[field] = value
+    anchors = {key: slot.get(key) for key in sorted(dimensions)}
+    invalid = [
+        key
+        for key, value in anchors.items()
+        if value is not None and (not isinstance(value, str) or value not in dimensions.get(key, frozenset()))
+    ]
+    if invalid:
+        raise CardLoadError(path, f"{path}: slot {slot_id!r} anchors contain unadmitted values")
     return Slot(
         slot_id,
         label,
@@ -155,9 +148,7 @@ def _load_slot(
         context.pillbox_name,
         context.pillbox_label,
         context.stack,
-        cast(MealContext | None, topology["meal_context"]),
-        cast(CircadianAnchor | None, topology["circadian_anchor"]),
-        cast(ExerciseAnchor | None, topology["exercise_anchor"]),
+        MappingProxyType(cast(dict[str, str | None], anchors)),
     )
 
 
@@ -190,18 +181,15 @@ def check_pillbox_slot_anchors(
     slots_path: Path,
     bundle: OntologyBundle | RuntimeProgram,
 ) -> list[str]:
-    """Validate the closed, optional logical topology axes."""
+    """Validate generic immutable topology anchors against runtime metadata."""
     errors: list[str] = []
+    runtime = bundle.runtime_program if isinstance(bundle, OntologyBundle) else bundle
+    dimensions = runtime.canonical_scheduling.pressure_values_by_dimension
     for pillbox_name, pillbox in pillboxes.items():
         for slot_id, slot in pillbox.slots.items():
-            for field, value, allowed in (
-                ("meal_context", slot.meal_context, _MEAL_CONTEXTS),
-                ("circadian_anchor", slot.circadian_anchor, _CIRCADIAN_ANCHORS),
-                ("exercise_anchor", slot.exercise_anchor, _EXERCISE_ANCHORS),
+            if set(slot.anchors) != set(dimensions) or any(
+                value is not None and value not in dimensions.get(key, frozenset())
+                for key, value in slot.anchors.items()
             ):
-                if value is not None and value not in allowed:
-                    errors.append(
-                        f"{slots_path}: pillbox '{pillbox_name}' slot '{slot_id}' has invalid "
-                        f"{field} {value!r}; expected one of {sorted(allowed)!r}"
-                    )
+                errors.append(f"{slots_path}: pillbox '{pillbox_name}' slot '{slot_id}' has invalid runtime anchors")
     return errors

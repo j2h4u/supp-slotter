@@ -7,8 +7,14 @@ notes: Amide form of niacin; does not cause flushing typical of free niacin. Com
   Nutrition Opti-Men.
 knowledge:
   context:
-  - mitochondrial_health
+  - value: mitochondrial_health
+    research_state: unassessed
+    sources: []
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: unassessed
+    sources: []
   pathway:
-  - nad_metabolism
+  - value: nad_metabolism
+    research_state: unassessed
+    sources: []

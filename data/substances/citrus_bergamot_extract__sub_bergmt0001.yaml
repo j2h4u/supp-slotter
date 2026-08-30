@@ -15,16 +15,34 @@ concerns:
     or other CYP-sensitive drugs are present.
 knowledge:
   context:
-  - antioxidant_protection
-  - vascular_health
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
+  - value: vascular_health
+    research_state: unassessed
+    sources: []
   effect:
-  - lipid_metabolism_support
-  - vascular_polyphenol_context
+  - value: lipid_metabolism_support
+    research_state: unassessed
+    sources: []
+  - value: vascular_polyphenol_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
-  - flavonoid
+  - value: botanical
+    research_state: unassessed
+    sources: []
+  - value: flavonoid
+    research_state: unassessed
+    sources: []
   risk:
-  - cyp450_med_interaction
-  - manual_review
+  - value: cyp450_med_interaction
+    research_state: unassessed
+    sources: []
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

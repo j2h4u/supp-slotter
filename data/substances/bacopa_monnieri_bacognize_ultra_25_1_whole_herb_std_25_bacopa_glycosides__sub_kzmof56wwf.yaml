@@ -13,14 +13,30 @@ concerns:
   text: Anecdotal reports (Reddit) of daytime sedation; not actionable for scheduling without stronger evidence.
 knowledge:
   context:
-  - neurocognitive_support
+  - value: neurocognitive_support
+    research_state: unassessed
+    sources: []
   effect:
-  - cholinergic_support
-  - memory_recall_context
-  - learning_context
-  - stress_reactivity_context
+  - value: cholinergic_support
+    research_state: unassessed
+    sources: []
+  - value: memory_recall_context
+    research_state: unassessed
+    sources: []
+  - value: learning_context
+    research_state: unassessed
+    sources: []
+  - value: stress_reactivity_context
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - adaptogen
-  - nootropic
+  - value: adaptogen
+    research_state: unassessed
+    sources: []
+  - value: nootropic
+    research_state: unassessed
+    sources: []

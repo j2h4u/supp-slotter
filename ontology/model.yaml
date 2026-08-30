@@ -24,16 +24,22 @@ enums:
       not_every_day:
   MealContext:
     description: Independent logical meal-context anchor for a canonical slot.
+    annotations:
+      canonical_pressure_dimension: meal_context
     permissible_values:
       with_food:
       without_food:
   CircadianAnchor:
     description: Independent logical circadian anchor for a canonical slot.
+    annotations:
+      canonical_pressure_dimension: circadian_anchor
     permissible_values:
       wake:
       sleep:
   ExerciseAnchor:
     description: Independent logical exercise anchor for a canonical slot.
+    annotations:
+      canonical_pressure_dimension: exercise_anchor
     permissible_values:
       before:
       after:
@@ -118,9 +124,9 @@ classes:
     slot_usage:
       label: {required: true, multivalued: false}
       order: {required: true, minimum_value: 1, multivalued: false}
-      meal_context: {range: MealContext, multivalued: false}
-      circadian_anchor: {range: CircadianAnchor, multivalued: false}
-      exercise_anchor: {range: ExerciseAnchor, multivalued: false}
+      meal_context: {range: MealContext, multivalued: false, annotations: {canonical_pressure_dimension: meal_context}}
+      circadian_anchor: {range: CircadianAnchor, multivalued: false, annotations: {canonical_pressure_dimension: circadian_anchor}}
+      exercise_anchor: {range: ExerciseAnchor, multivalued: false, annotations: {canonical_pressure_dimension: exercise_anchor}}
   LogicalSlot:
     description: Shadow canonical logical intake group with independent optional anchors.
     annotations:
@@ -134,9 +140,9 @@ classes:
       id: {required: true, pattern: '^[a-z][a-z0-9_:-]*$'}
       label: {required: false, multivalued: false}
       order: {required: true, minimum_value: 1, multivalued: false}
-      meal_context: {range: MealContext, multivalued: false}
-      circadian_anchor: {range: CircadianAnchor, multivalued: false}
-      exercise_anchor: {range: ExerciseAnchor, multivalued: false}
+      meal_context: {range: MealContext, multivalued: false, annotations: {canonical_pressure_dimension: meal_context}}
+      circadian_anchor: {range: CircadianAnchor, multivalued: false, annotations: {canonical_pressure_dimension: circadian_anchor}}
+      exercise_anchor: {range: ExerciseAnchor, multivalued: false, annotations: {canonical_pressure_dimension: exercise_anchor}}
   LogicalSlotTopology:
     description: Canonical topology containing unbounded logical intake groups.
     annotations:

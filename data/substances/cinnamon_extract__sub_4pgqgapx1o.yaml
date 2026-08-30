@@ -14,11 +14,21 @@ concerns:
     and liver-safety context can differ.
 knowledge:
   effect:
-  - insulin_signaling_context
+  - value: insulin_signaling_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - glucose_med_interaction
-  - liver_injury_review
-  - manual_review
+  - value: glucose_med_interaction
+    research_state: unassessed
+    sources: []
+  - value: liver_injury_review
+    research_state: unassessed
+    sources: []
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_4pgqgapx1o

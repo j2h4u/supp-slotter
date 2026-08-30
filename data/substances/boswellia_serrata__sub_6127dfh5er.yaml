@@ -8,12 +8,24 @@ notes: Anti-inflammatory gum extract; mild antiplatelet potential and CYP modula
   but not high-certainty; relevant to bleeding-load review when stacked with antiplatelet substances.
 knowledge:
   effect:
-  - anti_inflammatory_context
-  - joint_comfort_context
+  - value: anti_inflammatory_context
+    research_state: unassessed
+    sources: []
+  - value: joint_comfort_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - bleeding_med_interaction
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: bleeding_med_interaction
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

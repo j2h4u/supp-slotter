@@ -64,7 +64,7 @@ def exhaustive_layout(  # noqa: C901
         pressure_count = sum(
             1
             for pressure in identities
-            if getattr(choices[item_indexes[pressure.item_id]], pressure.dimension) == pressure.value
+            if choices[item_indexes[pressure.item_id]].anchors.get(pressure.dimension) == pressure.value
         )
         loads: dict[str, int] = {}
         for slot_id in layout.values():

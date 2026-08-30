@@ -102,15 +102,22 @@ def _knowledge_assertions(
 
 
 def _knowledge_record(raw: object, path: Path, label: str) -> tuple[object, object, tuple[str, ...]]:
-    if isinstance(raw, str):
-        return raw, "unassessed", ()
     if not isinstance(raw, Mapping):
-        raise CardLoadError(path, f"{path}: {label} must be a string or mapping")
+        raise CardLoadError(path, f"{path}: {label} must be a mapping with explicit research metadata")
     record = cast(Mapping[str, object], raw)
-    if set(record) - {"value", "research_state", "sources"} or "value" not in record:
-        raise CardLoadError(path, f"{path}: {label} has unsupported fields")
-    state = record.get("research_state", "unassessed")
-    raw_sources = record.get("sources", [])
+    required: set[str] = {"value", "research_state", "sources"}
+    actual_fields: set[str] = set(record.keys())
+    missing: set[str] = required - actual_fields
+    unsupported: set[str] = actual_fields - required
+    if missing or unsupported:
+        details: list[str] = []
+        if missing:
+            details.append(f"missing required field(s): {', '.join(sorted(missing))}")
+        if unsupported:
+            details.append(f"unsupported field(s): {', '.join(sorted(unsupported))}")
+        raise CardLoadError(path, f"{path}: {label} {'; '.join(details)}")
+    state = record["research_state"]
+    raw_sources = record["sources"]
     if not isinstance(raw_sources, list) or any(
         not isinstance(source, str) or not source.strip() for source in raw_sources
     ):

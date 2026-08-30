@@ -4,6 +4,10 @@ notes: Phosphorus component listed on Source Naturals Calcium Hydroxyapatite. Re
   mineral, ATP, and phospholipid membrane structure.
 knowledge:
   effect:
-  - bone_mineral_metabolism_support
+  - value: bone_mineral_metabolism_support
+    research_state: unassessed
+    sources: []
   kind:
-  - mineral
+  - value: mineral
+    research_state: unassessed
+    sources: []

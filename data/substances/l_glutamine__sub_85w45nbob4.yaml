@@ -7,7 +7,13 @@ notes: Conditionally essential amino acid; common in amino-acid blends and athle
   clinical relevance is dose- and stress-state-dependent.
 knowledge:
   effect:
-  - gut_barrier_context
-  - immune_cell_context
+  - value: gut_barrier_context
+    research_state: unassessed
+    sources: []
+  - value: immune_cell_context
+    research_state: unassessed
+    sources: []
   kind:
-  - amino
+  - value: amino
+    research_state: unassessed
+    sources: []

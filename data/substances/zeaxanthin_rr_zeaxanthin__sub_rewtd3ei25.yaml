@@ -6,10 +6,18 @@ notes: Zeaxanthin stereoisomer listed separately on the Jarrow MaculaPF Suppleme
   stereoisomer instead of collapsing into generic zeaxanthin.
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - ocular_retina_context
+  - value: ocular_retina_context
+    research_state: unassessed
+    sources: []
   kind:
-  - carotenoid
+  - value: carotenoid
+    research_state: unassessed
+    sources: []
   quality:
-  - fat_soluble
+  - value: fat_soluble
+    research_state: unassessed
+    sources: []

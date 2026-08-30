@@ -12,10 +12,18 @@ concerns:
     quality before practical use discussion.
 knowledge:
   effect:
-  - bile_acid_conjugation_context
-  - fat_digestion_support
+  - value: bile_acid_conjugation_context
+    research_state: unassessed
+    sources: []
+  - value: fat_digestion_support
+    research_state: unassessed
+    sources: []
   kind:
-  - bile_acid
+  - value: bile_acid
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_atj92jfxeo

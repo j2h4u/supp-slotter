@@ -13,7 +13,13 @@ concerns:
     phytosterol use as routine.
 knowledge:
   effect:
-  - lipid_metabolism_support
-  - fat_digestion_support
+  - value: lipid_metabolism_support
+    research_state: unassessed
+    sources: []
+  - value: fat_digestion_support
+    research_state: unassessed
+    sources: []
   kind:
-  - phytosterol
+  - value: phytosterol
+    research_state: unassessed
+    sources: []

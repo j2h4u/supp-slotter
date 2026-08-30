@@ -102,17 +102,10 @@ def _active_role_ids(paths: Paths, products: Mapping[str, Product], bundle: Onto
 
 
 def _canonical_fact_role_ids(bundle: OntologyBundle, roles: Mapping[str, GroomWorkItem]) -> set[str]:
-    catalog = bundle.runtime_program.canonical_fact_catalog
+    catalog = bundle.runtime_program.canonical_scheduling
     return {
         role_id
-        for family in (
-            catalog.food_effects,
-            catalog.acute_alertness_effects,
-            catalog.acute_sleep_effects,
-            catalog.pre_exercise_performance_effects,
-            catalog.post_exercise_recovery_effects,
-        )
-        for fact in family
+        for fact in catalog.facts
         for role_id, role in roles.items()
         if (
             fact.applicability.substance == role.substance_id

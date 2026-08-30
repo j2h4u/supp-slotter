@@ -11,12 +11,22 @@ concerns:
     raw or improperly prepared elderberry plant parts are not equivalent to standardized supplement extracts.
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - immune_modulation_context
+  - value: immune_modulation_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
-  - flavonoid
+  - value: botanical
+    research_state: unassessed
+    sources: []
+  - value: flavonoid
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_dopjesesge

@@ -7,13 +7,27 @@ notes: Zinc oxide form used in Optimum Nutrition Opti-Men and Animal Flex. Human
   from zinc oxide than citrate/gluconate, so it remains a separate review card.
 knowledge:
   context:
-  - skin_support
+  - value: skin_support
+    research_state: unassessed
+    sources: []
   effect:
-  - dna_synthesis_support
-  - immune_function_support
-  - skin_barrier_context
-  - wound_healing_support
+  - value: dna_synthesis_support
+    research_state: unassessed
+    sources: []
+  - value: immune_function_support
+    research_state: unassessed
+    sources: []
+  - value: skin_barrier_context
+    research_state: unassessed
+    sources: []
+  - value: wound_healing_support
+    research_state: unassessed
+    sources: []
   kind:
-  - mineral
+  - value: mineral
+    research_state: unassessed
+    sources: []
   risk:
-  - zinc_copper_balance_review
+  - value: zinc_copper_balance_review
+    research_state: unassessed
+    sources: []

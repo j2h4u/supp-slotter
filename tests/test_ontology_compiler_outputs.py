@@ -114,7 +114,7 @@ def test_committed_projection_matches_schema_and_authored_runtime() -> None:
     )
 
     runtime_program = _json("runtime-program.json")
-    assert runtime_program["format_version"] == "ontology-runtime-program-v1"
+    assert runtime_program["format_version"] == "ontology-runtime-program-v2"
     assert runtime_program["schema_version"] == "2"
     assert isinstance(runtime_program["source_hash"], str) and len(runtime_program["source_hash"]) == 64
     provenance = _json_mapping(runtime_program["provenance"])

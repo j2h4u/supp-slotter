@@ -5,8 +5,14 @@ notes: 'Sleep-onset hormone used in bedtime products. Labels in the intake batch
   lag and delayed sleep-wake timing than for routine chronic insomnia.'
 knowledge:
   context:
-  - sleep_recovery
+  - value: sleep_recovery
+    research_state: unassessed
+    sources: []
   effect:
-  - sleep_onset_support
+  - value: sleep_onset_support
+    research_state: unassessed
+    sources: []
   kind:
-  - hormone
+  - value: hormone
+    research_state: unassessed
+    sources: []

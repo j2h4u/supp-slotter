@@ -10,10 +10,18 @@ concerns:
     especially if acetylcholinesterase inhibitors, anticholinergic drugs, or other strong choline donors are present.
 knowledge:
   context:
-  - neurocognitive_support
+  - value: neurocognitive_support
+    research_state: unassessed
+    sources: []
   effect:
-  - cholinergic_support
+  - value: cholinergic_support
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []

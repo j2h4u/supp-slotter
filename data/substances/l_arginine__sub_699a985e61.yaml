@@ -8,14 +8,26 @@ concerns:
     and can add to hypotensive stack load.
 knowledge:
   context:
-  - vascular_health
+  - value: vascular_health
+    research_state: unassessed
+    sources: []
   effect:
-  - nitric_oxide_support
+  - value: nitric_oxide_support
+    research_state: unassessed
+    sources: []
   kind:
-  - amino
+  - value: amino
+    research_state: unassessed
+    sources: []
   pathway:
-  - nitric_oxide_cgmp
+  - value: nitric_oxide_cgmp
+    research_state: unassessed
+    sources: []
   risk:
-  - hypotension_med_interaction
+  - value: hypotension_med_interaction
+    research_state: unassessed
+    sources: []
   role:
-  - ergogenic
+  - value: ergogenic
+    research_state: unassessed
+    sources: []

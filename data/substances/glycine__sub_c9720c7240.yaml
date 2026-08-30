@@ -6,7 +6,13 @@ notes: 'Free-form amino acid, not to be confused with magnesium glycinate. Impro
   (Glycine).'
 knowledge:
   context:
-  - cortisol_reduction
-  - sleep_recovery
+  - value: cortisol_reduction
+    research_state: unassessed
+    sources: []
+  - value: sleep_recovery
+    research_state: unassessed
+    sources: []
   kind:
-  - amino
+  - value: amino
+    research_state: unassessed
+    sources: []

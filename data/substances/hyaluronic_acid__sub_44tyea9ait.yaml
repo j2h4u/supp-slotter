@@ -6,9 +6,17 @@ aliases:
 notes: Glycosaminoglycan with joint-lubrication and connective-tissue positioning. Used in Animal Flex Joint Lubrication Complex.
 knowledge:
   context:
-  - connective_tissue_support
+  - value: connective_tissue_support
+    research_state: unassessed
+    sources: []
   effect:
-  - glycosaminoglycan_context
-  - joint_lubrication_context
+  - value: glycosaminoglycan_context
+    research_state: unassessed
+    sources: []
+  - value: joint_lubrication_context
+    research_state: unassessed
+    sources: []
   kind:
-  - glycosaminoglycan
+  - value: glycosaminoglycan
+    research_state: unassessed
+    sources: []

@@ -5,10 +5,20 @@ notes: Water-soluble vitamin C form. Reviewer context includes antioxidant suppo
   product cards retain dose/form details.
 knowledge:
   context:
-  - connective_tissue_support
-  - cortisol_reduction
-  - skin_support
+  - value: connective_tissue_support
+    research_state: unassessed
+    sources: []
+  - value: cortisol_reduction
+    research_state: unassessed
+    sources: []
+  - value: skin_support
+    research_state: unassessed
+    sources: []
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

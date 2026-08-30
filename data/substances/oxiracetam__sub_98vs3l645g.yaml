@@ -9,11 +9,21 @@ concerns:
     any use-case discussion.
 knowledge:
   effect:
-  - cognitive_performance_context
-  - learning_context
-  - alertness_context
+  - value: cognitive_performance_context
+    research_state: unassessed
+    sources: []
+  - value: learning_context
+    research_state: unassessed
+    sources: []
+  - value: alertness_context
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []
 id: sub_98vs3l645g

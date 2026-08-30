@@ -6,6 +6,10 @@ notes: Essential amino acid; common in multivitamin amino-acid blends. Review co
   context; blend presence does not imply dose adequacy.
 knowledge:
   effect:
-  - protein_synthesis_support
+  - value: protein_synthesis_support
+    research_state: unassessed
+    sources: []
   kind:
-  - amino
+  - value: amino
+    research_state: unassessed
+    sources: []

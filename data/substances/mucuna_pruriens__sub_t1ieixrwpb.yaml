@@ -15,11 +15,19 @@ concerns:
     and manual_review until several cards need a reusable dopaminergic axis.
 knowledge:
   effect:
-  - catecholamine_precursor_context
+  - value: catecholamine_precursor_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []
 id: sub_t1ieixrwpb

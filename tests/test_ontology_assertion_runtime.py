@@ -3,64 +3,50 @@
 from __future__ import annotations
 
 import pytest
-from planner.contracts import Relation, Substance
+from planner.contracts import Substance
 from planner.ontology.policies import load_ontology_assertions
 from planner.ontology.selector import resolve_selector
-from planner.query_model import build_stack_read_model
+from planner.query_model.relations import classify_relations, resolve_relation_queries
 
 from tests.helpers import ontology_bundle
 from tests.scheduling_fixtures import SubstanceTraitOverrides, make_substance
 
 
-def _canonical_read_model(substances: dict[str, Substance]):
+def _canonical_relation_rows(substances: dict[str, Substance], active_substances: set[str]):
     bundle = ontology_bundle()
-    relations = [
-        Relation(
-            id=assertion.id,
-            type=assertion.relation_type,
-            reason=assertion.reason,
-            source_selector=assertion.source_selector,
-            target_selector=assertion.target_selector,
-            action=assertion.action,
-            severity=assertion.severity,
-            assertion_kind=assertion.assertion_kind,
-            semantic_family=assertion.semantic_family,
-            research_state=assertion.research_state,
-            sources=assertion.sources,
-        )
+    assertions = tuple(
+        assertion
         for assertion in load_ontology_assertions(bundle)
         if resolve_selector(assertion.source_selector, substances, bundle).outcome == "resolved"
         and resolve_selector(assertion.target_selector, substances, bundle).outcome == "resolved"
-    ]
-    return build_stack_read_model(substances, relations, {}, {}, ontology_bundle=bundle)
+    )
+    return classify_relations(
+        resolve_relation_queries(assertions, substances, bundle), active_substances, bundle.runtime_program
+    )
 
 
 def test_assertion_projection_resolves_id_and_name_selectors_without_scheduling_effect() -> None:
     metformin = make_substance("sub_605u9zvqt2", "Metformin")
     b12 = make_substance("sub_b12", "Vitamin B12")
 
-    read_model = _canonical_read_model({metformin.id: metformin, b12.id: b12})
-    warnings = [
-        warning
-        for warning in read_model.collect_relation_warnings({metformin.id, b12.id})
-        if warning["type"] == "review_with_substance_present"
-    ]
+    rows = _canonical_relation_rows({metformin.id: metformin, b12.id: b12}, {metformin.id, b12.id})
+    warnings = [row for row in rows["both_active"] if row["warning_type"] == "review_with_substance_present"]
 
     assert len(warnings) == 1
-    assert warnings[0]["source_substance"] == metformin.id
-    assert warnings[0]["target_substance"] == "Vitamin B12"
-    assert warnings[0]["type"] == "review_with_substance_present"
+    assert warnings[0]["source"] == "Metformin"
+    assert warnings[0]["target"] == "Vitamin B12"
+    assert warnings[0]["warning_type"] == "review_with_substance_present"
 
 
 def test_relation_warning_query_does_not_cross_relation_types_with_shared_filter() -> None:
     """A balance assertion must not satisfy the review_with warning rule."""
     zinc = make_substance("sub_zinc", "Zinc")
     copper = make_substance("sub_copper", "Copper")
-    read_model = _canonical_read_model({zinc.id: zinc, copper.id: copper})
+    rows = _canonical_relation_rows({zinc.id: zinc, copper.id: copper}, {zinc.id, copper.id})
 
-    warnings = read_model.collect_relation_warnings({zinc.id, copper.id})
-
-    assert not [warning for warning in warnings if warning["type"] == "review_with_substance_present"]
+    assert not [
+        row for entries in rows.values() for row in entries if row["warning_type"] == "review_with_substance_present"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -83,41 +69,30 @@ def test_eight_rule_cutover_review_pairs_emit_only_review_warnings(
 ) -> None:
     source = make_substance(source_id, source_name)
     target = make_substance(target_id, target_name)
-    read_model = _canonical_read_model({source.id: source, target.id: target})
-
-    warnings = [
-        warning
-        for warning in read_model.collect_relation_warnings({source.id, target.id})
-        if warning["type"] == "review_with_substance_present"
-    ]
+    rows = _canonical_relation_rows({source.id: source, target.id: target}, {source.id, target.id})
+    warnings = [row for row in rows["both_active"] if row["warning_type"] == "review_with_substance_present"]
 
     assert len(warnings) == 1
-    assert warnings[0]["source_substance"] in {source_id, source_name}
-    assert warnings[0]["target_substance"] in {target_id, target_name}
-    assert warnings[0]["source_name"] == source_name
-    assert warnings[0]["target_name"] == target_name
+    assert warnings[0]["source"] == source_name
+    assert warnings[0]["target"] == target_name
     assert warnings[0]["severity"] == severity
 
 
 def test_retired_mineral_fat_soluble_rule_emits_no_relation_warning() -> None:
     mineral = make_substance("sub_mineral", "Zinc", traits=SubstanceTraitOverrides(kind=("mineral",)))
     fat_soluble = make_substance("sub_fat_soluble", "Vitamin E", traits=SubstanceTraitOverrides(kind=("fat_soluble",)))
-    read_model = _canonical_read_model({mineral.id: mineral, fat_soluble.id: fat_soluble})
-
+    rows = _canonical_relation_rows({mineral.id: mineral, fat_soluble.id: fat_soluble}, {mineral.id, fat_soluble.id})
     assert not [
-        warning
-        for warning in read_model.collect_relation_warnings({mineral.id, fat_soluble.id})
-        if warning["type"] == "review_with_substance_present"
+        row for entries in rows.values() for row in entries if row["warning_type"] == "review_with_substance_present"
     ]
 
 
 def test_tocopherol_review_relation_does_not_broaden_to_other_vitamin_e_forms() -> None:
     tocopherol = make_substance("sub_844a87d72b", "Vitamin E")
     other_form = make_substance("sub_grely3rikd", "Vitamin E")
-    read_model = _canonical_read_model({tocopherol.id: tocopherol, other_form.id: other_form})
-
+    rows = _canonical_relation_rows(
+        {tocopherol.id: tocopherol, other_form.id: other_form}, {tocopherol.id, other_form.id}
+    )
     assert not [
-        warning
-        for warning in read_model.collect_relation_warnings({tocopherol.id, other_form.id})
-        if warning["type"] == "review_with_substance_present"
+        row for entries in rows.values() for row in entries if row["warning_type"] == "review_with_substance_present"
     ]

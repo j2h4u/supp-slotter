@@ -5,16 +5,30 @@ from __future__ import annotations
 import random
 
 import pytest
-from planner.contracts import Slot
-from planner.engine._canonical_optimizer import (
+from planner.canonical_optimizer import (
     CanonicalOptimizerInput,
     Indeterminate,
     Optimal,
-    optimize_canonical_layout,
 )
+from planner.canonical_optimizer import optimize_canonical_layout as _optimize_canonical_layout
+from planner.contracts import Slot
 from planner.ontology.canonical_inference import UnaryPressureIdentity
 
 from tests.oracles.exhaustive_layout import exhaustive_layout
+
+PRESSURE_VALUES = {
+    "meal_context": frozenset({"with_food", "without_food"}),
+    "circadian_anchor": frozenset({"wake", "sleep"}),
+    "exercise_anchor": frozenset({"before", "after"}),
+}
+
+
+def optimize_canonical_layout(
+    item_domains: dict[str, str], slots: dict[str, Slot], pressures: tuple[UnaryPressureIdentity, ...], **kwargs: object
+) -> Optimal | Indeterminate:
+    return _optimize_canonical_layout(
+        CanonicalOptimizerInput(item_domains, slots, pressures, PRESSURE_VALUES, **kwargs)  # type: ignore[arg-type]
+    )
 
 
 def _slot(  # noqa: PLR0913
@@ -26,7 +40,19 @@ def _slot(  # noqa: PLR0913
     circadian: str | None = None,
     exercise: str | None = None,
 ) -> Slot:
-    return Slot(slot_id, slot_id, order, domain, domain, domain, meal, circadian, exercise)
+    return Slot(
+        slot_id,
+        slot_id,
+        order,
+        domain,
+        domain,
+        domain,
+        {
+            "meal_context": meal,
+            "circadian_anchor": circadian,
+            "exercise_anchor": exercise,
+        },
+    )
 
 
 def test_pressure_maximum_precedes_balance_and_keeps_only_maximum_slots() -> None:
@@ -70,8 +96,8 @@ def test_tie_break_uses_slot_id_after_order_and_is_domain_independent() -> None:
             _slot("other", 5, "two"),
         )
     }
-    result = optimize_canonical_layout(
-        CanonicalOptimizerInput({"item-z": "one", "item-a": "one", "item-b": "two"}, slots, ())
+    result = _optimize_canonical_layout(
+        CanonicalOptimizerInput({"item-z": "one", "item-a": "one", "item-b": "two"}, slots, (), PRESSURE_VALUES)
     )
     assert isinstance(result, Optimal)
     assert result.assignments == {"item-a": "a", "item-b": "other", "item-z": "z"}

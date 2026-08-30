@@ -17,9 +17,15 @@ concerns:
     is oil, powder, or part of a blended meal replacement.
 knowledge:
   effect:
-  - fatty_acid_metabolism_support
+  - value: fatty_acid_metabolism_support
+    research_state: unassessed
+    sources: []
   kind:
-  - fatty_acid_derivative
+  - value: fatty_acid_derivative
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_l512lczi25

@@ -12,11 +12,21 @@ concerns:
     and medication interactions before practical use discussion.
 knowledge:
   effect:
-  - immune_modulation_context
-  - immune_function_support
+  - value: immune_modulation_context
+    research_state: unassessed
+    sources: []
+  - value: immune_function_support
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - cyp450_med_interaction
-  - manual_review
+  - value: cyp450_med_interaction
+    research_state: unassessed
+    sources: []
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_ud7grsqvtr

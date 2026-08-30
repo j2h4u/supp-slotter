@@ -8,8 +8,14 @@ concerns:
     cimetidine as an ordinary supplement card.
 knowledge:
   effect:
-  - gastric_acid_suppressing_drug_context
+  - value: gastric_acid_suppressing_drug_context
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - pharmaceutical
+  - value: pharmaceutical
+    research_state: unassessed
+    sources: []

@@ -8,9 +8,17 @@ notes: 'English lavender flower listed in the Natural Balance Happy Sleeper prop
   rather than a strong sleep-efficacy claim.'
 knowledge:
   context:
-  - sleep_recovery
+  - value: sleep_recovery
+    research_state: unassessed
+    sources: []
   effect:
-  - calming_context
-  - sleep_context
+  - value: calming_context
+    research_state: unassessed
+    sources: []
+  - value: sleep_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []

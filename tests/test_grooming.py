@@ -36,16 +36,10 @@ def _bundle(*, substances: set[str] = frozenset(), roles: set[str] = frozenset()
         SimpleNamespace(applicability=SimpleNamespace(substance=substance, composition_role=None))
         for substance in substances
     ) + tuple(SimpleNamespace(applicability=SimpleNamespace(substance=None, composition_role=role)) for role in roles)
-    catalog = SimpleNamespace(
-        food_effects=facts,
-        acute_alertness_effects=(),
-        acute_sleep_effects=(),
-        pre_exercise_performance_effects=(),
-        post_exercise_recovery_effects=(),
-    )
+    scheduling = SimpleNamespace(facts=facts)
     return SimpleNamespace(
         runtime_program=SimpleNamespace(
-            canonical_fact_catalog=catalog,
+            canonical_scheduling=scheduling,
             glue_contract=SimpleNamespace(
                 inactive_stack_name="inactive",
                 stack_partition=SimpleNamespace(routable_stack_names=("daily", "training")),

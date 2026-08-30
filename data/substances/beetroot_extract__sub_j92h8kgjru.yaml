@@ -20,19 +20,41 @@ concerns:
     dietary nitrate intervention.
 knowledge:
   context:
-  - vascular_health
-  - workout_performance
+  - value: vascular_health
+    research_state: unassessed
+    sources: []
+  - value: workout_performance
+    research_state: unassessed
+    sources: []
   effect:
-  - nitrate_context
-  - nitric_oxide_support
-  - exercise_pump_context
-  - endurance_context
+  - value: nitrate_context
+    research_state: unassessed
+    sources: []
+  - value: nitric_oxide_support
+    research_state: unassessed
+    sources: []
+  - value: exercise_pump_context
+    research_state: unassessed
+    sources: []
+  - value: endurance_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   pathway:
-  - nitric_oxide_cgmp
+  - value: nitric_oxide_cgmp
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - hypotension_med_interaction
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: hypotension_med_interaction
+    research_state: unassessed
+    sources: []
   role:
-  - ergogenic
+  - value: ergogenic
+    research_state: unassessed
+    sources: []

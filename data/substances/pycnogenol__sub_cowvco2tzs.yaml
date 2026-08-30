@@ -18,17 +18,37 @@ concerns:
     unless the product label and standardization justify it.
 knowledge:
   context:
-  - antioxidant_protection
-  - vascular_health
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
+  - value: vascular_health
+    research_state: unassessed
+    sources: []
   effect:
-  - anti_inflammatory_context
-  - vascular_polyphenol_context
-  - endothelial_context
-  - capillary_support_context
+  - value: anti_inflammatory_context
+    research_state: unassessed
+    sources: []
+  - value: vascular_polyphenol_context
+    research_state: unassessed
+    sources: []
+  - value: endothelial_context
+    research_state: unassessed
+    sources: []
+  - value: capillary_support_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
-  - flavonoid
+  - value: botanical
+    research_state: unassessed
+    sources: []
+  - value: flavonoid
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

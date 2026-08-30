@@ -11,11 +11,23 @@ concerns:
     drugs, and narrow-therapeutic-window medicines before active use.
 knowledge:
   effect:
-  - lipid_metabolism_support
-  - insulin_signaling_context
+  - value: lipid_metabolism_support
+    research_state: unassessed
+    sources: []
+  - value: insulin_signaling_context
+    research_state: unassessed
+    sources: []
   kind:
-  - alkaloid
+  - value: alkaloid
+    research_state: unassessed
+    sources: []
   risk:
-  - glucose_med_interaction
-  - cyp450_med_interaction
-  - manual_review
+  - value: glucose_med_interaction
+    research_state: unassessed
+    sources: []
+  - value: cyp450_med_interaction
+    research_state: unassessed
+    sources: []
+  - value: manual_review
+    research_state: unassessed
+    sources: []

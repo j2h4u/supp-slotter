@@ -4,8 +4,14 @@ notes: Amino acid and urea cycle intermediate. Reduces exercise-induced ammonia 
   arginine and lysine in the growth-hormone secretagogue hypothesis.
 knowledge:
   context:
-  - workout_performance
+  - value: workout_performance
+    research_state: unassessed
+    sources: []
   kind:
-  - amino
+  - value: amino
+    research_state: unassessed
+    sources: []
   role:
-  - ergogenic
+  - value: ergogenic
+    research_state: unassessed
+    sources: []

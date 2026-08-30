@@ -8,4 +8,6 @@ notes: Whole-seed African Mango / Irvingia gabonensis powder form listed on Swan
   - same plant as extract form, but whole-seed powder should not inherit extract-potency assumptions.
 knowledge:
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []

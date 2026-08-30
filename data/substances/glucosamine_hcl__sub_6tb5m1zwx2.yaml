@@ -7,10 +7,20 @@ notes: Amino sugar / cartilage and glycosaminoglycan substrate; HCl form lacks t
   sulfate variants. Used in Animal Flex Joint Construction Complex.
 knowledge:
   context:
-  - connective_tissue_support
+  - value: connective_tissue_support
+    research_state: unassessed
+    sources: []
   effect:
-  - cartilage_matrix_context
-  - glycosaminoglycan_context
-  - joint_comfort_context
+  - value: cartilage_matrix_context
+    research_state: unassessed
+    sources: []
+  - value: glycosaminoglycan_context
+    research_state: unassessed
+    sources: []
+  - value: joint_comfort_context
+    research_state: unassessed
+    sources: []
   kind:
-  - amino
+  - value: amino
+    research_state: unassessed
+    sources: []

@@ -12,10 +12,20 @@ concerns:
     flaxseed is used therapeutically.
 knowledge:
   effect:
-  - lipid_metabolism_support
-  - bowel_regularity_context
+  - value: lipid_metabolism_support
+    research_state: unassessed
+    sources: []
+  - value: bowel_regularity_context
+    research_state: unassessed
+    sources: []
   kind:
-  - fiber
+  - value: fiber
+    research_state: unassessed
+    sources: []
   risk:
-  - bleeding_med_interaction
-  - manual_review
+  - value: bleeding_med_interaction
+    research_state: unassessed
+    sources: []
+  - value: manual_review
+    research_state: unassessed
+    sources: []

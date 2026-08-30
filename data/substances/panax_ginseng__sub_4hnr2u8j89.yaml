@@ -12,12 +12,26 @@ concerns:
     carefully if any of these are introduced to the stack.
 knowledge:
   effect:
-  - stress_resilience_context
-  - fatigue_resilience_context
-  - cognitive_performance_context
+  - value: stress_resilience_context
+    research_state: unassessed
+    sources: []
+  - value: fatigue_resilience_context
+    research_state: unassessed
+    sources: []
+  - value: cognitive_performance_context
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - bleeding_med_interaction
-  - glucose_med_interaction
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: bleeding_med_interaction
+    research_state: unassessed
+    sources: []
+  - value: glucose_med_interaction
+    research_state: unassessed
+    sources: []
   role:
-  - adaptogen
+  - value: adaptogen
+    research_state: unassessed
+    sources: []

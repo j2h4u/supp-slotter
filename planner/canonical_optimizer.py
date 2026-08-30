@@ -16,7 +16,6 @@ from __future__ import annotations
 import time
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import cast
 
 from planner.canonical_optimizer_result import (
     CanonicalObjective,
@@ -32,12 +31,6 @@ from planner.ontology.canonical_inference import NormalizedUnaryPressure, UnaryP
 Pressure = UnaryPressureIdentity | NormalizedUnaryPressure
 InterruptCheck = Callable[[], bool]
 MonotonicNs = Callable[[], int]
-
-_ANCHOR_VALUES: dict[str, frozenset[str]] = {
-    "meal_context": frozenset({"with_food", "without_food"}),
-    "circadian_anchor": frozenset({"wake", "sleep"}),
-    "exercise_anchor": frozenset({"before", "after"}),
-}
 
 
 @dataclass(frozen=True, slots=True)
@@ -56,6 +49,7 @@ class CanonicalOptimizerInput:
     item_domains: Mapping[str, str]
     slots: Mapping[str, Slot]
     pressures: Sequence[Pressure]
+    pressure_values_by_dimension: Mapping[str, frozenset[str]]
     deadline_monotonic_ns: int | None = None
     interruption: InterruptCheck | None = None
     state_bound: int | None = None
@@ -86,34 +80,15 @@ class _IndeterminateError(Exception):
         self.diagnostic: Diagnostic = Diagnostic(code, message)
 
 
-def optimize_canonical_layout(  # noqa: PLR0913
-    item_domains: Mapping[str, str] | CanonicalOptimizerInput,
-    slots: Mapping[str, Slot] | None = None,
-    pressures: Sequence[Pressure] | None = None,
-    *,
-    deadline_monotonic_ns: int | None = None,
-    interruption: InterruptCheck | None = None,
-    state_bound: int | None = None,
-    monotonic_ns: MonotonicNs = time.monotonic_ns,
-) -> CanonicalOptimizerResult:
+def optimize_canonical_layout(optimizer_input: CanonicalOptimizerInput) -> CanonicalOptimizerResult:
     """Prove and return the exact canonical layout.
 
-    The first positional argument may be a :class:`CanonicalOptimizerInput`,
-    in which case the remaining arguments must be omitted.  Invalid inputs,
-    conflicts, interruption, deadline expiry, resource bounds, allocation
-    failure, and proof failures all return ``Indeterminate`` with no layout.
+    Invalid inputs, conflicts, interruption, deadline expiry, resource bounds,
+    allocation failure, and proof failures all return ``Indeterminate`` with
+    no layout.
     """
 
     try:
-        optimizer_input = _coerce_input(
-            item_domains,
-            slots,
-            pressures,
-            deadline_monotonic_ns=deadline_monotonic_ns,
-            interruption=interruption,
-            state_bound=state_bound,
-            monotonic_ns=monotonic_ns,
-        )
         prepared = _prepare(optimizer_input)
         _check_abort(optimizer_input)
         assignment: dict[str, str] = {}
@@ -161,42 +136,12 @@ def optimize_canonical_layout(  # noqa: PLR0913
         return Indeterminate(Diagnostic("infrastructure_failed", f"optimization failed closed: {error}"))
 
 
-def _coerce_input(  # noqa: PLR0913
-    item_domains: Mapping[str, str] | CanonicalOptimizerInput,
-    slots: Mapping[str, Slot] | None,
-    pressures: Sequence[Pressure] | None,
-    *,
-    deadline_monotonic_ns: int | None,
-    interruption: InterruptCheck | None,
-    state_bound: int | None,
-    monotonic_ns: MonotonicNs,
-) -> CanonicalOptimizerInput:
-    if isinstance(item_domains, CanonicalOptimizerInput):
-        if (
-            slots is not None
-            or pressures is not None
-            or any(value is not None for value in (deadline_monotonic_ns, interruption, state_bound))
-        ):
-            raise _IndeterminateError("invalid_input", "optimizer input object cannot be combined with keyword inputs")
-        return item_domains
-    if slots is None or pressures is None:
-        raise _IndeterminateError("invalid_input", "item_domains, slots, and pressures are required")
-    return CanonicalOptimizerInput(
-        item_domains,
-        slots,
-        pressures,
-        deadline_monotonic_ns=deadline_monotonic_ns,
-        interruption=interruption,
-        state_bound=state_bound,
-        monotonic_ns=monotonic_ns,
-    )
-
-
 def _prepare(optimizer_input: CanonicalOptimizerInput) -> _PreparedInput:
     _validate_run_limits(optimizer_input)
     domains = _validated_item_domains(optimizer_input.item_domains)
-    slots_by_domain = _validated_slots_by_domain(optimizer_input.slots)
-    pressures = _pressure_identities(optimizer_input.pressures, domains)
+    dimensions = _validated_dimensions(optimizer_input.pressure_values_by_dimension)
+    slots_by_domain = _validated_slots_by_domain(optimizer_input.slots, dimensions)
+    pressures = _pressure_identities(optimizer_input.pressures, domains, dimensions)
     items = _prepared_items(domains, slots_by_domain, pressures)
     return _PreparedInput(
         items,
@@ -234,24 +179,46 @@ def _validated_item_domains(item_domains: Mapping[str, str]) -> dict[str, str]:
     return domains
 
 
-def _validated_slots_by_domain(slots: Mapping[str, Slot]) -> dict[str, tuple[Slot, ...]]:
+def _validated_dimensions(values: Mapping[str, frozenset[str]]) -> Mapping[str, frozenset[str]]:
+    if not isinstance(values, Mapping) or not values:
+        raise _IndeterminateError("invalid_input", "pressure dimensions must be a non-empty mapping")
+    if any(
+        not isinstance(key, str)
+        or not key
+        or not isinstance(row, frozenset)
+        or not row
+        or not all(isinstance(value, str) and value for value in row)
+        for key, row in values.items()
+    ):
+        raise _IndeterminateError("invalid_input", "pressure dimensions contain invalid values")
+    return values
+
+
+def _validated_slots_by_domain(
+    slots: Mapping[str, Slot], dimensions: Mapping[str, frozenset[str]]
+) -> dict[str, tuple[Slot, ...]]:
     slots_by_domain: dict[str, list[Slot]] = {}
     for slot_key, slot in slots.items():
-        if not isinstance(slot_key, str) or not slot_key or not isinstance(slot, Slot):
-            raise _IndeterminateError("invalid_input", "slots must be keyed by non-empty IDs and contain Slot values")
-        if slot.slot_id != slot_key or not slot.slot_id or not isinstance(slot.stack, str) or not slot.stack:
-            raise _IndeterminateError("invalid_input", f"slot identity/domain is invalid for {slot_key!r}")
-        if isinstance(slot.order, bool) or not isinstance(slot.order, int):
-            raise _IndeterminateError("invalid_input", f"slot order is invalid for {slot_key!r}")
-        for dimension, values in _ANCHOR_VALUES.items():
-            value = cast(str | None, getattr(slot, dimension))
-            if value is not None and value not in values:
-                raise _IndeterminateError("invalid_input", f"slot {slot_key!r} has invalid {dimension} value")
+        _validate_slot(slot_key, slot, dimensions)
         slots_by_domain.setdefault(slot.stack, []).append(slot)
     return {
         domain: tuple(sorted(rows, key=lambda row: (row.order, row.slot_id)))
         for domain, rows in slots_by_domain.items()
     }
+
+
+def _validate_slot(slot_key: object, slot: object, dimensions: Mapping[str, frozenset[str]]) -> None:
+    if not isinstance(slot_key, str) or not slot_key or not isinstance(slot, Slot):
+        raise _IndeterminateError("invalid_input", "slots must be keyed by non-empty IDs and contain Slot values")
+    if slot.slot_id != slot_key or not slot.slot_id or not isinstance(slot.stack, str) or not slot.stack:
+        raise _IndeterminateError("invalid_input", f"slot identity/domain is invalid for {slot_key!r}")
+    if isinstance(slot.order, bool) or not isinstance(slot.order, int):
+        raise _IndeterminateError("invalid_input", f"slot order is invalid for {slot_key!r}")
+    if set(slot.anchors) != set(dimensions) or any(
+        value is not None and value not in dimensions.get(dimension, frozenset())
+        for dimension, value in slot.anchors.items()
+    ):
+        raise _IndeterminateError("invalid_input", f"slot {slot_key!r} has invalid anchors")
 
 
 def _prepared_items(
@@ -282,7 +249,7 @@ def _prepared_items(
 
 
 def _pressure_identities(
-    pressures: Sequence[Pressure], item_domains: Mapping[str, str]
+    pressures: Sequence[Pressure], item_domains: Mapping[str, str], dimensions: Mapping[str, frozenset[str]]
 ) -> tuple[UnaryPressureIdentity, ...]:
     if not isinstance(pressures, Sequence):
         raise _IndeterminateError("invalid_input", "pressures must be a sequence")
@@ -295,7 +262,7 @@ def _pressure_identities(
             identity = pressure.identity
         else:
             raise _IndeterminateError("invalid_input", "pressures must contain normalized pressure identities")
-        _validate_pressure_identity(identity, item_domains)
+        _validate_pressure_identity(identity, item_domains, dimensions)
         identities.add(identity)
     grouped: dict[tuple[str, str], set[str]] = {}
     for identity in identities:
@@ -306,7 +273,7 @@ def _pressure_identities(
 
 
 def _satisfied_count(slot: Slot, pressures: Sequence[UnaryPressureIdentity]) -> int:
-    return sum(1 for pressure in pressures if getattr(slot, pressure.dimension) == pressure.value)
+    return sum(1 for pressure in pressures if slot.anchors[pressure.dimension] == pressure.value)
 
 
 def _solve_domain(
@@ -395,7 +362,7 @@ def _satisfied_pressure_count(
     slots: Mapping[str, Slot], assignment: Mapping[str, str], pressures: Sequence[UnaryPressureIdentity]
 ) -> int:
     return sum(
-        getattr(slots[assignment[identity.item_id]], identity.dimension) == identity.value for identity in pressures
+        slots[assignment[identity.item_id]].anchors[identity.dimension] == identity.value for identity in pressures
     )
 
 
@@ -407,12 +374,16 @@ def _published_assignment_key(slots: Mapping[str, Slot], assignment: Mapping[str
     return tuple((slots[assignment[item_id]].order, assignment[item_id]) for item_id in sorted(assignment))
 
 
-def _validate_pressure_identity(identity: UnaryPressureIdentity, item_domains: Mapping[str, str]) -> None:
+def _validate_pressure_identity(
+    identity: UnaryPressureIdentity,
+    item_domains: Mapping[str, str],
+    dimensions: Mapping[str, frozenset[str]],
+) -> None:
     if not isinstance(identity.item_id, str) or not identity.item_id or identity.item_id not in item_domains:
         raise _IndeterminateError("invalid_input", "invalid or unselected pressure identity")
-    if identity.dimension not in _ANCHOR_VALUES:
+    if identity.dimension not in dimensions:
         raise _IndeterminateError("invalid_input", "invalid or unselected pressure identity")
-    if not isinstance(identity.value, str) or identity.value not in _ANCHOR_VALUES[identity.dimension]:
+    if not isinstance(identity.value, str) or identity.value not in dimensions[identity.dimension]:
         raise _IndeterminateError("invalid_input", "invalid or unselected pressure identity")
 
 

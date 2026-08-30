@@ -1,9 +1,30 @@
 {
-  "format_version": "ontology-runtime-program-v1",
+  "format_version": "ontology-runtime-program-v2",
   "projection": {
-    "canonical_fact_catalog": {
-      "acute_alertness_effects": [],
-      "acute_sleep_effects": [],
+    "canonical_scheduling": {
+      "dimensions": [
+        {
+          "id": "circadian_anchor",
+          "pressure_values": [
+            "sleep",
+            "wake"
+          ]
+        },
+        {
+          "id": "exercise_anchor",
+          "pressure_values": [
+            "after",
+            "before"
+          ]
+        },
+        {
+          "id": "meal_context",
+          "pressure_values": [
+            "with_food",
+            "without_food"
+          ]
+        }
+      ],
       "evidence_sources": [
         {
           "id": "src_pubmed_25441954"
@@ -42,11 +63,12 @@
           "id": "src_card_sub_iu7b8h87g2_notes"
         }
       ],
-      "food_effects": [
+      "facts": [
         {
           "applicability": {
             "substance": "sub_2476bf9d4b"
           },
+          "family": "FoodEffect",
           "id": "fact_food_prd_eb6337a6dc_sub_2476bf9d4b",
           "provenance": [
             {
@@ -67,6 +89,7 @@
           "applicability": {
             "substance": "sub_67fc2be8aa"
           },
+          "family": "FoodEffect",
           "id": "fact_food_prd_bb212cffc2_sub_67fc2be8aa",
           "provenance": [
             {
@@ -87,6 +110,7 @@
           "applicability": {
             "composition_role": "cmp_prd_htuhz2s2gt__sub_sunkcr05vl"
           },
+          "family": "FoodEffect",
           "id": "fact_food_prd_htuhz2s2gt_sub_sunkcr05vl",
           "provenance": [
             {
@@ -111,6 +135,7 @@
           "applicability": {
             "substance": "sub_85w45nbob4"
           },
+          "family": "FoodEffect",
           "id": "fact_food_prd_io1peb9syp_sub_85w45nbob4",
           "provenance": [
             {
@@ -128,6 +153,7 @@
           "applicability": {
             "substance": "sub_iu7b8h87g2"
           },
+          "family": "FoodEffect",
           "id": "fact_food_prd_io1peb9syp_sub_iu7b8h87g2",
           "provenance": [
             {
@@ -140,14 +166,12 @@
             "substance": "sub_iu7b8h87g2"
           },
           "value": "bioavailability_decreases"
-        }
-      ],
-      "post_exercise_recovery_effects": [],
-      "pre_exercise_performance_effects": [
+        },
         {
           "applicability": {
             "composition_role": "cmp_prd_cfce0b36b6__sub_3918fe347e"
           },
+          "family": "PreExercisePerformanceEffect",
           "id": "fact_pre_exercise_performance_prd_cfce0b36b6_sub_3918fe347e",
           "provenance": [
             {
@@ -168,73 +192,114 @@
           },
           "value": "performance_improves"
         }
+      ],
+      "families": [
+        {
+          "dimension": "circadian_anchor",
+          "fact_values": [
+            "acute_alertness_increases"
+          ],
+          "id": "AcuteAlertnessEffect"
+        },
+        {
+          "dimension": "circadian_anchor",
+          "fact_values": [
+            "continuity_improves",
+            "onset_latency_decreases"
+          ],
+          "id": "AcuteSleepEffect"
+        },
+        {
+          "dimension": "meal_context",
+          "fact_values": [
+            "bioavailability_decreases",
+            "bioavailability_increases",
+            "tolerability_improves",
+            "tolerability_worsens"
+          ],
+          "id": "FoodEffect"
+        },
+        {
+          "dimension": "exercise_anchor",
+          "fact_values": [
+            "recovery_improves"
+          ],
+          "id": "PostExerciseRecoveryEffect"
+        },
+        {
+          "dimension": "exercise_anchor",
+          "fact_values": [
+            "performance_improves"
+          ],
+          "id": "PreExercisePerformanceEffect"
+        }
+      ],
+      "laws": [
+        {
+          "dimension": "circadian_anchor",
+          "fact_value": "acute_alertness_increases",
+          "family": "AcuteAlertnessEffect",
+          "id": "law_acute_alertness_increases",
+          "pressure_value": "wake"
+        },
+        {
+          "dimension": "circadian_anchor",
+          "fact_value": "onset_latency_decreases",
+          "family": "AcuteSleepEffect",
+          "id": "law_acute_sleep_onset_latency_decreases",
+          "pressure_value": "sleep"
+        },
+        {
+          "dimension": "circadian_anchor",
+          "fact_value": "continuity_improves",
+          "family": "AcuteSleepEffect",
+          "id": "law_acute_sleep_continuity_improves",
+          "pressure_value": "sleep"
+        },
+        {
+          "dimension": "meal_context",
+          "fact_value": "bioavailability_increases",
+          "family": "FoodEffect",
+          "id": "law_food_bioavailability_increases",
+          "pressure_value": "with_food"
+        },
+        {
+          "dimension": "meal_context",
+          "fact_value": "bioavailability_decreases",
+          "family": "FoodEffect",
+          "id": "law_food_bioavailability_decreases",
+          "pressure_value": "without_food"
+        },
+        {
+          "dimension": "meal_context",
+          "fact_value": "tolerability_improves",
+          "family": "FoodEffect",
+          "id": "law_food_tolerability_improves",
+          "pressure_value": "with_food"
+        },
+        {
+          "dimension": "meal_context",
+          "fact_value": "tolerability_worsens",
+          "family": "FoodEffect",
+          "id": "law_food_tolerability_worsens",
+          "pressure_value": "without_food"
+        },
+        {
+          "dimension": "exercise_anchor",
+          "fact_value": "recovery_improves",
+          "family": "PostExerciseRecoveryEffect",
+          "id": "law_post_exercise_recovery_improves",
+          "pressure_value": "after"
+        },
+        {
+          "dimension": "exercise_anchor",
+          "fact_value": "performance_improves",
+          "family": "PreExercisePerformanceEffect",
+          "id": "law_pre_exercise_performance_improves",
+          "pressure_value": "before"
+        }
       ]
     },
-    "canonical_laws": [
-      {
-        "dimension": "meal_context",
-        "fact_value": "bioavailability_increases",
-        "family": "FoodEffect",
-        "id": "law_food_bioavailability_increases",
-        "pressure_value": "with_food"
-      },
-      {
-        "dimension": "meal_context",
-        "fact_value": "bioavailability_decreases",
-        "family": "FoodEffect",
-        "id": "law_food_bioavailability_decreases",
-        "pressure_value": "without_food"
-      },
-      {
-        "dimension": "meal_context",
-        "fact_value": "tolerability_improves",
-        "family": "FoodEffect",
-        "id": "law_food_tolerability_improves",
-        "pressure_value": "with_food"
-      },
-      {
-        "dimension": "meal_context",
-        "fact_value": "tolerability_worsens",
-        "family": "FoodEffect",
-        "id": "law_food_tolerability_worsens",
-        "pressure_value": "without_food"
-      },
-      {
-        "dimension": "circadian_anchor",
-        "fact_value": "acute_alertness_increases",
-        "family": "AcuteAlertnessEffect",
-        "id": "law_acute_alertness_increases",
-        "pressure_value": "wake"
-      },
-      {
-        "dimension": "circadian_anchor",
-        "fact_value": "onset_latency_decreases",
-        "family": "AcuteSleepEffect",
-        "id": "law_acute_sleep_onset_latency_decreases",
-        "pressure_value": "sleep"
-      },
-      {
-        "dimension": "circadian_anchor",
-        "fact_value": "continuity_improves",
-        "family": "AcuteSleepEffect",
-        "id": "law_acute_sleep_continuity_improves",
-        "pressure_value": "sleep"
-      },
-      {
-        "dimension": "exercise_anchor",
-        "fact_value": "performance_improves",
-        "family": "PreExercisePerformanceEffect",
-        "id": "law_pre_exercise_performance_improves",
-        "pressure_value": "before"
-      },
-      {
-        "dimension": "exercise_anchor",
-        "fact_value": "recovery_improves",
-        "family": "PostExerciseRecoveryEffect",
-        "id": "law_post_exercise_recovery_improves",
-        "pressure_value": "after"
-      }
-    ],
     "concern_catalog": [
       {
         "concern_kind": "safety",
@@ -355,56 +420,6 @@
       ]
     },
     "engine_contract": {
-      "conformance_scenarios": [
-        {
-          "expected": "one entity_id resolves one ID; an unscoped sibling collision fails closed",
-          "fixture": "selector_exact_form",
-          "id": "selector_exact_form",
-          "semantic": "selector_resolution"
-        },
-        {
-          "expected": "known canonical term with no matching card returns empty",
-          "fixture": "selector_empty_term",
-          "id": "selector_empty_term",
-          "semantic": "selector_resolution"
-        },
-        {
-          "expected": "only authored daily/training partitions route, inactive and tracked_unassigned remain excluded, absent membership is unassigned, daily not_every_day is presented separately",
-          "fixture": "stack_and_episodic",
-          "id": "stack_and_episodic",
-          "semantic": "stack_partition"
-        },
-        {
-          "expected": "not_every_day remains in daily assignment and changes presentation grouping only",
-          "fixture": "episodic_presentation",
-          "id": "episodic_presentation",
-          "semantic": "episodic_presentation"
-        },
-        {
-          "expected": "every selected item is feasible in every slot of its unbounded logical domain",
-          "fixture": "candidate_feasibility",
-          "id": "candidate_feasibility",
-          "semantic": "candidate_feasibility"
-        },
-        {
-          "expected": "unique pressure maximum wins; equal pressure count uses integer per-domain squared loads, then stable item-ID and slot-order tuple",
-          "fixture": "objective_tie",
-          "id": "objective_tie",
-          "semantic": "canonical_objective_and_tie_break"
-        },
-        {
-          "expected": "only globally proved Optimal publishes a layout; every unproved result is layout-free Indeterminate",
-          "fixture": "publication_status",
-          "id": "publication_status",
-          "semantic": "publication_boundary"
-        },
-        {
-          "expected": "all four source/target active combinations map to declared statuses and warning sides",
-          "fixture": "relation_presence",
-          "id": "relation_presence",
-          "semantic": "relation_warning_truth"
-        }
-      ],
       "domain_feasibility": "unbounded_logical_domain",
       "id": "planner_engine_contract",
       "pressure_identity": [
@@ -639,11 +654,11 @@
     ]
   },
   "provenance": {
-    "compiler_sha256": "96fd950e6ddda5ce497d5e8cf71b76ea2f297a840c42229ce6afc510f98b0bbd",
+    "compiler_sha256": "7b81b2331eab3e7ef14304c7e9cda84f28968d9b464bdac326af6d5e8897a44f",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "4fd34a20a4d7cf0a14d3de885c66d3414da7342da0ea79e4c2ba985ff90fc95c"
+    "source_sha256": "1dc8f5f09bae0f92c03122ea7e4f5af045e3a544e72a106e4bf09ebc1e4eda7e"
   },
   "schema_version": "2",
-  "source_hash": "4d96fc948208fcf7aa77753532bc98010ac00a2ca9f88e57c2446ee5694f775d"
+  "source_hash": "7ca48a9e49015ceb90cefe37810bdea8112175cda59ea548f84573a384237f58"
 }

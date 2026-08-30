@@ -10,14 +10,28 @@ notes: Polyphenol-rich extract of Camellia sinensis; usually standardized to EGC
   tool.
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - lipid_metabolism_support
-  - vascular_polyphenol_context
-  - cyp_modulation_context
+  - value: lipid_metabolism_support
+    research_state: unassessed
+    sources: []
+  - value: vascular_polyphenol_context
+    research_state: unassessed
+    sources: []
+  - value: cyp_modulation_context
+    research_state: unassessed
+    sources: []
   kind:
-  - flavonoid
+  - value: flavonoid
+    research_state: unassessed
+    sources: []
   risk:
-  - liver_injury_review
+  - value: liver_injury_review
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

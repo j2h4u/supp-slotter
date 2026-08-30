@@ -8,23 +8,21 @@ import pytest
 from planner.cards.pillboxes import load_pillboxes
 from planner.contracts import CardLoadError
 
+from tests.helpers import ontology_bundle
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_authored_topology_has_exact_six_migrated_slots() -> None:
-    pillboxes = load_pillboxes(ROOT / "data" / "pillboxes.yaml", None)  # type: ignore[arg-type]
+    pillboxes = load_pillboxes(ROOT / "data" / "pillboxes.yaml", ontology_bundle())
 
-    assert {
-        slot_id: (slot.meal_context, slot.circadian_anchor, slot.exercise_anchor)
-        for pillbox in pillboxes.values()
-        for slot_id, slot in pillbox.slots.items()
-    } == {
-        "morning_empty": ("without_food", "wake", None),
-        "morning_food": ("with_food", None, None),
-        "day_food": ("with_food", None, None),
-        "evening_empty": ("without_food", "sleep", None),
-        "pre_workout": ("without_food", None, "before"),
-        "post_workout": ("without_food", None, "after"),
+    assert {slot_id: slot.anchors for pillbox in pillboxes.values() for slot_id, slot in pillbox.slots.items()} == {
+        "morning_empty": {"meal_context": "without_food", "circadian_anchor": "wake", "exercise_anchor": None},
+        "morning_food": {"meal_context": "with_food", "circadian_anchor": None, "exercise_anchor": None},
+        "day_food": {"meal_context": "with_food", "circadian_anchor": None, "exercise_anchor": None},
+        "evening_empty": {"meal_context": "without_food", "circadian_anchor": "sleep", "exercise_anchor": None},
+        "pre_workout": {"meal_context": "without_food", "circadian_anchor": None, "exercise_anchor": "before"},
+        "post_workout": {"meal_context": "without_food", "circadian_anchor": None, "exercise_anchor": "after"},
     }
 
 
@@ -43,9 +41,9 @@ daily:
         encoding="utf-8",
     )
 
-    slot = load_pillboxes(path, None)["daily"].slots["arbitrary_name"]  # type: ignore[arg-type]
+    slot = load_pillboxes(path, ontology_bundle())["daily"].slots["arbitrary_name"]
 
-    assert (slot.meal_context, slot.circadian_anchor, slot.exercise_anchor) == (None, None, None)
+    assert slot.anchors == {"meal_context": None, "circadian_anchor": None, "exercise_anchor": None}
 
 
 @pytest.mark.parametrize("field", ("near", "food", "capacity", "dose", "count", "physical_fit"))
@@ -57,7 +55,7 @@ def test_legacy_and_physical_slot_fields_are_rejected(tmp_path: Path, field: str
     )
 
     with pytest.raises(CardLoadError, match=field):
-        load_pillboxes(path, None)  # type: ignore[arg-type]
+        load_pillboxes(path, ontology_bundle())
 
 
 def test_duplicate_global_slot_ids_are_rejected(tmp_path: Path) -> None:
@@ -82,8 +80,8 @@ training:
         encoding="utf-8",
     )
 
-    with pytest.raises(CardLoadError, match="duplicate global slot id"):
-        load_pillboxes(path, None)  # type: ignore[arg-type]
+    with pytest.raises(CardLoadError, match=r"slot_identity.*duplicate value 'shared'"):
+        load_pillboxes(path, ontology_bundle())
 
 
 def test_duplicate_order_is_rejected_within_one_topology(tmp_path: Path) -> None:
@@ -104,8 +102,8 @@ daily:
         encoding="utf-8",
     )
 
-    with pytest.raises(CardLoadError, match="duplicate slot order"):
-        load_pillboxes(path, None)  # type: ignore[arg-type]
+    with pytest.raises(CardLoadError, match=r"slot_order.*duplicate value 1"):
+        load_pillboxes(path, ontology_bundle())
 
 
 def test_distinct_topologies_keep_distinct_stack_references(tmp_path: Path) -> None:
@@ -130,6 +128,6 @@ training:
         encoding="utf-8",
     )
 
-    pillboxes = load_pillboxes(path, None)  # type: ignore[arg-type]
+    pillboxes = load_pillboxes(path, ontology_bundle())
 
     assert {pillbox.stack for pillbox in pillboxes.values()} == {"daily", "training"}

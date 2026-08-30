@@ -15,10 +15,18 @@ concerns:
     and whether it is part of a multi-herb digestive blend.
 knowledge:
   effect:
-  - digestive_comfort_context
-  - gut_barrier_context
+  - value: digestive_comfort_context
+    research_state: unassessed
+    sources: []
+  - value: gut_barrier_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_4lwevjtf97

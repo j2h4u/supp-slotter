@@ -48,8 +48,9 @@ outputs; they do not read authored ontology sources or the full formal artifact
 set. `planner` derives pressures, proves the exact lexicographic optimum, and
 writes `schedule.yaml` only when the result is `Optimal`. Generated output is a
 report; edit source facts, not `schedule.yaml`. Each generated placement
-explanation carries a derived `placement_basis`: `pressure_evidence` when it
-has normalized pressure matches, otherwise `balance_and_tie_break_only`.
+explanation carries a derived `placement_basis`: `pressure_evidence` when at
+least one normalized pressure match is satisfied, otherwise
+`balance_and_tie_break_only`.
 Neither value is an authored fact or scheduling input.
 
 ## Authoring a stack

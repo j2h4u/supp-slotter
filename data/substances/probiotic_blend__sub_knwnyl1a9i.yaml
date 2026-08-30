@@ -8,6 +8,10 @@ notes: Product-level probiotic blend marker for Garden of Life Super Seed Beyond
   claims until strains are modeled.
 knowledge:
   effect:
-  - gut_microbiome_context
+  - value: gut_microbiome_context
+    research_state: unassessed
+    sources: []
   kind:
-  - probiotic
+  - value: probiotic
+    research_state: unassessed
+    sources: []

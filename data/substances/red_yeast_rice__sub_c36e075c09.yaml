@@ -11,11 +11,21 @@ concerns:
     concerns depend on actual monacolin content, which is not captured on the current label.'
 knowledge:
   context:
-  - vascular_health
+  - value: vascular_health
+    research_state: unassessed
+    sources: []
   effect:
-  - lipid_metabolism_support
+  - value: lipid_metabolism_support
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - statin_like_monacolin_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: statin_like_monacolin_review
+    research_state: unassessed
+    sources: []

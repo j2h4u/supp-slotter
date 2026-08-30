@@ -8,9 +8,17 @@ notes: PQQ disodium salt form listed on California Gold Nutrition Nicotinamide R
   context rather than a strong efficacy claim.
 knowledge:
   context:
-  - mitochondrial_health
+  - value: mitochondrial_health
+    research_state: unassessed
+    sources: []
   effect:
-  - mitochondrial_biogenesis_context
-  - redox_metabolism_support
+  - value: mitochondrial_biogenesis_context
+    research_state: unassessed
+    sources: []
+  - value: redox_metabolism_support
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []

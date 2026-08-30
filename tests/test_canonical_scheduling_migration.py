@@ -44,12 +44,13 @@ def test_compact_receipt_reconstructs_and_closes_every_original_atom() -> None:
         "superseded_runtime_mechanism",
     }
     assert coverage["final_disposition_counts"] == {
-        "explicit_exclusion": 771,
-        "retained_unchanged": 1129,
+        "explicit_exclusion": 777,
+        "retained_unchanged": 1123,
         "source_metadata": 255,
         "typed_fact": 6,
     }
     assert coverage["closed_exclusion_counts"]["generated_action_not_canonical_evidence"] == 27
+    assert coverage["closed_exclusion_counts"]["superseded_runtime_mechanism"] == 373
     assert coverage["closed_exclusion_counts"]["stored_pair_answer"] == 1
     assert receipt["canonical_fact_links"]["count"] == 6
     assert receipt["source_metadata"]["count"] == 255
@@ -72,6 +73,16 @@ def test_card_deletion_has_no_collateral_semantic_change() -> None:
             expected = copy.deepcopy(source)
             for field in LEGACY_FIELDS:
                 expected.pop(field, None)
+            knowledge = expected.get("knowledge")
+            if isinstance(knowledge, dict):
+                for category, assertions in knowledge.items():
+                    if isinstance(assertions, list):
+                        knowledge[category] = [
+                            {"value": assertion, "research_state": "unassessed", "sources": []}
+                            if isinstance(assertion, str)
+                            else assertion
+                            for assertion in assertions
+                        ]
             assert current == expected, relative_path
             assert LEGACY_FIELDS.isdisjoint(current), relative_path
 

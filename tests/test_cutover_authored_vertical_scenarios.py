@@ -92,6 +92,8 @@ def _write_authored_vertical_fixture(root: Path) -> None:
                 "relation_type": "review_with",
                 "assertion_kind": "clinical_review_signal",
                 "semantic_family": "nutrient_balance_review_signal",
+                "research_state": "unassessed",
+                "sources": [],
                 "reason": "Fixture reviewer relation.",
                 "source_selector": {"entity": {"entity_id": _fixture_substance_id("food")}},
                 "target_selector": {"entity": {"entity_id": _fixture_substance_id("empty")}},
@@ -101,6 +103,8 @@ def _write_authored_vertical_fixture(root: Path) -> None:
                 "relation_type": "supports",
                 "assertion_kind": "ontology_assertion",
                 "semantic_family": "biochemical_mechanism_assertion",
+                "research_state": "unassessed",
+                "sources": [],
                 "reason": "Fixture support relation.",
                 "source_selector": {"entity": {"entity_id": _fixture_substance_id("wake")}},
                 "target_selector": {"entity": {"entity_id": _fixture_substance_id("sleep")}},
@@ -160,17 +164,8 @@ def test_authored_vertical_fixture_compiles_loads_and_routes_all_runtime_anchors
     ontology_root = tmp_path / "ontology"
     write_artifacts(ontology_root, compile_ontology(ontology_root))
     bundle = load_ontology(ontology_root)
-    catalog = bundle.runtime_program.canonical_fact_catalog
-    assert {
-        fact.id
-        for fact in (
-            *catalog.food_effects,
-            *catalog.acute_alertness_effects,
-            *catalog.acute_sleep_effects,
-            *catalog.pre_exercise_performance_effects,
-            *catalog.post_exercise_recovery_effects,
-        )
-    } == {f"fact_vertical_{key}" for key in FIXTURE_ID_SUFFIXES}
+    catalog = bundle.runtime_program.canonical_scheduling
+    assert {fact.id for fact in catalog.facts} == {f"fact_vertical_{key}" for key in FIXTURE_ID_SUFFIXES}
     result = plan_module._cmd_plan_inner(Paths.from_root(tmp_path), bundle)
     assert result.exit_code == 0, result.errors
     schedule = cast(dict[str, object], yaml.safe_load((tmp_path / "schedule.yaml").read_text(encoding="utf-8")))
@@ -190,4 +185,4 @@ def test_authored_vertical_fixture_compiles_loads_and_routes_all_runtime_anchors
     assert {match["fact_ids"][0] for match in matches} == {f"fact_vertical_{key}" for key in FIXTURE_ID_SUFFIXES}
     assert all(match["satisfied"] is True and match["applicability_role_ids"] for match in matches)
     groups = cast(dict[str, list[str]], cast(dict[str, object], schedule["summary"])["placement_groups"])
-    assert groups["episodic"] == ["Fixture with food"]
+    assert groups["episodic"] == [_fixture_product_id("food")]

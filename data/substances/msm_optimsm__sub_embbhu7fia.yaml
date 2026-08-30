@@ -8,11 +8,23 @@ notes: Methylsulfonylmethane as OptiMSM listed on Solgar Skin, Nails & Hair Adva
   connective-tissue context without assuming dose adequacy.
 knowledge:
   context:
-  - connective_tissue_support
-  - skin_support
+  - value: connective_tissue_support
+    research_state: unassessed
+    sources: []
+  - value: skin_support
+    research_state: unassessed
+    sources: []
   effect:
-  - sulfur_connective_tissue_context
-  - joint_comfort_context
-  - skin_matrix_context
+  - value: sulfur_connective_tissue_context
+    research_state: unassessed
+    sources: []
+  - value: joint_comfort_context
+    research_state: unassessed
+    sources: []
+  - value: skin_matrix_context
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

@@ -8,9 +8,17 @@ notes: 'Passionflower flowering tops extract listed in the Natural Balance Happy
   than a strong efficacy claim.'
 knowledge:
   context:
-  - sleep_recovery
+  - value: sleep_recovery
+    research_state: unassessed
+    sources: []
   effect:
-  - calming_context
-  - sleep_context
+  - value: calming_context
+    research_state: unassessed
+    sources: []
+  - value: sleep_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []

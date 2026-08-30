@@ -7,8 +7,14 @@ notes: Branched-chain essential amino acid; component of BCAA blends and multivi
   BCAA/protein synthesis context; blend presence does not imply ergogenic dose.
 knowledge:
   effect:
-  - protein_synthesis_support
+  - value: protein_synthesis_support
+    research_state: unassessed
+    sources: []
   kind:
-  - amino
+  - value: amino
+    research_state: unassessed
+    sources: []
   pathway:
-  - bcaa_metabolism
+  - value: bcaa_metabolism
+    research_state: unassessed
+    sources: []

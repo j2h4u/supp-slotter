@@ -4,8 +4,14 @@ notes: Choline component listed on Jarrow MaculaPF as coming from sunflower leci
   and amounts.
 knowledge:
   effect:
-  - cholinergic_support
+  - value: cholinergic_support
+    research_state: unassessed
+    sources: []
   kind:
-  - amino
+  - value: amino
+    research_state: unassessed
+    sources: []
   pathway:
-  - methylation_cycle
+  - value: methylation_cycle
+    research_state: unassessed
+    sources: []

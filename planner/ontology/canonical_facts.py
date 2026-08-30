@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from pathlib import Path
 
 from planner.card_ids import composition_role_id
 from planner.contracts import CardLoadError, Product, Substance
 from planner.ontology.runtime_program import (
-    RuntimeCanonicalFactCatalog,
+    RuntimeCanonicalScheduling,
     RuntimeCanonicalSchedulingFact,
     RuntimeCompositionRole,
 )
@@ -27,18 +27,6 @@ def composition_roles_for_products(products: Mapping[str, Product]) -> tuple[Run
                 raise CardLoadError(Path("data/products"), f"duplicate composition role {role_id!r}")
             roles[role_id] = role
     return tuple(roles[role_id] for role_id in sorted(roles))
-
-
-def _catalog_families(
-    catalog: RuntimeCanonicalFactCatalog,
-) -> tuple[tuple[str, Sequence[RuntimeCanonicalSchedulingFact]], ...]:
-    return (
-        ("food_effects", catalog.food_effects),
-        ("acute_alertness_effects", catalog.acute_alertness_effects),
-        ("acute_sleep_effects", catalog.acute_sleep_effects),
-        ("pre_exercise_performance_effects", catalog.pre_exercise_performance_effects),
-        ("post_exercise_recovery_effects", catalog.post_exercise_recovery_effects),
-    )
 
 
 def _applicability_errors(
@@ -103,8 +91,8 @@ def _fact_reference_errors(
     return errors
 
 
-def validate_canonical_fact_catalog(
-    catalog: RuntimeCanonicalFactCatalog,
+def validate_canonical_scheduling(
+    scheduling: RuntimeCanonicalScheduling,
     substances: Mapping[str, Substance],
     products: Mapping[str, Product],
     *,
@@ -118,15 +106,13 @@ def validate_canonical_fact_catalog(
     """
     errors: list[str] = []
     roles = {role.id: role for role in composition_roles_for_products(products)}
-    sources = {source.id for source in catalog.evidence_sources}
+    sources = {source.id for source in scheduling.evidence_sources}
 
-    for family_name, facts in _catalog_families(catalog):
-        for fact in facts:
-            label = f"{family_name}.{fact.id}"
-            errors.extend(_fact_reference_errors(fact, label, roles, substances, sources))
+    for fact in scheduling.facts:
+        errors.extend(_fact_reference_errors(fact, f"{fact.family}.{fact.id}", roles, substances, sources))
 
     if errors:
         raise CardLoadError(path, f"{path}: canonical fact catalog reference validation failed:\n" + "\n".join(errors))
 
 
-__all__ = ["composition_roles_for_products", "validate_canonical_fact_catalog"]
+__all__ = ["composition_roles_for_products", "validate_canonical_scheduling"]

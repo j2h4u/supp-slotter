@@ -12,8 +12,14 @@ concerns:
     is lactose intolerance versus milk allergy, which lactase does not address.
 knowledge:
   effect:
-  - digestive_enzyme_context
-  - carbohydrate_digestion_support
+  - value: digestive_enzyme_context
+    research_state: unassessed
+    sources: []
+  - value: carbohydrate_digestion_support
+    research_state: unassessed
+    sources: []
   kind:
-  - enzyme
+  - value: enzyme
+    research_state: unassessed
+    sources: []
 id: sub_bwatu3taud

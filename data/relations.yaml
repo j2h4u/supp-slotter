@@ -41,6 +41,8 @@ relations:
   relation_type: supports
   assertion_kind: ontology_assertion
   semantic_family: biochemical_mechanism_assertion
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       name: Selenium
@@ -100,6 +102,8 @@ relations:
   relation_type: supports
   assertion_kind: ontology_assertion
   semantic_family: absorption_interaction_claim
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       name: Vitamin E
@@ -127,6 +131,8 @@ relations:
   relation_type: supports
   assertion_kind: ontology_assertion
   semantic_family: biochemical_mechanism_assertion
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       name: Selenium
@@ -159,6 +165,8 @@ relations:
   relation_type: supports
   assertion_kind: ontology_assertion
   semantic_family: nutritional_adequacy_advisory
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       entity_id: sub_7ehuhfcly5
@@ -266,6 +274,8 @@ relations:
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       name: Vitamin E
@@ -278,6 +288,8 @@ relations:
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       name: Vitamin E
@@ -293,6 +305,8 @@ relations:
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       entity_id: sub_31a1408cad
@@ -308,6 +322,8 @@ relations:
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       entity_id: sub_31a1408cad
@@ -320,6 +336,8 @@ relations:
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       entity_id: sub_45587454c0
@@ -332,6 +350,8 @@ relations:
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       entity_id: sub_45587454c0
@@ -385,6 +405,8 @@ relations:
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: unassessed
+  sources: []
   source_selector:
     category: context
     term: incretin_drug_context
@@ -399,6 +421,8 @@ relations:
   relation_type: review_with
   assertion_kind: clinical_review_signal
   semantic_family: clinical_review_signal
+  research_state: unassessed
+  sources: []
   source_selector:
     category: context
     term: incretin_drug_context

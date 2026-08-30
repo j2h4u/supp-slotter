@@ -15,11 +15,19 @@ concerns:
     not transfer evidence between forms without label-specific support.
 knowledge:
   context:
-  - mitochondrial_health
+  - value: mitochondrial_health
+    research_state: unassessed
+    sources: []
   effect:
-  - nad_precursor_support
+  - value: nad_precursor_support
+    research_state: unassessed
+    sources: []
   kind:
-  - nucleotide
+  - value: nucleotide
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_7ozks6pos5

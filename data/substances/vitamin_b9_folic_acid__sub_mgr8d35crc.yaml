@@ -7,10 +7,20 @@ notes: Folic acid form listed on Source Naturals Advanced Ferrochel. Review cont
   blood cells, homocysteine handling, and methylation-cycle review; preserve synthetic folic-acid form.
 knowledge:
   effect:
-  - dna_synthesis_support
-  - homocysteine_metabolism_support
-  - red_blood_cell_support
+  - value: dna_synthesis_support
+    research_state: unassessed
+    sources: []
+  - value: homocysteine_metabolism_support
+    research_state: unassessed
+    sources: []
+  - value: red_blood_cell_support
+    research_state: unassessed
+    sources: []
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: unassessed
+    sources: []
   pathway:
-  - methylation_cycle
+  - value: methylation_cycle
+    research_state: unassessed
+    sources: []

@@ -33,6 +33,10 @@ classes:
   FoodEffectLaw:
     description: Universal FoodEffect to meal-context pressure law.
     slots: [id, fact_value, meal_context]
+    annotations:
+      canonical_fact_family: FoodEffect
+      canonical_catalog_slot: food_effect_laws
+      canonical_pressure_dimension: meal_context
     slot_usage:
       id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
       fact_value: {required: true, range: FoodEffectValue, multivalued: false}
@@ -41,6 +45,10 @@ classes:
   AcuteAlertnessEffectLaw:
     description: Universal acute-alertness to wake pressure law.
     slots: [id, fact_value, circadian_anchor]
+    annotations:
+      canonical_fact_family: AcuteAlertnessEffect
+      canonical_catalog_slot: acute_alertness_effect_laws
+      canonical_pressure_dimension: circadian_anchor
     slot_usage:
       id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
       fact_value: {required: true, range: AcuteAlertnessEffectValue, multivalued: false}
@@ -49,6 +57,10 @@ classes:
   AcuteSleepEffectLaw:
     description: Universal acute-sleep to sleep pressure law.
     slots: [id, fact_value, circadian_anchor]
+    annotations:
+      canonical_fact_family: AcuteSleepEffect
+      canonical_catalog_slot: acute_sleep_effect_laws
+      canonical_pressure_dimension: circadian_anchor
     slot_usage:
       id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
       fact_value: {required: true, range: AcuteSleepEffectValue, multivalued: false}
@@ -57,6 +69,10 @@ classes:
   PreExercisePerformanceEffectLaw:
     description: Universal pre-exercise-performance to before-exercise pressure law.
     slots: [id, fact_value, exercise_anchor]
+    annotations:
+      canonical_fact_family: PreExercisePerformanceEffect
+      canonical_catalog_slot: pre_exercise_performance_effect_laws
+      canonical_pressure_dimension: exercise_anchor
     slot_usage:
       id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
       fact_value: {required: true, range: PreExercisePerformanceEffectValue, multivalued: false}
@@ -65,6 +81,10 @@ classes:
   PostExerciseRecoveryEffectLaw:
     description: Universal post-exercise-recovery to after-exercise pressure law.
     slots: [id, fact_value, exercise_anchor]
+    annotations:
+      canonical_fact_family: PostExerciseRecoveryEffect
+      canonical_catalog_slot: post_exercise_recovery_effect_laws
+      canonical_pressure_dimension: exercise_anchor
     slot_usage:
       id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
       fact_value: {required: true, range: PostExerciseRecoveryEffectValue, multivalued: false}
@@ -106,6 +126,9 @@ classes:
     is_a: CanonicalSchedulingFact
     description: Closed food-context effect fact family.
     slots: [value]
+    annotations:
+      canonical_fact_family: FoodEffect
+      canonical_catalog_slot: food_effects
     slot_usage:
       value: {required: true, range: FoodEffectValue, multivalued: false}
 
@@ -113,6 +136,9 @@ classes:
     is_a: CanonicalSchedulingFact
     description: Closed acute alertness effect fact family.
     slots: [value]
+    annotations:
+      canonical_fact_family: AcuteAlertnessEffect
+      canonical_catalog_slot: acute_alertness_effects
     slot_usage:
       value: {required: true, range: AcuteAlertnessEffectValue, multivalued: false}
 
@@ -120,6 +146,9 @@ classes:
     is_a: CanonicalSchedulingFact
     description: Closed acute sleep effect fact family.
     slots: [value]
+    annotations:
+      canonical_fact_family: AcuteSleepEffect
+      canonical_catalog_slot: acute_sleep_effects
     slot_usage:
       value: {required: true, range: AcuteSleepEffectValue, multivalued: false}
 
@@ -127,6 +156,9 @@ classes:
     is_a: CanonicalSchedulingFact
     description: Closed pre-exercise performance effect fact family.
     slots: [value]
+    annotations:
+      canonical_fact_family: PreExercisePerformanceEffect
+      canonical_catalog_slot: pre_exercise_performance_effects
     slot_usage:
       value: {required: true, range: PreExercisePerformanceEffectValue, multivalued: false}
 
@@ -134,6 +166,9 @@ classes:
     is_a: CanonicalSchedulingFact
     description: Closed post-exercise recovery effect fact family.
     slots: [value]
+    annotations:
+      canonical_fact_family: PostExerciseRecoveryEffect
+      canonical_catalog_slot: post_exercise_recovery_effects
     slot_usage:
       value: {required: true, range: PostExerciseRecoveryEffectValue, multivalued: false}
 

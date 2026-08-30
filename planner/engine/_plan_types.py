@@ -12,12 +12,12 @@ from planner.contracts import (
     Substance,
 )
 from planner.ontology.canonical_inference import InferenceResult as CanonicalInferenceResult
-from planner.ontology.runtime_program import RuntimeCanonicalFactCatalog, RuntimeProgram
+from planner.ontology.runtime_program import RuntimeCanonicalScheduling, RuntimeProgram
 
 
 class PlanInputs(NamedTuple):
     runtime_program: RuntimeProgram
-    canonical_fact_catalog: RuntimeCanonicalFactCatalog
+    canonical_scheduling: RuntimeCanonicalScheduling
     slots: dict[str, Slot]
     substances: dict[str, Substance]
     products: dict[str, Product]

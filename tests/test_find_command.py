@@ -45,7 +45,9 @@ def _write_find_fixture(tmp_path: Path) -> None:
 
     citrulline_path = find_card_path_by_id(data_dir / "substances", "sub_citrulline")
     citrulline = cast(dict[str, object], yaml.safe_load(citrulline_path.read_text()))
-    assert citrulline["knowledge"] == {"effect": ["exercise_performance_context"]}
+    assert citrulline["knowledge"] == {
+        "effect": [{"value": "exercise_performance_context", "research_state": "unassessed", "sources": []}]
+    }
     citrulline["name"] = "L-Citrulline"
     citrulline["form"] = "malate"
     citrulline_path.write_text(yaml.safe_dump(citrulline, sort_keys=False))

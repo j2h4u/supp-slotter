@@ -30,6 +30,16 @@ The closed families and all nine admitted values are enumerated normatively in
 [`docs/domain-model.md`](../domain-model.md#closed-scheduling-fact-vocabulary).
 This checklist never substitutes a summary for that source.
 
+## v2 integration evidence status
+
+The commit-range and `just release` results recorded below are historic v1
+evidence only; they do not describe this uncommitted v2 cutover and must not be
+used as its release claim. The v2 acceptance boundary is the generated
+`ontology-runtime-program-v2`, its generic `canonical_scheduling` projection,
+and `Slot.anchors`. The current integration records its exact command results
+in the handoff rather than running a release recipe; the three independent
+final-review boxes at the end deliberately remain open.
+
 ## Critical — canonical product behavior
 
 - [x] **Make canonical facts and logical topology the only scheduler inputs.**
@@ -44,7 +54,7 @@ This checklist never substitutes a summary for that source.
     `6bc4d9fba7bdb73f31cb6a0add0db460d2a2e59a`; `just canonical-runtime` ->
     17 passed on the committed ancestor/equivalent runtime, and final-head
     `just release` -> exit 0 (smoke 23; ontology A/B/C 50/34/60; runtime 71).
-    Witnesses: `tests/test_canonical_fact_catalog_integration.py::test_plan_inputs_carries_verified_canonical_catalog`,
+    Witnesses: `tests/test_canonical_fact_catalog_integration.py::test_plan_inputs_carries_verified_canonical_scheduling`,
     `tests/test_cutover_authored_vertical_scenarios.py::test_authored_vertical_fixture_compiles_loads_and_routes_all_runtime_anchors`,
     `ontology/canonical-facts.yaml`, `ontology/generated/runtime-program.json`.
 
@@ -58,7 +68,7 @@ This checklist never substitutes a summary for that source.
   - Evidence: `cdc33c5f7a013b151516a9e58beff4b0a21715e3` through
     `6bc4d9fba7bdb73f31cb6a0add0db460d2a2e59a`; `just canonical-runtime` ->
     17 passed; final-head `just release` -> exit 0, ontology A 50 and runtime
-    71. Witnesses: `tests/test_canonical_law_catalog.py::test_catalog_matches_complete_domain_truth_table`,
+    71. Witnesses: `tests/test_canonical_law_catalog.py::test_every_annotated_family_value_has_exactly_one_generic_law`,
     `tests/test_canonical_inference.py::test_every_admitted_value_maps_to_one_pressure`,
     `tests/test_canonical_inference.py::test_proof_contains_law_fact_subject_path_and_provenance`,
     `docs/domain-model.md`, `ontology/runtime-policy.yaml`.
@@ -93,7 +103,7 @@ This checklist never substitutes a summary for that source.
     `tests/test_canonical_optimizer.py::test_exact_squared_load_balance_is_unbounded_and_stable_by_item_id`,
     `tests/test_canonical_optimizer.py::test_tie_break_uses_slot_id_after_order_and_is_domain_independent`,
     `tests/test_canonical_optimizer.py::test_bounded_randomized_results_match_independent_cartesian_oracle`,
-    `planner/engine/_canonical_optimizer.py`.
+    `planner/canonical_optimizer.py`.
 
 - [x] **Enforce the closed `Optimal | Indeterminate` publication boundary.**
   Publish `schedule.yaml` only after global optimality is proved. Conflicts,
@@ -122,7 +132,7 @@ This checklist never substitutes a summary for that source.
     exit 0, ontology B 34 and runtime 71. Witnesses:
     `tests/test_canonical_scheduling_migration.py::test_no_runtime_consumer_reads_the_removed_card_fields`,
     `tests/test_runtime_contract_v2.py::test_retired_objective_and_pair_fields_are_rejected`,
-    `docs/migrations/legacy-atom-ledger.yaml`, `planner/engine/_canonical_optimizer.py`,
+    `docs/migrations/legacy-atom-ledger.yaml`, `planner/canonical_optimizer.py`,
     `tests/test_scheduler_reviewer_authority.py::test_review_only_relation_cannot_change_command_level_schedule`.
 
 - [x] **Remove component vote aggregation and legacy policy scoring.** Delete
@@ -298,7 +308,7 @@ This checklist never substitutes a summary for that source.
   - Evidence: `6bc4d9fba7bdb73f31cb6a0add0db460d2a2e59a`; final-head
     `just release` -> exit 0, ontology B 34 and CRAP 237. Witnesses:
     `tests/test_read_model_relations.py::test_typed_read_model_rejects_every_incomplete_reference`,
-    `tests/test_canonical_fact_catalog_integration.py::test_plan_inputs_rejects_full_catalog_before_relation_processing`,
+    `tests/test_canonical_fact_catalog_integration.py::test_plan_inputs_rejects_full_canonical_scheduling_before_relation_processing`,
     `tests/test_canonical_fact_catalog_integration.py::test_canonical_reference_validator_rejects_dangling_or_inconsistent_references`,
     `planner/ontology/canonical_facts.py`.
 
@@ -377,7 +387,7 @@ This checklist never substitutes a summary for that source.
     `6bc4d9fba7bdb73f31cb6a0add0db460d2a2e59a`; final-head `just release` ->
     exit 0, ontology A/B/C 50/34/60. Witnesses:
     `tests/test_runtime_contract_v2.py::test_v2_contract_decodes_exactly_and_excludes_retired_objective_inputs`,
-    `tests/test_canonical_law_catalog.py::test_catalog_matches_complete_domain_truth_table`,
+    `tests/test_canonical_law_catalog.py::test_every_annotated_family_value_has_exactly_one_generic_law`,
     `ontology/runtime-policy.yaml`, `ontology/canonical-facts.yaml`.
 - [x] A future TypeDB implementation can reproduce facts, applicability,
   pressures, status, objective tuple, and selected layout without extracting
@@ -386,7 +396,7 @@ This checklist never substitutes a summary for that source.
     `6bc4d9fba7bdb73f31cb6a0add0db460d2a2e59a`; final-head `just release` ->
     exit 0, ontology A/B/C 50/34/60, runtime 71, and corpus projection conforms
     true. Witnesses: `tests/test_runtime_contract_v2.py::test_v1_contract_is_rejected_without_compatibility_fallback`,
-    `tests/test_canonical_fact_catalog_runtime.py::test_runtime_decodes_all_typed_fact_families`,
+    `tests/test_canonical_fact_catalog_runtime.py::test_decoder_types_facts_once_with_family_as_data`,
     `ontology/generated/runtime-program.json`, `docs/domain-model.md`.
 - [x] The legacy runtime and obsolete regression tests are deleted, not retained
   as a compatibility museum.

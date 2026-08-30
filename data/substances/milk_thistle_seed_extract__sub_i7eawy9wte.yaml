@@ -13,12 +13,22 @@ concerns:
     practical liver support; clinical evidence is mixed and product quality varies.
 knowledge:
   effect:
-  - cyp_modulation_context
+  - value: cyp_modulation_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - cyp450_med_interaction
-  - manual_review
+  - value: cyp450_med_interaction
+    research_state: unassessed
+    sources: []
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []
 id: sub_i7eawy9wte

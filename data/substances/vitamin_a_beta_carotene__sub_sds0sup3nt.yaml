@@ -9,12 +9,24 @@ notes: Plant-source pro-vitamin A carotenoid; converted to retinol on demand. Le
   without treating beta-carotene as preformed retinol exposure.
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - epithelial_immune_context
-  - vision_retinoid_support
+  - value: epithelial_immune_context
+    research_state: unassessed
+    sources: []
+  - value: vision_retinoid_support
+    research_state: unassessed
+    sources: []
   kind:
-  - carotenoid
-  - vitamin
+  - value: carotenoid
+    research_state: unassessed
+    sources: []
+  - value: vitamin
+    research_state: unassessed
+    sources: []
   quality:
-  - fat_soluble
+  - value: fat_soluble
+    research_state: unassessed
+    sources: []

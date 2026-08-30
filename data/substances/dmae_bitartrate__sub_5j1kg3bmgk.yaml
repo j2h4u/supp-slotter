@@ -7,8 +7,14 @@ aliases:
 notes: DMAE bitartrate form listed on Source Naturals DMAE; label reports 130 mg DMAE from 351 mg DMAE bitartrate.
 knowledge:
   context:
-  - neurocognitive_support
+  - value: neurocognitive_support
+    research_state: unassessed
+    sources: []
   effect:
-  - cholinergic_support
+  - value: cholinergic_support
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []

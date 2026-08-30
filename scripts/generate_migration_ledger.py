@@ -160,9 +160,22 @@ def _unchanged(root: Path, cache: dict[str, YamlValue | object], row: dict[str, 
     if document is _MISSING:
         return False
     value = _at_pointer(cast(YamlValue, document), _string(row.get("pointer"), source="atom pointer"))
-    return value is not _MISSING and _sha256(cast(YamlValue, value)) == _string(
-        row.get("exact_value_sha256"), source="atom hash"
-    )
+    expected_hash = _string(row.get("exact_value_sha256"), source="atom hash")
+    if value is not _MISSING and _sha256(cast(YamlValue, value)) == expected_hash:
+        return True
+    # Research provenance is now mandatory on every knowledge assertion.  An
+    # old scalar atom remains semantically unchanged when its sole world value
+    # is preserved and the new fields supply only explicit unassessed metadata.
+    if isinstance(value, dict):
+        metadata = cast(dict[str, YamlValue], value)
+        if set(metadata) != {"value", "research_state", "sources"}:
+            return False
+        return (
+            _sha256(metadata["value"]) == expected_hash
+            and metadata["research_state"] == "unassessed"
+            and metadata["sources"] == []
+        )
+    return False
 
 
 def _tree_document(root: Path, path: str) -> dict[str, YamlValue]:

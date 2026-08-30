@@ -10,13 +10,25 @@ concerns:
     dosing for LDL-C/ApoB lowering; high-dose nicotinic acid should be treated as drug-like and medically supervised.
 knowledge:
   context:
-  - mitochondrial_health
+  - value: mitochondrial_health
+    research_state: unassessed
+    sources: []
   effect:
-  - lipid_metabolism_support
-  - redox_metabolism_support
+  - value: lipid_metabolism_support
+    research_state: unassessed
+    sources: []
+  - value: redox_metabolism_support
+    research_state: unassessed
+    sources: []
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: unassessed
+    sources: []
   pathway:
-  - nad_metabolism
+  - value: nad_metabolism
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []

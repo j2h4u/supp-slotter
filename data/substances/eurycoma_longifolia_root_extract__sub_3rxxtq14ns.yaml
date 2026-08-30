@@ -16,13 +16,25 @@ concerns:
     context, and third-party testing.
 knowledge:
   effect:
-  - androgen_context
-  - fatigue_resilience_context
-  - stress_resilience_context
+  - value: androgen_context
+    research_state: unassessed
+    sources: []
+  - value: fatigue_resilience_context
+    research_state: unassessed
+    sources: []
+  - value: stress_resilience_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - adaptogen
+  - value: adaptogen
+    research_state: unassessed
+    sources: []
 id: sub_3rxxtq14ns

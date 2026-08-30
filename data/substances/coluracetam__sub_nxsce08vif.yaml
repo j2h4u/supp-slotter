@@ -10,10 +10,18 @@ concerns:
     and cholinergic-load assumptions are uncertain.
 knowledge:
   effect:
-  - cholinergic_support
-  - cognitive_performance_context
+  - value: cholinergic_support
+    research_state: unassessed
+    sources: []
+  - value: cognitive_performance_context
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []
 id: sub_nxsce08vif

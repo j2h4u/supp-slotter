@@ -12,12 +12,22 @@ concerns:
     saffron as routine mood or cognitive support.
 knowledge:
   effect:
-  - stress_reactivity_context
+  - value: stress_reactivity_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - serotonergic_med_interaction
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: serotonergic_med_interaction
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []
 id: sub_zizhyq1g4l

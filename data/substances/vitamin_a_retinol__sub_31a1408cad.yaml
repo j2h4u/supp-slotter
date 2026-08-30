@@ -9,12 +9,24 @@ concerns:
     and teratogenicity risk. Unlike beta-carotene, retinol toxicity is not demand-regulated by conversion rate.
 knowledge:
   effect:
-  - epithelial_immune_context
-  - vision_retinoid_support
+  - value: epithelial_immune_context
+    research_state: unassessed
+    sources: []
+  - value: vision_retinoid_support
+    research_state: unassessed
+    sources: []
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: unassessed
+    sources: []
   quality:
-  - fat_soluble
+  - value: fat_soluble
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - retinol_accumulation_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: retinol_accumulation_review
+    research_state: unassessed
+    sources: []

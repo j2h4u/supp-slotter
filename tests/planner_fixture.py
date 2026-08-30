@@ -296,6 +296,8 @@ def _write_relation_groups(
                     "relation_type": relation_type,
                     "assertion_kind": "ontology_assertion",
                     "semantic_family": "biochemical_mechanism_assertion",
+                    "research_state": "unassessed",
+                    "sources": [],
                     "source_selector": {"entity": {"entity_id": substance_ids[source_id]}},
                     "target_selector": {"entity": {"entity_id": substance_ids.get(target, target)}},
                     "reason": cast(str, relation["reason"]),
@@ -319,12 +321,13 @@ def _write_substance_cards(
             "name": substance_id.replace("_", " ").title(),
         }
         grouped = group_trait_ids(trait_ids)
-        knowledge: dict[str, list[str]] = {}
+        knowledge: dict[str, list[dict[str, object]]] = {}
         for namespace, slugs in grouped.items():
+            records = [{"value": slug, "research_state": "unassessed", "sources": []} for slug in slugs]
             if namespace in knowledge_namespaces:
-                knowledge[namespace] = slugs
+                knowledge[namespace] = records
             else:
-                knowledge[namespace] = slugs
+                knowledge[namespace] = records
         # Preserve unknown namespaces in the card.  The generated schema is
         # the normal validation boundary and must reject them explicitly.
         if knowledge:

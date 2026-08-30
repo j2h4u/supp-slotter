@@ -17,12 +17,24 @@ concerns:
     lipase, and protease activity units.
 knowledge:
   effect:
-  - digestive_enzyme_context
-  - carbohydrate_digestion_support
-  - fat_digestion_support
-  - protein_digestion_support
+  - value: digestive_enzyme_context
+    research_state: unassessed
+    sources: []
+  - value: carbohydrate_digestion_support
+    research_state: unassessed
+    sources: []
+  - value: fat_digestion_support
+    research_state: unassessed
+    sources: []
+  - value: protein_digestion_support
+    research_state: unassessed
+    sources: []
   kind:
-  - enzyme
+  - value: enzyme
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_winwtayogk

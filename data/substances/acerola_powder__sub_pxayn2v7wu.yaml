@@ -4,8 +4,14 @@ notes: Acerola component listed on NOW Foods Vitamin C-1000 Complex. Product car
   - vitamin-C-rich botanical food matrix and antioxidant context, not a separate high-confidence therapeutic axis.
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

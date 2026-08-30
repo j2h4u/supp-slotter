@@ -4,6 +4,10 @@ notes: Strontium from Aquamin listed on Nature's Way Alive Calcium Max Absorptio
   context from the Aquamin source; this does not imply standalone strontium therapy.
 knowledge:
   effect:
-  - bone_mineral_metabolism_support
+  - value: bone_mineral_metabolism_support
+    research_state: unassessed
+    sources: []
   kind:
-  - mineral
+  - value: mineral
+    research_state: unassessed
+    sources: []

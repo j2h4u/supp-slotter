@@ -101,9 +101,22 @@ def test_knowledge_assertion_values_are_unique_within_category(tmp_path: Path) -
     duplicate = {
         "id": "sub_aaaaaaaaaa",
         "name": "Duplicate knowledge probe",
-        "knowledge": {"kind": ["amino", "amino"]},
+        "knowledge": {
+            "kind": [
+                {"value": "amino", "research_state": "unassessed", "sources": []},
+                {"value": "amino", "research_state": "unassessed", "sources": []},
+            ]
+        },
     }
-    distinct = {**duplicate, "knowledge": {"kind": ["amino", "mineral"]}}
+    distinct = {
+        **duplicate,
+        "knowledge": {
+            "kind": [
+                {"value": "amino", "research_state": "unassessed", "sources": []},
+                {"value": "mineral", "research_state": "unassessed", "sources": []},
+            ]
+        },
+    }
 
     errors = schema_errors(duplicate, "substance", Path("substance.yaml"), ontology_bundle())
     assert any("knowledge" in error and "amino" in error for error in errors)
@@ -111,7 +124,7 @@ def test_knowledge_assertion_values_are_unique_within_category(tmp_path: Path) -
 
     path = tmp_path / "substance.yaml"
     path.write_text(
-        "id: sub_aaaaaaaaaa\nname: Duplicate knowledge probe\nknowledge:\n  kind: [amino, amino]\n",
+        "id: sub_aaaaaaaaaa\nname: Duplicate knowledge probe\nknowledge:\n  kind:\n  - value: amino\n    research_state: unassessed\n    sources: []\n  - value: amino\n    research_state: unassessed\n    sources: []\n",
         encoding="utf-8",
     )
     with pytest.raises(CardLoadError, match="knowledge"):
@@ -171,6 +184,8 @@ def _relation_entry(identifier: str, *, reason: str = "relation identity probe")
         "relation_type": "supports",
         "assertion_kind": "ontology_assertion",
         "semantic_family": "test",
+        "research_state": "unassessed",
+        "sources": [],
         "reason": reason,
         "source_selector": {"category": "context", "term": "vascular_health"},
         "target_selector": {"category": "context", "term": "vascular_health"},
@@ -211,6 +226,8 @@ def test_relation_loader_rejects_cross_form_entity_duplicate(tmp_path: Path) -> 
         "relation_type": "review_with",
         "assertion_kind": "clinical_review_signal",
         "semantic_family": "test",
+        "research_state": "unassessed",
+        "sources": [],
         "reason": "cross-form identity probe",
         "target_selector": {"entity": {"entity_id": "sub_other000"}},
     }
@@ -254,6 +271,8 @@ def test_name_selector_resolves_new_same_name_form_in_runtime_record(tmp_path: P
                         "relation_type": "supports",
                         "assertion_kind": "ontology_assertion",
                         "semantic_family": "test",
+                        "research_state": "unassessed",
+                        "sources": [],
                         "reason": "name family runtime probe",
                         "source_selector": {"entity": {"name": "Known"}},
                         "target_selector": {"entity": {"entity_id": "sub_other000"}},

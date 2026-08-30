@@ -58,20 +58,30 @@ name: ""  # Required. Canonical substance name. Use the most specific form that
 
 # knowledge:
 #   kind:                     # Structural classification. Used for class-level
-#   - mineral                 # intrinsic class for review/dashboard/context membership.
-#                             # See ontology/vocabulary.yaml for valid slugs.
+#   - value: mineral          # intrinsic class for review/dashboard/context membership.
+#     research_state: unassessed
+#     sources: []             # See ontology/vocabulary.yaml for valid slugs.
 #   effect:                   # Pharmacological effects for review.
-#   - vasodilator             # See ontology/vocabulary.yaml for valid slugs.
+#   - value: vasodilator      # See ontology/vocabulary.yaml for valid slugs.
+#     research_state: mechanistic_only
+#     sources: [https://pubmed.ncbi.nlm.nih.gov/example]
 #                             # Examples: vasodilator, cholinergic_support,
 #                             # pde5_inhibition, fibrinolytic
 #   risk:                     # Authored reviewer-only safety / interaction facts.
-#   - manual_review           # Never a placement instruction.
-#                             # See ontology/vocabulary.yaml.
+#   - value: manual_review    # Never a placement instruction.
+#     research_state: unassessed
+#     sources: []             # See ontology/vocabulary.yaml.
 #                             # Examples: manual_review, bleeding_med_interaction,
 #                             # hypotension_med_interaction
 #   pathway:                  # Authored reviewer-only metabolic pathway membership;
 #                             # not part of the active fact projection in `planner review`.
-#   - methylation_cycle       # See ontology/vocabulary.yaml for valid slugs.
+#   - value: methylation_cycle # See ontology/vocabulary.yaml for valid slugs.
+#     research_state: supported
+#     sources: [https://pubmed.ncbi.nlm.nih.gov/example]
+#
+# Every knowledge assertion must state both research_state and sources. Use
+# `unassessed` with [] when no evidence review has been recorded; a non-
+# unassessed state requires one or more stable source locators.
 
 # ---------------------------------------------------------------------------
 # CONCERNS

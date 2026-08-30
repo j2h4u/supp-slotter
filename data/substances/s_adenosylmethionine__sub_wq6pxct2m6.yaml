@@ -11,12 +11,22 @@ concerns:
     should not be treated as routine background methylation support.
 knowledge:
   effect:
-  - homocysteine_metabolism_support
+  - value: homocysteine_metabolism_support
+    research_state: unassessed
+    sources: []
   kind:
-  - amino
+  - value: amino
+    research_state: unassessed
+    sources: []
   pathway:
-  - methylation_cycle
+  - value: methylation_cycle
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - serotonergic_med_interaction
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: serotonergic_med_interaction
+    research_state: unassessed
+    sources: []
 id: sub_wq6pxct2m6

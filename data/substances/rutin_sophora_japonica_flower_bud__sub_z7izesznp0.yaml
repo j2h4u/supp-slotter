@@ -4,11 +4,21 @@ form: Sophora japonica flower bud
 notes: Rutin powder source listed on NOW Foods Vitamin C-1000 Complex.
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - vascular_polyphenol_context
-  - capillary_support_context
+  - value: vascular_polyphenol_context
+    research_state: unassessed
+    sources: []
+  - value: capillary_support_context
+    research_state: unassessed
+    sources: []
   kind:
-  - flavonoid
+  - value: flavonoid
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

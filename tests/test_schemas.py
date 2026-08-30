@@ -23,7 +23,10 @@ def _make_substance_card(**extra: YamlValue) -> dict[str, YamlValue]:
 
 def test_substance_schema_accepts_nested_form() -> None:
     card = _make_substance_card(
-        knowledge={"kind": ["amino"], "risk": ["manual_review"]},
+        knowledge={
+            "kind": [{"value": "amino", "research_state": "unassessed", "sources": []}],
+            "risk": [{"value": "manual_review", "research_state": "unassessed", "sources": []}],
+        },
     )
     errors = schema_errors(card, "substance", Path("test"), ontology_bundle())
     assert errors == [], f"Expected no errors, got: {errors}"
@@ -58,6 +61,8 @@ def test_generated_relation_schema_rejects_noncanonical_selector_shape() -> None
                     "target_selector": {"target_trait": "fixture"},
                     "assertion_kind": "ontology_assertion",
                     "semantic_family": "biochemical_mechanism_assertion",
+                    "research_state": "unassessed",
+                    "sources": [],
                 }
             ]
         },
@@ -88,6 +93,8 @@ def test_generated_relation_schema_enforces_formal_selector_exclusivity() -> Non
                         "target_selector": {"entity": {"entity_id": "sub_bbbbbbbbbb"}},
                         "assertion_kind": "ontology_assertion",
                         "semantic_family": "biochemical_mechanism_assertion",
+                        "research_state": "unassessed",
+                        "sources": [],
                     }
                 ]
             },
@@ -123,6 +130,8 @@ def test_generated_relation_schema_rejects_nullable_or_blank_selector_scalars(
                     "target_selector": {"entity": {"entity_id": "sub_bbbbbbbbbb"}},
                     "assertion_kind": "ontology_assertion",
                     "semantic_family": "biochemical_mechanism_assertion",
+                    "research_state": "unassessed",
+                    "sources": [],
                 }
             ]
         },
@@ -156,6 +165,8 @@ def test_relation_schema_enforces_ontology_relation_type_and_severity_enums() ->
                     "target_selector": {"entity": {"entity_id": "sub_bbbbbbbbbb"}},
                     "assertion_kind": "ontology_assertion",
                     "semantic_family": "biochemical_mechanism_assertion",
+                    "research_state": "unassessed",
+                    "sources": [],
                     "severity": "not_authored",
                 }
             ]

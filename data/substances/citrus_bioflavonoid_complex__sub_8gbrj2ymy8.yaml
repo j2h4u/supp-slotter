@@ -5,9 +5,17 @@ notes: Complex listed on NOW Foods Vitamin C-1000 Complex. Kept as a label-backe
   inventing undisclosed individual flavonoids.
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - vascular_polyphenol_context
-  - capillary_support_context
+  - value: vascular_polyphenol_context
+    research_state: unassessed
+    sources: []
+  - value: capillary_support_context
+    research_state: unassessed
+    sources: []
   kind:
-  - flavonoid
+  - value: flavonoid
+    research_state: unassessed
+    sources: []

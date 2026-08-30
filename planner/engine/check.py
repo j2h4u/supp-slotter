@@ -16,7 +16,7 @@ from planner.check_report import report
 from planner.contracts import CardLoadError
 from planner.engine.results import CheckResult
 from planner.ontology.artifacts import OntologyBundle, load_ontology
-from planner.ontology.canonical_facts import validate_canonical_fact_catalog
+from planner.ontology.canonical_facts import validate_canonical_scheduling
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.warning_policy import check_warning_type_references
 from planner.paths import ROOT, Paths
@@ -132,7 +132,7 @@ def _extend_card_validation_errors(
     info.extend(p_info)
     try:
         products = load_product_registry(paths, bundle)
-        validate_canonical_fact_catalog(bundle.runtime_program.canonical_fact_catalog, substances, products)
+        validate_canonical_scheduling(bundle.runtime_program.canonical_scheduling, substances, products)
     except CardLoadError as e:
         errors.append(e.message)
 

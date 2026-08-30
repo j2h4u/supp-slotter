@@ -8,6 +8,10 @@ concerns:
     glucose-lowering supplements before treating metformin as routine stack background.
 knowledge:
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - pharmaceutical
+  - value: pharmaceutical
+    research_state: unassessed
+    sources: []

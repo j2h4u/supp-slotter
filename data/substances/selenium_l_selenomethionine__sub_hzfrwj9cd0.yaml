@@ -8,11 +8,21 @@ notes: Organic selenium amino-acid form. NIH ODS lists selenomethionine among co
   selenium's thyroid-hormone metabolism role.
 knowledge:
   effect:
-  - antioxidant_enzyme_cofactor
+  - value: antioxidant_enzyme_cofactor
+    research_state: unassessed
+    sources: []
   kind:
-  - mineral
+  - value: mineral
+    research_state: unassessed
+    sources: []
   pathway:
-  - glutathione_metabolism
-  - thyroid_hormone_axis
+  - value: glutathione_metabolism
+    research_state: unassessed
+    sources: []
+  - value: thyroid_hormone_axis
+    research_state: unassessed
+    sources: []
   risk:
-  - narrow_therapeutic_window
+  - value: narrow_therapeutic_window
+    research_state: unassessed
+    sources: []

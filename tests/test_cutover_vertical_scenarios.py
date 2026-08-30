@@ -21,7 +21,11 @@ ROOT = Path(__file__).resolve().parents[1]
 def _schedule_products(schedule: dict[str, object], pillbox: str) -> list[str]:
     pillboxes = cast(dict[str, object], schedule["pillboxes"])
     entries = cast(dict[str, dict[str, object]], cast(dict[str, object], pillboxes[pillbox])["slots"])
-    return [product for entry in entries.values() for product in cast(list[str], entry["products"])]
+    return [
+        cast(str, product["label"])
+        for entry in entries.values()
+        for product in cast(list[dict[str, object]], entry["products"])
+    ]
 
 
 def _assert_current_shelf_proof(schedule: dict[str, object], stacks: dict[str, list[str]]) -> None:
@@ -87,12 +91,8 @@ def test_real_shelf_daily_episodic_and_training_products_are_complete(monkeypatc
 
     summary = cast(dict[str, object], schedule["summary"])
     placement_groups = cast(dict[str, list[str]], summary["placement_groups"])
-    episodic = {
-        format_product_name(products[product_id])
-        for product_id in stacks["daily"]
-        if products[product_id].use_pattern == "not_every_day"
-    }
+    episodic = {product_id for product_id in stacks["daily"] if products[product_id].use_pattern == "not_every_day"}
     assert set(placement_groups["episodic"]) == episodic
-    assert episodic <= actual_by_stack["daily"]
+    assert {format_product_name(products[product_id]) for product_id in episodic} <= actual_by_stack["daily"]
 
     _assert_current_shelf_proof(schedule, stacks)

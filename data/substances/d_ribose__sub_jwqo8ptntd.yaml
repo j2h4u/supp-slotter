@@ -10,9 +10,15 @@ concerns:
     support, fatigue support, or cardiac/clinical nutrition support.
 knowledge:
   effect:
-  - exercise_recovery_support
+  - value: exercise_recovery_support
+    research_state: unassessed
+    sources: []
   kind:
-  - carbohydrate
+  - value: carbohydrate
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_jwqo8ptntd

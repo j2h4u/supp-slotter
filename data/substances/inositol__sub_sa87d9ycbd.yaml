@@ -7,6 +7,10 @@ notes: Cyclic carbohydrate (vitamin-like compound) commonly accompanying B-compl
   matrix component, not enough by itself to infer therapeutic inositol use.
 knowledge:
   effect:
-  - insulin_signaling_context
+  - value: insulin_signaling_context
+    research_state: unassessed
+    sources: []
   kind:
-  - carbohydrate
+  - value: carbohydrate
+    research_state: unassessed
+    sources: []

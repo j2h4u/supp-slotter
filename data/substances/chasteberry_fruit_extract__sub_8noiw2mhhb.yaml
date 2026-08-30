@@ -17,9 +17,15 @@ concerns:
     dose, and duration.
 knowledge:
   effect:
-  - reproductive_hormone_context
+  - value: reproductive_hormone_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_8noiw2mhhb

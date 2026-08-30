@@ -538,6 +538,8 @@ def test_load_global_relations_rejects_unknown_ontology_relation_type(
                 "source_selector": {"entity": {"entity_id": "sub_src"}},
                 "target_selector": {"entity": {"entity_id": "sub_tgt"}},
                 "reason": "unknown relation type should not be silently dropped",
+                "research_state": "unassessed",
+                "sources": [],
             }
         ]
     }

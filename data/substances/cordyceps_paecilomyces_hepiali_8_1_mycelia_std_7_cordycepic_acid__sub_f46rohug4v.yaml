@@ -9,11 +9,23 @@ notes: Mycelial cordyceps extract used in Life Extension Adrenal Energy Formula 
   in vascular-review context.
 knowledge:
   effect:
-  - fatigue_resilience_context
-  - endurance_context
-  - immune_modulation_context
+  - value: fatigue_resilience_context
+    research_state: unassessed
+    sources: []
+  - value: endurance_context
+    research_state: unassessed
+    sources: []
+  - value: immune_modulation_context
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - serotonergic_med_interaction
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: serotonergic_med_interaction
+    research_state: unassessed
+    sources: []
   role:
-  - adaptogen
+  - value: adaptogen
+    research_state: unassessed
+    sources: []

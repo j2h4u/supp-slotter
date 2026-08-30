@@ -8,11 +8,21 @@ notes: 'Valerian root extract listed in the Natural Balance Happy Sleeper propri
   long-term safety is not established.'
 knowledge:
   context:
-  - sleep_recovery
+  - value: sleep_recovery
+    research_state: unassessed
+    sources: []
   effect:
-  - calming_context
-  - sleep_context
+  - value: calming_context
+    research_state: unassessed
+    sources: []
+  - value: sleep_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   pathway:
-  - gabaergic_signaling
+  - value: gabaergic_signaling
+    research_state: unassessed
+    sources: []

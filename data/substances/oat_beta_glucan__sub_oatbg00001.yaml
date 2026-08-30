@@ -10,8 +10,16 @@ notes: Viscous beta-glucan soluble fiber from oats or barley. FDA cholesterol/CH
   cholesterol fiber.
 knowledge:
   effect:
-  - lipid_metabolism_support
-  - bowel_regularity_context
-  - gut_microbiome_context
+  - value: lipid_metabolism_support
+    research_state: unassessed
+    sources: []
+  - value: bowel_regularity_context
+    research_state: unassessed
+    sources: []
+  - value: gut_microbiome_context
+    research_state: unassessed
+    sources: []
   kind:
-  - fiber
+  - value: fiber
+    research_state: unassessed
+    sources: []

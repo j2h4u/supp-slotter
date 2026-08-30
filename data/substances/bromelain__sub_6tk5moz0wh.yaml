@@ -8,10 +8,20 @@ notes: Proteolytic enzyme from pineapple stem; systemic anti-inflammatory and an
   matches product practice. Relevant to bleeding-load review.
 knowledge:
   effect:
-  - digestive_enzyme_context
-  - protein_digestion_support
+  - value: digestive_enzyme_context
+    research_state: unassessed
+    sources: []
+  - value: protein_digestion_support
+    research_state: unassessed
+    sources: []
   kind:
-  - enzyme
+  - value: enzyme
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - bleeding_med_interaction
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: bleeding_med_interaction
+    research_state: unassessed
+    sources: []
