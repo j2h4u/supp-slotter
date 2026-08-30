@@ -78,7 +78,7 @@ def test_fast_unit_suite_selects_curated_modules_in_one_invocation(
     tests_root = _make_modules(
         tmp_path,
         [
-            "test_plan_search.py",
+            "test_canonical_optimizer.py",
             "test_warning_humanization.py",
             "test_ontology_artifacts.py",
         ],
@@ -98,7 +98,7 @@ def test_fast_unit_suite_selects_curated_modules_in_one_invocation(
         "-q",
         "-m",
         run_unit_gate.PYTEST_MARKERS,
-        str(tests_root / "test_plan_search.py"),
+        str(tests_root / "test_canonical_optimizer.py"),
         str(tests_root / "test_warning_humanization.py"),
     ]
     output = capsys.readouterr().out
@@ -139,7 +139,7 @@ def test_runtime_scenarios_selects_exact_modules_and_nodes_in_order(
     assert "-n" not in pytest_command
     assert "--dist" not in pytest_command
     output = capsys.readouterr().out
-    assert "Running runtime-scenarios suite (18 targets)\n" in output
+    assert "Running runtime-scenarios suite (17 targets)\n" in output
     assert output.count("elapsed=") == 2
 
 
@@ -189,7 +189,6 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
         [
             *(path.relative_to(Path("tests")).as_posix() for path in run_unit_gate.FAST_UNIT_MODULES),
             *(path.relative_to(Path("tests")).as_posix() for path in run_unit_gate.COVERAGE_ONLY_MODULES),
-            "test_scheduler_reviewer_authority.py",
         ],
     )
     calls: list[list[str]] = []
@@ -201,30 +200,34 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
     assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, suite="coverage") == 0
     assert len(calls) == 2
     expected_inventory = [
+        "tests/test_canonical_fact_catalog_integration.py",
+        "tests/test_canonical_inference.py",
+        "tests/test_canonical_inference_plan_integration.py",
+        "tests/test_canonical_optimizer.py",
+        "tests/test_canonical_optimizer_plan_integration.py",
+        "tests/test_canonical_publication.py",
         "tests/test_card_reference_integrity.py",
         "tests/test_cli_surface.py",
+        "tests/test_composition_role_identity.py",
         "tests/test_crap_gate.py",
         "tests/test_dashboard_review.py",
         "tests/test_dashboard_schema.py",
         "tests/test_fact_labels.py",
         "tests/test_formal_uniqueness.py",
         "tests/test_loader_fail_closed.py",
+        "tests/test_logical_slot_topology.py",
         "tests/test_maintenance.py",
         "tests/test_pillbox_loader_contract.py",
-        "tests/test_plan_relation_scheduling.py",
-        "tests/test_plan_search.py",
         "tests/test_product_validation.py",
         "tests/test_query_model_loaders.py",
         "tests/test_read_model_relations.py",
-        "tests/test_relation_conflicts.py",
         "tests/test_review_command.py",
         "tests/test_run_unit_gate.py",
-        "tests/test_scheduling_constraint_runtime.py",
-        "tests/test_scheduling_units.py",
+        "tests/test_runtime_contract_v2.py",
+        "tests/test_scheduler_reviewer_authority.py",
         "tests/test_schemas.py",
         "tests/test_substance_similarity.py",
         "tests/test_warning_humanization.py",
-        "tests/test_scheduler_reviewer_authority.py::test_reviewer_only_knowledge_does_not_change_slot_assignment",
     ]
     expected_coverage_modules = [Path(item) for item in expected_inventory if "::" not in item]
     assert calls[1] == [
@@ -235,7 +238,6 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
         "-m",
         run_unit_gate.PYTEST_MARKERS,
         *(str(tests_root / path.relative_to(Path("tests"))) for path in expected_coverage_modules),
-        "tests/test_scheduler_reviewer_authority.py::test_reviewer_only_knowledge_does_not_change_slot_assignment",
         "--cov=planner",
         "--cov-report=",
         "--crap",
@@ -244,20 +246,16 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
     assert not any(argument.startswith("--cov-fail-under=") for argument in calls[1])
     assert "-n" not in calls[1]
     assert "--dist" not in calls[1]
-    smoke_node = (
-        "tests/test_scheduler_reviewer_authority.py::test_reviewer_only_knowledge_does_not_change_slot_assignment"
-    )
-    assert calls[1].count(smoke_node) == 1
     assert len(calls[1][6:-2]) == len(set(calls[1][6:-2]))
     assert run_unit_gate._coverage_inventory_items() == expected_inventory
     assert not set(expected_inventory) & {path.as_posix() for path in run_unit_gate.ONTOLOGY_CONTRACT_MODULES}
     output = capsys.readouterr().out
-    assert "Running coverage suite (24 targets)\n" in output
+    assert "Running coverage suite (28 targets)\n" in output
     assert output.count("elapsed=") == 2
 
 
 def test_coverage_suite_propagates_pytest_failure_without_followup_process(tmp_path: Path) -> None:
-    tests_root = _make_modules(tmp_path, ["test_plan_search.py"])
+    tests_root = _make_modules(tmp_path, ["test_canonical_optimizer.py"])
     calls: list[list[str]] = []
 
     def runner(command: run_unit_gate.Command) -> int:
@@ -379,8 +377,11 @@ def test_release_suite_runs_six_ordered_pytest_stages_without_fast_unit(
     assert pytest_targets(pytest_calls[0]) == list(run_unit_gate.SMOKE_NODE_IDS)
     assert [[target_name(target) for target in pytest_targets(call)] for call in pytest_calls[1:4]] == [
         [
+            "test_canonical_fact_catalog_runtime.py",
+            "test_canonical_law_catalog.py",
             "test_linkml_core_schema.py",
             "test_ontology_compiler_outputs.py",
+            "test_real_canonical_catalog.py",
             "tests/test_runtime_axis_cardinality.py::test_compiler_rejects_unknown_projection_target",
         ],
         [

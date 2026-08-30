@@ -4,15 +4,13 @@ from __future__ import annotations
 
 import copy
 import json
-from dataclasses import replace
 from pathlib import Path
 from typing import cast
 
 import pytest
 import yaml
 from planner.cards.substance import load_substance
-from planner.contracts import CardLoadError, Product, ProductComponent, ScheduleAssertion, Substance
-from planner.engine._scheduling import project_schedule_assignments
+from planner.contracts import CardLoadError
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.runtime_program import decode_runtime_program
 from scripts.ontology_compiler import _runtime_projection_tree
@@ -108,13 +106,3 @@ def test_card_loader_enforces_mutated_axis_cardinality(
     path.write_text(yaml.safe_dump(card, sort_keys=False), encoding="utf-8")
     with pytest.raises(CardLoadError, match=message):
         load_substance(path, bundle)
-
-
-def test_scheduler_enforces_axis_cardinality_even_for_typed_mutation() -> None:
-    runtime = ontology_bundle().runtime_program
-    axis = runtime.assignment_axes[0]
-    mutated = replace(runtime, assignment_axes=(replace(axis, maximum_cardinality=0), *runtime.assignment_axes[1:]))
-    product = Product("prd_a", "A", (ProductComponent("sub_a"),))
-    substance = Substance("sub_a", "A", (), schedule_assertions=(ScheduleAssertion("intake", "food_preferred"),))
-    with pytest.raises(OntologyInfrastructureError, match="at most 0"):
-        project_schedule_assignments(mutated, product, {substance.id: substance}, {})

@@ -13,6 +13,8 @@ from planner.contracts import CardLoadError, Product, ProductComponent
 from tests.helpers import ontology_bundle
 from tests.planner_fixture import (
     PlannerFixtureInput,
+    find_card_path_by_id,
+    fixture_id,
     plan_in_temp_dir,
     write_minimal_planner_fixture,
     write_yaml,
@@ -89,7 +91,7 @@ def test_product_loader_accepts_closed_use_pattern(tmp_path: Path) -> None:
                 "id": "prd_aaaaaaaaaa",
                 "name": "Occasional",
                 "use_pattern": "not_every_day",
-                "components": [{"substance": "sub_aaaaaaaaaa"}],
+                "components": [{"id": "cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa", "substance": "sub_aaaaaaaaaa"}],
             },
             sort_keys=False,
         ),
@@ -107,7 +109,7 @@ def test_product_loader_rejects_invalid_use_pattern(tmp_path: Path) -> None:
                 "id": "prd_aaaaaaaaaa",
                 "name": "Invalid",
                 "use_pattern": "weekly",
-                "components": [{"substance": "sub_aaaaaaaaaa"}],
+                "components": [{"id": "cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa", "substance": "sub_aaaaaaaaaa"}],
             },
             sort_keys=False,
         ),
@@ -127,7 +129,7 @@ def test_marked_daily_product_remains_in_physical_daily_schedule(tmp_path: Path)
             traits={},
         ),
     )
-    product_path = next((tmp_path / "data/products").glob("*.yaml"))
+    product_path = find_card_path_by_id(tmp_path / "data/products", fixture_id("prd", "marked"))
     card = yaml.safe_load(product_path.read_text(encoding="utf-8"))
     assert isinstance(card, dict)
     card["use_pattern"] = "not_every_day"

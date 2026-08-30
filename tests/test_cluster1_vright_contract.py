@@ -171,7 +171,7 @@ def test_migration_ledger_is_deterministic_complete_in_shape_and_fail_closed(tmp
     assert sum(counts.values()) == coverage["atom_count"]
     assert coverage["pending_atom_count"] == 0
     assert coverage["migration_complete"] is False
-    assert coverage["outstanding_sol_adjudication_count"] == 1786
+    assert coverage["outstanding_sol_adjudication_count"] == 1735
     assert "before deletion" in coverage["migration_blocker"]
 
     allowed = {"data/relations.yaml", "ontology/policies.yaml", "ontology/runtime-policy.yaml"}

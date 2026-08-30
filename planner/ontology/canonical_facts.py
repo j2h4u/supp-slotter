@@ -7,10 +7,7 @@ from pathlib import Path
 
 from planner.cards.product import composition_role_id
 from planner.contracts import CardLoadError, Product, Substance
-from planner.ontology.runtime_program import (
-    RuntimeCanonicalFactCatalog,
-    RuntimeCanonicalSchedulingFact,
-)
+from planner.ontology.runtime_program import RuntimeCanonicalFactCatalog, RuntimeCanonicalSchedulingFact
 
 _CATALOG_PATH = Path(__file__).resolve().parents[2] / "ontology" / "canonical-facts.yaml"
 

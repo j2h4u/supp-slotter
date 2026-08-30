@@ -18,7 +18,6 @@ from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
 from planner.ontology.runtime_program import RuntimeProgram
 from planner.ontology.selector import resolve_selector, selector_capability_form
 from planner.ontology.warning_policy import authored_term_label
-from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
 
 
 def substance_record(substance_id: str, substance: Substance, ontology_bundle: OntologyBundle) -> dict[str, object]:
@@ -125,28 +124,6 @@ def scheduling_constraint_record(
         "tgt_selector": _selector_record(constraint.target_selector, runtime_program),
         "action": constraint.action or "",
         "rationale": constraint.rationale or "",
-    }
-
-
-def scheduling_constraint_execution_plan_record(
-    plan: SchedulingConstraintExecutionPlan,
-) -> dict[str, object]:
-    """Serialize the compiled behavioral instruction."""
-    return {
-        "id": plan.id,
-        "source_substances": list(plan.source_substance_ids),
-        "target_substances": list(plan.target_substance_ids),
-        "operation": plan.operation,
-        "executable": plan.executable,
-        "blocks_slots": plan.blocks_slots,
-        "scores_advisory": plan.scores_advisory,
-        "score_delta": plan.score_delta,
-        "match_direction": plan.match_direction,
-        "aggregation": plan.aggregation,
-        "selector_resolution": plan.selector_resolution,
-        "selector_resolution_outcome": plan.selector_resolution_outcome,
-        "action": plan.action or "",
-        "rationale": plan.rationale or "",
     }
 
 

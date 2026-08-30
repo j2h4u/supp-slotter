@@ -24,12 +24,6 @@
             "string",
             "null"
           ]
-        },
-        "weight": {
-          "type": [
-            "number",
-            "null"
-          ]
         }
       },
       "required": [
@@ -827,31 +821,6 @@
       ],
       "title": "Condition",
       "type": "object"
-    },
-    "ConstraintExecutionAggregation": {
-      "description": "",
-      "enum": [
-        "distinct_constraint"
-      ],
-      "title": "ConstraintExecutionAggregation",
-      "type": "string"
-    },
-    "ConstraintExecutionMatchDirection": {
-      "description": "",
-      "enum": [
-        "symmetric",
-        "directed"
-      ],
-      "title": "ConstraintExecutionMatchDirection",
-      "type": "string"
-    },
-    "ConstraintExecutionOperation": {
-      "description": "",
-      "enum": [
-        "separate_products_same_slot"
-      ],
-      "title": "ConstraintExecutionOperation",
-      "type": "string"
     },
     "Dashboard": {
       "additionalProperties": false,
@@ -1778,6 +1747,15 @@
       "title": "ProductUsePattern",
       "type": "string"
     },
+    "PublicationStatus": {
+      "description": "",
+      "enum": [
+        "Optimal",
+        "Indeterminate"
+      ],
+      "title": "PublicationStatus",
+      "type": "string"
+    },
     "RelationAssertionCatalog": {
       "additionalProperties": false,
       "description": "Authored supplement relation assertions consumed by the read model and reviewer surfaces.",
@@ -2105,48 +2083,6 @@
       "title": "RuntimeConcernCatalogEntry",
       "type": "object"
     },
-    "RuntimeConstraintExecutionPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "aggregation": {
-          "$ref": "#/$defs/ConstraintExecutionAggregation"
-        },
-        "blocks_slots": {
-          "type": "boolean"
-        },
-        "id": {
-          "type": "string"
-        },
-        "match_direction": {
-          "$ref": "#/$defs/ConstraintExecutionMatchDirection"
-        },
-        "operation": {
-          "$ref": "#/$defs/ConstraintExecutionOperation"
-        },
-        "score_delta": {
-          "type": "integer"
-        },
-        "scores_advisory": {
-          "type": "boolean"
-        },
-        "selector_resolution": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "operation",
-        "match_direction",
-        "aggregation",
-        "selector_resolution",
-        "blocks_slots",
-        "scores_advisory",
-        "score_delta"
-      ],
-      "title": "RuntimeConstraintExecutionPolicy",
-      "type": "object"
-    },
     "RuntimeDashboardProductTrackingStateDefinition": {
       "additionalProperties": false,
       "description": "",
@@ -2315,75 +2251,6 @@
       "title": "RuntimeEffectMatchDimensionPolicy",
       "type": "object"
     },
-    "RuntimeEffectScore": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "level": {
-          "type": "string"
-        },
-        "score": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "id",
-        "level",
-        "score"
-      ],
-      "title": "RuntimeEffectScore",
-      "type": "object"
-    },
-    "RuntimeEffectScoringPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "aggregation_mode": {
-          "type": "string"
-        },
-        "balance_penalty_expression": {
-          "type": "string"
-        },
-        "balance_weight": {
-          "minimum": 0,
-          "type": "number"
-        },
-        "id": {
-          "type": "string"
-        },
-        "objective_function": {
-          "type": "string"
-        },
-        "prefer_with_bonus": {
-          "minimum": 0,
-          "type": "integer"
-        },
-        "scores": {
-          "items": {
-            "$ref": "#/$defs/RuntimeEffectScore"
-          },
-          "type": "array"
-        },
-        "tie_break": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "aggregation_mode",
-        "objective_function",
-        "balance_penalty_expression",
-        "tie_break",
-        "scores",
-        "balance_weight",
-        "prefer_with_bonus"
-      ],
-      "title": "RuntimeEffectScoringPolicy",
-      "type": "object"
-    },
     "RuntimeEngineConformanceScenario": {
       "additionalProperties": false,
       "description": "",
@@ -2420,13 +2287,34 @@
           },
           "type": "array"
         },
+        "domain_feasibility": {
+          "type": "string"
+        },
         "id": {
+          "type": "string"
+        },
+        "pressure_identity": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "primary_objective": {
           "type": "string"
         },
         "protocol_version": {
           "type": "string"
         },
+        "publication_statuses": {
+          "items": {
+            "$ref": "#/$defs/PublicationStatus"
+          },
+          "type": "array"
+        },
         "result_mode": {
+          "type": "string"
+        },
+        "secondary_objective": {
           "type": "string"
         },
         "semantics": {
@@ -2434,12 +2322,21 @@
             "$ref": "#/$defs/RuntimeEngineSemantic"
           },
           "type": "array"
+        },
+        "tie_break": {
+          "type": "string"
         }
       },
       "required": [
         "id",
         "protocol_version",
         "result_mode",
+        "pressure_identity",
+        "domain_feasibility",
+        "primary_objective",
+        "secondary_objective",
+        "tie_break",
+        "publication_statuses",
         "semantics",
         "conformance_scenarios"
       ],
@@ -2481,24 +2378,6 @@
         },
         "inactive_stack_name": {
           "type": "string"
-        },
-        "prefer_with_pair_modes": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "prefer_with_source_fields": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "prefer_with_target_resolutions": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
         },
         "relation_endpoint_selector_kinds": {
           "items": {
@@ -2566,10 +2445,7 @@
         "relation_presence_truth_table",
         "relation_endpoint_selector_kinds",
         "relation_selector_forms",
-        "warning_emitter_ids",
-        "prefer_with_source_fields",
-        "prefer_with_target_resolutions",
-        "prefer_with_pair_modes"
+        "warning_emitter_ids"
       ],
       "title": "RuntimeGlueContract",
       "type": "object"
@@ -2653,12 +2529,6 @@
           },
           "type": "array"
         },
-        "constraint_execution_policies": {
-          "items": {
-            "$ref": "#/$defs/RuntimeConstraintExecutionPolicy"
-          },
-          "type": "array"
-        },
         "dashboard_state_catalog": {
           "$ref": "#/$defs/RuntimeDashboardStateCatalog"
         },
@@ -2667,9 +2537,6 @@
             "$ref": "#/$defs/RuntimeEffectMatchDimensionPolicy"
           },
           "type": "array"
-        },
-        "effect_scoring": {
-          "$ref": "#/$defs/RuntimeEffectScoringPolicy"
         },
         "engine_contract": {
           "$ref": "#/$defs/RuntimeEngineContract"
@@ -2682,9 +2549,6 @@
         },
         "id": {
           "type": "string"
-        },
-        "prefer_with_policy": {
-          "$ref": "#/$defs/RuntimePreferWithPolicy"
         },
         "relation_presence_statuses": {
           "items": {
@@ -2749,9 +2613,6 @@
         "effect_match_dimensions",
         "assignment_axes",
         "slot_near_values",
-        "constraint_execution_policies",
-        "effect_scoring",
-        "prefer_with_policy",
         "warning_types",
         "warning_emitters",
         "warning_trait_actions",
@@ -2764,32 +2625,6 @@
         "runtime_projection"
       ],
       "title": "RuntimePolicyCatalog",
-      "type": "object"
-    },
-    "RuntimePreferWithPolicy": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "pair_mode": {
-          "type": "string"
-        },
-        "source_field": {
-          "type": "string"
-        },
-        "target_resolution": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "source_field",
-        "target_resolution",
-        "pair_mode"
-      ],
-      "title": "RuntimePreferWithPolicy",
       "type": "object"
     },
     "RuntimeProjectionDescriptor": {
@@ -3451,9 +3286,7 @@
         "id": {
           "type": "string"
         },
-        "operation": {
-          "$ref": "#/$defs/ConstraintExecutionOperation"
-        },
+        "operation": {},
         "rationale": {
           "type": "string"
         },
@@ -3503,9 +3336,7 @@
         "id": {
           "type": "string"
         },
-        "operation": {
-          "$ref": "#/$defs/ConstraintExecutionOperation"
-        },
+        "operation": {},
         "rationale": {
           "type": "string"
         },

@@ -56,7 +56,9 @@ def test_vocabulary_terms_are_classes_not_linkml_enums() -> None:
 
 
 def test_global_slot_definitions_do_not_disagree() -> None:
-    polymorphic_slots = {"axis", "source", "term"}
+    # ``operation`` remains a source SchedulingConstraintRecord field for
+    # LinkML parsing, while runtime v2 does not admit it into its projection.
+    polymorphic_slots = {"axis", "operation", "source", "term"}
     modules = (
         "model.yaml",
         "vocabulary-model.yaml",

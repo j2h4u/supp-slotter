@@ -56,12 +56,10 @@ ignore = [
 # ontology contract harder to audit, so keep the strict rules elsewhere and
 # exempt only the current boundary files.
 "planner/engine/_plan_active_index.py" = ["PLR0914"]
-"planner/engine/_scheduling.py" = ["PLR0913", "PLR0914", "PLR2004"]
 "planner/ontology/artifacts.py" = ["C901", "PLR0912", "PLR0915"]
 "planner/ontology/policies.py" = ["C901", "PLR0914", "PLR0916"]
 "planner/ontology/projection.py" = ["PLR0914", "PLR0915"]
 "planner/ontology/runtime_program.py" = ["C901", "PLR0912", "PLR0913", "PLR0914", "PLR0915", "PLR0917", "PLR2004"]
-"planner/scheduling_constraint_execution.py" = ["PLR0914", "PLR0916"]
 "planner/schema_validation.py" = ["C901", "PERF401", "PLR0912"]
 "scripts/ontology_compiler.py" = ["PLR0913", "PLR0914", "PLR0915", "PLR0916", "PLR2004"]
 "tests/test_ontology_artifacts.py" = ["C901"]
@@ -186,11 +184,8 @@ name = "Plan internals do not depend on command entrypoints"
 type = "forbidden"
 source_modules = [
     "planner.engine._plan_active_index",
-    "planner.engine._plan_blocking",
-    "planner.engine._plan_feasibility",
     "planner.engine._plan_inputs",
     "planner.engine._plan_output",
-    "planner.engine._plan_search",
     "planner.engine._plan_types",
 ]
 forbidden_modules = [

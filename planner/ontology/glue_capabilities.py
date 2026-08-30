@@ -71,9 +71,6 @@ IMPLEMENTED_WARNING_EMITTER_IDS: Final[tuple[str, ...]] = (
 ONTOLOGY_COMPOSITE_KEY_SEPARATOR: Final = ":"
 SOURCE_KIND_ROLE_ASSIGNMENT: Final = "assignment_source"
 IMPLEMENTED_SOURCE_KIND_ROLES: Final[tuple[str, ...]] = (SOURCE_KIND_ROLE_ASSIGNMENT,)
-IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS: Final[tuple[str, ...]] = ("prefer_with",)
-IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS: Final[tuple[str, ...]] = ("exactly_one_active_item",)
-IMPLEMENTED_PREFER_WITH_PAIR_MODES: Final[tuple[str, ...]] = ("undirected_same_slot_bonus",)
 ONTOLOGY_ASSERTION_FILTER_COLUMNS: Final[dict[str, str]] = {
     field: field for field in IMPLEMENTED_RELATION_WARNING_FILTER_FIELDS
 }
@@ -85,9 +82,6 @@ IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS: Final[dict[str, tuple[str, ...]]] = {
     "relation_endpoint_selector_kinds": IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS,
     "relation_selector_forms": IMPLEMENTED_RELATION_SELECTOR_FORMS,
     "warning_emitter_ids": IMPLEMENTED_WARNING_EMITTER_IDS,
-    "prefer_with_source_fields": IMPLEMENTED_PREFER_WITH_SOURCE_FIELDS,
-    "prefer_with_target_resolutions": IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS,
-    "prefer_with_pair_modes": IMPLEMENTED_PREFER_WITH_PAIR_MODES,
 }
 
 

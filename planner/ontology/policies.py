@@ -57,7 +57,11 @@ def _build_trait_effect(effect: dict[str, object], runtime: RuntimeProgram) -> T
     level_raw = effect.get("level")
     if set(effect) - {"match", "level"}:
         raise CardLoadError(ROOT / "ontology", "policy effect has unknown fields")
-    if level_raw is not None and (not isinstance(level_raw, str) or level_raw not in runtime.effect_score_levels):
+    # Policy levels remain source-authored review annotations for the
+    # transitional policy/read-model consumers.  Canonical v2 scheduling does
+    # not interpret them as optimizer scores, so membership in the retired
+    # effect-scoring catalog is intentionally not required.
+    if level_raw is not None and (not isinstance(level_raw, str) or not level_raw.strip()):
         raise CardLoadError(ROOT / "ontology", "policy effect has invalid level")
     level = level_raw if isinstance(level_raw, str) else None
     if level is None:

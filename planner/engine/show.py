@@ -13,7 +13,7 @@ from planner.contracts import CardLoadError
 from planner.engine.plan import cmd_plan
 from planner.engine.results import ShowResult
 from planner.paths import Paths
-from planner.schedule_types import ScheduleData, SchedulePillbox, ScheduleSlotEntry
+from planner.schedule_types import CanonicalScheduleData, SchedulePillbox, ScheduleSlotEntry
 from planner.yaml_io import load_yaml
 
 SEPARATOR = "─" * 41
@@ -68,7 +68,7 @@ def _show_inner(schedule_path: Path) -> int:
     return 0
 
 
-def _print_daily_usage_groups(schedule: ScheduleData) -> None:
+def _print_daily_usage_groups(schedule: CanonicalScheduleData) -> None:
     """Print active daily products by presentation marker, retaining slot detail."""
     groups = _usage_groups(schedule)
     pillboxes = schedule["pillboxes"]
@@ -80,7 +80,7 @@ def _print_daily_usage_groups(schedule: ScheduleData) -> None:
         _print_usage_group(label, names, pillboxes)
 
 
-def _usage_groups(schedule: ScheduleData) -> dict[str, list[str]]:
+def _usage_groups(schedule: CanonicalScheduleData) -> dict[str, list[str]]:
     summary = schedule.get("summary", {})
     raw_groups = summary.get("usage_groups", {}) if isinstance(summary, dict) else {}
     return raw_groups if isinstance(raw_groups, dict) else {}
@@ -128,7 +128,7 @@ def _group_slots(
     ]
 
 
-def _load_schedule(schedule_path: Path) -> ScheduleData | None:
+def _load_schedule(schedule_path: Path) -> CanonicalScheduleData | None:
     try:
         data = cast(object, load_yaml(schedule_path))
     except CardLoadError as e:
@@ -138,7 +138,7 @@ def _load_schedule(schedule_path: Path) -> ScheduleData | None:
     if not isinstance(data, dict):
         print(f"show: {schedule_path}: expected mapping", file=sys.stderr)
         return None
-    return cast(ScheduleData, data)
+    return cast(CanonicalScheduleData, data)
 
 
 def _non_empty_slots(pillbox: SchedulePillbox) -> list[tuple[str, ScheduleSlotEntry]]:
@@ -191,7 +191,7 @@ def _print_filtered_slot(slot_key: str, slot: ScheduleSlotEntry, wanted: set[str
         print(f"  • {product}")
 
 
-def _print_footer(schedule: ScheduleData) -> None:
+def _print_footer(schedule: CanonicalScheduleData) -> None:
     print(SEPARATOR)
     sections: list[str] = []
     warnings = schedule["warnings"]

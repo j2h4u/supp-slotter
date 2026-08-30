@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import contextlib
 import os
+import tempfile
+import uuid
 from pathlib import Path
 
 import yaml
 
-from planner.schedule_types import ScheduleData
+from planner.schedule_types import CanonicalScheduleData, OptimalPublication
 
 SCHEDULE_COMMENTS = {
     "summary": [
@@ -42,18 +44,26 @@ SCHEDULE_COMMENTS = {
         "Detailed review warnings.",
         "Warnings are prompts for human review; they are not medical advice.",
     ],
-    "pairwise_journal": [
-        "Ontology-derived pairwise scheduling decisions.",
-        "Includes prefer-together bonuses, hard/advisory separations, and intra-product conflicts.",
-        "Each row retains resolved product/component endpoints and the final slot state.",
+    "status": [
+        "Closed canonical publication status; only `Optimal` documents are publishable.",
     ],
-    "explanations": [
-        "Per-product placement explanation.",
-        "`slot` is the chosen slot; `components` lists the product substances that drove scheduling.",
-        "`why_here` summarizes why this slot was selected.",
-        "`review_tags` are readable traits aggregated from the product substances.",
-        "`policy_contributions` preserves component vote counts and chosen-slot score contributions.",
-        "`neutral_components` lists components with no authored scheduling fact for review only.",
+    "objective": [
+        "Exact canonical objective: unique pressure satisfaction, integer squared load, stable assignment key.",
+    ],
+    "assignments": [
+        "Stable canonical item-to-logical-slot assignment proved by the exact optimizer.",
+    ],
+    "pressure_matches": [
+        "Typed normalized pressure matches and their fact, law, applicability, and provenance records.",
+    ],
+    "domain_loads": [
+        "Exact per-domain integer slot loads and optimizer proof records.",
+    ],
+    "optimizer_proof": [
+        "Proof records emitted by the exact canonical optimizer.",
+    ],
+    "canonical_explanations": [
+        "Structured canonical placement explanations from typed facts, laws, anchors, and optimizer proofs.",
     ],
 }
 
@@ -65,7 +75,7 @@ class NoAliasSafeDumper(yaml.SafeDumper):
         return True
 
 
-def dump_schedule_yaml(schedule: ScheduleData) -> str:
+def dump_schedule_yaml(schedule: CanonicalScheduleData) -> str:
     """Serialise schedule and inject comment blocks above top-level keys."""
     rendered = yaml.dump(
         schedule,
@@ -83,19 +93,42 @@ def dump_schedule_yaml(schedule: ScheduleData) -> str:
     return "\n".join(lines) + "\n"
 
 
-def write_schedule_file(schedule_file: Path, schedule: ScheduleData) -> None:
-    """Atomically write the rendered schedule to disk."""
-    tmp_schedule_file = schedule_file.with_name(f"{schedule_file.name}.tmp.{os.getpid():x}")
+def write_schedule_file(schedule_file: Path, publication: OptimalPublication) -> None:
+    """Atomically publish one proved canonical schedule document.
+
+    Rendering occurs before creating the temporary file.  The temporary file
+    is unique per invocation and is removed for every failure path, leaving an
+    existing schedule byte-for-byte untouched unless the final replace works.
+    """
+    if not isinstance(publication, OptimalPublication):
+        raise TypeError("write_schedule_file requires an OptimalPublication")
+    publication.validate()
+    rendered = dump_schedule_yaml(publication.document)
+    fd, tmp_name = tempfile.mkstemp(
+        prefix=f"{schedule_file.name}.tmp.{os.getpid():x}.{uuid.uuid4().hex}.",
+        dir=schedule_file.parent,
+        text=True,
+    )
+    tmp_schedule_file = Path(tmp_name)
+    fd_open = True
     try:
-        tmp_schedule_file.write_text(dump_schedule_yaml(schedule), encoding="utf-8")
+        stream = os.fdopen(fd, "w", encoding="utf-8")
+        fd_open = False
+        with stream:
+            stream.write(rendered)
+            stream.flush()
+            os.fsync(stream.fileno())
         tmp_schedule_file.replace(schedule_file)
-    except OSError:
+    except BaseException:
+        if fd_open:
+            with contextlib.suppress(OSError):
+                os.close(fd)
         with contextlib.suppress(OSError):
             tmp_schedule_file.unlink(missing_ok=True)
         raise
 
 
-def schedule_slot_loads(schedule: ScheduleData) -> dict[str, int]:
+def schedule_slot_loads(schedule: CanonicalScheduleData) -> dict[str, int]:
     """Return product counts per pillbox slot."""
     return {
         f"{pillbox_name}.{slot_name}": len(slot_entry["products"])

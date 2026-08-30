@@ -20,13 +20,11 @@ from planner.contracts import CardLoadError, Slot
 from planner.engine._plan_types import PlanInputs
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.canonical_facts import validate_canonical_fact_catalog
-from planner.ontology.policies import load_scheduling_constraints, load_scheduling_policies
 from planner.paths import Paths
-from planner.scheduling_constraint_execution import compile_scheduling_constraint_execution_plans
 from planner.yaml_io import load_yaml
 
 
-def load_plan_inputs(  # noqa: PLR0911
+def load_plan_inputs(
     paths: Paths,
     bundle: OntologyBundle,
 ) -> PlanInputs | None:
@@ -43,11 +41,6 @@ def load_plan_inputs(  # noqa: PLR0911
         )
         if anchor_errors:
             raise CardLoadError(paths.data / "pillboxes.yaml", "\n".join(anchor_errors))
-    except CardLoadError as e:
-        print(f"plan: {e.message}", file=sys.stderr)
-        return None
-    try:
-        policies = load_scheduling_policies(bundle)
     except CardLoadError as e:
         print(f"plan: {e.message}", file=sys.stderr)
         return None
@@ -83,27 +76,15 @@ def load_plan_inputs(  # noqa: PLR0911
         print(f"plan: {paths.stacks_file}: {e}", file=sys.stderr)
         return None
 
-    scheduling_constraints = load_scheduling_constraints(bundle)
-    scheduling_constraint_plans = compile_scheduling_constraint_execution_plans(
-        scheduling_constraints,
-        substances,
-        bundle.runtime_program,
-        ontology_bundle=bundle,
-    )
-
     return PlanInputs(
         ontology_bundle=bundle,
         runtime_program=bundle.runtime_program,
         canonical_fact_catalog=bundle.runtime_program.canonical_fact_catalog,
-        effect_scoring=bundle.runtime_program.effect_scoring,
         slots=slots,
-        policies=policies,
-        scheduling_constraints=scheduling_constraints,
         substances=substances,
         products=products,
         global_relations=global_relations,
         dashboard_files=dashboard_files,
         stack_entries=stack_entries,
         pillboxes=pillboxes,
-        scheduling_constraint_plans=scheduling_constraint_plans,
     )

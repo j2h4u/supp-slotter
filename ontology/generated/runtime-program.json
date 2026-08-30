@@ -245,18 +245,6 @@
         "warning_type": "safety_concern"
       }
     ],
-    "constraint_execution_policies": [
-      {
-        "aggregation": "distinct_constraint",
-        "blocks_slots": true,
-        "id": "separate_products_same_slot",
-        "match_direction": "symmetric",
-        "operation": "separate_products_same_slot",
-        "score_delta": -1,
-        "scores_advisory": true,
-        "selector_resolution": "require_nonempty"
-      }
-    ],
     "dashboard_state_catalog": {
       "product_tracking_states": [
         {
@@ -383,37 +371,6 @@
         "value_type": "boolean"
       }
     ],
-    "effect_scoring": {
-      "aggregation_mode": "sum_unique_component_assignments",
-      "balance_penalty_expression": "balance_weight * sum(slot_count^2)",
-      "balance_weight": 0.5,
-      "id": "effect_scoring",
-      "objective_function": "slot_score_plus_prefer_with_minus_quadratic_balance_penalty",
-      "prefer_with_bonus": 3,
-      "scores": [
-        {
-          "id": "prefer_strong",
-          "level": "prefer_strong",
-          "score": 4
-        },
-        {
-          "id": "prefer",
-          "level": "prefer",
-          "score": 2
-        },
-        {
-          "id": "avoid",
-          "level": "avoid",
-          "score": -2
-        },
-        {
-          "id": "avoid_strong",
-          "level": "avoid_strong",
-          "score": -4
-        }
-      ],
-      "tie_break": "stable_slot_order"
-    },
     "engine_contract": {
       "conformance_scenarios": [
         {
@@ -429,12 +386,6 @@
           "semantic": "selector_resolution"
         },
         {
-          "expected": "two components sharing one policy contribute weight two; unknown assertion contributes zero",
-          "fixture": "component_votes",
-          "id": "component_votes",
-          "semantic": "component_vote_aggregation"
-        },
-        {
           "expected": "inactive is excluded, absent membership is unassigned, daily not_every_day is presented separately",
           "fixture": "stack_and_episodic",
           "id": "stack_and_episodic",
@@ -447,28 +398,22 @@
           "semantic": "episodic_presentation"
         },
         {
-          "expected": "symmetric forward and reverse pairs match; same-product pair emits warning and does not split product",
-          "fixture": "constraint_directions",
-          "id": "constraint_directions",
-          "semantic": "constraint_pair_evaluation"
-        },
-        {
-          "expected": "zero/one/many active targets produce no pair/pair/warning-without-bonus",
-          "fixture": "prefer_with_cardinality",
-          "id": "prefer_with_cardinality",
-          "semantic": "prefer_with_resolution"
-        },
-        {
-          "expected": "fewest candidates, then highest maximum score, then source order",
-          "fixture": "candidate_priority",
-          "id": "candidate_priority",
+          "expected": "every selected item is feasible in every slot of its unbounded logical domain",
+          "fixture": "candidate_feasibility",
+          "id": "candidate_feasibility",
           "semantic": "candidate_feasibility"
         },
         {
-          "expected": "higher total wins; equal total uses stable slot-order lexicographic tuple",
+          "expected": "unique pressure maximum wins; equal pressure count uses integer per-domain squared loads, then stable item-ID and slot-order tuple",
           "fixture": "objective_tie",
           "id": "objective_tie",
-          "semantic": "objective_and_tie_break"
+          "semantic": "canonical_objective_and_tie_break"
+        },
+        {
+          "expected": "only globally proved Optimal publishes a layout; every unproved result is layout-free Indeterminate",
+          "fixture": "publication_status",
+          "id": "publication_status",
+          "semantic": "publication_boundary"
         },
         {
           "expected": "all four source/target active combinations map to declared statuses and warning sides",
@@ -477,21 +422,27 @@
           "semantic": "relation_warning_truth"
         }
       ],
+      "domain_feasibility": "unbounded_logical_domain",
       "id": "planner_engine_contract",
-      "protocol_version": "supp-slotter.engine-contract/v1",
+      "pressure_identity": [
+        "item_id",
+        "dimension",
+        "value"
+      ],
+      "primary_objective": "maximize_unique_pressure_satisfaction",
+      "protocol_version": "supp-slotter.engine-contract/v2",
+      "publication_statuses": [
+        "Optimal",
+        "Indeterminate"
+      ],
       "result_mode": "exact_assignment",
+      "secondary_objective": "minimize_integer_squared_load_per_domain",
       "semantics": [
         {
           "category": "selectors",
           "id": "selector_resolution",
           "rule": "entity_id resolves one stable card; name resolves all exact-name cards; term resolves all cards carrying the canonical term; empty and unsupported outcomes remain distinct; exact_form requires an entity_id and is required when same-name siblings exist.",
           "source_of_truth": "ontology/scheduling-model.yaml + ontology/vocabulary.yaml + verified substance cards"
-        },
-        {
-          "category": "schedule_projection",
-          "id": "component_vote_aggregation",
-          "rule": "emit at most one assignment per component and axis; group rows by policy_id; group weight is row count; apply each matching effect once at that weight; round score*weight before summing; missing assertions contribute zero.",
-          "source_of_truth": "ontology/runtime-policy.yaml + substance schedule_assertions"
         },
         {
           "category": "stack_state",
@@ -506,28 +457,22 @@
           "source_of_truth": "ProductCard.use_pattern + data/products"
         },
         {
-          "category": "constraints",
-          "id": "constraint_pair_evaluation",
-          "rule": "evaluate operation pairs over product component IDs; symmetric matching checks both orientations; blocks_slots rejects a same-slot candidate; scores_advisory adds one score_delta per matched constraint and unordered product pair; intra-product matches warn because one product cannot be separated.",
-          "source_of_truth": "ontology/scheduling-constraints.yaml + ontology/runtime-policy.yaml"
-        },
-        {
-          "category": "preferences",
-          "id": "prefer_with_resolution",
-          "rule": "resolve each target against active component items; zero targets award no pair; one target creates one unordered pair; multiple targets warn and award no pair; self-pairs are ignored; duplicate/reverse pairs collapse.",
-          "source_of_truth": "SubstanceCard.schedule.prefer_with + ontology/runtime-policy.yaml"
-        },
-        {
           "category": "search_inputs",
           "id": "candidate_feasibility",
-          "rule": "initial candidates are slots whose stack equals the item stack; hard pair constraints are evaluated against already assigned slot items during search; item priority is fewest candidates, highest maximum base score, then source sequence.",
+          "rule": "each selected item is feasible in every slot belonging to its unbounded logical domain; no capacity, pair condition, numerical ranking, or physical-fit condition narrows the domain.",
           "source_of_truth": "pillbox slots + data/stacks.yaml + ontology/runtime-policy.yaml"
         },
         {
           "category": "optimization",
-          "id": "objective_and_tie_break",
-          "rule": "maximize slot_score + advisory_penalties + prefer_with_bonus - balance_weight*sum(slot_count^2); use stable slot order and lexicographic item assignment tuple for equal totals within the declared tolerance.",
+          "id": "canonical_objective_and_tie_break",
+          "rule": "maximize unique pressure identities; then minimize the exact integer sum of squared loads independently within each unbounded domain; then minimize the assignment tuple ordered by stable item ID and (slot.order, slot_id).",
           "source_of_truth": "ontology/runtime-policy.yaml"
+        },
+        {
+          "category": "publication",
+          "id": "publication_boundary",
+          "rule": "publish only Optimal results proved globally; conflicts, invalid inputs, interruption, timeout, or resource exhaustion are layout-free Indeterminate results.",
+          "source_of_truth": "ontology/runtime-policy.yaml + canonical optimizer"
         },
         {
           "category": "warnings",
@@ -535,20 +480,12 @@
           "rule": "active endpoint truth is intersection with components of products in non-inactive stacks; classify all four endpoint states; apply authored filters and active sides; preserve reverse output; deduplicate by endpoint/type key.",
           "source_of_truth": "ontology/runtime-policy.yaml + relation assertion projection"
         }
-      ]
+      ],
+      "tie_break": "stable_item_id_then_(slot.order,slot_id)"
     },
     "glue_contract": {
       "id": "planner_glue_contract",
       "inactive_stack_name": "inactive",
-      "prefer_with_pair_modes": [
-        "undirected_same_slot_bonus"
-      ],
-      "prefer_with_source_fields": [
-        "prefer_with"
-      ],
-      "prefer_with_target_resolutions": [
-        "exactly_one_active_item"
-      ],
       "relation_endpoint_selector_kinds": [
         "entity",
         "term"
@@ -627,12 +564,6 @@
       "relation_owner_field": "substance_id",
       "require_active_reachable": true,
       "selection_count": 1
-    },
-    "prefer_with_policy": {
-      "id": "prefer_with_policy",
-      "pair_mode": "undirected_same_slot_bonus",
-      "source_field": "prefer_with",
-      "target_resolution": "exactly_one_active_item"
     },
     "relation_presence_statuses": [
       {
@@ -741,7 +672,7 @@
     ],
     "warning_emitters": [
       {
-        "default_message": "prefer_with target maps to multiple active stack items; no bonus awarded",
+        "default_message": "Multiple active stack items match this companion request; manual review is required.",
         "emitter": "prefer_with_resolver",
         "id": "warning_emitter_prefer_with_resolver",
         "warning_type": "ambiguous_prefer_with"
@@ -822,11 +753,11 @@
     ]
   },
   "provenance": {
-    "compiler_sha256": "b3add2f8515033fc0fadd40ab0c01a9015092ca0a2170c784a15df349ce9242f",
+    "compiler_sha256": "4f512cce3e2f9a84548b1115680b7824bc61e51a7961e13d25e195b98239430d",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
-    "source_sha256": "fccd7bad0afe9187620e724a4eabe9242b391a54e6c0af9f8e4ba99de76c6816"
+    "source_sha256": "3d49f124d00f9e54fbbef224650b3a4e3d93bd479eb0aa60d5904f743af80f57"
   },
   "schema_version": "2",
-  "source_hash": "decdbd58055a1dca99c5016af9c6b4deab06d0c266d86af4cdb2c3d9aa828803"
+  "source_hash": "0b0a964282d91b024ef666590d244de581b7c9c3f6fc350f705bea5d2145c673"
 }

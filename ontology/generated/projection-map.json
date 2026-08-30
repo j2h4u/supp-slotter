@@ -96,14 +96,6 @@
           "name": "value",
           "range": "string",
           "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "weight",
-          "range": "decimal",
-          "required": false
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Action"
@@ -1913,76 +1905,6 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConcernCatalogEntry"
     },
     {
-      "name": "RuntimeConstraintExecutionPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "aggregation",
-          "range": "ConstraintExecutionAggregation",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "blocks_slots",
-          "range": "boolean",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "match_direction",
-          "range": "ConstraintExecutionMatchDirection",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "operation",
-          "range": "ConstraintExecutionOperation",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "score_delta",
-          "range": "integer",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "scores_advisory",
-          "range": "boolean",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "selector_resolution",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeConstraintExecutionPolicy"
-    },
-    {
       "name": "RuntimeDashboardProductTrackingStateDefinition",
       "slots": [
         {
@@ -2211,106 +2133,6 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectMatchDimensionPolicy"
     },
     {
-      "name": "RuntimeEffectScore",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "level",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "score",
-          "range": "integer",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectScore"
-    },
-    {
-      "name": "RuntimeEffectScoringPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "aggregation_mode",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "balance_penalty_expression",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "balance_weight",
-          "range": "decimal",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "objective_function",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "prefer_with_bonus",
-          "range": "integer",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "scores",
-          "range": "RuntimeEffectScore",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "tie_break",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimeEffectScoringPolicy"
-    },
-    {
       "name": "RuntimeEngineConformanceScenario",
       "slots": [
         {
@@ -2363,7 +2185,31 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
+          "name": "domain_feasibility",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
           "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": true,
+          "name": "pressure_identity",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "primary_objective",
           "range": "string",
           "required": true
         },
@@ -2378,8 +2224,24 @@
         {
           "inlined": false,
           "inlined_as_list": false,
+          "multivalued": true,
+          "name": "publication_statuses",
+          "range": "PublicationStatus",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
           "multivalued": false,
           "name": "result_mode",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "secondary_objective",
           "range": "string",
           "required": true
         },
@@ -2389,6 +2251,14 @@
           "multivalued": true,
           "name": "semantics",
           "range": "RuntimeEngineSemantic",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "tie_break",
+          "range": "string",
           "required": true
         }
       ],
@@ -2448,30 +2318,6 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "inactive_stack_name",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "prefer_with_pair_modes",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "prefer_with_source_fields",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": true,
-          "name": "prefer_with_target_resolutions",
           "range": "string",
           "required": true
         },
@@ -2663,14 +2509,6 @@
         },
         {
           "inlined": true,
-          "inlined_as_list": true,
-          "multivalued": true,
-          "name": "constraint_execution_policies",
-          "range": "RuntimeConstraintExecutionPolicy",
-          "required": true
-        },
-        {
-          "inlined": true,
           "inlined_as_list": false,
           "multivalued": false,
           "name": "dashboard_state_catalog",
@@ -2683,14 +2521,6 @@
           "multivalued": true,
           "name": "effect_match_dimensions",
           "range": "RuntimeEffectMatchDimensionPolicy",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "effect_scoring",
-          "range": "RuntimeEffectScoringPolicy",
           "required": true
         },
         {
@@ -2723,14 +2553,6 @@
           "multivalued": false,
           "name": "id",
           "range": "string",
-          "required": true
-        },
-        {
-          "inlined": true,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "prefer_with_policy",
-          "range": "RuntimePreferWithPolicy",
           "required": true
         },
         {
@@ -2807,44 +2629,6 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePolicyCatalog"
-    },
-    {
-      "name": "RuntimePreferWithPolicy",
-      "slots": [
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "id",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "pair_mode",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "source_field",
-          "range": "string",
-          "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "target_resolution",
-          "range": "string",
-          "required": true
-        }
-      ],
-      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/RuntimePreferWithPolicy"
     },
     {
       "name": "RuntimeProjectionDescriptor",

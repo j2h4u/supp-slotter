@@ -84,9 +84,12 @@ def _copy_repository_shape(tmp_path: Path) -> Path:  # noqa: PLR0912, PLR0914
 
 def test_committed_runtime_program_decodes() -> None:
     runtime = load_runtime_program(ONTOLOGY)
-    assert runtime.effect_scoring.aggregation_mode == "sum_unique_component_assignments"
-    assert runtime.effect_scoring.prefer_with_bonus > 0
-    assert runtime.constraint_execution_policy_for("separate_products_same_slot") is not None
+    assert runtime.engine_contract.protocol_version == "supp-slotter.engine-contract/v2"
+    assert runtime.engine_contract.pressure_identity == ("item_id", "dimension", "value")
+    assert runtime.engine_contract.publication_statuses == ("Optimal", "Indeterminate")
+    assert not hasattr(runtime, "effect_scoring")
+    assert not hasattr(runtime, "constraint_execution_policies")
+    assert not hasattr(runtime, "prefer_with_policy")
     declared_roles = set(runtime.glue_contract.source_kind_roles)
     assert runtime.glue_contract.source_kind_roles == IMPLEMENTED_SOURCE_KIND_ROLES
     assert all(set(row.applies_to) <= declared_roles for row in runtime.source_kind_values)
@@ -141,47 +144,32 @@ def test_runtime_decode_rejects_invalid_slot_near_values() -> None:
         decode_runtime_program(payload)
 
 
-def test_runtime_decode_rejects_unimplemented_objective_contract() -> None:
+def test_runtime_decode_rejects_unimplemented_canonical_engine_contract() -> None:
     payload = cast(
         dict[str, object],
         json.loads((ONTOLOGY / "generated/runtime-program.json").read_text(encoding="utf-8")),
     )
     projection = cast(dict[str, object], payload["projection"])
-    scoring = cast(dict[str, object], projection["effect_scoring"])
-    scoring["objective_function"] = "unimplemented_objective"
+    engine_contract = cast(dict[str, object], projection["engine_contract"])
+    engine_contract["primary_objective"] = "unimplemented_objective"
 
-    with pytest.raises(OntologyInfrastructureError, match="not implemented"):
+    with pytest.raises(OntologyInfrastructureError, match="must maximize unique pressure satisfaction"):
         decode_runtime_program(payload)
 
 
-def test_runtime_decode_rejects_missing_or_unknown_component_aggregation_mode() -> None:
+def test_runtime_decode_rejects_legacy_score_pair_or_default_compatibility_fields() -> None:
     payload = _runtime_payload()
     projection = cast(dict[str, object], payload["projection"])
-    scoring = cast(dict[str, object], projection["effect_scoring"])
-    scoring.pop("aggregation_mode")
+    projection["effect_scoring"] = {}
     with pytest.raises(OntologyInfrastructureError, match="invalid closed shape"):
         decode_runtime_program(payload)
 
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    scoring = cast(dict[str, object], projection["effect_scoring"])
-    scoring["aggregation_mode"] = "collapse_policy_votes"
-    with pytest.raises(OntologyInfrastructureError, match="not implemented"):
-        decode_runtime_program(payload)
-
-
-@pytest.mark.parametrize(
-    ("field", "value"),
-    [("balance_weight", -0.5), ("prefer_with_bonus", -1)],
-)
-def test_runtime_decode_rejects_negative_optimizer_coefficients(field: str, value: int | float) -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    scoring = cast(dict[str, object], projection["effect_scoring"])
-    scoring[field] = value
-
-    with pytest.raises(OntologyInfrastructureError, match="non-negative"):
-        decode_runtime_program(payload)
+    for field in ("constraint_execution_policies", "prefer_with_policy", "default_assignment"):
+        payload = _runtime_payload()
+        projection = cast(dict[str, object], payload["projection"])
+        projection[field] = []
+        with pytest.raises(OntologyInfrastructureError, match="invalid closed shape"):
+            decode_runtime_program(payload)
 
 
 def test_runtime_decode_requires_exact_executable_capability_parity() -> None:

@@ -12,10 +12,6 @@ from planner.query_model.facts import (
     inactive_substance_ids,
 )
 from planner.query_model.projections import ontology_assertion_record
-from planner.query_model.relation_conflicts import (
-    RelationConflictWarningRow,
-    collect_intra_product_scheduling_constraint_conflicts,
-)
 from planner.query_model.relation_matches import collect_substance_relation_matches
 from planner.query_model.relation_warnings import (
     RelationWarningRow,
@@ -25,7 +21,6 @@ from planner.query_model.relations import (
     classify_relations,
 )
 from planner.schedule_types import ActiveFactIndexEntry
-from planner.scheduling_constraint_execution import compile_scheduling_constraint_execution_plans
 
 
 class StackReadModel:
@@ -49,21 +44,6 @@ class StackReadModel:
     ) -> list[RelationWarningRow]:
         return collect_relation_warnings(
             self._data.assertions, active_substances, self._ontology_bundle.runtime_program
-        )
-
-    def collect_intra_product_scheduling_constraint_conflicts(
-        self,
-        *,
-        item_id: str,
-        product_id: str,
-        component_ids: list[str],
-    ) -> list[RelationConflictWarningRow]:
-        return collect_intra_product_scheduling_constraint_conflicts(
-            self._data.scheduling_constraint_plans,
-            self._ontology_bundle.runtime_program,
-            item_id=item_id,
-            product_id=product_id,
-            component_ids=component_ids,
         )
 
     def substance_relation_matches(
@@ -112,18 +92,6 @@ def build_stack_read_model(
     """Build the command-scoped read model from loaded YAML/domain objects."""
     loaded_context = context or ReadModelContext(None, None, None, None)
     assertions = project_ontology_assertions(relations, ontology_bundle)
-    # Raw constraints are retained for provenance rows, while this
-    # boundary is the canonical fallback for callers that do not already own a
-    # command-level compilation.  A supplied typed tuple is reused verbatim so
-    # the planner command's exactly-once compilation is not repeated here.
-    scheduling_constraint_plans = loaded_context.scheduling_constraint_plans
-    if loaded_context.scheduling_constraints and not scheduling_constraint_plans:
-        scheduling_constraint_plans = compile_scheduling_constraint_execution_plans(
-            loaded_context.scheduling_constraints,
-            substances,
-            ontology_bundle.runtime_program,
-            ontology_bundle=ontology_bundle,
-        )
     return StackReadModel(
         ReadModelData(
             substances=substances,
@@ -132,7 +100,6 @@ def build_stack_read_model(
             assertions=tuple(
                 ontology_assertion_record(assertion, substances, ontology_bundle) for assertion in assertions
             ),
-            scheduling_constraint_plans=scheduling_constraint_plans,
         ),
         ontology_bundle,
     )

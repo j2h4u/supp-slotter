@@ -140,22 +140,40 @@ def test_plan_inputs_carries_verified_canonical_catalog(monkeypatch: pytest.Monk
     bundle = SimpleNamespace(runtime_program=runtime)
     monkeypatch.setattr(plan_inputs_module, "load_pillboxes", lambda *_args: {})
     monkeypatch.setattr(plan_inputs_module, "check_pillbox_slot_anchors", lambda *_args: [])
-    monkeypatch.setattr(plan_inputs_module, "load_scheduling_policies", lambda *_args: {})
     monkeypatch.setattr(plan_inputs_module, "load_yaml", lambda *_args: {})
     monkeypatch.setattr(plan_inputs_module, "flatten_pillbox_slots", lambda *_args: {})
     monkeypatch.setattr(plan_inputs_module, "load_substance_registry", lambda *_args: substances)
     monkeypatch.setattr(plan_inputs_module, "load_product_registry", lambda *_args: products)
     monkeypatch.setattr(plan_inputs_module, "load_global_relations", lambda *_args: [])
     monkeypatch.setattr(plan_inputs_module, "normalize_stack_entries", lambda *_args: {})
-    monkeypatch.setattr(plan_inputs_module, "load_scheduling_constraints", lambda *_args: ())
-    monkeypatch.setattr(
-        plan_inputs_module, "compile_scheduling_constraint_execution_plans", lambda *_args, **_kwargs: ()
-    )
 
     result = plan_inputs_module.load_plan_inputs(Paths.from_root(tmp_path), bundle)  # type: ignore[arg-type]
 
     assert isinstance(result, PlanInputs)
     assert result.canonical_fact_catalog is catalog
+
+
+def test_plan_inputs_rejects_full_catalog_before_relation_processing(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """A dangling canonical reference cannot disappear through later plan scoping."""
+    substances, products = _cards()
+    catalog = _catalog()
+    catalog = replace(catalog, composition_roles=(replace(catalog.composition_roles[0], product="prd_missing"),))
+    bundle = SimpleNamespace(runtime_program=SimpleNamespace(canonical_fact_catalog=catalog))
+    monkeypatch.setattr(plan_inputs_module, "load_pillboxes", lambda *_args: {})
+    monkeypatch.setattr(plan_inputs_module, "check_pillbox_slot_anchors", lambda *_args: [])
+    monkeypatch.setattr(plan_inputs_module, "load_yaml", lambda *_args: {})
+    monkeypatch.setattr(plan_inputs_module, "flatten_pillbox_slots", lambda *_args: {})
+    monkeypatch.setattr(plan_inputs_module, "load_substance_registry", lambda *_args: substances)
+    monkeypatch.setattr(plan_inputs_module, "load_product_registry", lambda *_args: products)
+    monkeypatch.setattr(
+        plan_inputs_module,
+        "load_global_relations",
+        lambda *_args: pytest.fail("canonical validation must run before relation/scenario processing"),
+    )
+
+    assert plan_inputs_module.load_plan_inputs(Paths.from_root(tmp_path), bundle) is None  # type: ignore[arg-type]
 
 
 def test_check_uses_the_same_canonical_reference_validator(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

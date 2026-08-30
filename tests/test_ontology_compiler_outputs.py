@@ -138,22 +138,18 @@ def test_committed_projection_matches_schema_and_authored_policy() -> None:
     provenance = _json_mapping(runtime_program["provenance"])
     assert provenance["source"] == "ontology/runtime-policy.yaml"
     runtime_projection = _json_mapping(runtime_program["projection"])
-    assert _json_mapping_list(runtime_projection["constraint_execution_policies"])
     assert _is_json_list(runtime_projection["slot_near_values"])
     assert all(isinstance(value, str) and value for value in runtime_projection["slot_near_values"])
     assert set(runtime_program) == {"format_version", "schema_version", "source_hash", "provenance", "projection"}
-    scoring = _json_mapping(runtime_projection["effect_scoring"])
+    engine_contract = _json_mapping(runtime_projection["engine_contract"])
     authored_policy = cast(
         dict[str, object],
         yaml.safe_load((ONTOLOGY / "runtime-policy.yaml").read_text(encoding="utf-8")),
     )
-    authored_scoring = cast(dict[str, object], authored_policy["effect_scoring"])
-    for key in ("aggregation_mode", "prefer_with_bonus"):
-        assert scoring[key] == authored_scoring[key]
-
-    authored_constraints = cast(list[dict[str, object]], authored_policy["constraint_execution_policies"])
-    runtime_constraints = cast(list[dict[str, object]], runtime_projection["constraint_execution_policies"])
-    assert runtime_constraints == authored_constraints
+    assert engine_contract == cast(dict[str, object], authored_policy["engine_contract"])
+    assert "effect_scoring" not in runtime_projection
+    assert "constraint_execution_policies" not in runtime_projection
+    assert "prefer_with_policy" not in runtime_projection
 
 
 def test_generated_constraint_schema_preserves_required_metadata_contract() -> None:
@@ -256,19 +252,15 @@ def test_compiler_rejects_non_boolean_runtime_presence_truth_values(tmp_path: Pa
         compile_ontology(root)
 
 
-@pytest.mark.parametrize(
-    ("field", "value"),
-    [("balance_weight", -0.5), ("prefer_with_bonus", -1)],
-)
-def test_compiler_rejects_negative_optimizer_coefficients(tmp_path: Path, field: str, value: int | float) -> None:
+def test_compiler_rejects_unimplemented_canonical_engine_contract(tmp_path: Path) -> None:
     root = _copy_repository_shape(tmp_path)
     path = root / "runtime-policy.yaml"
     source = cast(dict[str, object], yaml.safe_load(path.read_text(encoding="utf-8")))
-    scoring = cast(dict[str, object], source["effect_scoring"])
-    scoring[field] = value
+    engine_contract = cast(dict[str, object], source["engine_contract"])
+    engine_contract["primary_objective"] = "weighted_evidence_count"
     path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
 
-    with pytest.raises(OntologyInfrastructureError, match="minimum"):
+    with pytest.raises(OntologyInfrastructureError, match="must maximize unique pressure satisfaction"):
         compile_ontology(root)
 
 

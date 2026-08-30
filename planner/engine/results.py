@@ -29,9 +29,12 @@ class PlanResult:
     schedule_written: bool
     warnings: list[ScheduleWarning]
     slot_loads: dict[str, int]
-    prefer_pairs_declared: int
-    prefer_pairs_together: int
     errors: list[str] = field(default_factory=list[str])
+
+    @property
+    def status(self) -> str:
+        """Publication status exposed by the canonical plan boundary."""
+        return "Optimal" if self.schedule_written else "Indeterminate"
 
 
 @dataclass(frozen=True)

@@ -5,7 +5,7 @@ from typing import TypedDict, cast
 
 import pytest
 import yaml
-from planner.engine import cmd_check, cmd_plan, cmd_review
+from planner.engine import cmd_check, cmd_review
 from planner.ontology.runtime_program import RuntimeRelationWarningRule
 from planner.query_model.relations import _RelationReviewContext, _warning_type_for_relation
 
@@ -151,19 +151,6 @@ def test_balance_relation_warns_when_related_substance_missing(tmp_path: Path) -
     assert "Relation outcomes:" in review_result.output
     assert "Zinc" in review_result.output and "Copper" in review_result.output
 
-    plan_result = cmd_plan(data_root=tmp_path)
-
-    assert plan_result.exit_code == 0, plan_result
-    assert any(
-        w.get("type") == "missing_balance_substance"
-        and w.get("severity") == "medium"
-        and "Zinc" in str(w.get("source_name", ""))
-        and "Copper" in str(w.get("target_name", ""))
-        and "reason" in w
-        and "action" in w
-        for w in plan_result.warnings
-    ), f"Expected missing_balance_substance warning for Zinc/Copper in: {plan_result.warnings}"
-
 
 def test_relation_validation_rejects_unknown_substance_name(tmp_path: Path) -> None:
     temp_data = _write_relation_fixture(tmp_path)
@@ -234,13 +221,12 @@ def test_relation_validation_rejects_invalid_selector_shape(
     assert "Use the canonical selector shape {entity: {entity_id|name}} or {category, term} on each side." in error_text
 
 
-def test_typed_selector_relation_does_not_create_a_scheduling_conflict(tmp_path: Path) -> None:
+def test_typed_selector_relation_is_valid_against_the_complete_canonical_corpus(tmp_path: Path) -> None:
     _write_relation_fixture(tmp_path)
 
-    result = cmd_plan(data_root=tmp_path)
+    result = cmd_check(data_root=tmp_path)
 
     assert result.exit_code == 0, result
-    assert not any(warning.get("type") == "intra_product_relation_conflict" for warning in result.warnings)
 
 
 def test_relation_validation_rejects_unregistered_trait(tmp_path: Path) -> None:
@@ -264,56 +250,6 @@ def test_relation_validation_rejects_unregistered_trait(tmp_path: Path) -> None:
     assert "source_selector term 'effect:not_real' is not in canonical ontology vocabulary" in "\n".join(result.errors)
 
 
-def test_trait_relation_endpoint_warns_by_matching_trait(tmp_path: Path) -> None:
-    temp_data = _write_relation_fixture(tmp_path)
-    relations_path = temp_data / "relations.yaml"
-    relations = cast(Relations, yaml.safe_load(relations_path.read_text()))
-    relations["relations"].append({
-        "id": "rel_effect_to_tadalafil",
-        "relation_type": "review_with",
-        "assertion_kind": "clinical_review_signal",
-        "semantic_family": "clinical_review_signal",
-        "source_selector": {"category": "effect", "term": "nitric_oxide_support"},
-        "target_selector": {"entity": {"name": "Tadalafil"}},
-        "severity": "low",
-        "reason": "Fixture trait endpoint relation.",
-        "action": "Review fixture trait endpoint.",
-    })
-    relations_path.write_text(yaml.safe_dump(relations, sort_keys=False))
-
-    result = cmd_plan(data_root=tmp_path)
-
-    assert result.exit_code == 0, result
-    assert any(
-        warning.get("type") == "review_with_substance_present"
-        and warning.get("source_substance") == "effect:nitric_oxide_support"
-        and warning.get("target_name") == "Tadalafil"
-        and warning.get("reason") == "Fixture trait endpoint relation."
-        and warning.get("action") == "Review fixture trait endpoint."
-        for warning in result.warnings
-    )
-
-
-def test_nitric_oxide_pde5_trait_relation_warns_for_active_stack(
-    tmp_path: Path,
-) -> None:
-    _write_relation_fixture(tmp_path)
-
-    result = cmd_plan(data_root=tmp_path)
-
-    assert result.exit_code == 0, result
-    assert any(
-        warning.get("type") == "review_with_substance_present"
-        and warning.get("source_substance") == "effect:nitric_oxide_support"
-        and warning.get("source_name") == "Nitric Oxide Support"
-        and warning.get("target_substance") == "effect:pde5_inhibition"
-        and warning.get("target_name") == "PDE5 Inhibition"
-        and warning.get("severity") == "medium"
-        and "Convergence is mechanistic" in str(warning.get("reason"))
-        for warning in result.warnings
-    )
-
-
 def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     temp_data = _write_relation_fixture(tmp_path)
     _remove_component_from_product(
@@ -333,25 +269,6 @@ def test_support_relation_warns_when_supporter_missing(tmp_path: Path) -> None:
     assert "Relation outcomes:" in review_result.output
     assert "Selenium" in review_result.output
     assert "N-Acetyl Cysteine" in review_result.output
-
-    plan_result = cmd_plan(data_root=tmp_path)
-
-    assert plan_result.exit_code == 0, plan_result
-    support_warnings = [
-        warning
-        for warning in plan_result.warnings
-        if warning.get("type") == "missing_support_substance"
-        and warning.get("source_name") == "Selenium"
-        and warning.get("target_name") == "N-Acetyl Cysteine"
-    ]
-    assert len(support_warnings) == 1
-    warning = support_warnings[0]
-    assert warning["type"] == "missing_support_substance"
-    assert warning["source_name"] == "Selenium"
-    assert warning["target_name"] == "N-Acetyl Cysteine"
-    assert warning["severity"] == "low"
-    assert warning["reason"] == "Fixture support relation."
-    assert warning["action"] == "Review fixture support relationship in context."
 
 
 def test_support_relation_accepts_active_supporter_from_another_product(

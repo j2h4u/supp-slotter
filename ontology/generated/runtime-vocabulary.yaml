@@ -1,7 +1,7 @@
 format: supp-slotter.runtime-vocabulary/v2
 schema_version: '2'
 base_iri: https://j2h4u.github.io/supp-slotter/ontology/v1/
-source_hash: decdbd58055a1dca99c5016af9c6b4deab06d0c266d86af4cdb2c3d9aa828803
+source_hash: 0b0a964282d91b024ef666590d244de581b7c9c3f6fc350f705bea5d2145c673
 categories:
   kind:
     allowed_predicates: &id005
@@ -1822,8 +1822,19 @@ runtime_policy:
   id: runtime_policy
   engine_contract:
     id: planner_engine_contract
-    protocol_version: supp-slotter.engine-contract/v1
+    protocol_version: supp-slotter.engine-contract/v2
     result_mode: exact_assignment
+    pressure_identity:
+    - item_id
+    - dimension
+    - value
+    domain_feasibility: unbounded_logical_domain
+    primary_objective: maximize_unique_pressure_satisfaction
+    secondary_objective: minimize_integer_squared_load_per_domain
+    tie_break: stable_item_id_then_(slot.order,slot_id)
+    publication_statuses:
+    - Optimal
+    - Indeterminate
     semantics:
     - id: selector_resolution
       category: selectors
@@ -1833,12 +1844,6 @@ runtime_policy:
         when same-name siblings exist.
       source_of_truth: ontology/scheduling-model.yaml + ontology/vocabulary.yaml +
         verified substance cards
-    - id: component_vote_aggregation
-      category: schedule_projection
-      rule: emit at most one assignment per component and axis; group rows by policy_id;
-        group weight is row count; apply each matching effect once at that weight;
-        round score*weight before summing; missing assertions contribute zero.
-      source_of_truth: ontology/runtime-policy.yaml + substance schedule_assertions
     - id: stack_partition
       category: stack_state
       rule: normalize each product into one stack; only the configured inactive stack
@@ -1851,32 +1856,24 @@ runtime_policy:
         presentation grouping only; it does not define recurrence, dosage, or calendar
         semantics.
       source_of_truth: ProductCard.use_pattern + data/products
-    - id: constraint_pair_evaluation
-      category: constraints
-      rule: evaluate operation pairs over product component IDs; symmetric matching
-        checks both orientations; blocks_slots rejects a same-slot candidate; scores_advisory
-        adds one score_delta per matched constraint and unordered product pair; intra-product
-        matches warn because one product cannot be separated.
-      source_of_truth: ontology/scheduling-constraints.yaml + ontology/runtime-policy.yaml
-    - id: prefer_with_resolution
-      category: preferences
-      rule: resolve each target against active component items; zero targets award
-        no pair; one target creates one unordered pair; multiple targets warn and
-        award no pair; self-pairs are ignored; duplicate/reverse pairs collapse.
-      source_of_truth: SubstanceCard.schedule.prefer_with + ontology/runtime-policy.yaml
     - id: candidate_feasibility
       category: search_inputs
-      rule: initial candidates are slots whose stack equals the item stack; hard pair
-        constraints are evaluated against already assigned slot items during search;
-        item priority is fewest candidates, highest maximum base score, then source
-        sequence.
+      rule: each selected item is feasible in every slot belonging to its unbounded
+        logical domain; no capacity, pair condition, numerical ranking, or physical-fit
+        condition narrows the domain.
       source_of_truth: pillbox slots + data/stacks.yaml + ontology/runtime-policy.yaml
-    - id: objective_and_tie_break
+    - id: canonical_objective_and_tie_break
       category: optimization
-      rule: maximize slot_score + advisory_penalties + prefer_with_bonus - balance_weight*sum(slot_count^2);
-        use stable slot order and lexicographic item assignment tuple for equal totals
-        within the declared tolerance.
+      rule: maximize unique pressure identities; then minimize the exact integer sum
+        of squared loads independently within each unbounded domain; then minimize
+        the assignment tuple ordered by stable item ID and (slot.order, slot_id).
       source_of_truth: ontology/runtime-policy.yaml
+    - id: publication_boundary
+      category: publication
+      rule: publish only Optimal results proved globally; conflicts, invalid inputs,
+        interruption, timeout, or resource exhaustion are layout-free Indeterminate
+        results.
+      source_of_truth: ontology/runtime-policy.yaml + canonical optimizer
     - id: relation_warning_truth
       category: warnings
       rule: active endpoint truth is intersection with components of products in non-inactive
@@ -1893,11 +1890,6 @@ runtime_policy:
       semantic: selector_resolution
       fixture: selector_empty_term
       expected: known canonical term with no matching card returns empty
-    - id: component_votes
-      semantic: component_vote_aggregation
-      fixture: component_votes
-      expected: two components sharing one policy contribute weight two; unknown assertion
-        contributes zero
     - id: stack_and_episodic
       semantic: stack_partition
       fixture: stack_and_episodic
@@ -1908,24 +1900,21 @@ runtime_policy:
       fixture: episodic_presentation
       expected: not_every_day remains in daily assignment and changes presentation
         grouping only
-    - id: constraint_directions
-      semantic: constraint_pair_evaluation
-      fixture: constraint_directions
-      expected: symmetric forward and reverse pairs match; same-product pair emits
-        warning and does not split product
-    - id: prefer_with_cardinality
-      semantic: prefer_with_resolution
-      fixture: prefer_with_cardinality
-      expected: zero/one/many active targets produce no pair/pair/warning-without-bonus
-    - id: candidate_priority
+    - id: candidate_feasibility
       semantic: candidate_feasibility
-      fixture: candidate_priority
-      expected: fewest candidates, then highest maximum score, then source order
+      fixture: candidate_feasibility
+      expected: every selected item is feasible in every slot of its unbounded logical
+        domain
     - id: objective_tie
-      semantic: objective_and_tie_break
+      semantic: canonical_objective_and_tie_break
       fixture: objective_tie
-      expected: higher total wins; equal total uses stable slot-order lexicographic
-        tuple
+      expected: unique pressure maximum wins; equal pressure count uses integer per-domain
+        squared loads, then stable item-ID and slot-order tuple
+    - id: publication_status
+      semantic: publication_boundary
+      fixture: publication_status
+      expected: only globally proved Optimal publishes a layout; every unproved result
+        is layout-free Indeterminate
     - id: relation_presence
       semantic: relation_warning_truth
       fixture: relation_presence
@@ -1970,12 +1959,6 @@ runtime_policy:
     - intra_product_constraint_conflict
     - prefer_with_resolver
     - trait_review_assignment
-    prefer_with_source_fields:
-    - prefer_with
-    prefer_with_target_resolutions:
-    - exactly_one_active_item
-    prefer_with_pair_modes:
-    - undirected_same_slot_bonus
   source_kind_values:
   - id: source_kind_assignment
     source_kind: assignment
@@ -2012,41 +1995,6 @@ runtime_policy:
     assignment_field: activity
     minimum_cardinality: 0
     maximum_cardinality: 1
-  constraint_execution_policies:
-  - id: separate_products_same_slot
-    operation: separate_products_same_slot
-    match_direction: symmetric
-    aggregation: distinct_constraint
-    selector_resolution: require_nonempty
-    blocks_slots: true
-    scores_advisory: true
-    score_delta: -1
-  effect_scoring:
-    id: effect_scoring
-    aggregation_mode: sum_unique_component_assignments
-    objective_function: slot_score_plus_prefer_with_minus_quadratic_balance_penalty
-    balance_penalty_expression: balance_weight * sum(slot_count^2)
-    tie_break: stable_slot_order
-    scores:
-    - id: prefer_strong
-      level: prefer_strong
-      score: 4
-    - id: prefer
-      level: prefer
-      score: 2
-    - id: avoid
-      level: avoid
-      score: -2
-    - id: avoid_strong
-      level: avoid_strong
-      score: -4
-    balance_weight: 0.5
-    prefer_with_bonus: 3
-  prefer_with_policy:
-    id: prefer_with_policy
-    source_field: prefer_with
-    target_resolution: exactly_one_active_item
-    pair_mode: undirected_same_slot_bonus
   slot_near_values:
   - wake
   - breakfast
@@ -2092,8 +2040,8 @@ runtime_policy:
   - id: warning_emitter_prefer_with_resolver
     emitter: prefer_with_resolver
     warning_type: ambiguous_prefer_with
-    default_message: prefer_with target maps to multiple active stack items; no bonus
-      awarded
+    default_message: Multiple active stack items match this companion request; manual
+      review is required.
   - id: warning_emitter_intra_product_constraint_conflict
     emitter: intra_product_constraint_conflict
     warning_type: intra_product_scheduling_constraint_conflict
@@ -2289,39 +2237,6 @@ runtime_policy:
   - id: assignment_axes
     target: assignment_axes
     source: assignment_axes
-  - id: constraint_execution_policies
-    target: constraint_execution_policies
-    source: constraint_execution_policies
-  - id: scoring_projection
-    target: effect_scoring
-    children:
-    - id: scoring_id
-      target: id
-      source: effect_scoring.id
-    - id: scoring_objective_function
-      target: objective_function
-      source: effect_scoring.objective_function
-    - id: scoring_aggregation_mode
-      target: aggregation_mode
-      source: effect_scoring.aggregation_mode
-    - id: scoring_balance_penalty_expression
-      target: balance_penalty_expression
-      source: effect_scoring.balance_penalty_expression
-    - id: scoring_tie_break
-      target: tie_break
-      source: effect_scoring.tie_break
-    - id: scoring_prefer_with_bonus
-      target: prefer_with_bonus
-      source: effect_scoring.prefer_with_bonus
-    - id: scoring_balance_weight
-      target: balance_weight
-      source: effect_scoring.balance_weight
-    - id: effect_scores
-      target: scores
-      source: effect_scoring.scores
-  - id: prefer_with_policy
-    target: prefer_with_policy
-    source: prefer_with_policy
   - id: slot_near_values
     target: slot_near_values
     source: slot_near_values

@@ -6,8 +6,7 @@ from pathlib import Path
 
 import pytest
 from planner.cards.pillboxes import load_pillboxes
-from planner.contracts import CardLoadError, Slot, TraitEffectMatch
-from planner.engine._scheduling import slot_matches
+from planner.contracts import CardLoadError
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -107,15 +106,3 @@ daily:
 
     with pytest.raises(CardLoadError, match="duplicate slot order"):
         load_pillboxes(path, None)  # type: ignore[arg-type]
-
-
-def test_legacy_policy_match_adapts_only_supported_axes() -> None:
-    morning = Slot("morning", "Morning", 1, (), "daily", "Daily", "daily", "with_food")
-    wake = Slot("wake", "Wake", 1, (), "daily", "Daily", "daily", "without_food", "wake")
-    pre = Slot("pre", "Pre", 1, (), "training", "Training", "training", "without_food", None, "before")
-
-    assert slot_matches(None, morning, TraitEffectMatch((("food", True),)))  # type: ignore[arg-type]
-    assert slot_matches(None, wake, TraitEffectMatch((("near", "wake"),)))  # type: ignore[arg-type]
-    assert slot_matches(None, pre, TraitEffectMatch((("near", "workout_before"),)))  # type: ignore[arg-type]
-    assert not slot_matches(None, morning, TraitEffectMatch((("near", "breakfast"),)))  # type: ignore[arg-type]
-    assert not slot_matches(None, morning, TraitEffectMatch((("near", "day_meal"),)))  # type: ignore[arg-type]

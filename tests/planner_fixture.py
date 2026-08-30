@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass, field
 from pathlib import Path
+from shutil import copy2
 from typing import cast
 
 import yaml
@@ -190,6 +191,47 @@ def write_minimal_planner_fixture(
     )
     _write_scheduling_constraint_reference_cards(tmp_path)
     _write_product_cards(tmp_path, products, substance_ids, product_ids)
+    _write_complete_canonical_catalog_fixture_cards(tmp_path)
+
+
+def _write_complete_canonical_catalog_fixture_cards(tmp_path: Path) -> None:
+    """Make every temporary planner corpus satisfy the production fact catalog.
+
+    The canonical catalog is validated against the complete loaded corpus
+    before plan scoping.  Synthetic products may coexist with it, but cannot
+    replace its referenced product/substance forms.  Copy just the catalog's
+    real product forms and their components, preserving any fixture card that
+    already provides the same stable substance ID.
+    """
+    catalog = _load_yaml_dict(_ONTOLOGY_ROOT / "canonical-facts.yaml")
+    roles = cast(list[dict[str, object]], catalog["composition_roles"])
+    product_ids = {cast(str, row["product"]) for row in roles}
+    substance_ids = {cast(str, row["substance"]) for row in roles}
+    source_products = _ONTOLOGY_ROOT.parents[0] / "data/products"
+    source_substances = _ONTOLOGY_ROOT.parents[0] / "data/substances"
+
+    for product_id in product_ids:
+        source = _card_path_for_id(source_products, product_id)
+        product = _load_yaml_dict(source)
+        components = cast(list[dict[str, object]], product["components"])
+        substance_ids.update(cast(str, component["substance"]) for component in components)
+        destination = tmp_path / "data/products" / source.name
+        if not destination.exists():
+            copy2(source, destination)
+
+    fixture_substances = tmp_path / "data/substances"
+    existing_ids = {_load_yaml_dict(path).get("id") for path in fixture_substances.glob("*.yaml")}
+    for substance_id in substance_ids:
+        if substance_id in existing_ids:
+            continue
+        source = _card_path_for_id(source_substances, substance_id)
+        copy2(source, fixture_substances / source.name)
+
+
+def _card_path_for_id(directory: Path, card_id: str) -> Path:
+    matches = [path for path in directory.glob("*.yaml") if _load_yaml_dict(path).get("id") == card_id]
+    assert len(matches) == 1, f"expected exactly one canonical card for {card_id!r}"
+    return matches[0]
 
 
 def _write_relation_groups(
