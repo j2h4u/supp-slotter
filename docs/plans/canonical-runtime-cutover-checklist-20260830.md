@@ -9,25 +9,20 @@ boundary decision is the
 [`canonical-instance ADR`](../decisions/canonical-instance-inference-boundary-20260822.md).
 
 This refresh audits durable source and test paths against the clean runtime
-candidate `db5c36c199d11e66e1e72d4f00170d96dca01f9a` (`db5c36c`,
-`test: cover canonical publication source validation`). It is documentation-only:
+candidate `b8bd5de0d256c211c66116b880c8db5deb7ffb98` (`b8bd5de`,
+`refactor: remove final inference compatibility aliases`). It is documentation-only:
 the receipt below is the release result for that exact source head, not a claim
 that a release recipe was rerun while updating this checklist.
 
 ## Exact release receipt (R1)
 
-- Candidate: `db5c36c199d11e66e1e72d4f00170d96dca01f9a`; clean HEAD; release
+- Candidate: `b8bd5de0d256c211c66116b880c8db5deb7ffb98`; clean HEAD; release
   exit status `0`.
 - Ordered release stages: `14/37/31/53/63/232 = 430` passing tests.
-- Coverage: `82%`; 6,847 statements with 987 missed; 2,280 branches with 573
-  partial branches.
-- CRAP: 638 functions at threshold `30`; zero violations; maximum `29.40`.
-- Corpus projection: conforms; `130.561586s`.
-- Release inventory: 73 files and 309 dependencies; 10 kept and 0 broken.
-- QA witness: `db5c36c` corrects the publication-source-validation
-  false-positive by asserting the specific failure for each mutation.
-  Canonical-runtime now exercises those mutation-specific failures through
-  `tests/test_canonical_publication.py::test_invalid_source_mapping_product_domain_or_slot_publishes_nothing`.
+- Coverage: `82%` over 6,841 statements.
+- CRAP: 636 functions at threshold `30`; passed.
+- Corpus projection: conforms; `140.395s`.
+- The gate left the checkout clean and no repository processes remained.
 
 Every checked item below cites R1 plus its current durable witness. The runtime
 source of authority is the generic `ontology-runtime-program-v2` projection
@@ -149,28 +144,35 @@ answer.
   - Evidence: R1; `tests/test_canonical_fact_catalog_runtime.py::test_annotation_and_manifest_ranges_admit_a_new_family_without_python_changes`; `tests/test_canonical_fact_catalog_runtime.py::test_compiler_emits_one_generic_scheduling_projection_without_retired_catalog_keys`; `ontology/generated/runtime-program.json`.
 
 - [x] **The legacy runtime and obsolete compatibility regressions are deleted.**
-  - Evidence: R1; `tests/test_architecture_contracts.py::test_runtime_has_no_legacy_stored_schedule_answer_consumers`; `tests/test_runtime_contract_v2.py::test_v1_contract_is_rejected_without_compatibility_fallback`.
+  Compatibility archaeology is removed: no live
+  `CompositionApplicabilityPath.applicability_role`,
+  `infer_canonical_pressures`, or `infer_pressures` symbol remains.
+  - Evidence: R1; `b8bd5de0d256c211c66116b880c8db5deb7ffb98`; `planner/ontology/canonical_inference.py`; `tests/test_canonical_inference.py`; `tests/test_architecture_contracts.py::test_runtime_has_no_legacy_stored_schedule_answer_consumers`; `tests/test_runtime_contract_v2.py::test_v1_contract_is_rejected_without_compatibility_fallback`.
 
 - [x] **Targeted acceptance, release, static quality, and corpus projection have one exact-head receipt.**
   - Evidence: R1; `scripts/run_unit_gate.py`; `tests/test_crap_gate.py`; `planner/ontology/projection.py`.
 
 ## Final review holds
 
-- [x] **Independent Sol panel.** Confirmed `SHIP` without actionable Critical,
-  High, or Medium reservations for the reviewed documentation head and runtime
-  parent.
-  - Evidence: [independent panel and convergence record](../decisions/canonical-runtime-convergence-20260831.md), reviewed docs `fb84f3c8fcf1c30ee22ccf92b631d4775cbc3beb`, runtime parent `db5c36c199d11e66e1e72d4f00170d96dca01f9a`.
+- [ ] **Independent Sol panel.** Re-run the independent panel against the
+  remediated runtime candidate and return `SHIP` without actionable Critical,
+  High, or Medium reservations.
+  - Pending on `b8bd5de0d256c211c66116b880c8db5deb7ffb98`: the prior
+    [convergence record](../decisions/canonical-runtime-convergence-20260831.md)
+    is superseded and cannot close this remediated head.
 
 - [ ] **Fresh-context final auditor.** Inspect this exact runtime candidate,
   validate every checked record and R1, then save per-item verdicts and a final
   `COMPLETE` or `INCOMPLETE` decision in `docs/decisions/`.
-  - Pending on `db5c36c199d11e66e1e72d4f00170d96dca01f9a`: no fresh-context
-    final-auditor report with `COMPLETE` exists.
+  - Pending on `b8bd5de0d256c211c66116b880c8db5deb7ffb98`: remediation is
+    present, but no fresh-context final-auditor report with `COMPLETE` exists.
 
-- [x] **Repeated same-optics convergence.** Product, ontology, portability,
-  and QA reviewers returned `SHIP` with no actionable Critical, High, or Medium
-  reservation; the prior stale-schedule, applicability/satisfaction/provenance-
-  ID, and QA false-positive concerns are closed.
-  - Evidence: [independent panel and convergence record](../decisions/canonical-runtime-convergence-20260831.md), reviewed docs `fb84f3c8fcf1c30ee22ccf92b631d4775cbc3beb`, runtime parent `db5c36c199d11e66e1e72d4f00170d96dca01f9a`.
+- [ ] **Repeated same-optics convergence.** Repeat the product, ontology,
+  portability, and QA optics after the fresh-context audit; compare the
+  remediated head with the historical review and return `SHIP` only with no
+  actionable reservation.
+  - Pending on `b8bd5de0d256c211c66116b880c8db5deb7ffb98`: the prior
+    [convergence record](../decisions/canonical-runtime-convergence-20260831.md)
+    is superseded and non-final.
 
 The cutover remains open until all three holds are independently closed.

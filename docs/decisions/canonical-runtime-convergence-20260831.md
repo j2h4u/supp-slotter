@@ -2,8 +2,11 @@
 
 ## Status
 
-**SHIP.** The same-optics independent review and convergence check completed
-without actionable Critical, High, or Medium findings.
+**Superseded — non-final.** This preserves the historical `SHIP` findings for
+the reviewed heads below. Fresh-auditor remediation at
+`b8bd5de0d256c211c66116b880c8db5deb7ffb98` invalidated it as final convergence;
+the independent panel, fresh-context audit, and same-optics convergence must be
+repeated for the remediated candidate.
 
 ## Reviewed scope
 
@@ -35,6 +38,6 @@ accepted contract and evidence.
 
 ## Decision
 
-The independent panel and repeated same-optics convergence requirements are
-complete for the reviewed heads. The remaining final-cutover hold is the
-separate fresh-context checklist audit.
+The historical panel and same-optics convergence completed for the reviewed
+heads only. This record does not close any final-review hold for the remediated
+candidate; see the current [cutover checklist](../plans/canonical-runtime-cutover-checklist-20260830.md).
