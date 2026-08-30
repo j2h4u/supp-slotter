@@ -11,10 +11,9 @@ from pathlib import Path
 from typing import Any, cast
 
 import pytest
+import scripts.generate_migration_ledger as migration_ledger
 import yaml
 from jsonschema import Draft202012Validator
-
-import scripts.generate_migration_ledger as migration_ledger
 from planner.engine._plan_types import PlanInputs
 from scripts.ontology_compiler import compile_ontology
 
@@ -103,7 +102,7 @@ def test_canonical_shadow_catalog_and_topology_are_closed(schema: dict[str, Any]
 
     slot = definitions["LogicalSlot"]
     assert {"meal_context", "circadian_anchor", "exercise_anchor"} == {
-        name for name in slot["properties"] if name.endswith("_context") or name.endswith("_anchor")
+        name for name in slot["properties"] if name.endswith(("_context", "_anchor"))
     }
     assert not {"near", "food", "capacity", "dose", "placement"} & set(slot["properties"])
     topology = definitions["LogicalSlotTopology"]
@@ -127,9 +126,7 @@ def test_canonical_shadow_catalog_and_topology_are_closed(schema: dict[str, Any]
 def test_shadow_catalog_and_topology_are_not_manifest_or_scheduler_inputs() -> None:
     manifest = cast(dict[str, Any], yaml.safe_load((ONTOLOGY / "manifest.yaml").read_text(encoding="utf-8")))
     catalogs = cast(list[dict[str, Any]], manifest["catalogs"])
-    assert {catalog["root_class"] for catalog in catalogs}.isdisjoint(
-        {"CanonicalFactCatalog", "LogicalSlotTopology"}
-    )
+    assert {catalog["root_class"] for catalog in catalogs}.isdisjoint({"CanonicalFactCatalog", "LogicalSlotTopology"})
     assert {field for field in PlanInputs._fields if "catalog" in field or "topology" in field} == set()
 
 

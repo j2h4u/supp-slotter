@@ -96,6 +96,7 @@ ONTOLOGY_CONTRACT_GROUPS: tuple[tuple[str, tuple[SuiteTarget, ...]], ...] = (
         (
             Path("tests/test_architecture_contracts.py"),
             Path("tests/test_canonical_scheduling_policies.py"),
+            Path("tests/test_cluster1_vright_contract.py"),
             Path("tests/test_ontology_formal_runtime_assertions.py"),
             Path("tests/test_ontology_ontoclean_contract.py"),
             Path("tests/test_ontology_repository_contract.py"),

@@ -309,7 +309,7 @@ def test_nitric_oxide_pde5_trait_relation_warns_for_active_stack(
         and warning.get("target_substance") == "effect:pde5_inhibition"
         and warning.get("target_name") == "PDE5 Inhibition"
         and warning.get("severity") == "medium"
-        and "additive blood-pressure lowering" in str(warning.get("reason"))
+        and "Convergence is mechanistic" in str(warning.get("reason"))
         for warning in result.warnings
     )
 

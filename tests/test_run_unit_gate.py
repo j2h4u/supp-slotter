@@ -279,6 +279,7 @@ def test_ontology_contract_suite_runs_three_curated_groups_in_order(tmp_path: Pa
             "test_linkml_core_schema.py",
             "test_architecture_contracts.py",
             "test_canonical_scheduling_policies.py",
+            "test_cluster1_vright_contract.py",
             "test_ontology_formal_runtime_assertions.py",
             "test_ontology_ontoclean_contract.py",
             "test_ontology_repository_contract.py",
@@ -309,6 +310,7 @@ def test_ontology_contract_suite_runs_three_curated_groups_in_order(tmp_path: Pa
         [
             "test_architecture_contracts.py",
             "test_canonical_scheduling_policies.py",
+            "test_cluster1_vright_contract.py",
             "test_ontology_formal_runtime_assertions.py",
             "test_ontology_ontoclean_contract.py",
             "test_ontology_repository_contract.py",
@@ -384,6 +386,7 @@ def test_release_suite_runs_six_ordered_pytest_stages_without_fast_unit(
         [
             "test_architecture_contracts.py",
             "test_canonical_scheduling_policies.py",
+            "test_cluster1_vright_contract.py",
             "test_ontology_formal_runtime_assertions.py",
             "test_ontology_ontoclean_contract.py",
             "test_ontology_repository_contract.py",
