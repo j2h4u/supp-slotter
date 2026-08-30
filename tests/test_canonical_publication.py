@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import inspect
 from pathlib import Path
+
 import planner.canonical_optimizer as optimizer_module
 import planner.schedule_writer as schedule_writer
 import pytest
