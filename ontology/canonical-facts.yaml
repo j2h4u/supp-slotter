@@ -13,6 +13,12 @@ composition_roles:
   - id: cmp_prd_cfce0b36b6__sub_3918fe347e
     product: prd_cfce0b36b6
     substance: sub_3918fe347e
+  - id: cmp_prd_io1peb9syp__sub_85w45nbob4
+    product: prd_io1peb9syp
+    substance: sub_85w45nbob4
+  - id: cmp_prd_io1peb9syp__sub_iu7b8h87g2
+    product: prd_io1peb9syp
+    substance: sub_iu7b8h87g2
 evidence_sources:
   - id: src_pubmed_25441954
   - id: src_pubmed_20200983
@@ -24,6 +30,8 @@ evidence_sources:
   - id: src_pubmed_17953788
   - id: src_pubmed_39662304
   - id: src_pmc_13304508
+  - id: src_card_sub_85w45nbob4_notes
+  - id: src_card_sub_iu7b8h87g2_notes
 food_effects:
   - id: fact_food_prd_eb6337a6dc_sub_2476bf9d4b
     subject:
@@ -57,6 +65,24 @@ food_effects:
       - source: src_pubmed_30799231
         locator: https://pubmed.ncbi.nlm.nih.gov/30799231/
     value: bioavailability_increases
+  - id: fact_food_prd_io1peb9syp_sub_85w45nbob4
+    subject:
+      substance: sub_85w45nbob4
+    applicability: cmp_prd_io1peb9syp__sub_85w45nbob4
+    provenance:
+      - source: src_card_sub_85w45nbob4_notes
+        locator: data/substances/l_glutamine__sub_85w45nbob4.yaml#/notes
+        quotation: Empty stomach preferred for systemic absorption away from food amino-acid competition.
+    value: bioavailability_decreases
+  - id: fact_food_prd_io1peb9syp_sub_iu7b8h87g2
+    subject:
+      substance: sub_iu7b8h87g2
+    applicability: cmp_prd_io1peb9syp__sub_iu7b8h87g2
+    provenance:
+      - source: src_card_sub_iu7b8h87g2_notes
+        locator: data/substances/alpha_lipoic_acid__sub_iu7b8h87g2.yaml#/notes
+        quotation: food may reduce absorption.
+    value: bioavailability_decreases
 acute_alertness_effects: []
 acute_sleep_effects: []
 pre_exercise_performance_effects:
