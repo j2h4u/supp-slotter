@@ -156,10 +156,10 @@ answer.
 
 ## Final review holds
 
-- [ ] **Independent Sol panel.** Confirm the canonical-runtime contract and
-  return `SHIP` without Critical, High, or Medium reservations.
-  - Pending on `db5c36c199d11e66e1e72d4f00170d96dca01f9a`: no independent
-    final Sol-panel report is recorded in `docs/decisions/`.
+- [x] **Independent Sol panel.** Confirmed `SHIP` without actionable Critical,
+  High, or Medium reservations for the reviewed documentation head and runtime
+  parent.
+  - Evidence: [independent panel and convergence record](../decisions/canonical-runtime-convergence-20260831.md), reviewed docs `fb84f3c8fcf1c30ee22ccf92b631d4775cbc3beb`, runtime parent `db5c36c199d11e66e1e72d4f00170d96dca01f9a`.
 
 - [ ] **Fresh-context final auditor.** Inspect this exact runtime candidate,
   validate every checked record and R1, then save per-item verdicts and a final
@@ -167,11 +167,10 @@ answer.
   - Pending on `db5c36c199d11e66e1e72d4f00170d96dca01f9a`: no fresh-context
     final-auditor report with `COMPLETE` exists.
 
-- [ ] **Repeated same-optics convergence.** Re-run the original product,
-  ontology, architecture, portability, data-loss, and complexity optics against
-  this candidate, this checklist, and the fresh-context audit; record whether
-  the work is converging and return `SHIP` only with no actionable reservation.
-  - Pending on `db5c36c199d11e66e1e72d4f00170d96dca01f9a`: no same-optics
-    convergence report with `SHIP` exists.
+- [x] **Repeated same-optics convergence.** Product, ontology, portability,
+  and QA reviewers returned `SHIP` with no actionable Critical, High, or Medium
+  reservation; the prior stale-schedule, applicability/satisfaction/provenance-
+  ID, and QA false-positive concerns are closed.
+  - Evidence: [independent panel and convergence record](../decisions/canonical-runtime-convergence-20260831.md), reviewed docs `fb84f3c8fcf1c30ee22ccf92b631d4775cbc3beb`, runtime parent `db5c36c199d11e66e1e72d4f00170d96dca01f9a`.
 
 The cutover remains open until all three holds are independently closed.
