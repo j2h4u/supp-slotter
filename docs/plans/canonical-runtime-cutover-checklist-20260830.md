@@ -9,19 +9,25 @@ boundary decision is the
 [`canonical-instance ADR`](../decisions/canonical-instance-inference-boundary-20260822.md).
 
 This refresh audits durable source and test paths against the clean runtime
-candidate `c766f7c9ca24c082b65f3afefefd4e493b760ec8` (`c766f7c`,
-`test: decode runtime engine contract in plan fixture`). It is documentation-only:
+candidate `db5c36c199d11e66e1e72d4f00170d96dca01f9a` (`db5c36c`,
+`test: cover canonical publication source validation`). It is documentation-only:
 the receipt below is the release result for that exact source head, not a claim
 that a release recipe was rerun while updating this checklist.
 
 ## Exact release receipt (R1)
 
-- Candidate: `c766f7c9ca24c082b65f3afefefd4e493b760ec8`; clean HEAD; release
+- Candidate: `db5c36c199d11e66e1e72d4f00170d96dca01f9a`; clean HEAD; release
   exit status `0`.
-- Ordered release modules: smoke `14`, ontology A/B/C `37/31/53`, runtime
-  `63`, and CRAP `232` passing tests.
-- CRAP: 638 functions at threshold `30`; coverage `82%` over 6,847 statements.
-- Corpus projection: conforms; `132.816425s`.
+- Ordered release stages: `14/37/31/53/63/232 = 430` passing tests.
+- Coverage: `82%`; 6,847 statements with 987 missed; 2,280 branches with 573
+  partial branches.
+- CRAP: 638 functions at threshold `30`; zero violations; maximum `29.40`.
+- Corpus projection: conforms; `130.561586s`.
+- Release inventory: 73 files and 309 dependencies; 10 kept and 0 broken.
+- QA witness: `db5c36c` corrects the publication-source-validation
+  false-positive by asserting the specific failure for each mutation.
+  Canonical-runtime now exercises those mutation-specific failures through
+  `tests/test_canonical_publication.py::test_invalid_source_mapping_product_domain_or_slot_publishes_nothing`.
 
 Every checked item below cites R1 plus its current durable witness. The runtime
 source of authority is the generic `ontology-runtime-program-v2` projection
@@ -68,7 +74,7 @@ answer.
   - Evidence: R1; `docs/migrations/legacy-atom-ledger.yaml`; `tests/test_grooming.py::test_receipts_are_operational_and_not_a_plan_runtime_input`; no migration generator is a runtime or release input.
 
 - [x] **The canonical-runtime acceptance inventory is explicit and release-covered.**
-  - Evidence: R1; `tests/test_run_unit_gate.py::test_canonical_runtime_inventory_is_exact_stable_and_release_covered`; `scripts/run_unit_gate.py`.
+  - Evidence: R1; `tests/test_run_unit_gate.py::test_canonical_runtime_inventory_is_exact_stable_and_release_covered`; `scripts/run_unit_gate.py`; `tests/test_canonical_publication.py::test_invalid_source_mapping_product_domain_or_slot_publishes_nothing`.
 
 ## High/Medium — architecture and runtime boundary
 
@@ -152,20 +158,20 @@ answer.
 
 - [ ] **Independent Sol panel.** Confirm the canonical-runtime contract and
   return `SHIP` without Critical, High, or Medium reservations.
-  - Pending on `c766f7c9ca24c082b65f3afefefd4e493b760ec8`: no independent
+  - Pending on `db5c36c199d11e66e1e72d4f00170d96dca01f9a`: no independent
     final Sol-panel report is recorded in `docs/decisions/`.
 
 - [ ] **Fresh-context final auditor.** Inspect this exact runtime candidate,
   validate every checked record and R1, then save per-item verdicts and a final
   `COMPLETE` or `INCOMPLETE` decision in `docs/decisions/`.
-  - Pending on `c766f7c9ca24c082b65f3afefefd4e493b760ec8`: no fresh-context
+  - Pending on `db5c36c199d11e66e1e72d4f00170d96dca01f9a`: no fresh-context
     final-auditor report with `COMPLETE` exists.
 
 - [ ] **Repeated same-optics convergence.** Re-run the original product,
   ontology, architecture, portability, data-loss, and complexity optics against
   this candidate, this checklist, and the fresh-context audit; record whether
   the work is converging and return `SHIP` only with no actionable reservation.
-  - Pending on `c766f7c9ca24c082b65f3afefefd4e493b760ec8`: no same-optics
+  - Pending on `db5c36c199d11e66e1e72d4f00170d96dca01f9a`: no same-optics
     convergence report with `SHIP` exists.
 
 The cutover remains open until all three holds are independently closed.
