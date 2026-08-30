@@ -135,13 +135,16 @@ classes:
     annotations:
       identity_scope: global
       identity_uniqueness: required
-      order_scope: pillbox
+      order_scope: topology
       order_uniqueness: required
-    slots: [order, near, food]
+      unbounded_group: true
+    slots: [order, label, meal_context, circadian_anchor, exercise_anchor]
     slot_usage:
+      label: {required: true, multivalued: false}
       order: {required: true, minimum_value: 1, multivalued: false}
-      near: {required: true, multivalued: false}
-      food: {required: true, multivalued: false}
+      meal_context: {range: MealContext, multivalued: false}
+      circadian_anchor: {range: CircadianAnchor, multivalued: false}
+      exercise_anchor: {range: ExerciseAnchor, multivalued: false}
   LogicalSlot:
     description: Shadow canonical logical intake group with independent optional anchors.
     annotations:
@@ -296,6 +299,8 @@ slots:
   schedule_value: {}
   slots: {multivalued: true, range: Slot, inlined: true, inlined_as_list: true}
   order: {range: integer}
+  # Retained only for the temporary legacy SchedulingPolicy effect-match
+  # contract; these are not fields of the active Slot topology.
   near: {}
   food: {range: boolean}
   meal_context: {range: MealContext, multivalued: false}

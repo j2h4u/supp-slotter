@@ -122,12 +122,40 @@ def test_canonical_shadow_catalog_and_topology_are_closed(schema: dict[str, Any]
     ):
         assert _errors(schema, "CanonicalFactCatalog", {forbidden: "x"}), forbidden
 
+    law_catalog = definitions["CanonicalLawCatalog"]
+    expected_laws = {
+        "food_effect_laws": "FoodEffectLaw",
+        "acute_alertness_effect_laws": "AcuteAlertnessEffectLaw",
+        "acute_sleep_effect_laws": "AcuteSleepEffectLaw",
+        "pre_exercise_performance_effect_laws": "PreExercisePerformanceEffectLaw",
+        "post_exercise_recovery_effect_laws": "PostExerciseRecoveryEffectLaw",
+    }
+    assert set(law_catalog["properties"]) == set(expected_laws)
+    for name, law_class in expected_laws.items():
+        assert law_catalog["properties"][name]["items"] == {"$ref": f"#/$defs/{law_class}"}
+    assert _errors(schema, "CanonicalLawCatalog", {})
+
+    for law_class, anchor in (
+        ("FoodEffectLaw", "meal_context"),
+        ("AcuteAlertnessEffectLaw", "circadian_anchor"),
+        ("AcuteSleepEffectLaw", "circadian_anchor"),
+        ("PreExercisePerformanceEffectLaw", "exercise_anchor"),
+        ("PostExerciseRecoveryEffectLaw", "exercise_anchor"),
+    ):
+        assert set(definitions[law_class]["properties"]) == {"id", "fact_value", anchor}
+
 
 def test_shadow_catalog_and_topology_are_not_manifest_or_scheduler_inputs() -> None:
     manifest = cast(dict[str, Any], yaml.safe_load((ONTOLOGY / "manifest.yaml").read_text(encoding="utf-8")))
     catalogs = cast(list[dict[str, Any]], manifest["catalogs"])
-    assert {catalog["root_class"] for catalog in catalogs}.isdisjoint({"CanonicalFactCatalog", "LogicalSlotTopology"})
-    assert {field for field in PlanInputs._fields if "catalog" in field or "topology" in field} == set()
+    assert {catalog["root_class"] for catalog in catalogs}.isdisjoint({"LogicalSlotTopology"})
+    assert "CanonicalLawCatalog" in {catalog["root_class"] for catalog in catalogs}
+    # The verified canonical evidence catalog is an explicit plan input so
+    # Cluster 2 can derive pressures.  Logical topology remains owned by the
+    # slot input and must not be duplicated as a catalog field.
+    assert {field for field in PlanInputs._fields if "catalog" in field or "topology" in field} == {
+        "canonical_fact_catalog"
+    }
 
 
 def test_migration_ledger_is_deterministic_complete_in_shape_and_fail_closed(tmp_path: Path) -> None:

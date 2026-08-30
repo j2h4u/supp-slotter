@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 0d0a05f8f28332673b5d2ec8f871285a8b55d1084c6bd5d3eea7cab48bbcd5f6
+# source-hash: 4e5decef4f19516e3b3ebb135a772c057de273545e828d92de6845d079b665c7
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -13,11 +13,20 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteAlertnessEffect> a ss:SchemaClass ;
   ss:name "AcuteAlertnessEffect" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteAlertnessEffectLaw> a ss:SchemaClass ;
+  ss:name "AcuteAlertnessEffectLaw" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteSleepEffect> a ss:SchemaClass ;
   ss:name "AcuteSleepEffect" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteSleepEffectLaw> a ss:SchemaClass ;
+  ss:name "AcuteSleepEffectLaw" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/CanonicalFactCatalog> a ss:SchemaClass ;
   ss:name "CanonicalFactCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/CanonicalLawCatalog> a ss:SchemaClass ;
+  ss:name "CanonicalLawCatalog" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/CanonicalSchedulingFact> a ss:SchemaClass ;
   ss:name "CanonicalSchedulingFact" .
@@ -64,6 +73,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/FoodEffect> a ss:SchemaClass ;
   ss:name "FoodEffect" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/FoodEffectLaw> a ss:SchemaClass ;
+  ss:name "FoodEffectLaw" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/IdentifiedNode> a ss:SchemaClass ;
   ss:name "IdentifiedNode" .
 
@@ -97,8 +109,14 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/PostExerciseRecoveryEffect> a ss:SchemaClass ;
   ss:name "PostExerciseRecoveryEffect" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/PostExerciseRecoveryEffectLaw> a ss:SchemaClass ;
+  ss:name "PostExerciseRecoveryEffectLaw" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/PreExercisePerformanceEffect> a ss:SchemaClass ;
   ss:name "PreExercisePerformanceEffect" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/PreExercisePerformanceEffectLaw> a ss:SchemaClass ;
+  ss:name "PreExercisePerformanceEffectLaw" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/Product> a ss:SchemaClass ;
   ss:name "Product" .
@@ -313,8 +331,14 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/activity> a ss:SchemaSlot ;
   ss:name "activity" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/acute_alertness_effect_laws> a ss:SchemaSlot ;
+  ss:name "acute_alertness_effect_laws" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/acute_alertness_effects> a ss:SchemaSlot ;
   ss:name "acute_alertness_effects" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/acute_sleep_effect_laws> a ss:SchemaSlot ;
+  ss:name "acute_sleep_effect_laws" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/acute_sleep_effects> a ss:SchemaSlot ;
   ss:name "acute_sleep_effects" .
@@ -505,6 +529,9 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/expression> a ss:SchemaSlot ;
   ss:name "expression" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/fact_value> a ss:SchemaSlot ;
+  ss:name "fact_value" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/field> a ss:SchemaSlot ;
   ss:name "field" .
 
@@ -519,6 +546,9 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/food> a ss:SchemaSlot ;
   ss:name "food" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/food_effect_laws> a ss:SchemaSlot ;
+  ss:name "food_effect_laws" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/food_effects> a ss:SchemaSlot ;
   ss:name "food_effects" .
@@ -643,8 +673,14 @@
 <https://j2h4u.github.io/supp-slotter/ontology/v1/policy> a ss:SchemaSlot ;
   ss:name "policy" .
 
+<https://j2h4u.github.io/supp-slotter/ontology/v1/post_exercise_recovery_effect_laws> a ss:SchemaSlot ;
+  ss:name "post_exercise_recovery_effect_laws" .
+
 <https://j2h4u.github.io/supp-slotter/ontology/v1/post_exercise_recovery_effects> a ss:SchemaSlot ;
   ss:name "post_exercise_recovery_effects" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/pre_exercise_performance_effect_laws> a ss:SchemaSlot ;
+  ss:name "pre_exercise_performance_effect_laws" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/pre_exercise_performance_effects> a ss:SchemaSlot ;
   ss:name "pre_exercise_performance_effects" .
@@ -1039,6 +1075,11 @@
   ss:catalog_role "canonical_facts" ;
   ss:catalog_path "ontology/canonical-facts.yaml" ;
   ss:catalog_root_class "CanonicalFactCatalog" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/canonical_laws> a ss:Catalog ;
+  ss:catalog_role "canonical_laws" ;
+  ss:catalog_path "ontology/canonical-laws.yaml" ;
+  ss:catalog_root_class "CanonicalLawCatalog" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/catalog/constraints> a ss:Catalog ;
   ss:catalog_role "constraints" ;

@@ -870,6 +870,9 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     )
     canonical_fact_catalog = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "canonical_facts"))
     _validate_linkml_instance(schema_view, "CanonicalFactCatalog", canonical_fact_catalog)
+    canonical_law_catalog = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "canonical_laws"))
+    _validate_linkml_instance(schema_view, "CanonicalLawCatalog", canonical_law_catalog)
+    canonical_laws = _normalize_canonical_laws(canonical_law_catalog)
     ontoclean_profiles = _load_ontoclean_profiles(ontology_root, manifest, schema_view)
     categories = _required_mapping(vocabulary, "semantic_categories")
     _validate_semantic_categories(categories, ontoclean_profiles)
@@ -927,7 +930,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     product_schema = _product_schema(generated_schema_doc, schema_view, base_iri)
     dashboard_schema = _dashboard_schema(generated_schema_doc, schema_view, manifest, base_iri, categories)
     relations_schema = _relations_schema(generated_schema_doc, schema_view, base_iri)
-    pillboxes_schema = _pillboxes_schema(generated_schema_doc, schema_view, runtime, base_iri)
+    pillboxes_schema = _pillboxes_schema(generated_schema_doc, schema_view, base_iri)
     stacks_schema = _stacks_schema(generated_schema_doc, schema_view, manifest, base_iri)
     generated_shapes = _canonical_shapes(schema_view, relation_types)
     _validate_repository_projection_coverage(ontology_root, manifest)
@@ -939,6 +942,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         runtime.authored,
         canonical_fact_catalog,
         source_hash,
+        canonical_laws=canonical_laws,
     )
     artifacts: dict[Path, bytes] = {
         Path("card.schema.json"): _json_bytes_no_header(card_schema),
@@ -1288,7 +1292,6 @@ def _stacks_schema(
 def _pillboxes_schema(
     generated_schema: Mapping[str, object],
     schema_view: SchemaView,
-    runtime: _PolicyRuntime,
     base_iri: str,
 ) -> dict[str, object]:
     """Project the authored Pillbox/Slot model onto the keyed YAML source shape."""
@@ -1311,24 +1314,28 @@ def _pillboxes_schema(
         raise OntologyInfrastructureError("Pillbox model must require label, stack, and slots")
     if not {"label", "order"}.issubset(set(required_slot)):
         raise OntologyInfrastructureError("Slot model must require label and order")
+    # Topology is canonical source data, not a projection of the legacy
+    # compound effect-match dimensions.  Keep these three axes independent and
+    # optional exactly as declared by the active Slot class.
     dimensions: dict[str, dict[str, object]] = {}
-    for dimension, value_type in runtime.effect_match_dimensions.items():
-        slot_field = runtime.effect_match_slot_fields.get(dimension)
-        if slot_field is None:
-            raise OntologyInfrastructureError(
-                f"Effect-match dimension {dimension!r} has no authored Slot projection field"
-            )
-        handler = IMPLEMENTED_EFFECT_MATCH_VALUE_HANDLERS.get(value_type)
-        if handler == "boolean":
-            dimensions[slot_field] = {"type": "boolean"}
-        elif handler == "capability_values":
-            dimensions[slot_field] = {
-                "type": "string",
-                "minLength": 1,
-                "enum": sorted(runtime.near_values),
-            }
+    for field in ("meal_context", "circadian_anchor", "exercise_anchor"):
+        property_schema = slot_properties.get(field)
+        if not isinstance(property_schema, Mapping):
+            raise OntologyInfrastructureError(f"Generated Slot definition is missing {field}")
+        property_schema = cast(Mapping[str, object], property_schema)
+        # The standalone pillboxes schema cannot resolve references into the
+        # full generated schema's ``$defs``.  Inline the enum definition while
+        # retaining the canonical enum authored by the active Slot class.
+        reference = property_schema.get("$ref")
+        if isinstance(reference, str) and reference.startswith("#/$defs/"):
+            definitions = generated_schema.get("$defs")
+            definition_name = reference.removeprefix("#/$defs/")
+            definition = definitions.get(definition_name) if isinstance(definitions, Mapping) else None
+            if not isinstance(definition, Mapping):
+                raise OntologyInfrastructureError(f"Generated Slot definition cannot resolve {field}")
+            dimensions[field] = dict(cast(Mapping[str, object], definition))
         else:
-            raise OntologyInfrastructureError(f"Unsupported effect-match value handler for {dimension!r}")
+            dimensions[field] = dict(property_schema)
     source_slot_properties: dict[str, object] = {
         "label": {**cast(Mapping[str, object], slot_properties["label"]), "minLength": 1},
         "order": cast(object, slot_properties["order"]),
@@ -1373,7 +1380,7 @@ def _pillboxes_schema(
                         "additionalProperties": {
                             "type": "object",
                             "additionalProperties": False,
-                            "required": ["label", "order", *dimensions.keys()],
+                            "required": ["label", "order"],
                             "properties": source_slot_properties,
                         },
                     },
@@ -1983,6 +1990,131 @@ def _runtime_records(source: Mapping[str, object], slot: str) -> list[dict[str, 
     return out
 
 
+# This table is the complete universal-law truth table from
+# ``docs/domain-model.md`` and the canonical-instance ADR.  It is deliberately
+# compiler-owned metadata: no item, product, or authored policy can extend it.
+_CANONICAL_LAW_SPECS: tuple[tuple[str, str, str, str, tuple[tuple[str, str], ...]], ...] = (
+    (
+        "food_effect_laws",
+        "FoodEffect",
+        "meal_context",
+        "MealContext",
+        (
+            ("bioavailability_increases", "with_food"),
+            ("bioavailability_decreases", "without_food"),
+            ("tolerability_improves", "with_food"),
+            ("tolerability_worsens", "without_food"),
+        ),
+    ),
+    (
+        "acute_alertness_effect_laws",
+        "AcuteAlertnessEffect",
+        "circadian_anchor",
+        "CircadianAnchor",
+        (("acute_alertness_increases", "wake"),),
+    ),
+    (
+        "acute_sleep_effect_laws",
+        "AcuteSleepEffect",
+        "circadian_anchor",
+        "CircadianAnchor",
+        (("onset_latency_decreases", "sleep"), ("continuity_improves", "sleep")),
+    ),
+    (
+        "pre_exercise_performance_effect_laws",
+        "PreExercisePerformanceEffect",
+        "exercise_anchor",
+        "ExerciseAnchor",
+        (("performance_improves", "before"),),
+    ),
+    (
+        "post_exercise_recovery_effect_laws",
+        "PostExerciseRecoveryEffect",
+        "exercise_anchor",
+        "ExerciseAnchor",
+        (("recovery_improves", "after"),),
+    ),
+)
+
+
+def _normalize_canonical_laws(catalog: Mapping[str, object]) -> tuple[dict[str, object], ...]:
+    """Normalize the closed authored law catalog to runtime law records.
+
+    LinkML proves the per-family typed shape.  This second, explicit boundary
+    proves the finite table itself: every admitted value appears exactly once,
+    maps to the prescribed dimension/value, and no duplicate technical IDs or
+    executable meanings can enter the runtime program.
+    """
+    normalized: list[dict[str, object]] = []
+    seen_ids: set[str] = set()
+    seen_meanings: set[tuple[str, str, str, str]] = set()
+    expected_collections = {spec[0] for spec in _CANONICAL_LAW_SPECS}
+    if set(catalog) != expected_collections:
+        raise OntologyInfrastructureError(
+            "Canonical law catalog has an invalid closed shape; expected " + ", ".join(sorted(expected_collections))
+        )
+    for collection, family, dimension, _anchor_type, expected_pairs in _CANONICAL_LAW_SPECS:
+        rows = catalog.get(collection)
+        if not isinstance(rows, list):
+            raise OntologyInfrastructureError(f"Canonical law catalog {collection!r} must be a list")
+        if len(rows) != len(expected_pairs):
+            raise OntologyInfrastructureError(
+                f"Canonical law catalog {collection!r} must contain exactly {len(expected_pairs)} rows"
+            )
+        expected_values = dict(expected_pairs)
+        expected_fields = {"id", "fact_value", dimension}
+        observed_values: set[str] = set()
+        for index, raw in enumerate(rows):
+            if not isinstance(raw, Mapping):
+                raise OntologyInfrastructureError(f"Canonical law {collection}[{index}] must be a mapping")
+            row = dict(cast(Mapping[str, object], raw))
+            if set(row) != expected_fields:
+                raise OntologyInfrastructureError(
+                    f"Canonical law {collection}[{index}] has invalid fields; expected {sorted(expected_fields)}"
+                )
+            identifier = row.get("id")
+            fact_value = row.get("fact_value")
+            pressure_value = row.get(dimension)
+            if not isinstance(identifier, str) or not identifier:
+                raise OntologyInfrastructureError(f"Canonical law {collection}[{index}].id must be non-empty")
+            if identifier in seen_ids:
+                raise OntologyInfrastructureError(f"Canonical law catalog has duplicate id {identifier!r}")
+            if not isinstance(fact_value, str) or fact_value not in expected_values:
+                raise OntologyInfrastructureError(
+                    f"Canonical law {collection}[{index}].fact_value is not admitted for family {family}"
+                )
+            if fact_value in observed_values:
+                raise OntologyInfrastructureError(
+                    f"Canonical law catalog {collection} has duplicate fact value {fact_value!r}"
+                )
+            expected_pressure = expected_values[fact_value]
+            if pressure_value != expected_pressure:
+                raise OntologyInfrastructureError(
+                    f"Canonical law {collection}[{index}] maps {fact_value!r} to {pressure_value!r}; "
+                    f"expected {expected_pressure!r}"
+                )
+            meaning = (family, fact_value, dimension, expected_pressure)
+            if meaning in seen_meanings:
+                raise OntologyInfrastructureError(f"Canonical law catalog has duplicate meaning {meaning!r}")
+            seen_ids.add(identifier)
+            observed_values.add(fact_value)
+            seen_meanings.add(meaning)
+            normalized.append({
+                "id": identifier,
+                "family": family,
+                "fact_value": fact_value,
+                "dimension": dimension,
+                "pressure_value": expected_pressure,
+            })
+        if observed_values != set(expected_values):
+            raise OntologyInfrastructureError(
+                f"Canonical law catalog {collection} does not cover the complete family value table"
+            )
+    if len(normalized) != 9:
+        raise OntologyInfrastructureError("Canonical law catalog must normalize to exactly nine laws")
+    return tuple(normalized)
+
+
 # These are the semantic identities consumed by runtime lookup and matching.
 # ``id`` remains a technical provenance key; it must never be the only
 # uniqueness guard for a catalog whose records can have distinct IDs but the
@@ -2371,9 +2503,7 @@ def _apply_relation_type_enum(
     relation_type["enum"] = values
 
 
-def _tighten_exactly_one_of_schema(
-    definitions: Mapping[str, object], schema_view: SchemaView
-) -> None:
+def _tighten_exactly_one_of_schema(definitions: Mapping[str, object], schema_view: SchemaView) -> None:
     """Make required scalar branches of exactly-one unions non-null.
 
     LinkML represents optional scalar slots as ``string | null`` in JSON
@@ -2655,6 +2785,8 @@ def _runtime_program(
     policy: Mapping[str, object],
     canonical_fact_catalog: Mapping[str, object],
     source_hash: str,
+    *,
+    canonical_laws: Sequence[Mapping[str, object]],
 ) -> dict[str, object]:
     """Render a deterministic, provenance-bearing executable runtime program."""
     policy_path = _catalog_path(ontology_root, manifest, "runtime_policy")
@@ -2669,6 +2801,7 @@ def _runtime_program(
     # machinery emits it without making it policy-authored.
     projection_policy = dict(policy)
     projection_policy["canonical_fact_catalog"] = canonical_fact_catalog
+    projection_policy["canonical_laws"] = [dict(row) for row in canonical_laws]
     descriptors = policy.get("runtime_projection")
     if not isinstance(descriptors, list):
         raise OntologyInfrastructureError("Runtime policy requires runtime_projection descriptors")
@@ -2678,6 +2811,11 @@ def _runtime_program(
             "id": "canonical_fact_catalog",
             "target": "canonical_fact_catalog",
             "source": "canonical_fact_catalog",
+        },
+        {
+            "id": "canonical_laws",
+            "target": "canonical_laws",
+            "source": "canonical_laws",
         },
     ]
     projected = _runtime_projection_tree(projection_policy, projection_descriptors)

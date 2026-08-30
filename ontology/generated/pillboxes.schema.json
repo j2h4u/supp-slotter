@@ -15,23 +15,35 @@
           "additionalProperties": {
             "additionalProperties": false,
             "properties": {
-              "food": {
-                "type": "boolean"
+              "circadian_anchor": {
+                "description": "Independent logical circadian anchor for a canonical slot.",
+                "enum": [
+                  "wake",
+                  "sleep"
+                ],
+                "title": "CircadianAnchor",
+                "type": "string"
+              },
+              "exercise_anchor": {
+                "description": "Independent logical exercise anchor for a canonical slot.",
+                "enum": [
+                  "before",
+                  "after"
+                ],
+                "title": "ExerciseAnchor",
+                "type": "string"
               },
               "label": {
                 "minLength": 1,
                 "type": "string"
               },
-              "near": {
+              "meal_context": {
+                "description": "Independent logical meal-context anchor for a canonical slot.",
                 "enum": [
-                  "breakfast",
-                  "day_meal",
-                  "sleep",
-                  "wake",
-                  "workout_after",
-                  "workout_before"
+                  "with_food",
+                  "without_food"
                 ],
-                "minLength": 1,
+                "title": "MealContext",
                 "type": "string"
               },
               "order": {
@@ -41,9 +53,7 @@
             },
             "required": [
               "label",
-              "order",
-              "near",
-              "food"
+              "order"
             ],
             "type": "object"
           },
@@ -80,7 +90,7 @@
     "slot_order": {
       "field": "order",
       "minimum": 1,
-      "scope": "pillbox",
+      "scope": "topology",
       "source": "<pillbox_key>.slots.<slot_key>",
       "uniqueness": "required"
     },

@@ -13,6 +13,12 @@
       "root_class": "CanonicalFactCatalog"
     },
     {
+      "id": "canonical_laws",
+      "path": "ontology/canonical-laws.yaml",
+      "role": "canonical_laws",
+      "root_class": "CanonicalLawCatalog"
+    },
+    {
       "id": "constraints",
       "path": "ontology/scheduling-constraints.yaml",
       "role": "constraints",
@@ -149,6 +155,36 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteAlertnessEffect"
     },
     {
+      "name": "AcuteAlertnessEffectLaw",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "circadian_anchor",
+          "range": "CircadianAnchor",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "fact_value",
+          "range": "AcuteAlertnessEffectValue",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteAlertnessEffectLaw"
+    },
+    {
       "name": "AcuteSleepEffect",
       "slots": [
         {
@@ -193,6 +229,36 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteSleepEffect"
+    },
+    {
+      "name": "AcuteSleepEffectLaw",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "circadian_anchor",
+          "range": "CircadianAnchor",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "fact_value",
+          "range": "AcuteSleepEffectValue",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteSleepEffectLaw"
     },
     {
       "name": "CanonicalFactCatalog",
@@ -255,6 +321,52 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/CanonicalFactCatalog"
+    },
+    {
+      "name": "CanonicalLawCatalog",
+      "slots": [
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "acute_alertness_effect_laws",
+          "range": "AcuteAlertnessEffectLaw",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "acute_sleep_effect_laws",
+          "range": "AcuteSleepEffectLaw",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "food_effect_laws",
+          "range": "FoodEffectLaw",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "post_exercise_recovery_effect_laws",
+          "range": "PostExerciseRecoveryEffectLaw",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "pre_exercise_performance_effect_laws",
+          "range": "PreExercisePerformanceEffectLaw",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/CanonicalLawCatalog"
     },
     {
       "name": "CanonicalSchedulingFact",
@@ -787,6 +899,36 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/FoodEffect"
     },
     {
+      "name": "FoodEffectLaw",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "fact_value",
+          "range": "FoodEffectValue",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "meal_context",
+          "range": "MealContext",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/FoodEffectLaw"
+    },
+    {
       "name": "IdentifiedNode",
       "slots": [
         {
@@ -1205,6 +1347,36 @@
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/PostExerciseRecoveryEffect"
     },
     {
+      "name": "PostExerciseRecoveryEffectLaw",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "exercise_anchor",
+          "range": "ExerciseAnchor",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "fact_value",
+          "range": "PostExerciseRecoveryEffectValue",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/PostExerciseRecoveryEffectLaw"
+    },
+    {
       "name": "PreExercisePerformanceEffect",
       "slots": [
         {
@@ -1249,6 +1421,36 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/PreExercisePerformanceEffect"
+    },
+    {
+      "name": "PreExercisePerformanceEffectLaw",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "exercise_anchor",
+          "range": "ExerciseAnchor",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "fact_value",
+          "range": "PreExercisePerformanceEffectValue",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/PreExercisePerformanceEffectLaw"
     },
     {
       "name": "Product",
@@ -3617,6 +3819,14 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
+          "name": "circadian_anchor",
+          "range": "CircadianAnchor",
+          "required": false
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
           "name": "description",
           "range": "string",
           "required": false
@@ -3625,9 +3835,9 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "food",
-          "range": "boolean",
-          "required": true
+          "name": "exercise_anchor",
+          "range": "ExerciseAnchor",
+          "required": false
         },
         {
           "inlined": false,
@@ -3649,9 +3859,9 @@
           "inlined": false,
           "inlined_as_list": false,
           "multivalued": false,
-          "name": "near",
-          "range": "string",
-          "required": true
+          "name": "meal_context",
+          "range": "MealContext",
+          "required": false
         },
         {
           "inlined": false,
@@ -4262,8 +4472,14 @@
             },
             {
               "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/food",
-              "source": "<key>.slots.<key>.food",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/circadian_anchor",
+              "source": "<key>.slots.<key>.circadian_anchor",
+              "subject": "<key>.slots.<key>"
+            },
+            {
+              "kind": "slot",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/exercise_anchor",
+              "source": "<key>.slots.<key>.exercise_anchor",
               "subject": "<key>.slots.<key>"
             },
             {
@@ -4274,8 +4490,8 @@
             },
             {
               "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/near",
-              "source": "<key>.slots.<key>.near",
+              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/meal_context",
+              "source": "<key>.slots.<key>.meal_context",
               "subject": "<key>.slots.<key>"
             },
             {

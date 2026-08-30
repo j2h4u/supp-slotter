@@ -79,7 +79,6 @@ def _missing_required_file_error(paths: Paths) -> str | None:
 
 def _schema_preflight_errors(paths: Paths, info: list[str], bundle: OntologyBundle) -> CheckResult | None:
     slots_path = paths.data / "pillboxes.yaml"
-    errors: list[str] = []
     try:
         slots_data = load_yaml(slots_path)
     except CardLoadError as e:
@@ -98,7 +97,7 @@ def _schema_preflight_errors(paths: Paths, info: list[str], bundle: OntologyBund
     references = (
         {"Stack": {key for key in stacks_data if isinstance(key, str)}} if isinstance(stacks_data, dict) else {}
     )
-    errors.extend(schema_errors(slots_data, "pillboxes", slots_path, bundle, reference_values=references))
+    errors = schema_errors(slots_data, "pillboxes", slots_path, bundle, reference_values=references)
     if errors:
         report(errors, info)
         return CheckResult(exit_code=1, errors=errors, info=info)

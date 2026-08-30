@@ -536,6 +536,22 @@ class RuntimePostExerciseRecoveryEffect(RuntimeCanonicalSchedulingFact):
 
 
 @dataclass(frozen=True, slots=True)
+class RuntimeCanonicalLaw:
+    """One compiler-emitted, identity-free canonical inference law.
+
+    Laws are indexed by ``(family, fact_value)`` by the inference executor.
+    The law carries no item or evidence identity: those belong to the fact and
+    the proof produced while traversing an applicability role.
+    """
+
+    id: str
+    family: str
+    fact_value: str
+    dimension: str
+    pressure_value: str
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimeCanonicalFactCatalog:
     """Strict typed view of the authoritative canonical evidence catalog."""
 
@@ -572,6 +588,7 @@ class RuntimeProgram:
     dashboard_state_catalog: RuntimeDashboardStateCatalog
     grooming_policy: RuntimeGroomingPolicy
     canonical_fact_catalog: RuntimeCanonicalFactCatalog
+    canonical_laws: tuple[RuntimeCanonicalLaw, ...]
 
     @property
     def effect_score_levels(self) -> frozenset[str]:
@@ -652,6 +669,7 @@ _PROJECTION_RECORDS: Mapping[str, type[object]] = {
     "canonical_fact_catalog.acute_sleep_effects": RuntimeAcuteSleepEffect,
     "canonical_fact_catalog.pre_exercise_performance_effects": RuntimePreExercisePerformanceEffect,
     "canonical_fact_catalog.post_exercise_recovery_effects": RuntimePostExerciseRecoveryEffect,
+    "canonical_laws": RuntimeCanonicalLaw,
 }
 _MAPPING_RECORD_PATHS = frozenset({
     "engine_contract",
@@ -1050,6 +1068,43 @@ def _post_exercise_recovery_effect(row: Mapping[str, object], label: str) -> Run
         RuntimePostExerciseRecoveryEffect,
         _canonical_fact(row, label, RuntimePostExerciseRecoveryEffect, _POST_EXERCISE_RECOVERY_EFFECT_VALUES),
     )
+
+
+def _canonical_law(row: Mapping[str, object], label: str) -> RuntimeCanonicalLaw:
+    """Decode one closed compiler law row."""
+    expected = frozenset({"id", "family", "fact_value", "dimension", "pressure_value"})
+    _exact_map(row, label, expected)
+    return RuntimeCanonicalLaw(
+        _str(row["id"], f"{label}.id"),
+        _str(row["family"], f"{label}.family"),
+        _str(row["fact_value"], f"{label}.fact_value"),
+        _str(row["dimension"], f"{label}.dimension"),
+        _str(row["pressure_value"], f"{label}.pressure_value"),
+    )
+
+
+def _canonical_laws(value: object, label: str = "canonical_laws") -> tuple[RuntimeCanonicalLaw, ...]:
+    rows = _rows(value, label)
+    result = tuple(_canonical_law(row, f"{label}[{index}]") for index, row in enumerate(rows))
+    if len(result) != 9:
+        raise _error(label, "must contain exactly nine laws")
+    keys = [(law.family, law.fact_value) for law in result]
+    if len(keys) != len(set(keys)):
+        raise _error(label, "has duplicate semantic keys (family, fact_value)")
+    expected_keys = frozenset({
+        ("FoodEffect", "bioavailability_increases"),
+        ("FoodEffect", "bioavailability_decreases"),
+        ("FoodEffect", "tolerability_improves"),
+        ("FoodEffect", "tolerability_worsens"),
+        ("AcuteAlertnessEffect", "acute_alertness_increases"),
+        ("AcuteSleepEffect", "onset_latency_decreases"),
+        ("AcuteSleepEffect", "continuity_improves"),
+        ("PreExercisePerformanceEffect", "performance_improves"),
+        ("PostExerciseRecoveryEffect", "recovery_improves"),
+    })
+    if frozenset(keys) != expected_keys:
+        raise _error(label, "does not cover the exact nine admitted family/value laws")
+    return result
 
 
 def _canonical_fact_catalog(value: object, label: str = "canonical_fact_catalog") -> RuntimeCanonicalFactCatalog:
@@ -1477,6 +1532,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         "grooming_policy",
     )
     canonical_fact_catalog = _canonical_fact_catalog(projection.get("canonical_fact_catalog"))
+    canonical_laws = _canonical_laws(projection["canonical_laws"])
     return RuntimeProgram(
         _str(root["format_version"], "format_version"),
         _str(root["schema_version"], "schema_version"),
@@ -1500,6 +1556,7 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         dashboard_state_catalog,
         grooming_policy,
         canonical_fact_catalog,
+        canonical_laws,
     )
 
 

@@ -16,9 +16,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import NamedTuple, TypedDict
+from typing import Literal, NamedTuple, TypedDict
 
 type SlotNear = str
+type MealContext = Literal["with_food", "without_food"]
+type CircadianAnchor = Literal["wake", "sleep"]
+type ExerciseAnchor = Literal["before", "after"]
 type RelationType = str
 type Severity = str
 type ConcernKind = str
@@ -325,6 +328,12 @@ class Slot:
     pillbox: str
     pillbox_label: str
     stack: str
+    # Logical topology is deliberately three independent, optional axes.  A
+    # missing axis is meaningful: it is not inferred from the slot's id,
+    # label, order, or from either of the other axes.
+    meal_context: MealContext | None = None
+    circadian_anchor: CircadianAnchor | None = None
+    exercise_anchor: ExerciseAnchor | None = None
 
 
 @dataclass(frozen=True, slots=True)

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -31,31 +30,24 @@ def _write(path: Path, slot: str) -> None:
     )
 
 
-def test_loader_projects_authored_dimension_key_from_independent_slot_field(tmp_path: Path) -> None:
-    runtime = _runtime()
-    dimensions = tuple(
-        replace(dimension, key="context" if dimension.key == "near" else dimension.key)
-        for dimension in runtime.effect_match_dimensions
-    )
-    runtime = replace(runtime, effect_match_dimensions=dimensions)
+def test_loader_projects_independent_topology_fields(tmp_path: Path) -> None:
     path = tmp_path / "pillboxes.yaml"
-    _write(path, "label: Morning\norder: 1\nnear: wake\nfood: false")
+    _write(path, "label: Morning\norder: 1\nmeal_context: without_food\ncircadian_anchor: wake")
 
-    slot = load_pillboxes(path, runtime)["daily"].slots["morning"]
+    slot = load_pillboxes(path, _runtime())["daily"].slots["morning"]
 
-    assert {observation.key: observation.value for observation in slot.observations} == {
-        "context": "wake",
-        "food": False,
-    }
+    assert slot.meal_context == "without_food"
+    assert slot.circadian_anchor == "wake"
+    assert slot.exercise_anchor is None
 
 
 @pytest.mark.parametrize(
     "slot",
     (
-        "order: 1\nnear: wake\nfood: false",
-        "label: ''\norder: 1\nnear: wake\nfood: false",
-        "label: Morning\norder: nope\nnear: wake\nfood: false",
-        "label: Morning\norder: 1\nnear: wake\nfood: 1",
+        "order: 1\nmeal_context: without_food",
+        "label: ''\norder: 1\nmeal_context: without_food",
+        "label: Morning\norder: nope\nmeal_context: without_food",
+        "label: Morning\norder: 1\nmeal_context: invalid",
     ),
 )
 def test_loader_rejects_missing_or_malformed_slot_fields(tmp_path: Path, slot: str) -> None:
@@ -72,15 +64,15 @@ def test_generated_contract_rejects_global_slot_and_scoped_order_duplicates() ->
             "label": "Daily",
             "stack": "daily",
             "slots": {
-                "morning": {"label": "Morning", "order": 1, "near": "wake", "food": False},
-                "evening": {"label": "Evening", "order": 1, "near": "sleep", "food": False},
+                "morning": {"label": "Morning", "order": 1, "circadian_anchor": "wake"},
+                "evening": {"label": "Evening", "order": 1, "circadian_anchor": "sleep"},
             },
         },
         "training": {
             "label": "Training",
             "stack": "training",
             "slots": {
-                "morning": {"label": "Training morning", "order": 2, "near": "wake", "food": False},
+                "morning": {"label": "Training morning", "order": 2, "circadian_anchor": "wake"},
             },
         },
     }
@@ -96,7 +88,7 @@ def test_generated_contract_resolves_stack_references_from_validation_context() 
         "daily": {
             "label": "Daily",
             "stack": "missing",
-            "slots": {"morning": {"label": "Morning", "order": 1, "near": "wake", "food": False}},
+            "slots": {"morning": {"label": "Morning", "order": 1, "circadian_anchor": "wake"}},
         }
     }
 

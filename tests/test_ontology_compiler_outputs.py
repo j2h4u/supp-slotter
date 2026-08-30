@@ -195,21 +195,20 @@ def test_rdf_records_emit_canonical_terms_and_semantic_profiles() -> None:
     )
 
 
-def test_generated_pillbox_schema_projects_authored_effect_dimensions() -> None:
-    """Pillbox observations come from effect-dimension projection metadata."""
+def test_generated_pillbox_schema_projects_canonical_topology() -> None:
+    """Pillbox source fields derive from the active logical Slot contract."""
     pillboxes = _json("pillboxes.schema.json")
-    runtime_program = _json("runtime-program.json")
-    projection = _json_mapping(runtime_program["projection"])
-    dimensions = _json_mapping_list(projection["effect_match_dimensions"])
-    expected_fields = {"label", "order", *(_json_string(row["slot_field"]) for row in dimensions)}
+    topology_fields = {"meal_context", "circadian_anchor", "exercise_anchor"}
+    expected_fields = {"label", "order", *topology_fields}
 
     pattern = _json_mapping(pillboxes["patternProperties"])
     pillbox = _json_mapping(pattern["^[a-z][a-z0-9_]*$"])
     slots = _json_mapping(_json_mapping(pillbox["properties"])["slots"])
     slot = _json_mapping(_json_mapping(slots["additionalProperties"]))
 
-    assert set(cast(list[str], slot["required"])) == expected_fields
+    assert set(cast(list[str], slot["required"])) == {"label", "order"}
     assert set(_json_mapping(slot["properties"])) >= expected_fields
+    assert not {"near", "food"} & set(_json_mapping(slot["properties"]))
 
 
 def test_compiler_rejects_missing_terms_catalog(tmp_path: Path) -> None:

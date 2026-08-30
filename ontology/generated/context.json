@@ -7,11 +7,20 @@
     "AcuteAlertnessEffect": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteAlertnessEffect"
     },
+    "AcuteAlertnessEffectLaw": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteAlertnessEffectLaw"
+    },
     "AcuteSleepEffect": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteSleepEffect"
     },
+    "AcuteSleepEffectLaw": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/AcuteSleepEffectLaw"
+    },
     "CanonicalFactCatalog": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/CanonicalFactCatalog"
+    },
+    "CanonicalLawCatalog": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/CanonicalLawCatalog"
     },
     "CanonicalSchedulingFact": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/CanonicalSchedulingFact"
@@ -58,6 +67,9 @@
     "FoodEffect": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/FoodEffect"
     },
+    "FoodEffectLaw": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/FoodEffectLaw"
+    },
     "IdentifiedNode": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/IdentifiedNode"
     },
@@ -91,8 +103,14 @@
     "PostExerciseRecoveryEffect": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/PostExerciseRecoveryEffect"
     },
+    "PostExerciseRecoveryEffectLaw": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/PostExerciseRecoveryEffectLaw"
+    },
     "PreExercisePerformanceEffect": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/PreExercisePerformanceEffect"
+    },
+    "PreExercisePerformanceEffectLaw": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/PreExercisePerformanceEffectLaw"
     },
     "Product": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/Product"
@@ -307,8 +325,14 @@
     "activity": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/activity"
     },
+    "acute_alertness_effect_laws": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/acute_alertness_effect_laws"
+    },
     "acute_alertness_effects": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/acute_alertness_effects"
+    },
+    "acute_sleep_effect_laws": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/acute_sleep_effect_laws"
     },
     "acute_sleep_effects": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/acute_sleep_effects"
@@ -499,6 +523,9 @@
     "expression": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/expression"
     },
+    "fact_value": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/fact_value"
+    },
     "field": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/field"
     },
@@ -513,6 +540,9 @@
     },
     "food": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/food"
+    },
+    "food_effect_laws": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/food_effect_laws"
     },
     "food_effects": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/food_effects"
@@ -637,8 +667,14 @@
     "policy": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/policy"
     },
+    "post_exercise_recovery_effect_laws": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/post_exercise_recovery_effect_laws"
+    },
     "post_exercise_recovery_effects": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/post_exercise_recovery_effects"
+    },
+    "pre_exercise_performance_effect_laws": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/pre_exercise_performance_effect_laws"
     },
     "pre_exercise_performance_effects": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/pre_exercise_performance_effects"

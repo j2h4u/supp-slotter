@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import cast
 
 import yaml
+from planner.cards.product import composition_role_id
 from planner.engine import CheckResult, cmd_check, cmd_plan
 from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
 
@@ -149,14 +150,13 @@ def write_minimal_planner_fixture(
                     "morning_empty": {
                         "label": "Morning empty",
                         "order": 1,
-                        "near": "wake",
-                        "food": False,
+                        "meal_context": "without_food",
+                        "circadian_anchor": "wake",
                     },
                     "day_empty": {
                         "label": "Day empty",
                         "order": 2,
-                        "near": "day_meal",
-                        "food": False,
+                        "meal_context": "without_food",
                     },
                 },
             },
@@ -167,14 +167,14 @@ def write_minimal_planner_fixture(
                     "pre_workout": {
                         "label": "Pre-workout",
                         "order": 1,
-                        "near": "workout_before",
-                        "food": False,
+                        "meal_context": "without_food",
+                        "exercise_anchor": "before",
                     },
                     "post_workout": {
                         "label": "Post-workout",
                         "order": 2,
-                        "near": "workout_after",
-                        "food": False,
+                        "meal_context": "without_food",
+                        "exercise_anchor": "after",
                     },
                 },
             },
@@ -328,7 +328,11 @@ def _write_product_cards(
                 "id": normalized_product_id,
                 "name": product_id.replace("_", " ").title(),
                 "components": [
-                    {"substance": substance_ids[component_id]} for component_id, _trait_ids in component_ids
+                    {
+                        "id": composition_role_id(normalized_product_id, substance_ids[component_id]),
+                        "substance": substance_ids[component_id],
+                    }
+                    for component_id, _trait_ids in component_ids
                 ],
             },
         )

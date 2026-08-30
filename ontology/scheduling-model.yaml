@@ -21,6 +21,63 @@ enums:
       exact_form:
 
 classes:
+  # Universal inference laws are authored separately from evidence facts.  A
+  # law is deliberately tiny: its closed typed fact value and the one anchor
+  # value it derives.  There are no predicates, conditions, weights, or
+  # item-specific selectors in this catalog.
+  CanonicalLawCatalog:
+    description: Closed universal law catalog for canonical pressure inference.
+    annotations:
+      canonical_shadow: true
+      closed_universal_laws: true
+    slots: [food_effect_laws, acute_alertness_effect_laws, acute_sleep_effect_laws, pre_exercise_performance_effect_laws, post_exercise_recovery_effect_laws]
+    slot_usage:
+      food_effect_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: FoodEffectLaw, inlined: true, inlined_as_list: true}
+      acute_alertness_effect_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: AcuteAlertnessEffectLaw, inlined: true, inlined_as_list: true}
+      acute_sleep_effect_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: AcuteSleepEffectLaw, inlined: true, inlined_as_list: true}
+      pre_exercise_performance_effect_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: PreExercisePerformanceEffectLaw, inlined: true, inlined_as_list: true}
+      post_exercise_recovery_effect_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: PostExerciseRecoveryEffectLaw, inlined: true, inlined_as_list: true}
+
+  FoodEffectLaw:
+    description: Universal FoodEffect to meal-context pressure law.
+    slots: [id, fact_value, meal_context]
+    slot_usage:
+      id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
+      fact_value: {required: true, range: FoodEffectValue, multivalued: false}
+      meal_context: {required: true, range: MealContext, multivalued: false}
+
+  AcuteAlertnessEffectLaw:
+    description: Universal acute-alertness to wake pressure law.
+    slots: [id, fact_value, circadian_anchor]
+    slot_usage:
+      id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
+      fact_value: {required: true, range: AcuteAlertnessEffectValue, multivalued: false}
+      circadian_anchor: {required: true, range: CircadianAnchor, multivalued: false}
+
+  AcuteSleepEffectLaw:
+    description: Universal acute-sleep to sleep pressure law.
+    slots: [id, fact_value, circadian_anchor]
+    slot_usage:
+      id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
+      fact_value: {required: true, range: AcuteSleepEffectValue, multivalued: false}
+      circadian_anchor: {required: true, range: CircadianAnchor, multivalued: false}
+
+  PreExercisePerformanceEffectLaw:
+    description: Universal pre-exercise-performance to before-exercise pressure law.
+    slots: [id, fact_value, exercise_anchor]
+    slot_usage:
+      id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
+      fact_value: {required: true, range: PreExercisePerformanceEffectValue, multivalued: false}
+      exercise_anchor: {required: true, range: ExerciseAnchor, multivalued: false}
+
+  PostExerciseRecoveryEffectLaw:
+    description: Universal post-exercise-recovery to after-exercise pressure law.
+    slots: [id, fact_value, exercise_anchor]
+    slot_usage:
+      id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
+      fact_value: {required: true, range: PostExerciseRecoveryEffectValue, multivalued: false}
+      exercise_anchor: {required: true, range: ExerciseAnchor, multivalued: false}
+
   CanonicalFactCatalog:
     description: Shadow catalog of scheduler-consumable canonical evidence facts.
     annotations:
@@ -269,6 +326,12 @@ classes:
       name: {required: false, pattern: '\S'}
 
 slots:
+  food_effect_laws: {multivalued: true, range: FoodEffectLaw, inlined: true, inlined_as_list: true}
+  acute_alertness_effect_laws: {multivalued: true, range: AcuteAlertnessEffectLaw, inlined: true, inlined_as_list: true}
+  acute_sleep_effect_laws: {multivalued: true, range: AcuteSleepEffectLaw, inlined: true, inlined_as_list: true}
+  pre_exercise_performance_effect_laws: {multivalued: true, range: PreExercisePerformanceEffectLaw, inlined: true, inlined_as_list: true}
+  post_exercise_recovery_effect_laws: {multivalued: true, range: PostExerciseRecoveryEffectLaw, inlined: true, inlined_as_list: true}
+  fact_value:
   composition_roles: {multivalued: true, range: CompositionRole, inlined: true, inlined_as_list: true}
   evidence_sources: {multivalued: true, range: EvidenceSource, inlined: true, inlined_as_list: true}
   food_effects: {multivalued: true, range: FoodEffect, inlined: true, inlined_as_list: true}

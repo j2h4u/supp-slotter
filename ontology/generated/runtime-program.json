@@ -39,6 +39,71 @@
       "post_exercise_recovery_effects": [],
       "pre_exercise_performance_effects": []
     },
+    "canonical_laws": [
+      {
+        "dimension": "meal_context",
+        "fact_value": "bioavailability_increases",
+        "family": "FoodEffect",
+        "id": "law_food_bioavailability_increases",
+        "pressure_value": "with_food"
+      },
+      {
+        "dimension": "meal_context",
+        "fact_value": "bioavailability_decreases",
+        "family": "FoodEffect",
+        "id": "law_food_bioavailability_decreases",
+        "pressure_value": "without_food"
+      },
+      {
+        "dimension": "meal_context",
+        "fact_value": "tolerability_improves",
+        "family": "FoodEffect",
+        "id": "law_food_tolerability_improves",
+        "pressure_value": "with_food"
+      },
+      {
+        "dimension": "meal_context",
+        "fact_value": "tolerability_worsens",
+        "family": "FoodEffect",
+        "id": "law_food_tolerability_worsens",
+        "pressure_value": "without_food"
+      },
+      {
+        "dimension": "circadian_anchor",
+        "fact_value": "acute_alertness_increases",
+        "family": "AcuteAlertnessEffect",
+        "id": "law_acute_alertness_increases",
+        "pressure_value": "wake"
+      },
+      {
+        "dimension": "circadian_anchor",
+        "fact_value": "onset_latency_decreases",
+        "family": "AcuteSleepEffect",
+        "id": "law_acute_sleep_onset_latency_decreases",
+        "pressure_value": "sleep"
+      },
+      {
+        "dimension": "circadian_anchor",
+        "fact_value": "continuity_improves",
+        "family": "AcuteSleepEffect",
+        "id": "law_acute_sleep_continuity_improves",
+        "pressure_value": "sleep"
+      },
+      {
+        "dimension": "exercise_anchor",
+        "fact_value": "performance_improves",
+        "family": "PreExercisePerformanceEffect",
+        "id": "law_pre_exercise_performance_improves",
+        "pressure_value": "before"
+      },
+      {
+        "dimension": "exercise_anchor",
+        "fact_value": "recovery_improves",
+        "family": "PostExerciseRecoveryEffect",
+        "id": "law_post_exercise_recovery_improves",
+        "pressure_value": "after"
+      }
+    ],
     "concern_catalog": [
       {
         "concern_kind": "safety",
@@ -623,11 +688,11 @@
     ]
   },
   "provenance": {
-    "compiler_sha256": "609e3d4dcbf7e94a724e6cb7e6ae14359a8009cd3119feb1ed3126bfccbe2f9f",
+    "compiler_sha256": "b3add2f8515033fc0fadd40ab0c01a9015092ca0a2170c784a15df349ce9242f",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
     "source_sha256": "fccd7bad0afe9187620e724a4eabe9242b391a54e6c0af9f8e4ba99de76c6816"
   },
   "schema_version": "2",
-  "source_hash": "0d0a05f8f28332673b5d2ec8f871285a8b55d1084c6bd5d3eea7cab48bbcd5f6"
+  "source_hash": "4e5decef4f19516e3b3ebb135a772c057de273545e828d92de6845d079b665c7"
 }

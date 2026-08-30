@@ -25,6 +25,10 @@ catalogs:
     role: canonical_facts
     path: ontology/canonical-facts.yaml
     root_class: CanonicalFactCatalog
+  - id: canonical_laws
+    role: canonical_laws
+    path: ontology/canonical-laws.yaml
+    root_class: CanonicalLawCatalog
   - id: policies
     role: policies
     path: ontology/policies.yaml
@@ -170,8 +174,9 @@ repository_projection:
         - {kind: slot, source: "<key>.label", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/label}
         - {kind: slot, source: "<key>.slots.<key>.label", subject: "<key>.slots.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/label}
         - {kind: slot, source: "<key>.slots.<key>.order", subject: "<key>.slots.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/order}
-        - {kind: slot, source: "<key>.slots.<key>.near", subject: "<key>.slots.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/near}
-        - {kind: slot, source: "<key>.slots.<key>.food", subject: "<key>.slots.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/food}
+        - {kind: slot, source: "<key>.slots.<key>.meal_context", subject: "<key>.slots.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/meal_context}
+        - {kind: slot, source: "<key>.slots.<key>.circadian_anchor", subject: "<key>.slots.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/circadian_anchor}
+        - {kind: slot, source: "<key>.slots.<key>.exercise_anchor", subject: "<key>.slots.<key>", predicate: https://j2h4u.github.io/supp-slotter/ontology/v1/exercise_anchor}
     - source: assertions
       catalog_role: assertions
       root_class: RelationAssertionCatalog

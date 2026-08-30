@@ -163,27 +163,84 @@ def _project_source_assignments(
     return rows
 
 
+def _legacy_slot_match(slot: Slot, key: str, expected: str | bool) -> bool | None:
+    """Adapt the retired ``near``/``food`` policy match to logical topology.
+
+    This is intentionally the sole legacy bridge.  It adapts policy matching
+    only; authored cards and slot topology never regain the compound fields.
+    ``None`` means that the key is not a legacy key.
+    """
+    legacy_observations = {observation.key: observation.value for observation in slot.observations}
+    if len(legacy_observations) != len(slot.observations):
+        raise OntologyInfrastructureError("slot observations contain duplicate keys", code=MALFORMED)
+    if key == "food":
+        if not isinstance(expected, bool):
+            raise OntologyInfrastructureError("legacy food match must be boolean", code=MALFORMED)
+        if slot.meal_context is not None:
+            return slot.meal_context == ("with_food" if expected else "without_food")
+        return legacy_observations.get("food") == expected
+    if key != "near":
+        return None
+    if not isinstance(expected, str):
+        raise OntologyInfrastructureError("legacy near match must be a string", code=MALFORMED)
+    # Compound meal values had no independent semantics.  Preserve the old
+    # policy boundary by making breakfast/day_meal deliberately non-matches.
+    if expected in {"breakfast", "day_meal"}:
+        return False
+    axis_for_near = {
+        "wake": ("circadian_anchor", "wake"),
+        "sleep": ("circadian_anchor", "sleep"),
+        "workout_before": ("exercise_anchor", "before"),
+        "workout_after": ("exercise_anchor", "after"),
+    }
+    axis = axis_for_near.get(expected)
+    if axis is None:
+        raise OntologyInfrastructureError(f"unknown legacy near value {expected!r}", code=MALFORMED)
+    actual = getattr(slot, axis[0])
+    return actual == axis[1] if actual is not None else legacy_observations.get("near") == expected
+
+
+def _slot_topology_match(slot: Slot, key: str, expected: str | bool) -> bool:
+    """Evaluate one canonical or legacy policy match against a Slot."""
+    legacy = _legacy_slot_match(slot, key, expected)
+    if legacy is not None:
+        return legacy
+    actual: str | None
+    if key == "meal_context":
+        actual = slot.meal_context
+    elif key == "circadian_anchor":
+        actual = slot.circadian_anchor
+    elif key == "exercise_anchor":
+        actual = slot.exercise_anchor
+    else:
+        raise OntologyInfrastructureError(f"unknown ontology effect match dimension {key!r}", code=MALFORMED)
+    return actual == expected
+
+
 def slot_matches(program: RuntimeProgram, slot: Slot, match: TraitEffectMatch) -> bool:
+    """Match a policy against independent logical slot topology axes."""
+    del program  # retained in the public signature during the runtime cutover
     observations = {observation.key: observation.value for observation in slot.observations}
     if len(observations) != len(slot.observations):
         raise OntologyInfrastructureError("slot observations contain duplicate keys", code=MALFORMED)
-    unknown_observations = set(observations) - set(program.effect_match_dimensions_by_key)
+    unknown_observations = set(observations) - {
+        "near",
+        "food",
+        "meal_context",
+        "circadian_anchor",
+        "exercise_anchor",
+    }
     if unknown_observations:
         raise OntologyInfrastructureError(
             "slot contains unknown ontology observations: " + ", ".join(sorted(unknown_observations)),
             code=MALFORMED,
         )
+    keys: set[str] = set()
     for key, expected in match.values:
-        dimension = program.effect_match_dimensions_by_key.get(key)
-        if dimension is None:
-            raise OntologyInfrastructureError(f"unknown ontology effect match dimension {key!r}", code=MALFORMED)
-        actual = observations.get(dimension.key)
-        if actual is None:
-            raise OntologyInfrastructureError(
-                f"slot has no observation for ontology effect match dimension {key!r}",
-                code=MALFORMED,
-            )
-        if actual != expected:
+        if key in keys:
+            raise OntologyInfrastructureError(f"duplicate ontology effect match key {key!r}", code=MALFORMED)
+        keys.add(key)
+        if not _slot_topology_match(slot, key, expected):
             return False
     return True
 

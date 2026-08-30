@@ -17,6 +17,7 @@ from planner.contracts import (
     Substance,
 )
 from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.canonical_inference import InferenceResult as CanonicalInferenceResult
 from planner.ontology.runtime_program import RuntimeCanonicalFactCatalog, RuntimeEffectScoring, RuntimeProgram
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
 from planner.scheduling_constraint_execution import SchedulingConstraintExecutionPlan
@@ -46,6 +47,7 @@ class ActiveIndex(NamedTuple):
     item_stacks: dict[str, str]
     schedule_projection_by_item: dict[str, ScheduleProjection]
     active_policy_ids_by_item: dict[str, set[str]]
+    canonical_inference: CanonicalInferenceResult
 
 
 class BlockingContext(NamedTuple):

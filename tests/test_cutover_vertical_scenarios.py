@@ -90,7 +90,7 @@ def test_multicomponent_vertical_explanation_preserves_conflicting_votes_and_neu
     pillboxes = cast(dict[str, object], yaml.safe_load(pillboxes_path.read_text(encoding="utf-8")))
     daily = cast(dict[str, object], pillboxes["daily"])
     daily_slots = cast(dict[str, dict[str, object]], daily["slots"])
-    daily_slots["day_empty"]["food"] = True
+    daily_slots["day_empty"]["meal_context"] = "with_food"
     pillboxes_path.write_text(yaml.safe_dump(pillboxes, sort_keys=False), encoding="utf-8")
 
     schedule = cast(dict[str, object], plan_in_temp_dir(tmp_path))

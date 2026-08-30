@@ -16,6 +16,7 @@ from planner.contracts import (
 )
 from planner.engine._plan_types import ActiveIndex
 from planner.engine._scheduling import project_schedule_assignments
+from planner.ontology.canonical_inference import execute_canonical_inference
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
     IMPLEMENTED_PREFER_WITH_PAIR_MODES,
@@ -23,7 +24,11 @@ from planner.ontology.glue_capabilities import (
     IMPLEMENTED_PREFER_WITH_TARGET_RESOLUTIONS,
     WARNING_EMITTER_PREFER_WITH_RESOLVER,
 )
-from planner.ontology.runtime_program import RuntimeProgram
+from planner.ontology.runtime_program import (
+    RuntimeCanonicalFactCatalog,
+    RuntimeCanonicalLaw,
+    RuntimeProgram,
+)
 from planner.ontology.warning_policy import warning_policy_for_emitter
 from planner.query_model import StackReadModel
 from planner.query_model.relation_conflicts import RelationConflictWarningRow
@@ -46,6 +51,8 @@ class ActiveIndexInput(NamedTuple):
     policies: dict[str, SchedulingPolicy]
     read_model: StackReadModel
     scheduling_constraint_plans: tuple[SchedulingConstraintExecutionPlan, ...]
+    canonical_fact_catalog: RuntimeCanonicalFactCatalog
+    canonical_laws: tuple[RuntimeCanonicalLaw, ...]
 
 
 class _ActiveItemInput(NamedTuple):
@@ -93,6 +100,12 @@ def build_active_index(
         errors.append(msg)
         return None
 
+    canonical_inference = execute_canonical_inference(
+        index_input.canonical_fact_catalog,
+        item_products,
+        index_input.canonical_laws,
+    )
+
     return ActiveIndex(
         item_products=item_products,
         active_components=active_components,
@@ -100,6 +113,7 @@ def build_active_index(
         item_stacks=item_stacks,
         schedule_projection_by_item=schedule_projection_by_item,
         active_policy_ids_by_item=active_policy_ids_by_item,
+        canonical_inference=canonical_inference,
     )
 
 

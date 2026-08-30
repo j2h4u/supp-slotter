@@ -19,6 +19,7 @@ from planner.engine._plan_types import ActiveIndex, AdvisorySlotEvaluation, Plan
 from planner.engine.check import _cmd_check_inner
 from planner.engine.results import PlanResult
 from planner.ontology.artifacts import OntologyBundle, load_ontology
+from planner.ontology.canonical_inference import Conflict, SameDimensionPressureConflict
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.paths import ROOT, Paths
 from planner.query_model import StackReadModel, build_stack_read_model, dashboards_for_read_model
@@ -114,11 +115,23 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
             policies=inputs.policies,
             read_model=read_model,
             scheduling_constraint_plans=inputs.scheduling_constraint_plans,
+            canonical_fact_catalog=inputs.canonical_fact_catalog,
+            canonical_laws=inputs.runtime_program.canonical_laws,
         ),
         inputs.slots,
         errors,
     )
     if active is None:
+        return _failed_plan_result(1, errors)
+
+    if isinstance(active.canonical_inference, Conflict):
+        errors.extend(
+            _canonical_inference_conflict_diagnostic(conflict)
+            for conflict in sorted(
+                active.canonical_inference.conflicts,
+                key=lambda item: (item.item_id, item.dimension, item.values),
+            )
+        )
         return _failed_plan_result(1, errors)
 
     prefer_pairs, ambiguous_prefer_with_warnings, _ = resolve_prefer_pairs(
@@ -147,7 +160,27 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
     )
 
 
+def _canonical_inference_conflict_diagnostic(conflict: SameDimensionPressureConflict) -> str:
+    """Render one stable machine diagnostic for a canonical pressure conflict."""
+    # Keep formatting independent of proof/provenance multiplicity.  The typed
+    # conflict is already sorted by the executor; sorting here protects the
+    # publication boundary if a future executor changes its traversal order.
+    item_id = str(conflict.item_id)
+    dimension = str(conflict.dimension)
+    values = tuple(sorted(str(value) for value in conflict.values))
+    rendered_values = ",".join(values)
+    return f"plan: canonical_inference_conflict item_id={item_id!r} dimension={dimension!r} values=({rendered_values})"
+
+
 def _run_successful_plan_search(errors: list[str], runtime: _PlanRuntime) -> _SuccessfulSearch | PlanResult:
+    """Route conflict-free inputs through the quarantined legacy optimizer.
+
+    Canonical pressure proofs are attached to ``runtime.active`` for the
+    upcoming exact optimizer, but this Cluster 2 slice deliberately leaves the
+    existing weighted/float search untouched.  Keeping this call explicit
+    makes the transitional boundary auditable and prevents a false claim that
+    successful plans already satisfy canonical layout conformance.
+    """
     search_result = run_plan_search_result(
         PlanSearchInput(
             slots=runtime.inputs.slots,

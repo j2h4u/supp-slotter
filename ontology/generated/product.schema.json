@@ -73,6 +73,29 @@
       "title": "AcuteAlertnessEffect",
       "type": "object"
     },
+    "AcuteAlertnessEffectLaw": {
+      "additionalProperties": false,
+      "description": "Universal acute-alertness to wake pressure law.",
+      "properties": {
+        "circadian_anchor": {
+          "$ref": "#/$defs/CircadianAnchor"
+        },
+        "fact_value": {
+          "$ref": "#/$defs/AcuteAlertnessEffectValue"
+        },
+        "id": {
+          "pattern": "^law_[a-z][a-z0-9_:-]*$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "fact_value",
+        "circadian_anchor"
+      ],
+      "title": "AcuteAlertnessEffectLaw",
+      "type": "object"
+    },
     "AcuteAlertnessEffectValue": {
       "description": "Closed values admitted by the AcuteAlertnessEffect fact family.",
       "enum": [
@@ -114,6 +137,29 @@
         "provenance"
       ],
       "title": "AcuteSleepEffect",
+      "type": "object"
+    },
+    "AcuteSleepEffectLaw": {
+      "additionalProperties": false,
+      "description": "Universal acute-sleep to sleep pressure law.",
+      "properties": {
+        "circadian_anchor": {
+          "$ref": "#/$defs/CircadianAnchor"
+        },
+        "fact_value": {
+          "$ref": "#/$defs/AcuteSleepEffectValue"
+        },
+        "id": {
+          "pattern": "^law_[a-z][a-z0-9_:-]*$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "fact_value",
+        "circadian_anchor"
+      ],
+      "title": "AcuteSleepEffectLaw",
       "type": "object"
     },
     "AcuteSleepEffectValue": {
@@ -194,6 +240,56 @@
         }
       },
       "title": "CanonicalFactCatalog",
+      "type": "object"
+    },
+    "CanonicalLawCatalog": {
+      "additionalProperties": false,
+      "description": "Closed universal law catalog for canonical pressure inference.",
+      "properties": {
+        "acute_alertness_effect_laws": {
+          "items": {
+            "$ref": "#/$defs/AcuteAlertnessEffectLaw"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "acute_sleep_effect_laws": {
+          "items": {
+            "$ref": "#/$defs/AcuteSleepEffectLaw"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "food_effect_laws": {
+          "items": {
+            "$ref": "#/$defs/FoodEffectLaw"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "post_exercise_recovery_effect_laws": {
+          "items": {
+            "$ref": "#/$defs/PostExerciseRecoveryEffectLaw"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "pre_exercise_performance_effect_laws": {
+          "items": {
+            "$ref": "#/$defs/PreExercisePerformanceEffectLaw"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "food_effect_laws",
+        "acute_alertness_effect_laws",
+        "acute_sleep_effect_laws",
+        "pre_exercise_performance_effect_laws",
+        "post_exercise_recovery_effect_laws"
+      ],
+      "title": "CanonicalLawCatalog",
       "type": "object"
     },
     "CanonicalSchedulingFact": {
@@ -983,6 +1079,29 @@
       "title": "FoodEffect",
       "type": "object"
     },
+    "FoodEffectLaw": {
+      "additionalProperties": false,
+      "description": "Universal FoodEffect to meal-context pressure law.",
+      "properties": {
+        "fact_value": {
+          "$ref": "#/$defs/FoodEffectValue"
+        },
+        "id": {
+          "pattern": "^law_[a-z][a-z0-9_:-]*$",
+          "type": "string"
+        },
+        "meal_context": {
+          "$ref": "#/$defs/MealContext"
+        }
+      },
+      "required": [
+        "id",
+        "fact_value",
+        "meal_context"
+      ],
+      "title": "FoodEffectLaw",
+      "type": "object"
+    },
     "FoodEffectValue": {
       "description": "Closed values admitted by the FoodEffect fact family.",
       "enum": [
@@ -1390,6 +1509,29 @@
       "title": "PostExerciseRecoveryEffect",
       "type": "object"
     },
+    "PostExerciseRecoveryEffectLaw": {
+      "additionalProperties": false,
+      "description": "Universal post-exercise-recovery to after-exercise pressure law.",
+      "properties": {
+        "exercise_anchor": {
+          "$ref": "#/$defs/ExerciseAnchor"
+        },
+        "fact_value": {
+          "$ref": "#/$defs/PostExerciseRecoveryEffectValue"
+        },
+        "id": {
+          "pattern": "^law_[a-z][a-z0-9_:-]*$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "fact_value",
+        "exercise_anchor"
+      ],
+      "title": "PostExerciseRecoveryEffectLaw",
+      "type": "object"
+    },
     "PostExerciseRecoveryEffectValue": {
       "description": "Closed values admitted by the PostExerciseRecoveryEffect fact family.",
       "enum": [
@@ -1431,6 +1573,29 @@
         "provenance"
       ],
       "title": "PreExercisePerformanceEffect",
+      "type": "object"
+    },
+    "PreExercisePerformanceEffectLaw": {
+      "additionalProperties": false,
+      "description": "Universal pre-exercise-performance to before-exercise pressure law.",
+      "properties": {
+        "exercise_anchor": {
+          "$ref": "#/$defs/ExerciseAnchor"
+        },
+        "fact_value": {
+          "$ref": "#/$defs/PreExercisePerformanceEffectValue"
+        },
+        "id": {
+          "pattern": "^law_[a-z][a-z0-9_:-]*$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "fact_value",
+        "exercise_anchor"
+      ],
+      "title": "PreExercisePerformanceEffectLaw",
       "type": "object"
     },
     "PreExercisePerformanceEffectValue": {
@@ -3662,14 +3827,17 @@
       "additionalProperties": false,
       "description": "",
       "properties": {
+        "circadian_anchor": {
+          "$ref": "#/$defs/CircadianAnchor"
+        },
         "description": {
           "type": [
             "string",
             "null"
           ]
         },
-        "food": {
-          "type": "boolean"
+        "exercise_anchor": {
+          "$ref": "#/$defs/ExerciseAnchor"
         },
         "id": {
           "type": "string"
@@ -3677,8 +3845,8 @@
         "label": {
           "type": "string"
         },
-        "near": {
-          "type": "string"
+        "meal_context": {
+          "$ref": "#/$defs/MealContext"
         },
         "order": {
           "minimum": 1,
@@ -3687,10 +3855,8 @@
       },
       "required": [
         "order",
-        "near",
-        "food",
-        "id",
-        "label"
+        "label",
+        "id"
       ],
       "title": "Slot",
       "type": "object"
