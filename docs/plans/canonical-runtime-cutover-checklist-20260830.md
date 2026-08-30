@@ -9,19 +9,19 @@ boundary decision is the
 [`canonical-instance ADR`](../decisions/canonical-instance-inference-boundary-20260822.md).
 
 This refresh audits durable source and test paths against the clean runtime
-candidate `0725a996f8756d4d0873bf13f32ec26af970e804` (`0725a99`,
-`refactor: simplify runtime ontology validation`). It is documentation-only:
+candidate `c766f7c9ca24c082b65f3afefefd4e493b760ec8` (`c766f7c`,
+`test: decode runtime engine contract in plan fixture`). It is documentation-only:
 the receipt below is the release result for that exact source head, not a claim
 that a release recipe was rerun while updating this checklist.
 
 ## Exact release receipt (R1)
 
-- Candidate: `0725a996f8756d4d0873bf13f32ec26af970e804`; clean HEAD; release
+- Candidate: `c766f7c9ca24c082b65f3afefefd4e493b760ec8`; clean HEAD; release
   exit status `0`.
-- Ordered release modules: `15/37/31/45/64/233 = 425` passing tests.
-- CRAP: 635 functions; maximum `29.40`; zero functions at CRAP `>= 30`;
-  coverage `82%`.
-- Corpus projection: conforms; `131.179s`.
+- Ordered release modules: smoke `14`, ontology A/B/C `37/31/53`, runtime
+  `63`, and CRAP `232` passing tests.
+- CRAP: 638 functions at threshold `30`; coverage `82%` over 6,847 statements.
+- Corpus projection: conforms; `132.816425s`.
 
 Every checked item below cites R1 plus its current durable witness. The runtime
 source of authority is the generic `ontology-runtime-program-v2` projection
@@ -32,13 +32,17 @@ answer.
 ## Critical — canonical product behavior
 
 - [x] **Canonical facts and logical topology are the only scheduler inputs.**
-  - Evidence: R1; `tests/test_canonical_fact_catalog_integration.py::test_plan_inputs_keeps_runtime_program_as_canonical_scheduling_authority`; `planner/engine/_plan_inputs.py`.
+  The formal applicability operation is
+  `exact_role_or_all_roles_with_equal_substance`.
+  - Evidence: R1; `tests/test_canonical_fact_catalog_integration.py::test_plan_inputs_keeps_runtime_program_as_canonical_scheduling_authority`; `tests/test_runtime_contract_v2.py::test_v2_contract_decodes_exactly_and_excludes_retired_objective_inputs`; `tests/test_runtime_contract_v2.py::test_engine_semantic_strategies_are_closed_exact_values`; `planner/engine/_plan_inputs.py`.
 
 - [x] **The finite facts-to-pressures law table is complete and proof-producing.**
   - Evidence: R1; `tests/test_canonical_inference.py::test_every_admitted_value_maps_to_one_pressure`; `tests/test_canonical_inference.py::test_proof_contains_law_fact_subject_path_and_provenance`; `planner/ontology/canonical_inference.py`.
 
 - [x] **Pressure identities normalize and same-dimension contradictions fail closed.**
-  - Evidence: R1; `tests/test_canonical_inference.py::test_duplicate_witnesses_facts_components_and_paths_normalize_to_one_pressure`; `tests/test_canonical_inference.py::test_same_dimension_values_are_layout_free_conflict`.
+  Satisfaction is exactly
+  `slot_anchor_at_pressure_dimension_equals_pressure_value`.
+  - Evidence: R1; `tests/test_canonical_inference.py::test_duplicate_witnesses_facts_components_and_paths_normalize_to_one_pressure`; `tests/test_canonical_inference.py::test_same_dimension_values_are_layout_free_conflict`; `tests/test_runtime_contract_v2.py::test_engine_semantic_strategies_are_closed_exact_values`.
 
 - [x] **The optimizer uses the exact lexicographic contract.**
   - Evidence: R1; `tests/test_canonical_optimizer.py::test_pressure_maximum_precedes_balance_and_keeps_only_maximum_slots`; `tests/test_canonical_optimizer.py::test_exact_squared_load_balance_is_unbounded_and_stable_by_item_id`; `tests/test_canonical_optimizer.py::test_bounded_randomized_results_match_independent_cartesian_oracle`; `planner/canonical_optimizer.py`.
@@ -78,7 +82,9 @@ answer.
   - Evidence: R1; `tests/test_ontology_runtime_loader.py::test_runtime_bundle_retains_no_formal_projection_artifacts_or_reads`; `planner/ontology/artifacts.py`; `planner/ontology/projection.py`.
 
 - [x] **Validation commands are read-only; repair is explicit and failure-safe.**
-  - Evidence: R1; `tests/test_maintenance.py::test_check_succeeds_without_mutating_canonical_inputs`; `tests/test_maintenance.py::test_show_and_review_do_not_mutate_authored_inputs`; `tests/test_maintenance.py::test_run_maintenance_rolls_back_on_partial_stage_failure`.
+  Authored inputs remain read-only; `show` recomputes and overwrites the
+  disposable derived `schedule.yaml` without reading a prior schedule.
+  - Evidence: R1; `tests/test_maintenance.py::test_check_succeeds_without_mutating_canonical_inputs`; `tests/test_maintenance.py::test_show_and_review_do_not_mutate_authored_inputs`; `tests/test_canonical_publication.py::test_writer_does_not_accept_forged_projection_or_precomputed_optimal`; `tests/test_maintenance.py::test_run_maintenance_rolls_back_on_partial_stage_failure`.
 
 ## Medium — product and data integrity
 
@@ -89,7 +95,7 @@ answer.
   - Evidence: R1; `tests/test_pillbox_loader_contract.py::test_loader_rejects_multiple_pillboxes_for_one_stack`; `tests/test_logical_slot_topology.py::test_distinct_topologies_keep_distinct_stack_references`.
 
 - [x] **Non-daily presentation is truthful without adding recurrence semantics.**
-  - Evidence: R1; `tests/test_non_daily_presentation.py::test_marked_daily_product_is_an_episodic_current_plan_placement`; `tests/test_canonical_publication.py::test_show_marks_only_balance_only_product_in_mixed_slot`.
+  - Evidence: R1; `tests/test_non_daily_presentation.py::test_marked_daily_product_is_an_episodic_current_plan_placement`; `planner/engine/show.py`.
 
 - [x] **Grooming exposes canonical coverage work without becoming plan input.**
   - Evidence: R1; `tests/test_grooming.py::test_receipt_catalog_closes_the_real_active_queue`; `tests/test_grooming.py::test_receipts_are_operational_and_not_a_plan_runtime_input`; `planner/engine/grooming.py`.
@@ -97,8 +103,8 @@ answer.
 - [x] **Form-specific evidence is bound to composition roles; universal evidence remains universal.**
   - Evidence: R1; `tests/test_canonical_inference.py::test_substance_applicability_reaches_each_exact_matching_role`; `tests/test_canonical_fact_catalog_integration.py::test_canonical_reference_validator_accepts_matching_composition_role_fact`.
 
-- [x] **Catalog and reference boundaries fail closed.**
-  - Evidence: R1; `tests/test_read_model_relations.py::test_read_model_and_direct_classifier_reject_incomplete_references`; `tests/test_canonical_fact_catalog_integration.py::test_plan_inputs_rejects_full_canonical_scheduling_before_relation_processing`.
+- [x] **Catalog, strict runtime-envelope, and canonical-ID boundaries fail closed.**
+  - Evidence: R1; `tests/test_read_model_relations.py::test_read_model_and_direct_classifier_reject_incomplete_references`; `tests/test_canonical_fact_catalog_integration.py::test_plan_inputs_rejects_full_canonical_scheduling_before_relation_processing`; `tests/test_runtime_contract_v2.py::test_runtime_envelope_and_canonical_ids_fail_closed`.
 
 ## Medium — verification workflow
 
@@ -146,20 +152,20 @@ answer.
 
 - [ ] **Independent Sol panel.** Confirm the canonical-runtime contract and
   return `SHIP` without Critical, High, or Medium reservations.
-  - Pending on `0725a996f8756d4d0873bf13f32ec26af970e804`: no independent
+  - Pending on `c766f7c9ca24c082b65f3afefefd4e493b760ec8`: no independent
     final Sol-panel report is recorded in `docs/decisions/`.
 
 - [ ] **Fresh-context final auditor.** Inspect this exact runtime candidate,
   validate every checked record and R1, then save per-item verdicts and a final
   `COMPLETE` or `INCOMPLETE` decision in `docs/decisions/`.
-  - Pending on `0725a996f8756d4d0873bf13f32ec26af970e804`: no fresh-context
+  - Pending on `c766f7c9ca24c082b65f3afefefd4e493b760ec8`: no fresh-context
     final-auditor report with `COMPLETE` exists.
 
 - [ ] **Repeated same-optics convergence.** Re-run the original product,
   ontology, architecture, portability, data-loss, and complexity optics against
   this candidate, this checklist, and the fresh-context audit; record whether
   the work is converging and return `SHIP` only with no actionable reservation.
-  - Pending on `0725a996f8756d4d0873bf13f32ec26af970e804`: no same-optics
+  - Pending on `c766f7c9ca24c082b65f3afefefd4e493b760ec8`: no same-optics
     convergence report with `SHIP` exists.
 
 The cutover remains open until all three holds are independently closed.
