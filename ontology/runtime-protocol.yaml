@@ -12,16 +12,6 @@ imports:
   - model
 
 enums:
-  ConstraintExecutionOperation:
-    permissible_values:
-      separate_products_same_slot:
-  ConstraintExecutionAggregation:
-    permissible_values:
-      distinct_constraint:
-  ConstraintExecutionMatchDirection:
-    permissible_values:
-      symmetric:
-      directed:
   RelationWarningFilterField:
     permissible_values:
       assertion_kind:
@@ -40,6 +30,10 @@ enums:
     permissible_values:
       ascending:
       descending:
+  PublicationStatus:
+    permissible_values:
+      Optimal:
+      Indeterminate:
 classes:
   Condition:
     slots: [operator, field, value, values, conditions, selector, left, right]
@@ -49,19 +43,16 @@ classes:
       left: {inlined: true}
       right: {inlined: true}
   Action:
-    slots: [operator, field, value, weight, trace_key]
+    slots: [operator, field, value, trace_key]
   RuntimePolicyCatalog:
     description: Typed executable policy contract consumed by planner runtime.
-    slots: [id, engine_contract, glue_contract, source_kind_values, effect_match_dimensions, assignment_axes, slot_near_values, constraint_execution_policies, effect_scoring, prefer_with_policy, warning_types, warning_emitters, warning_trait_actions, concern_catalog, relation_warning_rules, relation_presence_statuses, selector_form_capabilities, dashboard_state_catalog, grooming_policy, runtime_projection]
+    slots: [id, engine_contract, glue_contract, source_kind_values, effect_match_dimensions, assignment_axes, slot_near_values, warning_types, warning_emitters, warning_trait_actions, concern_catalog, relation_warning_rules, relation_presence_statuses, selector_form_capabilities, dashboard_state_catalog, grooming_policy, runtime_projection]
     slot_usage:
       source_kind_values: {required: true, inlined: true, inlined_as_list: true}
       engine_contract: {required: true, inlined: true}
       effect_match_dimensions: {required: true, inlined: true, inlined_as_list: true}
       assignment_axes: {required: true, inlined: true, inlined_as_list: true}
       slot_near_values: {required: true, multivalued: true}
-      constraint_execution_policies: {required: true, inlined: true, inlined_as_list: true}
-      effect_scoring: {required: true, inlined: true}
-      prefer_with_policy: {required: true, inlined: true}
       warning_types: {required: true, inlined: true, inlined_as_list: true}
       warning_emitters: {required: true, inlined: true, inlined_as_list: true}
       warning_trait_actions: {required: true, inlined: true, inlined_as_list: true}
@@ -86,9 +77,6 @@ classes:
       - relation_endpoint_selector_kinds
       - relation_selector_forms
       - warning_emitter_ids
-      - prefer_with_source_fields
-      - prefer_with_target_resolutions
-      - prefer_with_pair_modes
     slot_usage:
       id: {required: true}
       inactive_stack_name: {required: true}
@@ -101,16 +89,19 @@ classes:
       relation_endpoint_selector_kinds: {required: true, multivalued: true}
       relation_selector_forms: {required: true, multivalued: true}
       warning_emitter_ids: {required: true, multivalued: true}
-      prefer_with_source_fields: {required: true, multivalued: true}
-      prefer_with_target_resolutions: {required: true, multivalued: true}
-      prefer_with_pair_modes: {required: true, multivalued: true}
   RuntimeEngineContract:
     description: Versioned observable scheduler contract. Values describe the generic execution protocol; they are not supplement facts.
-    slots: [id, protocol_version, result_mode, semantics, conformance_scenarios]
+    slots: [id, protocol_version, result_mode, pressure_identity, domain_feasibility, primary_objective, secondary_objective, tie_break, publication_statuses, semantics, conformance_scenarios]
     slot_usage:
       id: {required: true}
       protocol_version: {required: true}
       result_mode: {required: true}
+      pressure_identity: {required: true, multivalued: true}
+      domain_feasibility: {required: true}
+      primary_objective: {required: true}
+      secondary_objective: {required: true}
+      tie_break: {required: true}
+      publication_statuses: {required: true, multivalued: true, range: PublicationStatus}
       semantics: {required: true, inlined: true, inlined_as_list: true}
       conformance_scenarios: {required: true, inlined: true, inlined_as_list: true}
   RuntimeEngineSemantic:
@@ -149,35 +140,6 @@ classes:
       assignment_field: {required: true}
       minimum_cardinality: {required: true}
       maximum_cardinality: {required: true}
-  RuntimeEffectScore:
-    slots: [id, level, score]
-    slot_usage: {level: {required: true}, score: {required: true}}
-  RuntimeEffectScoringPolicy:
-    slots: [id, aggregation_mode, objective_function, balance_penalty_expression, tie_break, scores, balance_weight, prefer_with_bonus]
-    slot_usage:
-      aggregation_mode: {required: true}
-      objective_function: {required: true}
-      balance_penalty_expression: {required: true}
-      tie_break: {required: true}
-      scores: {required: true, inlined: true, inlined_as_list: true}
-      balance_weight: {required: true}
-      prefer_with_bonus: {required: true}
-  RuntimePreferWithPolicy:
-    slots: [id, source_field, target_resolution, pair_mode]
-    slot_usage:
-      source_field: {required: true}
-      target_resolution: {required: true}
-      pair_mode: {required: true}
-  RuntimeConstraintExecutionPolicy:
-    slots: [id, operation, match_direction, aggregation, selector_resolution, blocks_slots, scores_advisory, score_delta]
-    slot_usage:
-      operation: {required: true, range: ConstraintExecutionOperation}
-      match_direction: {required: true, range: ConstraintExecutionMatchDirection}
-      aggregation: {required: true, range: ConstraintExecutionAggregation}
-      selector_resolution: {required: true}
-      blocks_slots: {required: true}
-      scores_advisory: {required: true}
-      score_delta: {required: true}
   RuntimeWarningTypePolicy:
     slots: [id, warning_type, label, action_text]
     slot_usage: {warning_type: {required: true}, label: {required: true}, action_text: {required: true}}
@@ -269,10 +231,11 @@ classes:
 slots:
   id: {identifier: true, required: true}
   operator: {required: true}
-  operation: {range: ConstraintExecutionOperation}
-  match_direction: {range: ConstraintExecutionMatchDirection}
-  aggregation: {range: ConstraintExecutionAggregation}
-  selector_resolution:
+  # These fields belong to source SchedulingConstraintRecord data imported by
+  # scheduling-model.yaml.  RuntimePolicyCatalog does not admit or project
+  # them, so the online v2 engine cannot execute pair blocking or advisory
+  # scoring from this schema surface.
+  operation:
   blocks_slots: {range: boolean}
   scores_advisory: {range: boolean}
   score_delta: {range: integer}
@@ -283,7 +246,6 @@ slots:
   selector: {range: Selector, inlined: false}
   left: {range: Condition, inlined: true}
   right: {range: Condition, inlined: true}
-  weight: {range: decimal}
   trace_key:
   condition: {range: Condition, inlined: true}
   key:
@@ -295,13 +257,6 @@ slots:
   minimum_cardinality: {range: integer}
   maximum_cardinality: {range: integer}
   source_kind_values: {multivalued: true, range: RuntimeSourceKindValuePolicy, inlined: true, inlined_as_list: true}
-  constraint_execution_policies: {multivalued: true, range: RuntimeConstraintExecutionPolicy, inlined: true, inlined_as_list: true}
-  effect_scoring: {range: RuntimeEffectScoringPolicy, inlined: true}
-  aggregation_mode:
-  objective_function:
-  balance_penalty_expression:
-  tie_break:
-  prefer_with_policy: {range: RuntimePreferWithPolicy, inlined: true}
   effect_match_dimensions: {multivalued: true, range: RuntimeEffectMatchDimensionPolicy, inlined: true, inlined_as_list: true}
   warning_types: {multivalued: true, range: RuntimeWarningTypePolicy, inlined: true, inlined_as_list: true}
   warning_emitters: {multivalued: true, range: RuntimeWarningEmitterPolicy, inlined: true, inlined_as_list: true}
@@ -325,11 +280,14 @@ slots:
   relation_endpoint_selector_kinds: {multivalued: true}
   relation_selector_forms: {multivalued: true}
   warning_emitter_ids: {multivalued: true}
-  prefer_with_source_fields: {multivalued: true}
-  prefer_with_target_resolutions: {multivalued: true}
-  prefer_with_pair_modes: {multivalued: true}
   protocol_version:
   result_mode:
+  pressure_identity: {multivalued: true}
+  domain_feasibility:
+  primary_objective:
+  secondary_objective:
+  tie_break:
+  publication_statuses: {multivalued: true}
   semantics: {multivalued: true, range: RuntimeEngineSemantic, inlined: true, inlined_as_list: true}
   conformance_scenarios: {multivalued: true, range: RuntimeEngineConformanceScenario, inlined: true, inlined_as_list: true}
   category:
@@ -349,18 +307,12 @@ slots:
   target:
   source:
   children: {multivalued: true, range: RuntimeProjectionDescriptor, inlined: true, inlined_as_list: true}
-  executable: {range: boolean}
   assignment_source:
   assignment_field:
   order: {range: integer}
-  scores: {multivalued: true, range: RuntimeEffectScore, inlined: true, inlined_as_list: true}
+  # Source-facing scheduling-policy review metadata.  It is not part of the
+  # RuntimePolicyCatalog projection or the online v2 objective.
   level:
-  score: {range: integer}
-  balance_weight: {range: decimal, minimum_value: 0}
-  prefer_with_bonus: {range: integer, minimum_value: 0}
-  source_field:
-  target_resolution:
-  pair_mode:
   value_type:
   slot_near_values: {multivalued: true}
   near:

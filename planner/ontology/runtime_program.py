@@ -16,32 +16,11 @@ from planner.ontology.glue_capabilities import (
     relation_presence_active_side,
 )
 
-IMPLEMENTED_OBJECTIVE_FUNCTION = "slot_score_plus_prefer_with_minus_quadratic_balance_penalty"
-IMPLEMENTED_BALANCE_PENALTY_EXPRESSION = "balance_weight * sum(slot_count^2)"
-IMPLEMENTED_TIE_BREAK = "stable_slot_order"
-IMPLEMENTED_AGGREGATION_MODE = "sum_unique_component_assignments"
+IMPLEMENTED_TIE_BREAK = "stable_item_id_then_(slot.order,slot_id)"
 
 
 def _error(label: str, message: str) -> OntologyInfrastructureError:
     return OntologyInfrastructureError(f"runtime program {label} {message}", code=MALFORMED)
-
-
-def _validate_effect_scoring_interlock(effect_scoring: RuntimeEffectScoring) -> None:
-    """Fail while decoding when the compiled ontology requests unsupported search math."""
-    if (
-        effect_scoring.aggregation_mode != IMPLEMENTED_AGGREGATION_MODE
-        or effect_scoring.objective_function != IMPLEMENTED_OBJECTIVE_FUNCTION
-        or effect_scoring.balance_penalty_expression != IMPLEMENTED_BALANCE_PENALTY_EXPRESSION
-        or effect_scoring.tie_break != IMPLEMENTED_TIE_BREAK
-    ):
-        raise _error(
-            "effect_scoring",
-            "declares an objective not implemented by planner search: "
-            f"objective_function={effect_scoring.objective_function!r}, "
-            f"aggregation_mode={effect_scoring.aggregation_mode!r}, "
-            f"balance_penalty_expression={effect_scoring.balance_penalty_expression!r}, "
-            f"tie_break={effect_scoring.tie_break!r}",
-        )
 
 
 def _map(value: object, label: str) -> Mapping[str, object]:
@@ -94,19 +73,6 @@ def _cardinality(value: object, label: str) -> int | None:
     if value is None:
         return None
     return _nonnegative_int(value, label)
-
-
-def _number(value: object, label: str) -> float | int:
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
-        raise _error(label, "must be a number")
-    return value
-
-
-def _nonnegative_number(value: object, label: str) -> float | int:
-    result = _number(value, label)
-    if result < 0:
-        raise _error(label, "must be a non-negative number")
-    return result
 
 
 def _rows(
@@ -195,9 +161,6 @@ class RuntimeGlueContract:
     relation_endpoint_selector_kinds: tuple[str, ...]
     relation_selector_forms: tuple[str, ...]
     warning_emitter_ids: tuple[str, ...]
-    prefer_with_source_fields: tuple[str, ...]
-    prefer_with_target_resolutions: tuple[str, ...]
-    prefer_with_pair_modes: tuple[str, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -227,12 +190,24 @@ class RuntimeEngineContract:
     id: str
     protocol_version: str
     result_mode: str
+    pressure_identity: tuple[str, ...]
+    domain_feasibility: str
+    primary_objective: str
+    secondary_objective: str
+    tie_break: str
+    publication_statuses: tuple[str, ...]
     semantics: tuple[RuntimeEngineSemantic, ...]
     conformance_scenarios: tuple[RuntimeEngineConformanceScenario, ...]
 
 
-IMPLEMENTED_ENGINE_CONTRACT_PROTOCOL = "supp-slotter.engine-contract/v1"
+IMPLEMENTED_ENGINE_CONTRACT_PROTOCOL = "supp-slotter.engine-contract/v2"
 IMPLEMENTED_ENGINE_RESULT_MODES = frozenset({"exact_assignment"})
+IMPLEMENTED_PRESSURE_IDENTITY = ("item_id", "dimension", "value")
+IMPLEMENTED_DOMAIN_FEASIBILITY = "unbounded_logical_domain"
+IMPLEMENTED_PRIMARY_OBJECTIVE = "maximize_unique_pressure_satisfaction"
+IMPLEMENTED_SECONDARY_OBJECTIVE = "minimize_integer_squared_load_per_domain"
+IMPLEMENTED_ENGINE_TIE_BREAK = IMPLEMENTED_TIE_BREAK
+IMPLEMENTED_PUBLICATION_STATUSES = ("Optimal", "Indeterminate")
 
 
 @dataclass(frozen=True, slots=True)
@@ -259,49 +234,6 @@ class RuntimeAssignmentAxis:
     assignment_field: str
     minimum_cardinality: int
     maximum_cardinality: int | None
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeEffectScore:
-    id: str
-    level: str
-    score: float | int
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeEffectScoring:
-    id: str
-    aggregation_mode: str
-    scores: tuple[RuntimeEffectScore, ...]
-    objective_function: str
-    balance_penalty_expression: str
-    tie_break: str
-    balance_weight: float | int
-    prefer_with_bonus: int
-
-    @property
-    def scores_by_level(self) -> Mapping[str, RuntimeEffectScore]:
-        return MappingProxyType({row.level: row for row in self.scores})
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimePreferWithPolicy:
-    id: str
-    source_field: str
-    target_resolution: str
-    pair_mode: str
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeConstraintExecutionPolicy:
-    id: str
-    operation: str
-    match_direction: str
-    aggregation: str
-    selector_resolution: str
-    blocks_slots: bool
-    scores_advisory: bool
-    score_delta: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -575,9 +507,6 @@ class RuntimeProgram:
     assignment_axes: tuple[RuntimeAssignmentAxis, ...]
     slot_near_values: tuple[str, ...]
     effect_match_dimensions: tuple[RuntimeEffectMatchDimension, ...]
-    effect_scoring: RuntimeEffectScoring
-    prefer_with_policy: RuntimePreferWithPolicy
-    constraint_execution_policies: tuple[RuntimeConstraintExecutionPolicy, ...]
     warning_types: tuple[RuntimeWarningTypePolicy, ...]
     warning_emitters: tuple[RuntimeWarningEmitterPolicy, ...]
     warning_trait_actions: tuple[RuntimeWarningTraitAction, ...]
@@ -589,10 +518,6 @@ class RuntimeProgram:
     grooming_policy: RuntimeGroomingPolicy
     canonical_fact_catalog: RuntimeCanonicalFactCatalog
     canonical_laws: tuple[RuntimeCanonicalLaw, ...]
-
-    @property
-    def effect_score_levels(self) -> frozenset[str]:
-        return frozenset(item.level for item in self.effect_scoring.scores)
 
     @property
     def effect_match_dimensions_by_key(self) -> Mapping[str, RuntimeEffectMatchDimension]:
@@ -626,9 +551,6 @@ class RuntimeProgram:
     def concern_warning_catalog_by_kind(self) -> Mapping[str, str]:
         return MappingProxyType({item.concern_kind: item.warning_type for item in self.concern_catalog})
 
-    def constraint_execution_policy_for(self, operation: str) -> RuntimeConstraintExecutionPolicy | None:
-        return next((item for item in self.constraint_execution_policies if item.operation == operation), None)
-
 
 # This is technical dispatch metadata, not an authored domain vocabulary.  The
 # compiler imports it to validate the descriptor tree, while the decoder uses
@@ -640,13 +562,9 @@ _PROJECTION_RECORDS: Mapping[str, type[object]] = {
     "engine_contract.semantics": RuntimeEngineSemantic,
     "engine_contract.conformance_scenarios": RuntimeEngineConformanceScenario,
     "glue_contract": RuntimeGlueContract,
-    "effect_scoring": RuntimeEffectScoring,
-    "prefer_with_policy": RuntimePreferWithPolicy,
     "source_kind_values": RuntimeSourceKindValuePolicy,
     "assignment_axes": RuntimeAssignmentAxis,
     "effect_match_dimensions": RuntimeEffectMatchDimension,
-    "effect_scoring.scores": RuntimeEffectScore,
-    "constraint_execution_policies": RuntimeConstraintExecutionPolicy,
     "warning_types": RuntimeWarningTypePolicy,
     "warning_emitters": RuntimeWarningEmitterPolicy,
     "warning_trait_actions": RuntimeWarningTraitAction,
@@ -674,8 +592,6 @@ _PROJECTION_RECORDS: Mapping[str, type[object]] = {
 _MAPPING_RECORD_PATHS = frozenset({
     "engine_contract",
     "glue_contract",
-    "effect_scoring",
-    "prefer_with_policy",
     "dashboard_state_catalog",
     "grooming_policy",
     "canonical_fact_catalog",
@@ -775,25 +691,6 @@ def _dimension(row: Mapping[str, object], label: str) -> RuntimeEffectMatchDimen
         _str(row["key"], f"{label}.key"),
         _str(row["slot_field"], f"{label}.slot_field"),
         _str(row["value_type"], f"{label}.value_type"),
-    )
-
-
-def _policy(row: Mapping[str, object], label: str) -> RuntimeConstraintExecutionPolicy:
-    return RuntimeConstraintExecutionPolicy(
-        _str(row["id"], f"{label}.id"),
-        _str(row["operation"], f"{label}.operation"),
-        _str(row["match_direction"], f"{label}.match_direction"),
-        _str(row["aggregation"], f"{label}.aggregation"),
-        _str(row["selector_resolution"], f"{label}.selector_resolution"),
-        _bool(row["blocks_slots"], f"{label}.blocks_slots"),
-        _bool(row["scores_advisory"], f"{label}.scores_advisory"),
-        _int(row["score_delta"], f"{label}.score_delta"),
-    )
-
-
-def _score(row: Mapping[str, object], label: str) -> RuntimeEffectScore:
-    return RuntimeEffectScore(
-        _str(row["id"], f"{label}.id"), _str(row["level"], f"{label}.level"), _number(row["score"], f"{label}.score")
     )
 
 
@@ -1296,6 +1193,12 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         _str(engine_raw["id"], "engine_contract.id"),
         _str(engine_raw["protocol_version"], "engine_contract.protocol_version"),
         _str(engine_raw["result_mode"], "engine_contract.result_mode"),
+        _strings(engine_raw["pressure_identity"], "engine_contract.pressure_identity"),
+        _str(engine_raw["domain_feasibility"], "engine_contract.domain_feasibility"),
+        _str(engine_raw["primary_objective"], "engine_contract.primary_objective"),
+        _str(engine_raw["secondary_objective"], "engine_contract.secondary_objective"),
+        _str(engine_raw["tie_break"], "engine_contract.tie_break"),
+        _strings(engine_raw["publication_statuses"], "engine_contract.publication_statuses"),
         cast(tuple[RuntimeEngineSemantic, ...], engine_semantics),
         cast(tuple[RuntimeEngineConformanceScenario, ...], engine_scenarios),
     )
@@ -1308,6 +1211,24 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         raise _error(
             "engine_contract.result_mode",
             f"is not implemented: {engine_contract.result_mode!r}",
+        )
+    if engine_contract.pressure_identity != IMPLEMENTED_PRESSURE_IDENTITY:
+        raise _error(
+            "engine_contract.pressure_identity",
+            "must be the unique (item_id, dimension, value) identity",
+        )
+    if engine_contract.domain_feasibility != IMPLEMENTED_DOMAIN_FEASIBILITY:
+        raise _error("engine_contract.domain_feasibility", "must declare unbounded logical domains")
+    if engine_contract.primary_objective != IMPLEMENTED_PRIMARY_OBJECTIVE:
+        raise _error("engine_contract.primary_objective", "must maximize unique pressure satisfaction")
+    if engine_contract.secondary_objective != IMPLEMENTED_SECONDARY_OBJECTIVE:
+        raise _error("engine_contract.secondary_objective", "must minimize integer squared load per domain")
+    if engine_contract.tie_break != IMPLEMENTED_ENGINE_TIE_BREAK:
+        raise _error("engine_contract.tie_break", "must use stable item ID and slot order")
+    if engine_contract.publication_statuses != IMPLEMENTED_PUBLICATION_STATUSES:
+        raise _error(
+            "engine_contract.publication_statuses",
+            "must exactly be the closed Optimal/Indeterminate statuses",
         )
     scenario_semantics = {row.semantic for row in engine_scenarios}
     missing_scenario_semantics = sorted(semantic_ids - scenario_semantics)
@@ -1333,9 +1254,6 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         _strings(glue_raw["relation_endpoint_selector_kinds"], "glue_contract.relation_endpoint_selector_kinds"),
         _strings(glue_raw["relation_selector_forms"], "glue_contract.relation_selector_forms"),
         _strings(glue_raw["warning_emitter_ids"], "glue_contract.warning_emitter_ids"),
-        _strings(glue_raw["prefer_with_source_fields"], "glue_contract.prefer_with_source_fields"),
-        _strings(glue_raw["prefer_with_target_resolutions"], "glue_contract.prefer_with_target_resolutions"),
-        _strings(glue_raw["prefer_with_pair_modes"], "glue_contract.prefer_with_pair_modes"),
     )
     glue_capabilities: Mapping[str, tuple[str, ...]] = {
         "source_kind_roles": glue.source_kind_roles,
@@ -1345,48 +1263,13 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         "relation_endpoint_selector_kinds": glue.relation_endpoint_selector_kinds,
         "relation_selector_forms": glue.relation_selector_forms,
         "warning_emitter_ids": glue.warning_emitter_ids,
-        "prefer_with_source_fields": glue.prefer_with_source_fields,
-        "prefer_with_target_resolutions": glue.prefer_with_target_resolutions,
-        "prefer_with_pair_modes": glue.prefer_with_pair_modes,
     }
     for field_name, expected in IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS.items():
+        if field_name not in glue_capabilities:
+            continue
         actual = glue_capabilities[field_name]
         if actual != expected:
             raise _error(f"glue_contract.{field_name}", "must exactly match executable capabilities")
-    scoring = _exact_map(
-        projection.get("effect_scoring"), "effect_scoring", RUNTIME_PROJECTION_FIELDS["effect_scoring"]
-    )
-    scoring_obj = RuntimeEffectScoring(
-        _str(scoring["id"], "effect_scoring.id"),
-        _str(scoring["aggregation_mode"], "effect_scoring.aggregation_mode"),
-        cast(
-            tuple[RuntimeEffectScore, ...],
-            _typed_rows(
-                scoring["scores"],
-                "effect_scoring.scores",
-                _score,
-                semantic_keys=(("level",),),
-                fields=RUNTIME_PROJECTION_ROW_FIELDS["effect_scoring.scores"],
-            ),
-        ),
-        _str(scoring["objective_function"], "effect_scoring.objective_function"),
-        _str(scoring["balance_penalty_expression"], "effect_scoring.balance_penalty_expression"),
-        _str(scoring["tie_break"], "effect_scoring.tie_break"),
-        _nonnegative_number(scoring["balance_weight"], "effect_scoring.balance_weight"),
-        _nonnegative_int(scoring["prefer_with_bonus"], "effect_scoring.prefer_with_bonus"),
-    )
-    _validate_effect_scoring_interlock(scoring_obj)
-    prefer = _exact_map(
-        projection.get("prefer_with_policy"),
-        "prefer_with_policy",
-        RUNTIME_PROJECTION_FIELDS["prefer_with_policy"],
-    )
-    prefer_obj = RuntimePreferWithPolicy(
-        _str(prefer["id"], "prefer_with_policy.id"),
-        _str(prefer["source_field"], "prefer_with_policy.source_field"),
-        _str(prefer["target_resolution"], "prefer_with_policy.target_resolution"),
-        _str(prefer["pair_mode"], "prefer_with_policy.pair_mode"),
-    )
     source_kind_values = _typed_rows(
         projection["source_kind_values"],
         "source_kind_values",
@@ -1412,13 +1295,6 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         _dimension,
         semantic_keys=(("key",), ("slot_field",)),
         fields=RUNTIME_PROJECTION_ROW_FIELDS["effect_match_dimensions"],
-    )
-    constraint_execution_policies = _typed_rows(
-        projection["constraint_execution_policies"],
-        "constraint_execution_policies",
-        _policy,
-        semantic_keys=(("operation",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["constraint_execution_policies"],
     )
     warning_types = _typed_rows(
         projection["warning_types"],
@@ -1543,9 +1419,6 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         assignment_axes,
         slot_near_values,
         effect_match_dimensions,
-        scoring_obj,
-        prefer_obj,
-        constraint_execution_policies,
         warning_types,
         warning_emitters,
         warning_trait_actions,

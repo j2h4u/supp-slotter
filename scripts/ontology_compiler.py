@@ -893,7 +893,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         manifest,
         terms,
         schema_view,
-        runtime.constraints.selector_kinds,
+        set(IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS),
         relation_types,
         _load_substance_identity_registry(ontology_root),
     )
@@ -2123,7 +2123,6 @@ _RUNTIME_SEMANTIC_KEYS: Mapping[str, tuple[tuple[str, ...], ...]] = {
     "source_kind_values": (("source_kind",),),
     "effect_match_dimensions": (("key",), ("slot_field",)),
     "assignment_axes": (("axis",), ("order",)),
-    "constraint_execution_policies": (("operation",),),
     "warning_types": (("warning_type",),),
     "warning_emitters": (("emitter",),),
     "warning_trait_actions": (("trait_id",),),
@@ -2159,12 +2158,6 @@ def _validate_runtime_semantic_keys(
 
 
 @dataclass(frozen=True)
-class _ConstraintRuntime:
-    execution_policies: Mapping[str, Mapping[str, object]]
-    selector_kinds: set[str]
-
-
-@dataclass(frozen=True)
 class _PolicyRuntime:
     authored: dict[str, object]
     assignment_axes: set[str]
@@ -2172,7 +2165,6 @@ class _PolicyRuntime:
     score_levels: set[str]
     effect_match_dimensions: Mapping[str, str]
     effect_match_slot_fields: Mapping[str, str]
-    constraints: _ConstraintRuntime
 
 
 @dataclass(frozen=True)
@@ -2188,16 +2180,15 @@ def _load_runtime_policy(
 ) -> _PolicyRuntime:
     source = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "runtime_policy"))
     _validate_linkml_instance(schema_view, "RuntimePolicyCatalog", source)
-    required_mappings = ("glue_contract", "effect_scoring", "prefer_with_policy")
+    required_mappings = ("glue_contract",)
     if any(not isinstance(source.get(key), dict) for key in required_mappings):
-        raise OntologyInfrastructureError("Runtime policy requires glue_contract, scoring, and preferences")
+        raise OntologyInfrastructureError("Runtime policy requires glue_contract")
     records = {
         key: _runtime_records(source, key)
         for key in (
             "source_kind_values",
             "effect_match_dimensions",
             "assignment_axes",
-            "constraint_execution_policies",
             "warning_types",
             "warning_emitters",
             "warning_trait_actions",
@@ -2217,15 +2208,10 @@ def _load_runtime_policy(
     _validate_runtime_source_kind_contract(
         cast(Mapping[str, object], source["glue_contract"]), records["source_kind_values"]
     )
-    scoring = cast(Mapping[str, object], source["effect_scoring"])
-    scores = scoring.get("scores")
-    if not isinstance(scores, list) or not scores:
-        raise OntologyInfrastructureError("Runtime effect_scoring requires non-empty scores")
-    score_levels = {
-        _required_string(cast(Mapping[str, object], row), "level")
-        for row in cast(list[object], scores)
-        if isinstance(row, Mapping)
-    }
+    # Policy effect levels remain source-facing review metadata.  They are
+    # intentionally not loaded into the online runtime objective: the v2
+    # contract has no score magnitudes, weights, bonuses, or penalties.
+    score_levels: set[str] = set()
     assignment_axes = {_required_string(row, "axis") for row in records["assignment_axes"]}
     raw_near_values = source.get("slot_near_values")
     if (
@@ -2253,11 +2239,6 @@ def _load_runtime_policy(
             )
         effect_match_dimensions[key] = _required_string(row, "value_type")
         effect_match_slot_fields[key] = slot_field
-    execution = {_required_string(row, "operation"): row for row in records["constraint_execution_policies"]}
-    # Endpoint selector kinds are execution grammar.  Keep this closed over
-    # the runtime glue registry; decorative kinds must not enter the compiled
-    # ontology without an actual typed handler.
-    selector_kinds = set(IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS)
     selector_forms = tuple(_required_string(row, "selector_form") for row in records["selector_form_capabilities"])
     if selector_forms != IMPLEMENTED_RELATION_SELECTOR_FORMS:
         raise OntologyInfrastructureError(
@@ -2283,14 +2264,19 @@ def _load_runtime_policy(
         score_levels=score_levels,
         effect_match_dimensions=effect_match_dimensions,
         effect_match_slot_fields=effect_match_slot_fields,
-        constraints=_ConstraintRuntime(execution, selector_kinds),
     )
 
 
 def _validate_runtime_glue_contract(glue: Mapping[str, object]) -> None:
     if not glue:
         raise OntologyInfrastructureError("Runtime glue_contract must not be empty")
+    # Pair/preference capability rows belonged to the superseded weighted
+    # engine.  Keep the shared capability registry untouched for legacy
+    # consumers, but do not admit those fields into the online v2 projection.
+    removed = {"prefer_with_source_fields", "prefer_with_target_resolutions", "prefer_with_pair_modes"}
     for field, allowed in IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS.items():
+        if field in removed:
+            continue
         values = glue.get(field)
         if not isinstance(values, list) or tuple(values) != allowed:
             raise OntologyInfrastructureError(
@@ -2351,9 +2337,6 @@ def _validate_runtime_record_shapes(records: Mapping[str, Sequence[Mapping[str, 
             raise OntologyInfrastructureError("Runtime assignment axes require non-negative maximum_cardinality")
         if minimum is not None and maximum is not None and minimum > maximum:
             raise OntologyInfrastructureError("Runtime assignment axis minimum_cardinality exceeds maximum_cardinality")
-    for row in records["constraint_execution_policies"]:
-        if not isinstance(row.get("blocks_slots"), bool) or not isinstance(row.get("scores_advisory"), bool):
-            raise OntologyInfrastructureError("Runtime constraint execution policy booleans are required")
     boolean_fields = {
         "relation_warning_rules": ("reverse_output",),
         "relation_presence_statuses": ("source_active", "target_active"),
@@ -3509,7 +3492,7 @@ def _load_scheduling_constraints(
             if set(row) - allowed:
                 raise OntologyInfrastructureError(f"Scheduling constraint {identifier!r} has unsupported fields")
             operation = _required_string(row, "operation")
-            if operation not in policy_runtime.constraints.execution_policies:
+            if operation != "separate_products_same_slot":
                 raise OntologyInfrastructureError(f"Scheduling constraint {identifier!r} references unknown operation")
             normalized: dict[str, object] = {
                 "operation": operation,
@@ -3791,9 +3774,13 @@ def _load_substance_identity_registry(ontology_root: Path) -> dict[str, str]:
 def _normalize_policy_level(key: str, level: object, score_levels: set[str]) -> str | None:
     if level is None:
         return None
-    if level not in score_levels:
-        raise OntologyInfrastructureError(f"Policy {key!r} has invalid score level {level!r}")
-    return cast(str, level)
+    # Levels are retained as authored review/presentation annotations.  The
+    # online v2 engine never interprets them as numeric scores, so validating
+    # membership in an effect-scoring catalog would reintroduce the retired
+    # objective boundary.
+    if not isinstance(level, str) or not level.strip():
+        raise OntologyInfrastructureError(f"Policy {key!r} has invalid review level {level!r}")
+    return level
 
 
 def _read_custom_shapes(
