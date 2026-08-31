@@ -146,7 +146,7 @@ def test_annotation_and_manifest_ranges_admit_a_new_family_without_python_change
         },
     }
     scheduling_classes["IncidentalRecord"] = {"slots": ["id"]}
-    scheduling["enums"] = {"SyntheticEffectValue": {"permissible_values": {"helps": None}}}
+    cast(dict[str, object], scheduling["enums"])["SyntheticEffectValue"] = {"permissible_values": {"helps": None}}
     cast(dict[str, object], scheduling["slots"]).update({
         "synthetic_observations": {
             "multivalued": True,

@@ -1,0 +1,38 @@
+schema: actionable-scheduling-release-final/v1
+generated_at: 2026-08-31
+purpose: Exact-head receipt for the single final release-gate attempt.
+head:
+  branch: feature/actionable-scheduling-knowledge
+  sha: 77646e32914d6958bf92ee8a46c4ca7341409823
+  worktree_clean_before_gate: true
+  worktree_clean_after_gate: false
+  after_gate_change: this_receipt_only
+preflight:
+  active_bounded_gate_or_test_processes: none
+  unrelated_process_observed: omi-collector device sync (not a repository gate)
+command:
+  command: just release
+  invocation_count: 1
+  exit_status: 1
+  memory_limit_override: false
+  rerun: false
+stages:
+  - stage: check
+    result: passed
+    bounded: partial
+    output: format, lint, complexity, lock, basedpyright, import contracts, actionlint, supply-chain pins, deptry, compileall, and vulture passed
+  - stage: ontology-check
+    result: failed
+    substage: release ontology A pytest
+    summary: 36 passed, 1 failed in 112.67s
+blocker:
+  first_real_blocker: tests/test_canonical_fact_catalog_runtime.py::test_annotation_and_manifest_ranges_admit_a_new_family_without_python_changes
+  exception: planner.ontology.errors.OntologyInfrastructureError
+  message: Canonical enum ProductFoodInstructionValue has no closed values
+  location: scripts/ontology_compiler.py:_enum_values (line 1839 in traceback)
+  consequence: _release-unit stopped; CRAP, corpus projection, and later release stages did not run
+decision:
+  release_green: false
+  recovery_release_checkbox: unchecked
+  source_fix_attempted: false
+  push: false
