@@ -42,8 +42,12 @@ def test_loader_projects_independent_topology_fields(tmp_path: Path) -> None:
     "slot",
     (
         "order: 1\nmeal_context: without_food",
+        "label: Morning\nmeal_context: without_food",
         "label: ''\norder: 1\nmeal_context: without_food",
+        "label: 42\norder: 1\nmeal_context: without_food",
         "label: Morning\norder: nope\nmeal_context: without_food",
+        "label: Morning\norder: 0\nmeal_context: without_food",
+        "label: Morning\norder: true\nmeal_context: without_food",
         "label: Morning\norder: 1\nmeal_context: invalid",
     ),
 )
