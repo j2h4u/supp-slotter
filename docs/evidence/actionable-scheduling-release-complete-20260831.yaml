@@ -1,0 +1,52 @@
+schema: actionable-scheduling-release-complete/v1
+generated_at: 2026-08-31
+purpose: Exact-head receipt for the single release gate on the code-complete candidate.
+head:
+  branch: feature/actionable-scheduling-knowledge
+  sha: d3814ddce17e2ac7f14f11091cb3c8de48942647
+  worktree_clean_before_gate: true
+  worktree_clean_after_gate: false
+  after_gate_change: this_receipt_and_plan_checkbox_only
+preflight:
+  active_bounded_gate_or_test_processes: none
+  memory_limit_override: false
+command:
+  command: just release
+  invocation_count: 1
+  exit_status: 0
+  rerun: false
+stages:
+  - stage: static_and_quality_checks
+    result: passed
+    summary: format, lint, preview complexity lint, lock, basedpyright, import contracts, actionlint, supply-chain pins, deptry, compileall, vulture, and ontology generation check passed
+  - stage: smoke
+    result: passed
+    summary: 14 passed in 3.62s
+  - stage: ontology_contract_a
+    result: passed
+    summary: 37 passed in 136.63s
+  - stage: ontology_contract_b
+    result: passed
+    summary: 31 passed in 28.42s
+  - stage: ontology_contract_c
+    result: passed
+    summary: 54 passed in 55.81s
+  - stage: runtime_scenarios
+    result: passed
+    summary: 57 passed in 257.53s
+  - stage: crap
+    result: passed
+    summary: 244 passed in 192.54s; CRAP gate passed for 616 functions at threshold 30
+  - stage: ontology_check_benchmark
+    result: passed
+    summary: conforms true; total_seconds 132.544587; pyshacl_validation_seconds 129.024879
+  - stage: coverage_report
+    result: passed
+    summary: TOTAL 6690 statements, 82% coverage
+decision:
+  release_green: true
+  recovery_release_checkbox: checked
+  source_fix_attempted: false
+  push: false
+process_cleanup: release exited normally; no retry or additional gate was run
+date: 2026-08-31

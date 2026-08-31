@@ -130,8 +130,9 @@ review and do not silently satisfy an unchecked item below.
     so direct construction of an invalid publication object is outside the
     product boundary and requires no runtime change or test.
 
-- [ ] Run `just release` once only after the focused simplified-boundary
+- [x] Run `just release` once only after the focused simplified-boundary
   witnesses are green.
+  - Evidence: [release receipt](../evidence/actionable-scheduling-release-complete-20260831.yaml).
   - Evidence required: exact-head release receipt, stage results,
   corpus/quality output, and clean checkout.
 
