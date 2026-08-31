@@ -76,10 +76,14 @@ exactly one of these closed dispositions:
 | --- | --- | --- |
 | `pressure` | An individually adjudicated directed hypothesis with typed subject/applicability, provenance/research state, a closed fact or pairwise world-fact mechanism, and a universal-law path. | One derivable normalized pressure; it is never an authored placement. |
 | `neutral` | An assessed in-model candidate with no directed scheduling outcome. | None; it remains accountable in coverage. |
-| `unresolved_without_direction` | Evidence is incomplete and does not justify a directed hypothesis. | None; it remains visibly unresolved rather than silently neutral. |
+| `unresolved_without_direction` | Evidence is incomplete and does not justify a directed hypothesis. | None; it remains visibly research-open rather than silently neutral, but closes coverage for this exact candidate once its scope, provenance, and disposition validate. |
 | `outside_model` | A candidate excluded by one explicit closed reason. | None; it does not close unrelated candidates or dimensions. |
 
-Duplicate, missing, or mutually inconsistent dispositions are invalid. A
+Duplicate, missing, or mutually inconsistent dispositions are invalid. A valid
+`unresolved_without_direction` disposition is coverage-closed for its exact
+candidate, not neutral: later evidence may reopen research, but it does not
+make the current active shelf incomplete. Missing, unassessed, malformed, or
+stale candidate coverage remains incomplete. A
 directed hypothesis—including an anecdotal, mechanistic, or otherwise weak
 one—is not made a lower-weight signal: after individual semantic adjudication,
 it is one formal soft pressure through a typed fact and a universal law.
@@ -118,11 +122,16 @@ may carry a scheduling candidate.
 
 A coverage certificate is derived verification metadata, never an optimizer
 input or stored answer. For one active composition role it records the role,
-applicable dimensions, evaluated candidate IDs, exactly-one dispositions,
-required absence of directed pressure, and exact input hashes. It proves when a
-balance-only outcome is legitimate. A balance-only item may publish only with
-its complete current certificate; missing, stale, malformed, or incomplete
-coverage makes the whole result layout-free `Indeterminate`.
+applicable dimensions, exhaustive evaluated candidate IDs, exactly-one
+dispositions, each disposition's required evidence path, and exact input
+hashes. A valid `unresolved_without_direction` entry is shown explicitly as
+research-open and coverage-closed; it never becomes neutral or a pressure.
+The certificate proves that no unadjudicated directional candidate was omitted,
+not that no admitted pressure exists. A balance-and-tie-break-only explanation
+must also expose any unsatisfied admitted pressure rather than claiming that no
+direction exists. A balance-only item may publish only with its complete current
+certificate; missing, unassessed, stale, malformed, or incomplete coverage
+makes the whole result layout-free `Indeterminate`.
 
 ### Why the earlier V-model missed semantic coverage
 

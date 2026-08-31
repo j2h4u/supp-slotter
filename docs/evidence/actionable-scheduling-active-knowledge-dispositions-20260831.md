@@ -17,7 +17,7 @@ reachable composition role.
 | --- | ---: | --- |
 | `pressure` | 0 | No membership is itself an admitted scheduler fact or pairwise mechanism. |
 | `neutral` (`N`) | 146 | A world fact or review context was assessed; it contains no direction on a scheduling axis. |
-| `unresolved_without_direction` (`U`) | 24 | The exact assertion is `searched_insufficient` and records no direction. It remains visibly open. |
+| `unresolved_without_direction` (`U`) | 24 | The exact assertion is `searched_insufficient` and records no direction. It remains visibly research-open but coverage-closed for its exact membership once its scope, provenance, and disposition validate. |
 | `outside_model` (`O`) | 21 | Medication/safety/review material whose timing consequence would require prohibited clinical or treatment modelling. |
 
 The exact category accounting is:

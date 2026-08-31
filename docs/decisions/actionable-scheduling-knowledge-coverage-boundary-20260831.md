@@ -44,12 +44,14 @@ episodic, or training composition role has exactly one disposition:
 | --- | --- |
 | `pressure` | An individually adjudicated directed hypothesis with typed subject/applicability, provenance/research state, an admitted fact or pairwise world-fact mechanism, and a universal-law path. |
 | `neutral` | An assessed in-model candidate with no directed scheduling outcome. |
-| `unresolved_without_direction` | Evidence is incomplete and does not justify a directed hypothesis. |
+| `unresolved_without_direction` | Evidence is incomplete and does not justify a directed hypothesis. It is research-open but coverage-closed for this exact candidate once its scope, provenance, and disposition validate. |
 | `outside_model` | An explicitly reasoned closed exclusion with no scheduling effect. |
 
 No candidate may be missing, duplicated, mutually inconsistent, prose-only, or
-closed by a blanket `neutral`/`outside_model` decision. This ADR does not
-pre-adjudicate any actual candidate.
+closed by a blanket `neutral`/`outside_model` decision. A valid
+`unresolved_without_direction` disposition closes coverage without becoming
+neutral; missing, unassessed, malformed, or stale coverage does not. This ADR
+does not pre-adjudicate any actual candidate.
 
 After individual expert adjudication, every directed hypothesis—including
 anecdotal, mechanistic, or weak evidence—is one unweighted formal soft pressure
@@ -81,9 +83,14 @@ heuristic, compatibility field, migration runtime, or museum remains.
 
 A coverage certificate is derived verification metadata, not an optimizer input
 or stored answer. Per active composition role, it records applicable dimensions,
-evaluated candidate IDs, exactly-one dispositions, required absence of directed
-pressure, and exact input hashes. Only a complete current certificate permits a
-balance-only outcome. Missing, stale, or malformed coverage is layout-free
+the exhaustive evaluated candidate IDs, exactly-one dispositions, each
+disposition's required evidence path, and exact input hashes. A valid
+`unresolved_without_direction` entry remains explicit as research-open and
+coverage-closed; it is neither neutral nor a pressure. The certificate proves
+that no unadjudicated directional candidate was omitted, not that no admitted
+pressure exists; a balance-and-tie-break-only explanation exposes unsatisfied
+admitted pressures. Only a complete current certificate permits a balance-only
+outcome. Missing, unassessed, stale, or malformed coverage is layout-free
 `Indeterminate`.
 
 | V level | V-left contract | V-right acceptance evidence |
