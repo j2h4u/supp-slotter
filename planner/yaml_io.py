@@ -18,7 +18,7 @@ from yaml.nodes import MappingNode, SequenceNode
 
 from planner.contracts import CardLoadError
 
-type YamlScalar = None | bool | int | float | str
+type YamlScalar = bool | int | float | str | None
 type YamlValue = YamlScalar | list[YamlValue] | dict[str, YamlValue]
 
 

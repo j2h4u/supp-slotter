@@ -51,10 +51,10 @@ def substance_cluster_label(substances: dict[str, Substance], component: list[st
         display_names.setdefault(name_key, _substance_fallback_name(substance))
 
     if name_counts:
-        best_key = sorted(
+        best_key = min(
             name_counts,
             key=lambda key: (-name_counts[key], display_names[key].casefold()),
-        )[0]
+        )
         return display_names[best_key]
 
     return _substance_fallback_name(substances[component[0]])

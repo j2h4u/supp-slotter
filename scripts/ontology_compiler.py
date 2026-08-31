@@ -75,7 +75,7 @@ _ONTOCLEAN_RIGIDITY_VALUES = frozenset({"rigid", "anti_rigid"})
 _ONTOCLEAN_DEPENDENCE_VALUES = frozenset({"independent", "dependent"})
 
 type _RdfTriple = tuple[Node, Node, Node]
-type _JsonValue = str | int | float | bool | None | list[_JsonValue] | dict[str, _JsonValue]
+type _JsonValue = str | int | float | bool | list[_JsonValue] | dict[str, _JsonValue] | None
 type _JsonObject = dict[str, _JsonValue]
 
 
