@@ -166,10 +166,11 @@ review and do not silently satisfy an unchecked item below.
     for absence.
   - Evidence: [independent Kaizen/YAGNI SOL rereview](../evidence/actionable-scheduling-kaizen-yagni-sol-rereview-20260831.md)
 
-- [ ] Have a fresh-context auditor verify every checked item against commits,
+- [x] Have a fresh-context auditor verify every checked item against commits,
   receipts, and current source, then mark the recovery complete only if no
   unchecked release item remains.
   - Evidence required: exact-head COMPLETE/STOP record.
+  - Evidence: [exact-current-head release receipt](../evidence/actionable-scheduling-exact-head-release-20260831.yaml)
 
 - [ ] Push only `feature/actionable-scheduling-knowledge` after the preceding
   release and independent reviews pass; leave `main` unchanged.
