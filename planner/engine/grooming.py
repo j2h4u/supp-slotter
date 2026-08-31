@@ -1,41 +1,30 @@
-"""Read-only canonical-coverage grooming for active component roles."""
+"""Read-only deterministic grooming for active candidate coverage."""
 
 from __future__ import annotations
 
 import contextlib
 import io
-import re
 from collections.abc import Mapping
-from dataclasses import dataclass
-from datetime import date
 from pathlib import Path
-from typing import cast
 
 from planner.card_ids import composition_role_id
 from planner.cards.product import load_product_registry
+from planner.cards.relations import load_global_relations
+from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import load_substance_registry
 from planner.contracts import CardLoadError, Product, Substance
 from planner.engine.results import GroomResult, GroomWorkItem
 from planner.ontology.artifacts import OntologyBundle, load_ontology
+from planner.ontology.candidate_catalog import load_candidate_catalog
+from planner.ontology.coverage import load_coverage_closure, validate_coverage_closure
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.paths import ROOT, Paths
 from planner.schema_validation import validate_schemas
 from planner.yaml_io import load_yaml
 
-_RECEIPTS_FORMAT = "supp-slotter.grooming-receipts/v1"
-_OUTCOMES = frozenset({"no_supported_fact"})
-_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-
-
-@dataclass(frozen=True, slots=True)
-class _Receipt:
-    composition_role: str
-    assessed_on: str
-    outcome: str
-
 
 def cmd_groom(data_root: Path | None = None) -> GroomResult:
-    """Select one active component role without a completed grooming receipt."""
+    """Show the next canonical coverage item, or a stale global closure."""
     bundle = load_ontology(ROOT / "ontology")
     stdout_buf, stderr_buf = io.StringIO(), io.StringIO()
     with contextlib.redirect_stdout(stdout_buf), contextlib.redirect_stderr(stderr_buf):
@@ -48,7 +37,7 @@ def cmd_groom(data_root: Path | None = None) -> GroomResult:
             work_item = selected[0] if selected else None
             _render(selected, eligible_count)
             return GroomResult(0, work_item, eligible_count, stdout_buf.getvalue(), stderr_buf.getvalue())
-        except (CardLoadError, OntologyInfrastructureError) as error:
+        except (CardLoadError, OntologyInfrastructureError, ValueError) as error:
             message = error.message if isinstance(error, CardLoadError) else str(error)
             return GroomResult(1, None, 0, stderr=message + "\n")
 
@@ -56,17 +45,24 @@ def cmd_groom(data_root: Path | None = None) -> GroomResult:
 def _select_work_items(paths: Paths, bundle: OntologyBundle) -> tuple[tuple[GroomWorkItem, ...], int]:
     substances = load_substance_registry(paths, bundle)
     products = load_product_registry(paths, bundle)
-    all_roles = _component_roles(products, substances)
-    fact_role_ids = _canonical_fact_role_ids(bundle, all_roles)
-    receipts = _load_receipts(
-        paths.data / "grooming-receipts.yaml",
-        known_role_ids=set(all_roles),
-        fact_role_ids=fact_role_ids,
-    )
-    completed_role_ids = {receipt.composition_role for receipt in receipts}
+    catalog = load_candidate_catalog(paths.data / "scheduling-candidates.yaml")
+    relations = load_global_relations(paths, bundle, substances)
+    roles = _component_roles(products, substances)
     active_role_ids = _active_role_ids(paths, products, bundle)
-    candidates = tuple(all_roles[role_id] for role_id in sorted(active_role_ids - fact_role_ids - completed_role_ids))
-    return candidates[:1], len(candidates)
+    active_roles = [roles[role_id] for role_id in active_role_ids if role_id in roles]
+    closure = load_coverage_closure(paths.data / "coverage-closure.yaml")
+    closure_errors = validate_coverage_closure(
+        closure,
+        catalog,
+        active_roles,
+        substances=substances,
+        relations=relations,
+    )
+    if closure_errors:
+        raise ValueError("groom: coverage closure stale/unclosed source class: " + "; ".join(closure_errors))
+    # A closed empty candidate set is deliberate evidence, not a fake role
+    # candidate and not an optimizer input.
+    return (), 0
 
 
 def _component_roles(products: Mapping[str, Product], substances: Mapping[str, Substance]) -> dict[str, GroomWorkItem]:
@@ -87,90 +83,18 @@ def _active_role_ids(paths: Paths, products: Mapping[str, Product], bundle: Onto
     raw = load_yaml(paths.stacks_file)
     if not isinstance(raw, Mapping):
         raise CardLoadError(paths.stacks_file, "stacks must be a mapping")
-    routable_stack_names = set(bundle.runtime_program.glue_contract.stack_partition.routable_stack_names)
-    active_product_ids = {
-        product_id
-        for stack_name, product_ids in raw.items()
-        if stack_name in routable_stack_names and isinstance(product_ids, list)
-        for product_id in product_ids
-        if isinstance(product_id, str)
-    }
+    try:
+        entries = normalize_stack_entries(raw, bundle.runtime_program)
+    except ValueError as error:
+        raise CardLoadError(paths.stacks_file, str(error)) from error
+    routable = set(bundle.runtime_program.glue_contract.stack_partition.routable_stack_names)
+    active_products = {entry["product"] for entry in entries.values() if entry["stack"] in routable}
     return {
         component.id or composition_role_id(product.id, component.substance)
         for product_id, product in products.items()
-        if product_id in active_product_ids
+        if product_id in active_products
         for component in product.components
     }
-
-
-def _canonical_fact_role_ids(bundle: OntologyBundle, roles: Mapping[str, GroomWorkItem]) -> set[str]:
-    catalog = bundle.runtime_program.canonical_scheduling
-    return {
-        role_id
-        for fact in catalog.facts
-        for role_id, role in roles.items()
-        if (
-            fact.applicability.substance == role.substance_id
-            if fact.applicability.substance is not None
-            else fact.applicability.composition_role == role_id
-        )
-    }
-
-
-def _load_receipts(path: Path, *, known_role_ids: set[str], fact_role_ids: set[str]) -> tuple[_Receipt, ...]:
-    try:
-        raw = load_yaml(path)
-    except (CardLoadError, ValueError) as error:
-        raise CardLoadError(path, f"invalid grooming receipts: {error}") from error
-    if not isinstance(raw, Mapping) or set(raw) != {"format", "assessments"}:
-        raise CardLoadError(path, "grooming receipts must contain exactly format and assessments")
-    if raw["format"] != _RECEIPTS_FORMAT:
-        raise CardLoadError(path, f"grooming receipts format must be {_RECEIPTS_FORMAT!r}")
-    rows = raw["assessments"]
-    if not isinstance(rows, list):
-        raise CardLoadError(path, "grooming receipts assessments must be a list")
-    receipts = tuple(_receipt(row, path, index) for index, row in enumerate(rows))
-    receipt_roles = [receipt.composition_role for receipt in receipts]
-    if len(receipt_roles) != len(set(receipt_roles)):
-        raise CardLoadError(path, "grooming receipts must not contain duplicate composition_role values")
-    unknown = sorted(set(receipt_roles) - known_role_ids)
-    if unknown:
-        raise CardLoadError(path, f"grooming receipts reference unknown composition role(s): {', '.join(unknown)}")
-    covered = sorted(receipt.composition_role for receipt in receipts if receipt.composition_role in fact_role_ids)
-    if covered:
-        raise CardLoadError(
-            path,
-            "grooming receipt no_supported_fact is newly covered by canonical applicability for role(s): "
-            + ", ".join(covered),
-        )
-    return receipts
-
-
-def _receipt(row: object, path: Path, index: int) -> _Receipt:
-    label = f"assessments[{index}]"
-    if not isinstance(row, Mapping):
-        raise CardLoadError(
-            path, f"grooming receipt {label} must contain exactly composition_role, assessed_on, and outcome"
-        )
-    receipt = cast(Mapping[object, object], row)
-    if set(receipt) != {"composition_role", "assessed_on", "outcome"}:
-        raise CardLoadError(
-            path, f"grooming receipt {label} must contain exactly composition_role, assessed_on, and outcome"
-        )
-    role = receipt["composition_role"]
-    assessed_on = receipt["assessed_on"]
-    outcome = receipt["outcome"]
-    if not isinstance(role, str) or not role:
-        raise CardLoadError(path, f"grooming receipt {label}.composition_role must be a non-empty string")
-    if not isinstance(assessed_on, str) or _DATE.fullmatch(assessed_on) is None:
-        raise CardLoadError(path, f"grooming receipt {label}.assessed_on must be a quoted YYYY-MM-DD string")
-    try:
-        date.fromisoformat(assessed_on)
-    except ValueError as error:
-        raise CardLoadError(path, f"grooming receipt {label}.assessed_on must be a valid calendar date") from error
-    if outcome not in _OUTCOMES:
-        raise CardLoadError(path, f"grooming receipt {label}.outcome must be one of {sorted(_OUTCOMES)!r}")
-    return _Receipt(role, assessed_on, cast(str, outcome))
 
 
 def _render(items: tuple[GroomWorkItem, ...], eligible_count: int) -> None:
@@ -179,6 +103,11 @@ def _render(items: tuple[GroomWorkItem, ...], eligible_count: int) -> None:
         print(f"  role {item.composition_role_id}")
         print(f"    product: {item.product_id} — {item.product_name}")
         print(f"    substance: {item.substance_id} — {item.substance_name}")
+        if item.candidate_id is not None:
+            print(f"    candidate: {item.candidate_id} ({item.candidate_disposition})")
         print(
             "    collection boundary: identify evidence or applicability gaps only; do not author or adjudicate facts."
         )
+
+
+__all__ = ["cmd_groom"]

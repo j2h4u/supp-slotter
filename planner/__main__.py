@@ -32,7 +32,7 @@ def main(data_root: Path | None = None) -> None:
             "  normalize                      — explicitly rewrite card IDs, filenames, and refs\n"
             "  find WORDS...                  — search cards\n"
             "  review                         — active-stack health and review\n"
-            "  groom                          — next canonical-coverage grooming role"
+            "  groom                          — inspect canonical coverage closure"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -52,7 +52,7 @@ def main(data_root: Path | None = None) -> None:
         help="knowledge-section review of active stack (concerns, relations, fact memberships)",
     )
 
-    sub.add_parser("groom", help="show the next canonical-coverage grooming role")
+    sub.add_parser("groom", help="inspect canonical coverage closure and evidence gaps")
 
     if len(sys.argv) == 1:
         _exit_with_result(cmd_show(data_root=data_root))

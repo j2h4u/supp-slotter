@@ -1,0 +1,29 @@
+format: supp-slotter.coverage-closure/v1
+source_classes:
+  legacy_notes:
+    span_count: 354
+    atom_count: 1073
+    aggregate_migration_sha256: f5f780c8bfa2c34c775c66033bf20658ff32da5e96f7bfcd391dfbe74e6ac833
+    candidate_catalog_sha256: 2e86160562c6c71ffd428d1d51e8c7ebfd5e2d56fa155247794a300831c453a6
+    migration_receipt:
+      path: docs/evidence/actionable-scheduling-note-migration-20260831.yaml
+      sha256: 4b810c80b05eb0cae0f6e2b8be0e67faada5fcce017a55ac04dbe1d3b4d8f18f
+      record_count: 1
+  active_structured_memberships:
+    membership_count: 191
+    current_derived_sha256: 8f4260b056f112936e61039b69da8ff1818c395125bd5ab9e46b5e310723fe7a
+    adjudication_receipt:
+      path: docs/evidence/actionable-scheduling-active-knowledge-dispositions-20260831.md
+      sha256: 73cd7497ffdbcb33bd15d1528ec07a64fa69c11328c7e12aaeeae38406f4be0d
+      record_count: 191
+  current_relations:
+    relation_count: 34
+    current_derived_sha256: 3491e9ad0ad71ce324bfed27abc4dcb746277160531e7326709ff2c8fce7d128
+    pairwise_decision_receipt:
+      path: docs/decisions/actionable-scheduling-pairwise-adjudication-20260831.md
+      sha256: ede2b0cb87e065d1b125a9670a67f238c77b5fe3a3d23c97525140b8d3672887
+      record_count: 34
+      admitted_pairwise_count: 0
+role_universe:
+  count: 45
+  sha256: f8e3709f1377defa24d69f46e0512b34b0a70152a9d96c38048ed60074177906

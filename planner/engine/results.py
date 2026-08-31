@@ -56,13 +56,15 @@ class ReviewResult:
 
 @dataclass(frozen=True, slots=True)
 class GroomWorkItem:
-    """One selected component role whose operational receipt is absent."""
+    """One selected role/candidate needing canonical coverage work."""
 
     composition_role_id: str
     product_id: str
     product_name: str
     substance_id: str
     substance_name: str
+    candidate_id: str | None = None
+    candidate_disposition: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

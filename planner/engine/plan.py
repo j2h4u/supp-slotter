@@ -8,13 +8,22 @@ from typing import NamedTuple
 
 from planner.canonical_optimizer import Indeterminate
 from planner.canonical_optimizer_result import Diagnostic, DiagnosticCode
+from planner.cards.relations import load_global_relations
 from planner.engine._plan_active_index import ActiveIndexInput, build_active_index
 from planner.engine._plan_inputs import load_plan_inputs
 from planner.engine._plan_types import ActiveIndex, PlanInputs
 from planner.engine.check import _cmd_check_inner
 from planner.engine.results import PlanResult
 from planner.ontology.artifacts import OntologyBundle, load_ontology
+from planner.ontology.candidate_catalog import load_candidate_catalog
+from planner.ontology.canonical_facts import composition_roles_for_products
 from planner.ontology.canonical_inference import Conflict, SameDimensionPressureConflict, Success
+from planner.ontology.coverage import (
+    derive_coverage,
+    load_coverage_closure,
+    validate_candidate_references,
+    validate_coverage_closure,
+)
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.paths import ROOT, Paths
 from planner.schedule_types import CanonicalPublicationSource
@@ -67,15 +76,16 @@ def _cmd_plan_inner(paths: Paths, bundle: OntologyBundle) -> PlanResult:
     inputs_or_failure = _checked_plan_inputs(paths, errors, bundle)
     if isinstance(inputs_or_failure, PlanResult):
         return inputs_or_failure
-    runtime_or_failure = _build_plan_runtime(paths, errors, inputs_or_failure)
+    runtime_or_failure = _build_plan_runtime(paths, errors, inputs_or_failure, bundle)
     if isinstance(runtime_or_failure, PlanResult):
         return runtime_or_failure
     return _publish_plan(paths, errors, runtime_or_failure)
 
 
-def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> _PlanRuntime | PlanResult:
+def _build_plan_runtime(  # noqa: PLR0911
+    paths: Paths, errors: list[str], inputs: PlanInputs, bundle: OntologyBundle | None = None
+) -> _PlanRuntime | PlanResult:
     """Build only the canonical active index; legacy scheduler state is absent."""
-    del paths
     try:
         active = build_active_index(
             inputs.stack_entries,
@@ -85,7 +95,7 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
                 substances=inputs.substances,
             ),
         )
-    except KeyboardInterrupt, MemoryError:
+    except (KeyboardInterrupt, MemoryError):
         raise
     except Exception as error:  # noqa: BLE001
         message = f"plan: canonical input failed closed: {error}"
@@ -105,6 +115,55 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
             errors,
             Diagnostic("contradiction", "canonical inference found contradictory pressure facts"),
         )
+    if bundle is None:
+        message = "plan: coverage failed closed: ontology bundle is required"
+        print(message, file=sys.stderr)
+        errors.append(message)
+        return _failed_plan_result(1, errors, Diagnostic("invalid_input", message))
+    try:
+        candidate_catalog = load_candidate_catalog(paths.data / "scheduling-candidates.yaml")
+        active_products = set(active.item_products.values())
+        roles = tuple(
+            role for role in composition_roles_for_products(inputs.products) if role.product in active_products
+        )
+        reference_errors = validate_candidate_references(candidate_catalog, roles)
+        if reference_errors:
+            message = "plan: coverage references invalid: " + "; ".join(reference_errors)
+            print(message, file=sys.stderr)
+            errors.append(message)
+            return _failed_plan_result(1, errors, Diagnostic("invalid_input", message))
+        relations = load_global_relations(paths, bundle, inputs.substances)
+        closure = load_coverage_closure(paths.data / "coverage-closure.yaml")
+        closure_errors = validate_coverage_closure(
+            closure,
+            candidate_catalog,
+            roles,
+            substances=inputs.substances,
+            relations=relations,
+        )
+        if closure_errors:
+            message = "plan: coverage closure stale/unclosed: " + "; ".join(closure_errors)
+            print(message, file=sys.stderr)
+            errors.append(message)
+            return _failed_plan_result(1, errors, Diagnostic("invalid_input", message))
+        coverage = derive_coverage(
+            candidate_catalog,
+            roles,
+            dimensions=inputs.runtime_program.canonical_scheduling.pressure_values_by_dimension,
+        )
+        if not coverage.complete:
+            missing = sum(not certificate.complete for certificate in coverage.certificates)
+            message = f"plan: coverage incomplete: {missing} active composition role(s) lack closed candidate coverage"
+            print(message, file=sys.stderr)
+            errors.append(message)
+            return _failed_plan_result(1, errors, Diagnostic("invalid_input", message))
+    except (KeyboardInterrupt, MemoryError):
+        raise
+    except Exception as error:  # noqa: BLE001
+        message = f"plan: coverage failed closed: {error}"
+        print(message, file=sys.stderr)
+        errors.append(message)
+        return _failed_plan_result(1, errors, Diagnostic("invalid_input", message))
     return _PlanRuntime(inputs=inputs, active=active)
 
 
@@ -155,7 +214,7 @@ def _publish_plan(
             slot_loads=slot_loads,
             schedule=published.document,
         )
-    except KeyboardInterrupt, MemoryError:
+    except (KeyboardInterrupt, MemoryError):
         raise
     except Exception as error:  # noqa: BLE001
         message = f"plan: canonical publication failed closed: {error}"

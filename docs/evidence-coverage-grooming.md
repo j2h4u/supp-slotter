@@ -6,19 +6,17 @@ Grooming is a read-only queue for canonical evidence coverage:
 uv run python -m planner groom
 ```
 
-The queue considers active composition roles that have neither dynamically
-applicable canonical evidence nor a completed negative receipt in
-`data/grooming-receipts.yaml`, orders them by stable composition-role ID, and
-shows at most one role. Each receipt contains exactly a composition role,
-assessment date, and the one operational outcome:
-
-- `no_supported_fact` when assessment found no supported canonical fact.
-
-Canonical facts close roles dynamically: a substance target closes every
-product component whose exact canonical substance matches, while a
-composition-role target closes only that role. Receipt validation rejects
-duplicates, unknown roles, and negative receipts newly covered by a fact. A
-negative receipt closes its role; removing it reopens the role.
+The queue validates the closed `data/scheduling-candidates.yaml` catalog and
+the global `data/coverage-closure.yaml` receipt. The receipt binds the 354
+legacy-note spans/1073 atoms, 191 passive structured memberships, 34 passive
+relations, and the active role universe to exact hashes. A role with no matching
+candidate is complete when that global closure is valid; grooming never creates
+a fake per-role candidate. A candidate is closed only by exactly one of
+`pressure`, `neutral`, `unresolved_without_direction`, or `outside_model`.
+The last disposition is explicitly research-open but coverage-closed; it is
+not silently converted to neutral. Missing, malformed, or stale catalog and
+closure records are surfaced as a stale/unclosed source class and planning
+fails closed after disposing of any stale schedule output.
 
 Grooming identifies evidence or applicability gaps only. It does not write
 cards, relations, schedules, or conclusions. Evidence collection may produce
