@@ -3,13 +3,19 @@ name: Vitamin B7
 form: D-biotin
 aliases:
 - Biotin
-notes: D-biotin form listed on Doctor's Best Stabilized R-Lipoic Acid. Review context - biotin-dependent carboxylase cofactor
-  context and lab-test interference review, preserving D-biotin as the label form.
 knowledge:
   effect:
-  - carboxylase_cofactor
-  - fatty_acid_metabolism_support
+  - value: carboxylase_cofactor
+    research_state: unassessed
+    sources: []
+  - value: fatty_acid_metabolism_support
+    research_state: unassessed
+    sources: []
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: unassessed
+    sources: []
   risk:
-  - biotin_lab_interference
+  - value: biotin_lab_interference
+    research_state: unassessed
+    sources: []

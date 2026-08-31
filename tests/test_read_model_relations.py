@@ -1,129 +1,182 @@
-"""Unit tests for read-model relation warning semantics."""
+"""Focused acceptance coverage for direct relation classification queries."""
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import pytest
-from planner.contracts import Relation, RelationSelector
-from planner.ontology.policies import load_ontology_assertions
+from planner.contracts import OntologyAssertion, Product, ProductComponent, Relation, RelationSelector, Substance
 from planner.query_model import build_stack_read_model
-from planner.query_model.relation_matches import _row_match_labels
+from planner.query_model.relations import classify_relations, resolve_relation_queries
 
 from tests.helpers import ontology_bundle
-from tests.scheduling_fixtures import make_substance
 
 
-def test_canonical_balance_assertion_retains_current_authored_review_metadata() -> None:
-    bundle = ontology_bundle()
-    assertion = next(item for item in load_ontology_assertions(bundle) if item.id == "rel_balance_001")
+@dataclass(frozen=True, slots=True)
+class _RepresentativeQueryFixture:
+    substances: dict[str, Substance]
+    products: dict[str, Product]
+    stacks: dict[str, list[str]]
+    relations: list[Relation]
 
-    read_model = build_stack_read_model({}, [], ontology_bundle=bundle)
-    rows = read_model.classify_relations(set())
-    row = next(row for entries in rows.values() for row in entries if row["reason"] == assertion.reason)
 
-    assert row["reason"] == assertion.reason
-    assert row["severity"] == "medium"
-    assert row["action"] == (
-        "Review zinc/copper balance for sustained high-zinc exposure; do not split the same product or apply a "
-        "universal zinc-copper interval."
+@pytest.fixture()
+def representative_query_fixture() -> _RepresentativeQueryFixture:
+    active_alpha = Substance("sub_active_alpha", "Alpha")
+    active_zeta = Substance("sub_active_zeta", "Zeta")
+    inactive = Substance("sub_inactive", "Inactive")
+    support = Substance("sub_support", "Support")
+    substances = {item.id: item for item in (active_alpha, active_zeta, inactive, support)}
+    products = {
+        "prd_active_alpha": Product(
+            "prd_active_alpha", "Alpha", (ProductComponent(active_alpha.id, "cmp_prd_active_alpha__sub_active_alpha"),)
+        ),
+        "prd_active_zeta": Product(
+            "prd_active_zeta", "Zeta", (ProductComponent(active_zeta.id, "cmp_prd_active_zeta__sub_active_zeta"),)
+        ),
+        "prd_inactive": Product(
+            "prd_inactive", "Inactive", (ProductComponent(inactive.id, "cmp_prd_inactive__sub_inactive"),)
+        ),
+    }
+    relations = [
+        Relation(
+            "rel_support",
+            "supports",
+            "support reason",
+            RelationSelector(entity_id=support.id),
+            RelationSelector(entity_id=active_zeta.id),
+            assertion_kind="ontology_assertion",
+            semantic_family="biochemical_mechanism_assertion",
+            research_state="unassessed",
+            sources=(),
+        ),
+        Relation(
+            "rel_review",
+            "co_use_context",
+            "co-use reason",
+            RelationSelector(entity_id=active_alpha.id),
+            RelationSelector(entity_id=active_zeta.id),
+            assertion_kind="co_use_evidence",
+            semantic_family="co_use_evidence",
+            research_state="unassessed",
+            sources=(),
+        ),
+    ]
+    return _RepresentativeQueryFixture(
+        substances=substances,
+        products=products,
+        stacks={"daily": ["prd_active_zeta", "prd_active_alpha"], "inactive": ["prd_inactive"]},
+        relations=relations,
     )
 
 
-def test_canonical_vitamin_c_iron_support_assertion_retains_authored_review_metadata() -> None:
-    bundle = ontology_bundle()
-    assertion = next(item for item in load_ontology_assertions(bundle) if item.id == "rel_supports_009")
+def _relation_queries(fixture: _RepresentativeQueryFixture):
+    assertions = tuple(
+        OntologyAssertion(
+            id=relation.id,
+            relation_type=relation.type,
+            assertion_kind=relation.assertion_kind or "",
+            semantic_family=relation.semantic_family or "",
+            reason=relation.reason,
+            source_selector=relation.source_selector,
+            target_selector=relation.target_selector,
+            research_state=relation.research_state,
+            sources=relation.sources,
+        )
+        for relation in fixture.relations
+    )
+    return resolve_relation_queries(assertions, fixture.substances, ontology_bundle())
 
-    assert assertion.severity == "low"
-    assert assertion.action == (
-        "Review only when nonheme iron supplementation or other relevant iron context is active; no required "
-        "vitamin C supplement, co-dose, separation interval, or guaranteed outcome is established."
+
+def test_partition_and_direct_relation_classification(
+    representative_query_fixture: _RepresentativeQueryFixture,
+) -> None:
+    fixture = representative_query_fixture
+    read_model = build_stack_read_model(
+        fixture.substances, [], fixture.products, fixture.stacks, ontology_bundle=ontology_bundle()
     )
 
-
-def test_collect_relation_warnings_support_source_active_target_absent_no_warning() -> None:
-    """Cofactor present but primary actor absent does not warn."""
-    sub_src = make_substance("sub_src", "Src")
-    substances = {"sub_src": sub_src}
-    active_substances = {"sub_src"}
-    relation = Relation(
-        id="rel_support_1",
-        type="supports",
-        reason="supports pair",
-        source_selector=RelationSelector(entity_id="sub_src"),
-        target_selector=RelationSelector(entity_id="sub_tgt"),
-    )
-
-    read_model = build_stack_read_model(substances, [relation], ontology_bundle=ontology_bundle())
-    result = [
-        warning
-        for warning in read_model.collect_relation_warnings(active_substances)
-        if warning["type"] == "missing_support_substance"
+    active = read_model.active_substance_ids()
+    assert active == {"sub_active_alpha", "sub_active_zeta"}
+    rows = classify_relations(_relation_queries(fixture), active, ontology_bundle().runtime_program)
+    assert [
+        (row["type"], row["source_matches"], row["target_matches"], row["research_state"], row["sources"])
+        for row in rows
+    ] == [
+        ("supports", [], ["Zeta"], "unassessed", []),
+        ("co_use_context", ["Alpha"], ["Zeta"], "unassessed", []),
     ]
 
-    assert len(result) == 0
 
+def test_active_active_relation_is_passive_and_membership_only(
+    representative_query_fixture: _RepresentativeQueryFixture,
+) -> None:
+    fixture = representative_query_fixture
+    queries = _relation_queries(fixture)
+    runtime = ontology_bundle().runtime_program
 
-def test_collect_relation_warnings_support_target_active_source_absent_emits_warning() -> None:
-    """Target-active / source-absent direction triggers missing_support_substance."""
-    sub_src = make_substance("sub_src", "Src Supporter")
-    sub_tgt = make_substance("sub_tgt", "Tgt Supported")
-    substances = {"sub_src": sub_src, "sub_tgt": sub_tgt}
-    active_substances = {"sub_tgt"}
-    relation = Relation(
-        id="rel_support_2",
-        type="supports",
-        assertion_kind="ontology_assertion",
-        semantic_family="biochemical_mechanism_assertion",
-        reason="supports pair",
-        source_selector=RelationSelector(entity_id="sub_src"),
-        target_selector=RelationSelector(entity_id="sub_tgt"),
-    )
-
-    read_model = build_stack_read_model(substances, [relation], ontology_bundle=ontology_bundle())
-    result = [
-        warning
-        for warning in read_model.collect_relation_warnings(active_substances)
-        if warning["type"] == "missing_support_substance"
-    ]
-
-    assert len(result) == 1
-    warning = result[0]
-    assert warning["type"] == "missing_support_substance"
-    assert warning["source_substance"] == "sub_src"
-    assert warning["source_name"] == sub_src.name
-    assert warning["target_substance"] == "sub_tgt"
-    assert warning["target_name"] == sub_tgt.name
-    assert warning["reason"] == "supports pair"
+    assert classify_relations(queries, set(), runtime) == []
+    rows = classify_relations(queries, {"sub_active_alpha", "sub_active_zeta"}, runtime)
+    co_use = next(row for row in rows if row["type"] == "co_use_context")
+    assert co_use == {
+        "type": "co_use_context",
+        "source": "Alpha",
+        "target": "Zeta",
+        "reason": "co-use reason",
+        "research_state": "unassessed",
+        "sources": [],
+        "source_matches": ["Alpha"],
+        "target_matches": ["Zeta"],
+        "show_matches": False,
+    }
 
 
 @pytest.mark.parametrize(
-    ("row", "substance_id", "substance_name", "expected"),
+    ("mutation", "match"),
     [
+        ("stack_product", "stack 'daily'\\[0\\] references missing product 'prd_missing'"),
         (
-            {"src_substances": ["sub_target"], "tgt_substances": ["sub_target"]},
-            "sub_target",
-            "",
-            ["source selector", "target selector"],
+            "component_substance",
+            "product 'prd_active_alpha'\\.components\\[0\\] references missing substance 'sub_missing'",
         ),
-        (
-            {"src_substances": ["sub_other"], "tgt_substances": ["sub_other"]},
-            "sub_target",
-            "",
-            [],
-        ),
-        (
-            {
-                "src_substances": [],
-                "tgt_substances": [],
-                "src_selector": {"kind": "entity", "name": "Vitamin B6"},
-                "tgt_selector": {"kind": "entity", "name": "Levodopa"},
-            },
-            "sub_fixture_b6",
-            "Vitamin B6",
-            ["source selector"],
-        ),
+        ("relation_reference", "rel_support.*unresolved source endpoint: unsupported_selector"),
+        ("relation_endpoint", "rel_support.*unresolved source endpoint: malformed_selector"),
     ],
 )
-def test_row_match_labels_reports_selector_matches(
-    row: dict[str, object], substance_id: str, substance_name: str, expected: list[str]
+def test_read_model_and_direct_classifier_reject_incomplete_references(
+    representative_query_fixture: _RepresentativeQueryFixture,
+    mutation: str,
+    match: str,
 ) -> None:
-    assert _row_match_labels(row, substance_id, substance_name) == expected
+    fixture = representative_query_fixture
+    if mutation == "stack_product":
+        with pytest.raises(ValueError, match=match):
+            build_stack_read_model(
+                fixture.substances, [], fixture.products, {"daily": ["prd_missing"]}, ontology_bundle=ontology_bundle()
+            )
+        return
+    if mutation == "component_substance":
+        products = dict(fixture.products)
+        products["prd_active_alpha"] = Product(
+            "prd_active_alpha", "Alpha", (ProductComponent("sub_missing", "cmp_prd_active_alpha__sub_missing"),)
+        )
+        with pytest.raises(ValueError, match=match):
+            build_stack_read_model(fixture.substances, [], products, fixture.stacks, ontology_bundle=ontology_bundle())
+        return
+
+    relations = list(fixture.relations)
+    relations[0] = Relation(
+        id="rel_support",
+        type="supports",
+        reason="support reason",
+        source_selector=RelationSelector(entity_id="sub_missing")
+        if mutation == "relation_reference"
+        else RelationSelector(),
+        target_selector=relations[0].target_selector,
+        assertion_kind="ontology_assertion",
+        semantic_family="biochemical_mechanism_assertion",
+        research_state="unassessed",
+        sources=(),
+    )
+    with pytest.raises(ValueError, match=match):
+        _relation_queries(_RepresentativeQueryFixture(fixture.substances, fixture.products, fixture.stacks, relations))

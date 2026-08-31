@@ -4,19 +4,26 @@ aliases:
 - Vaccinium myrtillus
 - bilberry extract
 - anthocyanin source
-notes: Anthocyanin-rich berry extract with vascular and ocular-health positioning. Mild antiplatelet potential at concentrated
-  extract doses.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - ocular_retina_context
-  - vascular_polyphenol_context
-  - capillary_support_context
+  - value: ocular_retina_context
+    research_state: unassessed
+    sources: []
+  - value: vascular_polyphenol_context
+    research_state: unassessed
+    sources: []
+  - value: capillary_support_context
+    research_state: unassessed
+    sources: []
   kind:
-  - flavonoid
+  - value: flavonoid
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

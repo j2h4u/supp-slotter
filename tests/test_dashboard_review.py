@@ -26,7 +26,7 @@ def test_dashboard_review_rejects_product_in_active_and_inactive_stacks(tmp_path
     product = Product(
         id="prd_aaaaaaaaaa",
         name="Duplicate stack product",
-        components=(ProductComponent(substance=substance.id),),
+        components=(ProductComponent(substance=substance.id, id="cmp_prd_aaaaaaaaaa__sub_demo"),),
     )
     dashboard = tmp_path / "duplicate_stack_dashboard.yaml"
     dashboard.write_text(
@@ -78,9 +78,9 @@ def test_selector_resolution_distinguishes_unknown_from_valid_empty() -> None:
     assert unknown.outcome == "unsupported_selector"
 
 
-def test_dashboard_selector_resolution_rejects_schedule_axes() -> None:
+def test_dashboard_selector_resolution_rejects_unknown_categories() -> None:
     result = resolve_dashboard_selector(
-        RelationSelector(category="intake", term="food_preferred"),
+        RelationSelector(category="unknown_category", term="unknown_term"),
         {},
         ontology_bundle(),
     )
@@ -109,12 +109,12 @@ def test_selector_resolution_is_union_or(tmp_path: Path) -> None:
         "prd_aaaaaaaaaa": Product(
             id="prd_aaaaaaaaaa",
             name="Product A",
-            components=(ProductComponent(substance=sub_a.id),),
+            components=(ProductComponent(substance=sub_a.id, id="cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa"),),
         ),
         "prd_bbbbbbbbbb": Product(
             id="prd_bbbbbbbbbb",
             name="Product B",
-            components=(ProductComponent(substance=sub_b.id),),
+            components=(ProductComponent(substance=sub_b.id, id="cmp_prd_bbbbbbbbbb__sub_bbbbbbbbbb"),),
         ),
     }
     stack_entries: dict[str, StackEntry] = {
@@ -171,12 +171,12 @@ def test_dashboard_review_separates_product_tracking_from_usage(
         "prd_aaaaaaaaaa": Product(
             id="prd_aaaaaaaaaa",
             name="Active Product",
-            components=(ProductComponent(substance=active.id),),
+            components=(ProductComponent(substance=active.id, id="cmp_prd_aaaaaaaaaa__sub_active"),),
         ),
         "prd_bbbbbbbbbb": Product(
             id="prd_bbbbbbbbbb",
             name="Inactive Product",
-            components=(ProductComponent(substance=inactive.id),),
+            components=(ProductComponent(substance=inactive.id, id="cmp_prd_bbbbbbbbbb__sub_inactive"),),
         ),
     }
     stack_entries: dict[str, StackEntry] = {
@@ -235,12 +235,12 @@ def test_dashboard_review_retains_union_of_active_and_inactive_stacks(
         "prd_aaaaaaaaaa": Product(
             id="prd_aaaaaaaaaa",
             name="Daily product",
-            components=(ProductComponent(substance=substance.id),),
+            components=(ProductComponent(substance=substance.id, id="cmp_prd_aaaaaaaaaa__sub_demo"),),
         ),
         "prd_bbbbbbbbbb": Product(
             id="prd_bbbbbbbbbb",
             name="Inactive product",
-            components=(ProductComponent(substance=substance.id),),
+            components=(ProductComponent(substance=substance.id, id="cmp_prd_bbbbbbbbbb__sub_demo"),),
         ),
     }
     stack_entries: dict[str, StackEntry] = {

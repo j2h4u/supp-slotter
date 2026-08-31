@@ -14,12 +14,14 @@ uv run python -m planner
 ```
 
 Use `planner review` first. Its `Review brief` is the intake surface: authored
-concerns, relation review, active fact membership, and dashboard coverage
+concerns, relation review, active knowledge membership, and dashboard coverage
 summary. Use the detailed sections below it for concerns, relations, active
-fact memberships, and dashboard counts.
+knowledge memberships, and dashboard counts.
 
-Use `schedule.yaml` for generated slot placement, humanized warnings, placement
-notes, and explanations. Do not edit it directly.
+Invoke `uv run python -m planner` for generated slot placement and proof-backed
+explanations. It recomputes the layout and replaces `schedule.yaml`; never
+consume or edit that disposable output directly. Warnings, review notes, and
+dashboard benefits/risks belong to `planner review`.
 
 Use `planner check` to validate source-data references before the current review.
 
@@ -30,7 +32,8 @@ edits. Do not write product cards unless the user has approved data enrichment.
 
 Before treating an amount, form, marker, or standardization as unknown:
 
-- inspect the product card `components`, `notes`, and `urls`;
+- inspect the product card `components` and `urls`; consult typed identity,
+  composition, and provenance fields for the claim in question;
 - open existing manufacturer or retailer label URLs when available;
 - if the card has no usable source URL, search for the exact brand + product +
   supplement facts/label;
@@ -78,7 +81,7 @@ as informational review, not diagnosis or treatment.
 Pass to the review:
 
 - `planner review` brief and relevant detailed sections;
-- slot layout from `schedule.yaml`;
+- slot layout from a fresh `uv run python -m planner` invocation;
 - user context from `docs/private/`;
 - explicit framing that this is informational analysis, not medical advice.
 

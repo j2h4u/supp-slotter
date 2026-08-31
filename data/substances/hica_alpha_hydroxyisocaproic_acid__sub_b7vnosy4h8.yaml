@@ -3,17 +3,22 @@ name: HICA
 form: alpha-hydroxyisocaproic acid
 aliases:
 - alpha-hydroxyisocaproic acid
-notes: Alpha-hydroxyisocaproic acid component listed on The Genius Brand Genius Pre label at 500 mg per scoop. Specific performance/recovery
-  modeling is not currently represented by a trait.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
-  - workout_performance
+  - value: workout_performance
+    research_state: unassessed
+    sources: []
   effect:
-  - muscle_recovery_context
-  - anti_catabolic_context
-  - leucine_metabolite_context
+  - value: muscle_recovery_context
+    research_state: unassessed
+    sources: []
+  - value: anti_catabolic_context
+    research_state: unassessed
+    sources: []
+  - value: leucine_metabolite_context
+    research_state: unassessed
+    sources: []
   role:
-  - ergogenic
+  - value: ergogenic
+    research_state: unassessed
+    sources: []

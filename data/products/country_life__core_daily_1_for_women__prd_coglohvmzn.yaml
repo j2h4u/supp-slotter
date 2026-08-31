@@ -5,91 +5,117 @@ urls:
 - https://countrylifevitamins.com/products/core-daily-1-for-women
 components:
 - substance: sub_sds0sup3nt
+  id: cmp_prd_coglohvmzn__sub_sds0sup3nt
   label: Vitamin A as beta carotene
 - substance: sub_z88pld4hbv
+  id: cmp_prd_coglohvmzn__sub_z88pld4hbv
   label: Vitamin C as calcium ascorbate (also from amla and acerola sources)
 - substance: sub_pxayn2v7wu
+  id: cmp_prd_coglohvmzn__sub_pxayn2v7wu
   label: Vitamin C / acerola powder co-source
 - substance: sub_2476bf9d4b
+  id: cmp_prd_coglohvmzn__sub_2476bf9d4b
   label: Vitamin D3 as cholecalciferol
 - substance: sub_grely3rikd
+  id: cmp_prd_coglohvmzn__sub_grely3rikd
   label: Vitamin E as d-alpha tocopheryl acid succinate
 - substance: sub_1hhkguyz55
+  id: cmp_prd_coglohvmzn__sub_1hhkguyz55
   label: Vitamin K1 as phytonadione
 - substance: sub_wnyygv7y7l
+  id: cmp_prd_coglohvmzn__sub_wnyygv7y7l
   label: Thiamin (Vitamin B1) as thiamine HCl
 - substance: sub_kpn178y211
+  id: cmp_prd_coglohvmzn__sub_kpn178y211
   label: Thiamin (Vitamin B1) as thiamine cocarboxylase chloride
 - substance: sub_67fc2be8aa
+  id: cmp_prd_coglohvmzn__sub_67fc2be8aa
   label: Riboflavin (Vitamin B2)
 - substance: sub_qktkyyla88
+  id: cmp_prd_coglohvmzn__sub_qktkyyla88
   label: Riboflavin (Vitamin B2) as riboflavin 5'-phosphate
 - substance: sub_6yp50f6ach
+  id: cmp_prd_coglohvmzn__sub_6yp50f6ach
   label: Niacin (Vitamin B3) as inositol hexanicotinate
 - substance: sub_a873e428ee
+  id: cmp_prd_coglohvmzn__sub_a873e428ee
   label: Vitamin B6 as pyridoxine HCl
 - substance: sub_799419116d
+  id: cmp_prd_coglohvmzn__sub_799419116d
   label: Vitamin B6 as pyridoxal 5'-phosphate (P5P)
 - substance: sub_d0034bd130
+  id: cmp_prd_coglohvmzn__sub_d0034bd130
   label: Folate as methylfolate-glucosamine salt
 - substance: sub_ivywz0q6c6
+  id: cmp_prd_coglohvmzn__sub_ivywz0q6c6
   label: Vitamin B12 as cyanocobalamin
 - substance: sub_157418854b
+  id: cmp_prd_coglohvmzn__sub_157418854b
   label: Vitamin B12 as methylcobalamin
 - substance: sub_7628e4f478
+  id: cmp_prd_coglohvmzn__sub_7628e4f478
   label: Pantothenic acid (Vitamin B5)
 - substance: sub_fd899525d3
+  id: cmp_prd_coglohvmzn__sub_fd899525d3
   label: Biotin
 - substance: sub_p62urjkldd
+  id: cmp_prd_coglohvmzn__sub_p62urjkldd
   label: Choline
 - substance: sub_s7nzoqhaba
+  id: cmp_prd_coglohvmzn__sub_s7nzoqhaba
   label: Calcium as calcium hydroxyapatite
 - substance: sub_n9n2ry0sto
+  id: cmp_prd_coglohvmzn__sub_n9n2ry0sto
   label: Calcium as calcium fructoborate (also a co-source of boron)
 - substance: sub_d5p99yk0hh
+  id: cmp_prd_coglohvmzn__sub_d5p99yk0hh
   label: Iron as ferrous gluconate
 - substance: sub_1n5gnpnuxb
+  id: cmp_prd_coglohvmzn__sub_1n5gnpnuxb
   label: Magnesium as magnesium oxide
 - substance: sub_fhl7c4skmf
+  id: cmp_prd_coglohvmzn__sub_fhl7c4skmf
   label: Magnesium as magnesium citrate
 - substance: sub_8ppxce3s17
+  id: cmp_prd_coglohvmzn__sub_8ppxce3s17
   label: Zinc as zinc monomethionine
 - substance: sub_07c3tr4i3s
+  id: cmp_prd_coglohvmzn__sub_07c3tr4i3s
   label: Selenium as sodium selenate
 - substance: sub_4nngd11e2w
+  id: cmp_prd_coglohvmzn__sub_4nngd11e2w
   label: Copper as copper amino acid chelate
 - substance: sub_7938ea248e
+  id: cmp_prd_coglohvmzn__sub_7938ea248e
   label: Manganese
 - substance: sub_ddf8d310d2
+  id: cmp_prd_coglohvmzn__sub_ddf8d310d2
   label: Chromium as chromium picolinate
 - substance: sub_c55378389c
+  id: cmp_prd_coglohvmzn__sub_c55378389c
   label: Molybdenum
 - substance: sub_f7780f899b
+  id: cmp_prd_coglohvmzn__sub_f7780f899b
   label: Potassium as potassium citrate
 - substance: sub_9udzxhaaoe
+  id: cmp_prd_coglohvmzn__sub_9udzxhaaoe
   label: Women's Health Blend — Cranberry
-  notes: Per-component amount not disclosed; Women's Health Blend totals 207.5 mg
-    per tablet and additionally contains generic fruit powders (blueberry, tart cherry,
-    strawberry, raspberry seed, prune) which are not encoded as separate substance
-    cards per intake policy.
 - substance: sub_kv83vycgfy
+  id: cmp_prd_coglohvmzn__sub_kv83vycgfy
   label: Women's Health Blend — Grape seed extract
 - substance: sub_hgcwehsc12
+  id: cmp_prd_coglohvmzn__sub_hgcwehsc12
   label: Women's Health Blend — Pomegranate
 - substance: sub_tgw6yhz9u9
+  id: cmp_prd_coglohvmzn__sub_tgw6yhz9u9
   label: Women's Health Blend — Quercetin
 - substance: sub_5w2elq9npd
+  id: cmp_prd_coglohvmzn__sub_5w2elq9npd
   label: Women's Health Blend — Resveratrol
 - substance: sub_opy0wlzf1a
+  id: cmp_prd_coglohvmzn__sub_opy0wlzf1a
   label: Women's Health Blend — Bilberry
 - substance: sub_f3vgw907ew
+  id: cmp_prd_coglohvmzn__sub_f3vgw907ew
   label: Women's Health Blend — Ginger extract
-notes: 'Serving size: 1 tablet. Package: 60 tablets. Suggested use: adult females
-  take 1 tablet daily with food. Women''s Health Blend (207.5 mg per tablet) lists
-  cranberry, grape seed, pomegranate, quercetin, blueberry, resveratrol, tart cherry,
-  strawberry, raspberry seed, bilberry, prune, calcium fructoborate, and ginger extract;
-  generic fruit powders not encoded per intake policy. Phosphorus and sodium content
-  on the label are reported as nutrient line items but not encoded as separate substance
-  components. Manganese and Molybdenum forms are not specified by the label; generic
-  cards are used as fallbacks.'
 id: prd_coglohvmzn

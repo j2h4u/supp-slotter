@@ -1,10 +1,5 @@
 id: sub_a3ec9f9c52
 name: Tadalafil
-notes: 'Generic tadalafil evidence supports PDE5, vasodilator, NO-cGMP, and hypotension-interaction context; the exact Tadalista formulation and user-reported 1.25 mg amount are unverified, and no broad vascular benefit is established.'
-concerns:
-- kind: safety
-  text: PDE5 inhibitor context should be reviewed with nitrates, alpha-blockers, antihypertensives, alcohol, and other vasodilators
-    because symptomatic hypotension can become the limiting stack risk.
 knowledge:
   context:
   - value: vascular_health
@@ -35,21 +30,3 @@ knowledge:
     research_state: supported
     sources:
     - https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=78509a43-a907-4359-9022-f38c4f765880&type=display
-scheduling_assessment:
-  intake:
-    conclusion: supports_no_rule
-    sources:
-    - https://dailymed.nlm.nih.gov/dailymed/fdaDrugXsl.cfm?setid=78509a43-a907-4359-9022-f38c4f765880&type=display
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC1885023/
-    summary: Generic tadalafil has negligible food effect, so no executable food rule is established; the exact Tadalista formulation remains unverified.
-  timing:
-    conclusion: supports_no_rule
-    sources:
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC1885023/
-    summary: No morning-versus-evening effect is established; tadalafil half-life does not define a dosing-frequency model.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=78509a43-a907-4359-9022-f38c4f765880&type=display
-    - https://pmc.ncbi.nlm.nih.gov/articles/PMC1885023/
-    summary: Evidence does not compare tadalafil administration relative to exercise, so no activity rule is established.

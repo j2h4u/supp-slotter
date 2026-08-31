@@ -1,0 +1,6 @@
+receipt_format: canonical-migration-provenance-closure-v2
+acceptance: complete
+closure_commit: 4bda6259aef2c7a5508bd511b4290938cd1f59d9
+# SHA-256 of the sorted immutable field-name sequence, each newline-terminated:
+# acceptance, closure_commit, receipt_format, shape_sha256.
+shape_sha256: 9b813a79e9b66daeb96833089dd1671282eb280199b88508382cc84c6ec32fd3

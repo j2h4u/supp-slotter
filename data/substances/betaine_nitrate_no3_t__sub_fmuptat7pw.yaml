@@ -3,22 +3,33 @@ name: Betaine
 form: nitrate / NO3-T
 aliases:
 - NO3-T
-notes: Betaine nitrate form listed on The Genius Brand Genius Pre label as NO3-T. Nitrate-containing pre-workout component
-  intended for nitric-oxide and pump context.
-schedule:
-  activity:
-  - pre_workout
 knowledge:
   context:
-  - vascular_health
-  - workout_performance
+  - value: vascular_health
+    research_state: unassessed
+    sources: []
+  - value: workout_performance
+    research_state: unassessed
+    sources: []
   effect:
-  - nitric_oxide_support
-  - nitrate_context
-  - exercise_pump_context
+  - value: nitric_oxide_support
+    research_state: unassessed
+    sources: []
+  - value: nitrate_context
+    research_state: unassessed
+    sources: []
+  - value: exercise_pump_context
+    research_state: unassessed
+    sources: []
   pathway:
-  - nitric_oxide_cgmp
+  - value: nitric_oxide_cgmp
+    research_state: unassessed
+    sources: []
   risk:
-  - hypotension_med_interaction
+  - value: hypotension_med_interaction
+    research_state: unassessed
+    sources: []
   role:
-  - ergogenic
+  - value: ergogenic
+    research_state: unassessed
+    sources: []

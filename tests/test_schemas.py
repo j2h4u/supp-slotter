@@ -23,11 +23,42 @@ def _make_substance_card(**extra: YamlValue) -> dict[str, YamlValue]:
 
 def test_substance_schema_accepts_nested_form() -> None:
     card = _make_substance_card(
-        schedule={"intake": ["food_preferred"], "timing": ["sleep_support"]},
-        knowledge={"kind": ["amino"], "risk": ["manual_review"]},
+        knowledge={
+            "kind": [{"value": "amino", "research_state": "unassessed", "sources": []}],
+            "risk": [{"value": "manual_review", "research_state": "unassessed", "sources": []}],
+        },
     )
     errors = schema_errors(card, "substance", Path("test"), ontology_bundle())
     assert errors == [], f"Expected no errors, got: {errors}"
+
+
+@pytest.mark.parametrize(
+    "card",
+    [
+        _make_substance_card(notes="legacy substance notes"),
+        {
+            "id": "prd_zz0000zzzz",
+            "name": "Test Product",
+            "components": [
+                {
+                    "id": "cmp_prd_zz0000zzzz__sub_zz0000zzzz",
+                    "substance": "sub_zz0000zzzz",
+                    "notes": "legacy component notes",
+                }
+            ],
+        },
+        {
+            "id": "prd_zz0000zzzz",
+            "name": "Test Product",
+            "components": [{"id": "cmp_prd_zz0000zzzz__sub_zz0000zzzz", "substance": "sub_zz0000zzzz"}],
+            "notes": "legacy product notes",
+        },
+    ],
+)
+def test_card_schema_rejects_legacy_notes_at_every_card_position(card: dict[str, YamlValue]) -> None:
+    schema_name = "substance" if cast(str, card["id"]).startswith("sub_") else "product"
+    errors = schema_errors(card, schema_name, Path("legacy-notes.yaml"), ontology_bundle())
+    assert any("notes" in error for error in errors), errors
 
 
 def test_product_schema_rejects_unsupported_schedule_field() -> None:
@@ -41,51 +72,10 @@ def test_product_schema_rejects_unsupported_schedule_field() -> None:
     assert any("schedule" in error for error in errors)
 
 
-def test_generated_card_schema_owns_identity_schedule_and_reference_constraints() -> None:
-    cases: tuple[dict[str, YamlValue], ...] = (
-        _make_substance_card(id="sub_INVALID"),
-        _make_substance_card(schedule={"intake": ["a", "b"]}),
-        _make_substance_card(schedule={"prefer_with": ["prd_aaaaaaaaaa"]}),
-        _make_substance_card(schedule={"unknown_axis": ["a"]}),
-    )
+def test_generated_card_schema_owns_identity_and_reference_constraints() -> None:
+    cases: tuple[dict[str, YamlValue], ...] = (_make_substance_card(id="sub_INVALID"),)
     for card in cases:
         assert schema_errors(card, "substance", Path("test"), ontology_bundle())
-
-
-def test_scheduling_assessment_schema_enforces_closed_shape_and_policy_condition() -> None:
-    base_record: dict[str, YamlValue] = {
-        "conclusion": "insufficient",
-        "sources": ["https://example.test/source"],
-        "summary": "The evidence was reviewed but does not establish a rule.",
-    }
-    valid = _make_substance_card(scheduling_assessment={"intake": base_record})
-    assert schema_errors(valid, "substance", Path("assessment-valid"), ontology_bundle()) == []
-    invalid_cards = (
-        _make_substance_card(scheduling_assessment={"unknown": base_record}),
-        _make_substance_card(scheduling_assessment={"intake": {**base_record, "owner": "x"}}),
-        _make_substance_card(
-            scheduling_assessment={"intake": {**base_record, "conclusion": "unknown"}},
-        ),
-        _make_substance_card(scheduling_assessment={"intake": {**base_record, "sources": []}}),
-        _make_substance_card(scheduling_assessment={"intake": {**base_record, "summary": "   "}}),
-        _make_substance_card(
-            scheduling_assessment={"intake": {**base_record, "conclusion": "supports_preference"}},
-        ),
-        _make_substance_card(
-            scheduling_assessment={"intake": {**base_record, "policy": "food_preferred"}},
-        ),
-    )
-    for card in invalid_cards:
-        assert schema_errors(card, "substance", Path("assessment-invalid"), ontology_bundle())
-
-
-def test_scheduling_assessment_conclusion_vocabulary_is_generated() -> None:
-    assert set(schema_enum_values(ontology_bundle(), "SchedulingAssessmentConclusion")) == {
-        "supports_preference",
-        "supports_no_rule",
-        "insufficient",
-        "conflicting",
-    }
 
 
 def test_generated_relation_schema_rejects_noncanonical_selector_shape() -> None:
@@ -100,6 +90,8 @@ def test_generated_relation_schema_rejects_noncanonical_selector_shape() -> None
                     "target_selector": {"target_trait": "fixture"},
                     "assertion_kind": "ontology_assertion",
                     "semantic_family": "biochemical_mechanism_assertion",
+                    "research_state": "unassessed",
+                    "sources": [],
                 }
             ]
         },
@@ -130,6 +122,8 @@ def test_generated_relation_schema_enforces_formal_selector_exclusivity() -> Non
                         "target_selector": {"entity": {"entity_id": "sub_bbbbbbbbbb"}},
                         "assertion_kind": "ontology_assertion",
                         "semantic_family": "biochemical_mechanism_assertion",
+                        "research_state": "unassessed",
+                        "sources": [],
                     }
                 ]
             },
@@ -165,6 +159,8 @@ def test_generated_relation_schema_rejects_nullable_or_blank_selector_scalars(
                     "target_selector": {"entity": {"entity_id": "sub_bbbbbbbbbb"}},
                     "assertion_kind": "ontology_assertion",
                     "semantic_family": "biochemical_mechanism_assertion",
+                    "research_state": "unassessed",
+                    "sources": [],
                 }
             ]
         },
@@ -175,7 +171,7 @@ def test_generated_relation_schema_rejects_nullable_or_blank_selector_scalars(
     assert errors
 
 
-def test_relation_schema_enforces_ontology_relation_type_and_severity_enums() -> None:
+def test_relation_schema_enforces_ontology_relation_type_and_rejects_retired_decision_fields() -> None:
     bundle = ontology_bundle()
     schema = load_schema("relations", bundle)
     defs = cast(dict[str, object], schema["$defs"])
@@ -184,21 +180,23 @@ def test_relation_schema_enforces_ontology_relation_type_and_severity_enums() ->
 
     relation_types = bundle.runtime_vocabulary["relation_types"]
     assert relation_properties["relation_type"] == {"$ref": "#/$defs/RelationType"}
-    assert relation_properties["severity"] == {"$ref": "#/$defs/Severity"}
+    assert "severity" not in relation_properties
+    assert "action" not in relation_properties
     assert set(schema_enum_values(bundle, "RelationType")) == set(cast(dict[str, object], relation_types))
 
     errors = schema_errors(
         {
             "relations": [
                 {
-                    "id": "rel_invalid_type_and_severity",
+                    "id": "rel_invalid_type",
                     "relation_type": "not_authored",
                     "reason": "invalid enum fixture",
                     "source_selector": {"entity": {"entity_id": "sub_aaaaaaaaaa"}},
                     "target_selector": {"entity": {"entity_id": "sub_bbbbbbbbbb"}},
                     "assertion_kind": "ontology_assertion",
                     "semantic_family": "biochemical_mechanism_assertion",
-                    "severity": "not_authored",
+                    "research_state": "unassessed",
+                    "sources": [],
                 }
             ]
         },
@@ -208,4 +206,30 @@ def test_relation_schema_enforces_ontology_relation_type_and_severity_enums() ->
     )
 
     assert any("relations/0/relation_type" in error and "not_authored" in error for error in errors)
-    assert any("relations/0/severity" in error and "not_authored" in error for error in errors)
+
+    valid = {
+        "id": "rel_retired_field",
+        "relation_type": next(iter(schema_enum_values(bundle, "RelationType"))),
+        "reason": "retired decision-field fixture",
+        "source_selector": {"entity": {"entity_id": "sub_aaaaaaaaaa"}},
+        "target_selector": {"entity": {"entity_id": "sub_bbbbbbbbbb"}},
+        "assertion_kind": "ontology_assertion",
+        "semantic_family": "biochemical_mechanism_assertion",
+        "research_state": "unassessed",
+        "sources": [],
+    }
+    for field, value in {"action": "imperative text", "severity": "medium"}.items():
+        assert schema_errors({"relations": [{**valid, field: value}]}, "relations", Path("relations.yaml"), bundle), (
+            field
+        )
+
+
+def test_substance_schema_rejects_retired_stored_schedule_answers() -> None:
+    for field, value in {
+        "schedule": {"intake": ["food_preferred"]},
+        "prefer_with": ["sub_aaaaaaaaaa"],
+        "scheduling_assessment": {"intake": {"conclusion": "insufficient"}},
+    }.items():
+        assert schema_errors(
+            _make_substance_card(**{field: value}), "substance", Path("substance.yaml"), ontology_bundle()
+        ), field

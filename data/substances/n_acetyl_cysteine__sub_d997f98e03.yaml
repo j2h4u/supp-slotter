@@ -2,27 +2,30 @@ id: sub_d997f98e03
 name: N-Acetyl Cysteine
 aliases:
 - NAC
-notes: 'Water-soluble glutathione precursor and mucolytic; also used as antidote in acetaminophen overdose. Typical supplemental
-  dose 600–1800 mg/day, often split. GI tolerance (nausea, upset) is improved when taken with food. Known interaction with
-  nitroglycerin (severe hypotension); caution with anticoagulants and chemotherapy agents. Sources: NIH MedlinePlus (Acetylcysteine);
-  examine.com (NAC); Millea 2009 (Am Fam Physician); NIH ODS Selenium/Molybdenum fact sheets; NCI Drug Dictionary (acetylcysteine).'
-concerns:
-- kind: safety
-  text: Review nitroglycerin, anticoagulant/antiplatelet, chemotherapy, asthma/bronchospasm, and GI-tolerance context before
-    treating NAC as routine antioxidant support.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - glutathione_precursor_support
-  - mucolytic_context
-  - sulfur_amino_acid_metabolism
+  - value: glutathione_precursor_support
+    research_state: unassessed
+    sources: []
+  - value: mucolytic_context
+    research_state: unassessed
+    sources: []
+  - value: sulfur_amino_acid_metabolism
+    research_state: unassessed
+    sources: []
   pathway:
-  - glutathione_metabolism
+  - value: glutathione_metabolism
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

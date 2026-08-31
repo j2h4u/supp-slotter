@@ -2,14 +2,14 @@
 # data/stacks.yaml — Product stack membership
 # =============================================================================
 #
-# A stack is a named group of products that share a pillbox (a physical container
-# with a set of time slots). Each stack key must match a top-level key in
+# A stack is a named group of products that shares a logical intake group with
+# a set of time slots. Each stack key must match a top-level key in
 # pillboxes.yaml. The planner assigns every product in a stack to one of that
-# pillbox's slots.
+# group's slots.
 #
 # STACKS
 # ------
-# daily     Ordinary active routing stack. Maps to the "daily" physical pillbox
+# daily     Ordinary active routing stack. Maps to the "daily" logical intake group
 #           with morning_empty / morning_food / day_food / evening_empty. A product
 #           marked `use_pattern: not_every_day` remains in daily; presentation
 #           separates it in the generated view, with no frequency or calendar model
@@ -20,16 +20,15 @@
 #           from plan generation, relation warnings, and slot assignment. Use this
 #           instead of deleting a product card when temporarily stopping a
 #           substance that is still owned.
-# tracked-unassigned (outside all stacks): keep a product card for depleted,
-#           not-owned/reference/candidate entries by leaving it out of every
-#           stack key; there is no `unassigned` stack.
+# tracked_unassigned  Explicitly tracked products that are neither routable nor
+#           on the shelf. Each record has the product ID and its current reason.
+#           This collection is never an active stack and has no pillbox.
 #
 # CONVENTIONS
 # -----------
 # - Entries are product IDs (prd_*), not product names. IDs are stable; names can change.
-# - A product should normally appear in one of daily/training/inactive, but
-#   intentionally tracked/unowned state is allowed outside all stacks.
-#   Such products are summarized by planner check diagnostics.
+# - Every product appears exactly once in daily, training, inactive, or
+#   tracked_unassigned. Omission is invalid.
 # - Order within a list does not affect scheduling.
 # - To add a new product to the active stack: move its ID from inactive to daily or training.
 #
@@ -97,3 +96,12 @@ inactive:
 - prd_h9zp0td8gh
 - prd_nuicads5ns
 - prd_a6y3uidgfk
+tracked_unassigned:
+- product: prd_27f7b85aa6
+  reason: Not on the current shelf; no current intake decision.
+- product: prd_7f04daf970
+  reason: Not on the current shelf; no current intake decision.
+- product: prd_83dffd67bf
+  reason: Depleted and no longer on the shelf.
+- product: prd_c81eb18069
+  reason: Not on the current shelf; no current intake decision.

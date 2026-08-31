@@ -1,4 +1,4 @@
-"""Raw card mapping adapters for auto-maintenance."""
+"""Raw card mapping adapters for explicit normalization."""
 
 from __future__ import annotations
 

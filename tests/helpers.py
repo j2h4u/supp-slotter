@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
 
-from planner.ontology.artifacts import OntologyBundle, load_ontology
+from planner.ontology.artifacts import OntologyBundle, load_formal_ontology, load_ontology
 
 __all__ = ["RunResult", "ontology_bundle", "run_planner"]
 
@@ -20,6 +20,11 @@ _ROOT = Path(__file__).resolve().parents[1]
 @cache
 def ontology_bundle() -> OntologyBundle:
     return load_ontology(_ROOT / "ontology")
+
+
+@cache
+def formal_ontology_bundle() -> OntologyBundle:
+    return load_formal_ontology(_ROOT / "ontology")
 
 
 @dataclass

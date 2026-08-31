@@ -2,27 +2,21 @@
 # data/pillboxes.yaml — Pillboxes and their time slots
 # =============================================================================
 #
-# A pillbox is a physical container with named compartments (slots). Each top-level
-# key here must match a stack key in stacks.yaml. The planner assigns each active
-# product to exactly one slot within its stack's pillbox.
+# A pillbox is a logical intake group with named slots. Each top-level key here
+# must match a stack key in stacks.yaml. The planner assigns each active product
+# to exactly one slot within its stack's logical group.
 #
 # SLOT FIELDS
 # -----------
-# label   Human-readable name shown in schedule.yaml and warning output.
-# order   Integer display order within the pillbox (lower = earlier in the day).
-# near    Timing anchor for trait scoring. One of:
-#           wake          — first thing in the morning, before any food
-#           breakfast     — with or just after the morning meal
-#           day_meal      — with a midday or afternoon meal
-#           sleep         — at bedtime, away from food
-#           workout_before — immediately before exercise
-#           workout_after  — immediately after exercise
-#         Slots with workout_* near values require the product's stack to have a
-#         matching near value; the planner rejects products with activity: traits
-#         placed in a stack whose pillbox has no workout slots.
-# food    true = food is present in this slot; false = empty stomach.
-#         Ontology scheduling policies score each substance against this field
-#         to determine preferred and blocked slots.
+# label             Human-readable name shown in schedule.yaml.
+# order             Integer display order within this topology (lower first).
+# meal_context      Optional independent axis: with_food or without_food.
+# circadian_anchor  Optional independent axis: wake or sleep.
+# exercise_anchor   Optional independent axis: before or after.
+#
+# Missing axes remain missing. IDs, labels, and order have no biological
+# semantics and must not be used to infer an anchor. Slots are logical,
+# unbounded intake groups rather than physical compartments.
 #
 # CONVENTIONS
 # -----------
@@ -42,23 +36,21 @@ daily:
     morning_empty:
       label: Morning / empty stomach
       order: 1
-      near: wake
-      food: false
+      meal_context: without_food
+      circadian_anchor: wake
     morning_food:
       label: Morning / with breakfast
       order: 2
-      near: breakfast
-      food: true
+      meal_context: with_food
     day_food:
       label: Day / with meal
       order: 3
-      near: day_meal
-      food: true
+      meal_context: with_food
     evening_empty:
       label: Before sleep / empty stomach
       order: 4
-      near: sleep
-      food: false
+      meal_context: without_food
+      circadian_anchor: sleep
 training:
   label: Training
   stack: training
@@ -66,10 +58,10 @@ training:
     pre_workout:
       label: Pre-workout
       order: 1
-      near: workout_before
-      food: false
+      meal_context: without_food
+      exercise_anchor: before
     post_workout:
       label: Post-workout
       order: 2
-      near: workout_after
-      food: false
+      meal_context: without_food
+      exercise_anchor: after

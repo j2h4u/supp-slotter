@@ -3,16 +3,19 @@ name: Papain
 aliases:
 - papaya enzyme
 - carica papaya protease
-notes: Proteolytic enzyme from papaya; systemic anti-inflammatory and mild antiplatelet potential. Relevant to bleeding-load
-  review. Review context - in multivitamin blends, digestive protein-enzyme context is more certain than systemic effect.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
-  - digestive_enzyme_context
-  - protein_digestion_support
+  - value: digestive_enzyme_context
+    research_state: unassessed
+    sources: []
+  - value: protein_digestion_support
+    research_state: unassessed
+    sources: []
   kind:
-  - enzyme
+  - value: enzyme
+    research_state: unassessed
+    sources: []
   risk:
-  - bleeding_med_interaction
+  - value: bleeding_med_interaction
+    research_state: unassessed
+    sources: []

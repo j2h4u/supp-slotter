@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Protocol, TypeGuard, cast
 
 import pytest
-from planner.ontology.artifacts import load_ontology
+from planner.ontology.artifacts import load_formal_ontology
 from planner.ontology.projection import project_repository
 from planner.ontology.validation import ValidationRegistry, build_validation_registry, compose_validation_graph
 from pyshacl import validate
@@ -114,7 +114,7 @@ def test_custom_rules_have_focus_nodes_in_repository_projection() -> None:
 
     shapes = _shapes()
     rules = _rules()
-    projection = project_repository(ROOT, load_ontology(ROOT / "ontology")).graph
+    projection = project_repository(ROOT, load_formal_ontology(ROOT / "ontology")).graph
     for rule_id, shape in rules.items():
         focus_nodes: set[Identifier] = set()
         for target_class in shapes.objects(shape, SH.targetClass):

@@ -3,18 +3,23 @@ aliases:
 - whey protein concentrate
 - whey protein isolate
 - hydrolyzed whey protein
-notes: Knowledge-only sports-nutrition protein reference card. Added because whey is the canonical mainstream protein supplement
-  for muscle-protein-synthesis and recovery discussions. Sources checked - NIH ODS exercise/performance fact sheet; ISSN protein
-  and exercise position stand.
 concerns:
 - kind: data_quality
   text: Product cards should distinguish concentrate, isolate, hydrolysate, protein grams per serving, leucine/EAA content,
     sweeteners, lactose tolerance, and allergen context before comparing products.
 knowledge:
   effect:
-  - muscle_protein_synthesis_context
-  - protein_synthesis_support
-  - exercise_recovery_support
+  - value: muscle_protein_synthesis_context
+    research_state: unassessed
+    sources: []
+  - value: protein_synthesis_support
+    research_state: unassessed
+    sources: []
+  - value: exercise_recovery_support
+    research_state: unassessed
+    sources: []
   kind:
-  - protein
+  - value: protein
+    research_state: unassessed
+    sources: []
 id: sub_7ehuhfcly5

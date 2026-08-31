@@ -5,41 +5,20 @@ from __future__ import annotations
 from planner.contracts import Product, Relation, Substance
 from planner.ontology.artifacts import OntologyBundle
 from planner.ontology.policies import project_ontology_assertions
-from planner.query_model.facts import (
-    active_fact_index,
-    active_substance_ids,
-    inactive_substance_ids,
-)
-from planner.query_model.relation_conflicts import (
-    RelationConflictWarningRow,
-    collect_intra_product_scheduling_constraint_conflicts,
-)
-from planner.query_model.relation_matches import collect_substance_relation_matches
-from planner.query_model.relation_warnings import (
-    RelationWarningRow,
-    collect_relation_warnings,
-)
-from planner.query_model.relations import (
-    classify_relations,
-)
-from planner.query_model.session import SurrealSession
-from planner.query_model.surreal import SurrealLoadContext, build_surreal_session
-from planner.schedule_types import ActiveFactIndexEntry
-from planner.scheduling_constraint_execution import compile_scheduling_constraint_execution_plans
+from planner.query_model.data import ReadModelData
+from planner.query_model.facts import active_substance_ids
+from planner.query_model.relations import classify_relations, resolve_relation_queries
+from planner.query_model.types import RelationReviewRow
 
 
 class StackReadModel:
-    """Facade over the command-scoped SurrealDB read model.
+    """Facade over plain command-scoped domain data."""
 
-    Commands and scheduling code depend on this surface, not on the SurrealDB SDK
-    or raw SurrealQL.
-    """
-
-    _db: SurrealSession
+    _data: ReadModelData
     _ontology_bundle: OntologyBundle
 
-    def __init__(self, db: SurrealSession, ontology_bundle: OntologyBundle) -> None:
-        self._db = db
+    def __init__(self, data: ReadModelData, ontology_bundle: OntologyBundle) -> None:
+        self._data = data
         self._ontology_bundle = ontology_bundle
 
     @property
@@ -47,99 +26,58 @@ class StackReadModel:
         """The verified ontology bundle used to build this command read model."""
         return self._ontology_bundle
 
-    def collect_relation_warnings(
-        self,
-        active_substances: set[str],
-    ) -> list[RelationWarningRow]:
-        return collect_relation_warnings(self._db, active_substances, self._ontology_bundle.runtime_program)
-
-    def collect_intra_product_scheduling_constraint_conflicts(
-        self,
-        *,
-        item_id: str,
-        product_id: str,
-        component_ids: list[str],
-    ) -> list[RelationConflictWarningRow]:
-        return collect_intra_product_scheduling_constraint_conflicts(
-            self._db,
-            self._ontology_bundle.runtime_program,
-            item_id=item_id,
-            product_id=product_id,
-            component_ids=component_ids,
-        )
-
-    def substance_relation_matches(
-        self,
-        substance_id: str,
-        substance_name: str,
-    ) -> list[tuple[dict[str, object], list[str]]]:
-        return collect_substance_relation_matches(self._db, substance_id, substance_name)
-
     def active_substance_ids(self) -> set[str]:
-        return active_substance_ids(self._db, self._ontology_bundle.runtime_program.glue_contract.inactive_stack_name)
-
-    def inactive_substance_ids(self) -> set[str]:
-        return inactive_substance_ids(self._db, self._ontology_bundle.runtime_program.glue_contract.inactive_stack_name)
+        routable_stack_names = set(
+            self._ontology_bundle.runtime_program.glue_contract.stack_partition.routable_stack_names
+        )
+        return active_substance_ids(self._data, routable_stack_names)
 
     def classify_relations(
         self,
         active_substances: set[str],
-    ) -> dict[str, list[dict[str, object]]]:
-        return classify_relations(self._db, active_substances, self._ontology_bundle.runtime_program)
-
-    def active_fact_index(
-        self,
-        *,
-        item_id_sequence: list[str],
-        item_products: dict[str, str],
-    ) -> list[ActiveFactIndexEntry]:
-        return active_fact_index(
-            self._db,
-            self._ontology_bundle,
-            item_id_sequence=item_id_sequence,
-            item_products=item_products,
-        )
+    ) -> list[RelationReviewRow]:
+        return classify_relations(self._data.relations, active_substances, self._ontology_bundle.runtime_program)
 
 
 def build_stack_read_model(
     substances: dict[str, Substance],
     relations: list[Relation],
-    products: dict[str, Product] | None = None,
+    products: dict[str, Product],
+    stacks: dict[str, list[str]],
     *,
-    context: SurrealLoadContext | None = None,
     ontology_bundle: OntologyBundle,
 ) -> StackReadModel:
     """Build the command-scoped read model from loaded YAML/domain objects."""
-    loaded_context = context or SurrealLoadContext(None, None, None, None)
+    _validate_catalog_references(substances, products, stacks)
     assertions = project_ontology_assertions(relations, ontology_bundle)
-    # Raw constraints are retained for provenance rows, while this
-    # boundary is the canonical fallback for callers that do not already own a
-    # command-level compilation.  A supplied typed tuple is reused verbatim so
-    # the planner command's exactly-once compilation is not repeated here.
-    scheduling_constraint_plans = loaded_context.scheduling_constraint_plans
-    if loaded_context.scheduling_constraints and not scheduling_constraint_plans:
-        scheduling_constraint_plans = compile_scheduling_constraint_execution_plans(
-            loaded_context.scheduling_constraints,
-            substances,
-            ontology_bundle.runtime_program,
-            ontology_bundle=ontology_bundle,
-        )
-    loaded_context = SurrealLoadContext(
-        policies=loaded_context.policies,
-        stacks_data=loaded_context.stacks_data,
-        pillbox_stack_names=loaded_context.pillbox_stack_names,
-        dashboards=loaded_context.dashboards,
-        scheduling_constraints=loaded_context.scheduling_constraints,
-        scheduling_constraint_plans=scheduling_constraint_plans,
-        ontology_assertions=assertions,
-    )
     return StackReadModel(
-        build_surreal_session(
-            substances,
-            relations,
-            products,
-            load_context=loaded_context,
-            ontology_bundle=ontology_bundle,
+        ReadModelData(
+            substances=substances,
+            products=products,
+            stacks=stacks,
+            relations=resolve_relation_queries(assertions, substances, ontology_bundle),
         ),
         ontology_bundle,
     )
+
+
+def _validate_catalog_references(
+    substances: dict[str, Substance],
+    products: dict[str, Product],
+    stacks: dict[str, list[str]],
+) -> None:
+    """Reject dangling stack and composition references before query projection."""
+    for stack_name, product_ids in stacks.items():
+        if not stack_name:
+            raise ValueError("read-model stack name must be non-empty")
+        for index, product_id in enumerate(product_ids):
+            if product_id not in products:
+                raise ValueError(f"read-model stack {stack_name!r}[{index}] references missing product {product_id!r}")
+
+    for product_id, product in products.items():
+        for index, component in enumerate(product.components):
+            if component.substance not in substances:
+                raise ValueError(
+                    f"read-model product {product_id!r}.components[{index}] "
+                    f"references missing substance {component.substance!r}"
+                )

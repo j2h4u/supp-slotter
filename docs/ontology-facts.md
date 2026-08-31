@@ -1,57 +1,64 @@
-# Ontology Pressure Points
+# Ontology Facts Authoring Guide
 
-This document keeps only current supplement facts that do not yet have a clear
-home in the ontology. It is not a history log.
+This is the current guide for admitting canonical scheduling facts. It is
+facts-only and is not a queue, coverage checklist, grooming workflow, or
+source of stored scheduling answers.
 
-Remove an entry as soon as it has a clear representation in substance cards,
-traits, dashboards, or `data/relations.yaml`. Past changes remain in git.
+## Closed fact boundary
 
-This is not medical advice, an evidence review, or a source of medical truth.
-Facts here are prompts for checking whether the current ontology can represent
-something without inventing unnecessary structure.
+The runtime accepts only these six typed fact families and their currently
+admitted values:
 
-Preferred modeling order:
-
-1. Use existing substance cards when possible.
-2. Use `data/relations.yaml` when a fact is substance-to-substance.
-3. Use reviewer facts (`knowledge.kind`, `knowledge.effect`, `knowledge.risk`,
-   `knowledge.pathway`) when the fact is reusable across cards or dashboard
-   projections.
-4. Use scheduling traits only when the planner needs a reusable slot-placement
-   rule.
-5. Do not create abstract mechanism entities such as
-   `vitamin_k_cellular_uptake`.
-
-## Open Pressure Points
-
-| Fact | Current fit | Next useful action |
+| Family | Admitted values | Universal law target |
 |---|---|---|
-| Calcium and magnesium separation is dose-dependent. | A slot-blocking scheduling constraint would overstate the rule without a dose model; notes or `review_with` are safer unless typical-dose co-slotting should be blocked. | Keep thresholds in relation `reason` or notes. Add dose modeling only if scheduler decisions need reliable product amounts. |
-| Metformin may matter for lactate/exercise-tolerance review. | The B12-status relation is already modeled; broader medication-performance context is not first-class. | Keep broader context in private user notes or `concerns` until repeated cases need structure. |
+| `FoodEffect` | `bioavailability_increases`, `bioavailability_decreases`, `tolerability_improves`, `tolerability_worsens` | `meal_context=with_food` or `without_food` |
+| `AcuteAlertnessEffect` | `acute_alertness_increases` | `circadian_anchor=wake` |
+| `AcuteSleepEffect` | `onset_latency_decreases`, `continuity_improves` | `circadian_anchor=sleep` |
+| `PreExercisePerformanceEffect` | `performance_improves` | `exercise_anchor=before` |
+| `PostExerciseRecoveryEffect` | `recovery_improves` | `exercise_anchor=after` |
+| `ProductFoodInstruction` | `take_with_food` | `meal_context=with_food` |
 
-## Current Boundaries
+Each fact has one typed subject, exact applicability (a reusable substance or
+composition role, or the product intake item where the product family
+requires it), and evidence provenance. A universal law maps one closed family
+and value to one dimension and value. Laws are identity-free: they do not name
+products, slots, desired placements, actions, explanations, or weights.
 
-- Dose thresholds may be documented in `reason`, `action`, notes, or
-  `concerns`; the planner does not calculate dose, ratio, or adequacy.
-- Use slot-blocking scheduling constraints only when co-slotting should be avoided at typical doses.
-- Use `supports` when absence of the supporter should produce a useful review
-  warning.
-- Use `review_with` for pairings that should produce a schedule warning when
-  both endpoints are active: functional opposition, additive pharmacology,
-  nutrient-status effects, medication interactions, or practical separation
-  advice that is dose-dependent and cannot be computed by the planner.
-- Ubiquitous cofactors should not become noisy `supports` edges. Add them only
-  when the target-specific warning or dashboard explanation is useful.
-- Encode a dashboard cluster when the fact is a useful review goal, not as a
-  generic supplement-knowledge bucket.
-- Treat goal dashboards as candidate-comparison surfaces, not as proof of
-  coverage, adequacy, safety, or recommendation.
-- Prefer dashboard membership from reusable semantic facts (`kind:`, `effect:`,
-  `risk:`, `pathway:`). Use `knowledge.context: <slug>` only for explicit
-  curated membership.
-- Keep proprietary blends, excipients, and non-specific label lines in product
-  notes unless they have scheduler behavior, dashboard/relation behavior, or a
-  reusable review trait.
-- Keep personal health history, actual intake history, adherence, reactions,
-  and operator-specific hypotheses out of tracked ontology files; use
-  gitignored `docs/private/` when needed.
+## Authoring procedure
+
+1. Confirm the claim is a world fact or relation, not a desired placement,
+   pair preference, action, explanation, candidate assessment, or inferred
+   result.
+2. Reuse the existing typed identity and exact composition role where one
+   exists. Preserve source and provenance on the fact; do not copy evidence
+   into a generic card field.
+3. Admit only a value in the table above and add or reuse its universal law.
+   Product-specific food instructions target the product intake item directly;
+   they do not transfer to component roles.
+4. If the claim needs a new family, value, dimension, applicability kind, or
+   law shape, stop. Write and obtain a new accepted V-left contract before
+   changing ontology sources or runtime code. Do not extend this vocabulary
+   by convention.
+5. Run the applicable `just` ontology/runtime checks after an approved source
+   change. Generated schedules and explanations are derived outputs, never
+   authoring inputs.
+
+## Explicit exclusions
+
+- Do not author generic `notes` as a product, substance, or component surface.
+  Route identity, composition, and provenance to their typed destinations;
+  leave unresolved research in offline evidence or gitignored
+  `docs/private/`, outside runtime inputs.
+- Do not create scheduling traits, slot-blocking constraints, pairwise
+  placement rules, capacity or physical-fit semantics, dose/frequency/clock
+  semantics, candidate or coverage records, grooming state, dashboards, or
+  numeric evidence weights as canonical facts.
+- Passive relations and review memberships remain outside inference unless a
+  future accepted V-left contract makes a typed fact/law path for them.
+- Absence of a fact means no derived pressure. Opposing values on one item and
+  dimension produce layout-free `Indeterminate`; they are not reconciled by
+  weighting or compromise.
+
+Historical adjudications and migration receipts may explain why a fact was
+admitted or omitted, but they are offline provenance only and cannot authorize
+new runtime inputs.

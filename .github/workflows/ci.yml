@@ -39,7 +39,7 @@ jobs:
         with:
           python-version: "3.14"
 
-      - uses: astral-sh/setup-uv@v9.0.0
+      - uses: astral-sh/setup-uv@v10.0.1
         with:
           enable-cache: true
 
@@ -48,7 +48,7 @@ jobs:
           tool: just
 
       - name: Install dependencies
-        run: uv sync --locked
+        run: uv sync --locked --group ontology
 
       - name: Release gate
         run: just release

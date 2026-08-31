@@ -5,14 +5,13 @@ urls:
 - https://energy-body.ru/items/vitamir-istochnik-https-vitamir-ru/kaliya-yodid/41269
 components:
 - substance: sub_e3af6f78d9
+  id: cmp_prd_c81eb18069__sub_e3af6f78d9
   label: Lion's Mane extract polysaccharides / beta-glucans
   amount: 150 mg polysaccharides per capsule; beta-glucans 150 mg (+/-20%)
 - substance: sub_a873e428ee
+  id: cmp_prd_c81eb18069__sub_a873e428ee
   label: Vitamin B6 (as pyridoxine hydrochloride)
   amount: 1 mg
-notes: Vitamir Lion's Mane + B6 concrete product formula; public label text lists
-  Lion's Mane extract polysaccharides/beta-glucans and vitamin B6 as pyridoxine
-  hydrochloride.
 concerns:
 - kind: data_quality
   text: Public Vitamir label text captures polysaccharides/beta-glucans, but not

@@ -1,42 +1,6 @@
 id: sub_396c221c31
 name: Picamilon
 form: sodium nicotinoyl gamma-aminobutyrate
-notes: 'Synthetic conjugate of GABA and niacin (nicotinic acid), developed in the
-  USSR. The registered Russian tablet instruction identifies the active substance as
-  the sodium salt of N-nicotinoyl-gamma-aminobutyric acid and states that tablets are
-  taken independently of meals. The same instruction lists allergic reactions (rash,
-  itching), dizziness, headache, mild nausea, irritability, anxiety, and excitation as
-  adverse effects; contraindications include hypersensitivity, chronic renal failure,
-  pregnancy, lactation, and children under 3 years; it reports shortened barbiturate
-  action and potentiation of opioid analgesics. Classified as a prescription drug in
-  Russia and not a lawful dietary ingredient for US dietary supplements under the FDA''s
-  2015 action. A 2023 broad-panel assay found weak or no binding for parent picamilon
-  against 50 tested biological targets (PMID 36668678); this is limited evidence under
-  tested conditions and does not establish clinical efficacy or inefficacy. Sources:
-  registered Russian instruction (Medi.ru); Russian medicines registry; FDA 2015
-  scientific memorandum and constituent action; PubMed 36668678.'
-scheduling_assessment:
-  intake:
-    conclusion: supports_no_rule
-    sources:
-    - https://medi.ru/instrukciya/pikamilon_22339/
-    summary: The registered Russian tablet instruction states that Picamilon is taken
-      independently of meals, supporting no executable food-state rule for this product
-      form.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://medi.ru/instrukciya/pikamilon_22339/
-    - https://pubmed.ncbi.nlm.nih.gov/20359966/
-    summary: The registered instruction and available clinical evidence do not establish
-      a general clock-time preference; no AM or PM rule is supported for this planner.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://medi.ru/instrukciya/pikamilon_22339/
-    - https://pubmed.ncbi.nlm.nih.gov/20359966/
-    summary: The instruction and available evidence do not establish a workout-linked
-      activity rule; no pre-workout or post-workout assignment is supported.
 knowledge:
   context:
   - value: neurocognitive_support

@@ -3,23 +3,25 @@ aliases:
 - NMN
 - beta-Nicotinamide mononucleotide
 - beta-NMN
-notes: Knowledge-only NAD-precursor reference card. Added because NMN is one of the best-known longevity/NAD supplement categories
-  and was missing while NR was already represented. Sources checked - PubChem beta-NMN record; PubMed NMN safety/performance
-  reviews; FDA citizen-petition response context.
 concerns:
-- kind: safety
-  text: Review product quality, dose, long-term evidence limits, cancer-context caution, and current jurisdiction/regulatory
-    status before treating NMN as practical NAD support.
 - kind: data_quality
   text: Product cards should distinguish NMN from NR, niacin, nicotinamide, NAD+ injections, and multi-precursor blends; do
     not transfer evidence between forms without label-specific support.
 knowledge:
   context:
-  - mitochondrial_health
+  - value: mitochondrial_health
+    research_state: unassessed
+    sources: []
   effect:
-  - nad_precursor_support
+  - value: nad_precursor_support
+    research_state: unassessed
+    sources: []
   kind:
-  - nucleotide
+  - value: nucleotide
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_7ozks6pos5

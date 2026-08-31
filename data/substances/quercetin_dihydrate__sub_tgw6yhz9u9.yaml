@@ -3,22 +3,33 @@ name: Quercetin
 form: dihydrate
 aliases:
 - quercetin dihydrate
-notes: Flavonoid with anti-inflammatory and CYP-modulating activity; mild antiplatelet potential and possible interaction
-  with various medications. Distinct from dihydroquercetin (taxifolin), which is a different molecule.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - anti_inflammatory_context
-  - vascular_polyphenol_context
-  - cyp_modulation_context
+  - value: anti_inflammatory_context
+    research_state: unassessed
+    sources: []
+  - value: vascular_polyphenol_context
+    research_state: unassessed
+    sources: []
+  - value: cyp_modulation_context
+    research_state: unassessed
+    sources: []
   kind:
-  - flavonoid
+  - value: flavonoid
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - bleeding_med_interaction
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: bleeding_med_interaction
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

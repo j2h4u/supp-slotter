@@ -17,7 +17,7 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
-from planner.ontology.artifacts import load_ontology  # noqa: E402
+from planner.ontology.artifacts import load_formal_ontology  # noqa: E402
 from planner.ontology.projection import project_repository  # noqa: E402
 from planner.ontology.validation import validate_graph  # noqa: E402
 
@@ -59,7 +59,7 @@ def _path(repository_root: Path, *, include_compile: bool) -> CorpusRun:
 
         compile_ontology(ontology_root)
     phase_start = time.monotonic()
-    bundle = load_ontology(ontology_root)
+    bundle = load_formal_ontology(ontology_root)
     phases["ontology_load_seconds"] = time.monotonic() - phase_start
     phase_start = time.monotonic()
     projection = project_repository(repository_root, bundle)

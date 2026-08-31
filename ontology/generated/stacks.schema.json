@@ -2,8 +2,47 @@
   "$id": "https://j2h4u.github.io/supp-slotter/ontology/v1/generated/stacks.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
-  "patternProperties": {
-    "^[a-z][a-z0-9_]*$": {
+  "properties": {
+    "daily": {
+      "items": {
+        "pattern": "^prd_[a-z0-9]{10}$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "inactive": {
+      "items": {
+        "pattern": "^prd_[a-z0-9]{10}$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "tracked_unassigned": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "product": {
+            "pattern": "^prd_[a-z0-9]{10}$",
+            "type": "string"
+          },
+          "reason": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product",
+          "reason"
+        ],
+        "type": "object"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "training": {
       "items": {
         "pattern": "^prd_[a-z0-9]{10}$",
         "type": "string"
@@ -11,6 +50,9 @@
       "type": "array",
       "uniqueItems": true
     }
+  },
+  "propertyNames": {
+    "pattern": "^[a-z][a-z0-9_]*$"
   },
   "title": "Supp Slotter canonical stack source contract",
   "type": "object"

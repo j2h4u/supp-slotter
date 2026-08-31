@@ -2,15 +2,15 @@ id: sub_85w45nbob4
 name: L-Glutamine
 aliases:
 - glutamine
-notes: Conditionally essential amino acid; common in amino-acid blends and athletic products. Empty stomach preferred for
-  systemic absorption away from food amino-acid competition. Review context - gut/immune cell fuel and nitrogen-transfer context;
-  clinical relevance is dose- and stress-state-dependent.
-schedule:
-  intake:
-  - empty_preferred
 knowledge:
   effect:
-  - gut_barrier_context
-  - immune_cell_context
+  - value: gut_barrier_context
+    research_state: unassessed
+    sources: []
+  - value: immune_cell_context
+    research_state: unassessed
+    sources: []
   kind:
-  - amino
+  - value: amino
+    research_state: unassessed
+    sources: []

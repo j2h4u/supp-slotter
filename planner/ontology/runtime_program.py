@@ -11,37 +11,19 @@ from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
     IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
     IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS,
-    IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE,
     IMPLEMENTED_RELATION_SELECTOR_FORMS,
-    relation_presence_active_side,
 )
 
-IMPLEMENTED_OBJECTIVE_FUNCTION = "slot_score_plus_prefer_with_minus_quadratic_balance_penalty"
-IMPLEMENTED_BALANCE_PENALTY_EXPRESSION = "balance_weight * sum(slot_count^2)"
-IMPLEMENTED_TIE_BREAK = "stable_slot_order"
-IMPLEMENTED_AGGREGATION_MODE = "sum_unique_component_assignments"
+IMPLEMENTED_TIE_BREAK = "stable_item_id_then_(slot.order,slot_id)"
+IMPLEMENTED_RUNTIME_PROGRAM_SCHEMA_VERSION = "2"
+IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY = "exact_role_or_all_roles_with_equal_substance"
+IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY = "slot_anchor_at_pressure_dimension_equals_pressure_value"
+_RUNTIME_PROGRAM_PROVENANCE_SOURCE = "ontology/runtime-policy.yaml"
+_SHA256_HEX = frozenset("0123456789abcdef")
 
 
 def _error(label: str, message: str) -> OntologyInfrastructureError:
     return OntologyInfrastructureError(f"runtime program {label} {message}", code=MALFORMED)
-
-
-def _validate_effect_scoring_interlock(effect_scoring: RuntimeEffectScoring) -> None:
-    """Fail while decoding when the compiled ontology requests unsupported search math."""
-    if (
-        effect_scoring.aggregation_mode != IMPLEMENTED_AGGREGATION_MODE
-        or effect_scoring.objective_function != IMPLEMENTED_OBJECTIVE_FUNCTION
-        or effect_scoring.balance_penalty_expression != IMPLEMENTED_BALANCE_PENALTY_EXPRESSION
-        or effect_scoring.tie_break != IMPLEMENTED_TIE_BREAK
-    ):
-        raise _error(
-            "effect_scoring",
-            "declares an objective not implemented by planner search: "
-            f"objective_function={effect_scoring.objective_function!r}, "
-            f"aggregation_mode={effect_scoring.aggregation_mode!r}, "
-            f"balance_penalty_expression={effect_scoring.balance_penalty_expression!r}, "
-            f"tie_break={effect_scoring.tie_break!r}",
-        )
 
 
 def _map(value: object, label: str) -> Mapping[str, object]:
@@ -66,9 +48,16 @@ def _exact_map(value: object, label: str, expected: frozenset[str]) -> Mapping[s
 
 
 def _str(value: object, label: str) -> str:
-    if not isinstance(value, str) or not value:
-        raise _error(label, "must be a non-empty string")
+    if not isinstance(value, str) or not value.strip() or value != value.strip():
+        raise _error(label, "must be a non-blank, unpadded string")
     return value
+
+
+def _sha256(value: object, label: str) -> str:
+    result = _str(value, label)
+    if len(result) != 64 or any(character not in _SHA256_HEX for character in result):
+        raise _error(label, "must be a lowercase SHA-256 digest")
+    return result
 
 
 def _bool(value: object, label: str) -> bool:
@@ -94,19 +83,6 @@ def _cardinality(value: object, label: str) -> int | None:
     if value is None:
         return None
     return _nonnegative_int(value, label)
-
-
-def _number(value: object, label: str) -> float | int:
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
-        raise _error(label, "must be a number")
-    return value
-
-
-def _nonnegative_number(value: object, label: str) -> float | int:
-    result = _number(value, label)
-    if result < 0:
-        raise _error(label, "must be a non-negative number")
-    return result
 
 
 def _rows(
@@ -159,45 +135,23 @@ def _strings(value: object, label: str) -> tuple[str, ...]:
     return result
 
 
-def _truth_table(value: object, label: str) -> tuple[tuple[bool, bool], ...]:
-    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
-        raise _error(label, "must be a list")
-    sequence = cast(Sequence[object], value)
-    states: list[tuple[bool, bool]] = []
-    for index, item in enumerate(sequence):
-        row = _exact_map(
-            item,
-            f"{label}[{index}]",
-            RUNTIME_PROJECTION_ROW_FIELDS["glue_contract.relation_presence_truth_table"],
-        )
-        source_active = _bool(row.get("source_active"), f"{label}[{index}].source_active")
-        target_active = _bool(row.get("target_active"), f"{label}[{index}].target_active")
-        state = (source_active, target_active)
-        if state in states:
-            raise _error(label, f"has duplicate truth-table state {state!r}")
-        states.append(state)
-    expected = set(IMPLEMENTED_RELATION_PRESENCE_TRUTH_TABLE)
-    if set(states) != expected:
-        raise _error(label, "must have exact unique four-state coverage")
-    return tuple(states)
+@dataclass(frozen=True, slots=True)
+class RuntimeStackPartition:
+    """Authored ownership and routing partition for stack membership."""
+
+    id: str
+    routable_stack_names: tuple[str, ...]
+    excluded_stack_names: tuple[str, ...]
+    tracked_unassigned_partition_name: str
 
 
 @dataclass(frozen=True, slots=True)
 class RuntimeGlueContract:
     id: str
     inactive_stack_name: str
-    source_kinds: tuple[str, ...]
-    source_kind_roles: tuple[str, ...]
-    relation_warning_filter_fields: tuple[str, ...]
-    relation_warning_active_sides: tuple[str, ...]
-    relation_presence_active_sides: tuple[str, ...]
-    relation_presence_truth_table: tuple[tuple[bool, bool], ...]
+    stack_partition: RuntimeStackPartition
     relation_endpoint_selector_kinds: tuple[str, ...]
     relation_selector_forms: tuple[str, ...]
-    warning_emitter_ids: tuple[str, ...]
-    prefer_with_source_fields: tuple[str, ...]
-    prefer_with_target_resolutions: tuple[str, ...]
-    prefer_with_pair_modes: tuple[str, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -211,152 +165,30 @@ class RuntimeEngineSemantic:
 
 
 @dataclass(frozen=True, slots=True)
-class RuntimeEngineConformanceScenario:
-    """A stable fixture identity and expected protocol outcome."""
-
-    id: str
-    semantic: str
-    fixture: str
-    expected: str
-
-
-@dataclass(frozen=True, slots=True)
 class RuntimeEngineContract:
     """Versioned protocol metadata for independent scheduler implementations."""
 
     id: str
     protocol_version: str
     result_mode: str
-    semantics: tuple[RuntimeEngineSemantic, ...]
-    conformance_scenarios: tuple[RuntimeEngineConformanceScenario, ...]
-
-
-IMPLEMENTED_ENGINE_CONTRACT_PROTOCOL = "supp-slotter.engine-contract/v1"
-IMPLEMENTED_ENGINE_RESULT_MODES = frozenset({"exact_assignment"})
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeSourceKindValuePolicy:
-    id: str
-    source_kind: str
-    applies_to: tuple[str, ...]
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeEffectMatchDimension:
-    id: str
-    key: str
-    slot_field: str
-    value_type: str
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeAssignmentAxis:
-    id: str
-    axis: str
-    order: int
-    assignment_source: str
-    assignment_field: str
-    minimum_cardinality: int
-    maximum_cardinality: int | None
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeEffectScore:
-    id: str
-    level: str
-    score: float | int
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeEffectScoring:
-    id: str
-    aggregation_mode: str
-    scores: tuple[RuntimeEffectScore, ...]
-    objective_function: str
-    balance_penalty_expression: str
+    pressure_identity: tuple[str, ...]
+    applicability_expansion_strategy: str
+    pressure_satisfaction_strategy: str
+    domain_feasibility: str
+    primary_objective: str
+    secondary_objective: str
     tie_break: str
-    balance_weight: float | int
-    prefer_with_bonus: int
-
-    @property
-    def scores_by_level(self) -> Mapping[str, RuntimeEffectScore]:
-        return MappingProxyType({row.level: row for row in self.scores})
+    publication_statuses: tuple[str, ...]
+    semantics: tuple[RuntimeEngineSemantic, ...]
 
 
-@dataclass(frozen=True, slots=True)
-class RuntimePreferWithPolicy:
-    id: str
-    source_field: str
-    target_resolution: str
-    pair_mode: str
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeConstraintExecutionPolicy:
-    id: str
-    operation: str
-    match_direction: str
-    aggregation: str
-    selector_resolution: str
-    blocks_slots: bool
-    scores_advisory: bool
-    score_delta: int
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeWarningTypePolicy:
-    id: str
-    warning_type: str
-    label: str
-    action_text: str
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeWarningEmitterPolicy:
-    id: str
-    emitter: str
-    warning_type: str
-    default_message: str
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeWarningTraitAction:
-    id: str
-    trait_id: str
-    action_text: str
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeConcernCatalogEntry:
-    id: str
-    concern_kind: str
-    warning_type: str
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeRelationWarningRule:
-    id: str
-    relation_kind: str
-    filter_field: str
-    filter_value: str
-    active_side: str
-    warning_type: str
-    reverse_output: bool
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeRelationPresenceStatusPolicy:
-    id: str
-    status: str
-    source_active: bool
-    target_active: bool
-    description: str
-
-    @property
-    def active_side(self) -> str:
-        """Canonical label derived from the strict endpoint truth state."""
-        return relation_presence_active_side(self.source_active, self.target_active)
+IMPLEMENTED_ENGINE_CONTRACT_PROTOCOL = "supp-slotter.engine-contract/v2"
+IMPLEMENTED_ENGINE_RESULT_MODES = frozenset({"exact_assignment"})
+IMPLEMENTED_PRESSURE_IDENTITY = ("item_id", "dimension", "value")
+IMPLEMENTED_DOMAIN_FEASIBILITY = "unbounded_logical_domain"
+IMPLEMENTED_PRIMARY_OBJECTIVE = "maximize_unique_pressure_satisfaction"
+IMPLEMENTED_SECONDARY_OBJECTIVE = "minimize_integer_squared_load_per_domain"
+IMPLEMENTED_PUBLICATION_STATUSES = ("Optimal", "Indeterminate")
 
 
 @dataclass(frozen=True, slots=True)
@@ -454,21 +286,269 @@ class RuntimeDashboardStateCatalog:
 
 
 @dataclass(frozen=True, slots=True)
-class RuntimeGroomingRankFieldPolicy:
+class RuntimeCompositionRole:
+    """Stable product/substance composition identity used by canonical facts."""
+
     id: str
-    field: str
-    direction: str
+    product: str
+    substance: str
 
 
 @dataclass(frozen=True, slots=True)
-class RuntimeGroomingPolicy:
+class RuntimeEvidenceSource:
+    """Stable identity for an evidence source."""
+
     id: str
-    require_active_reachable: bool
-    open_research_state: str
-    rank_fields: tuple[RuntimeGroomingRankFieldPolicy, ...]
-    selection_count: int
-    relation_owner_field: str
-    relation_owner_direction: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeFactSubject:
+    """Exactly one typed subject selector for a canonical fact.
+
+    ``product`` is reserved for the product-scoped instruction family.  It is
+    intentionally decoded as a target in its own right so inference can route
+    directly to the product intake item without expanding composition roles.
+    """
+
+    substance: str | None = None
+    composition_role: str | None = None
+    product: str | None = None
+
+    @property
+    def target_kind(self) -> str:
+        if self.product is not None:
+            return "product"
+        return "substance" if self.substance is not None else "composition_role"
+
+    @property
+    def target_id(self) -> str:
+        target = self.product or self.substance or self.composition_role
+        if target is None:  # pragma: no cover - decoding establishes the XOR invariant.
+            raise ValueError("fact subject has no target")
+        return target
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeFactApplicability:
+    """Exactly one declared target selector for a canonical fact."""
+
+    substance: str | None = None
+    composition_role: str | None = None
+    product: str | None = None
+
+    @property
+    def target_kind(self) -> str:
+        if self.product is not None:
+            return "product"
+        return "substance" if self.substance is not None else "composition_role"
+
+    @property
+    def target_id(self) -> str:
+        target = self.product or self.substance or self.composition_role
+        if target is None:  # pragma: no cover - decoding establishes the XOR invariant.
+            raise ValueError("fact applicability has no target")
+        return target
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeEvidenceProvenance:
+    source: str
+    locator: str
+    quotation: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeCanonicalSchedulingFact:
+    id: str
+    family: str
+    subject: RuntimeFactSubject
+    applicability: RuntimeFactApplicability
+    provenance: tuple[RuntimeEvidenceProvenance, ...]
+    value: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeCanonicalLaw:
+    """One compiler-emitted, identity-free canonical inference law.
+
+    Laws are indexed by ``(family, fact_value)`` by the inference executor.
+    The law carries no item or evidence identity: those belong to the fact and
+    the proof produced while traversing an applicability role.
+    """
+
+    id: str
+    family: str
+    fact_value: str
+    dimension: str
+    pressure_value: str
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimePressureDimension:
+    id: str
+    pressure_values: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeCanonicalFactFamily:
+    id: str
+    fact_values: tuple[str, ...]
+    dimension: str
+    target_kind: str = "fact_subject"
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeCanonicalScheduling:
+    """Closed, data-derived scheduler evidence and universal laws."""
+
+    dimensions: tuple[RuntimePressureDimension, ...]
+    families: tuple[RuntimeCanonicalFactFamily, ...]
+    evidence_sources: tuple[RuntimeEvidenceSource, ...]
+    facts: tuple[RuntimeCanonicalSchedulingFact, ...]
+    laws: tuple[RuntimeCanonicalLaw, ...]
+
+    def __post_init__(self) -> None:
+        _validate_runtime_canonical_scheduling(self)
+
+    @property
+    def dimensions_by_id(self) -> Mapping[str, RuntimePressureDimension]:
+        return MappingProxyType({row.id: row for row in self.dimensions})
+
+    @property
+    def families_by_id(self) -> Mapping[str, RuntimeCanonicalFactFamily]:
+        return MappingProxyType({row.id: row for row in self.families})
+
+    @property
+    def laws_by_key(self) -> Mapping[tuple[str, str], RuntimeCanonicalLaw]:
+        return MappingProxyType({(row.family, row.fact_value): row for row in self.laws})
+
+    @property
+    def pressure_values_by_dimension(self) -> Mapping[str, frozenset[str]]:
+        return MappingProxyType({row.id: frozenset(row.pressure_values) for row in self.dimensions})
+
+
+def _validate_runtime_canonical_scheduling(catalog: RuntimeCanonicalScheduling) -> None:
+    """Keep the compiled canonical graph internally complete at its owner."""
+    _validate_canonical_row_types(catalog)
+    dimensions = _canonical_pressure_dimensions(catalog.dimensions)
+    families = _canonical_fact_families(catalog.families, dimensions)
+    _validate_canonical_graph_shape(dimensions, families)
+    sources = _canonical_evidence_sources(catalog.evidence_sources)
+    _validate_canonical_facts(catalog.facts, families, sources)
+    _validate_canonical_laws(catalog.laws, catalog.families, families, dimensions)
+
+
+def _validate_canonical_row_types(catalog: RuntimeCanonicalScheduling) -> None:
+    _require_canonical_row_type(
+        catalog.dimensions, "dimensions", RuntimePressureDimension, "runtime pressure dimensions"
+    )
+    _require_canonical_row_type(catalog.families, "families", RuntimeCanonicalFactFamily, "runtime fact families")
+    _require_canonical_row_type(
+        catalog.evidence_sources, "evidence_sources", RuntimeEvidenceSource, "runtime evidence sources"
+    )
+    _require_canonical_row_type(catalog.facts, "facts", RuntimeCanonicalSchedulingFact, "runtime canonical facts")
+    _require_canonical_row_type(catalog.laws, "laws", RuntimeCanonicalLaw, "runtime canonical laws")
+
+
+def _require_canonical_row_type(rows: tuple[object, ...], label: str, row_type: type[object], description: str) -> None:
+    if not all(isinstance(row, row_type) for row in rows):
+        raise _error(f"canonical_scheduling.{label}", f"must contain {description}")
+
+
+def _canonical_pressure_dimensions(
+    rows: tuple[RuntimePressureDimension, ...],
+) -> dict[str, set[str]]:
+    dimensions = {row.id: set(row.pressure_values) for row in rows}
+    if len(dimensions) != len(rows):
+        raise _error("canonical_scheduling", "has duplicate dimensions or families")
+    if any(
+        not row.id or not row.pressure_values or len(set(row.pressure_values)) != len(row.pressure_values)
+        for row in rows
+    ):
+        raise _error("canonical_scheduling.dimensions", "has empty or duplicate values")
+    return dimensions
+
+
+def _canonical_fact_families(
+    rows: tuple[RuntimeCanonicalFactFamily, ...], dimensions: Mapping[str, set[str]]
+) -> dict[str, RuntimeCanonicalFactFamily]:
+    families = {row.id: row for row in rows}
+    if len(families) != len(rows):
+        raise _error("canonical_scheduling", "has duplicate dimensions or families")
+    if any(
+        not row.id
+        or not row.fact_values
+        or len(set(row.fact_values)) != len(row.fact_values)
+        or row.dimension not in dimensions
+        or row.target_kind not in {"fact_subject", "product"}
+        for row in rows
+    ):
+        raise _error("canonical_scheduling.families", "has an incomplete dimension or fact-value graph")
+    return families
+
+
+def _validate_canonical_graph_shape(
+    dimensions_by_id: Mapping[str, set[str]],
+    families_by_id: Mapping[str, RuntimeCanonicalFactFamily],
+) -> None:
+    if bool(dimensions_by_id) != bool(families_by_id):
+        raise _error("canonical_scheduling", "must contain dimensions and families together")
+
+
+def _canonical_evidence_sources(rows: tuple[RuntimeEvidenceSource, ...]) -> set[str]:
+    sources = {row.id for row in rows}
+    if any(not row.id for row in rows) or len(sources) != len(rows):
+        raise _error("canonical_scheduling.evidence_sources", "has duplicate or empty identities")
+    return sources
+
+
+def _validate_canonical_facts(
+    facts: tuple[RuntimeCanonicalSchedulingFact, ...],
+    families: Mapping[str, RuntimeCanonicalFactFamily],
+    sources: set[str],
+) -> None:
+    for fact in facts:
+        family = families.get(fact.family)
+        if family is None:
+            raise _error("canonical_scheduling.facts", "references an unknown family, value, or evidence source")
+        if (
+            fact.value not in family.fact_values
+            or any(provenance.source not in sources for provenance in fact.provenance)
+            or (family.target_kind == "product") != (fact.applicability.product is not None)
+            or (family.target_kind == "product" and fact.subject.product != fact.applicability.product)
+        ):
+            raise _error("canonical_scheduling.facts", "references an unknown family, value, or evidence source")
+
+
+def _validate_canonical_laws(
+    laws: tuple[RuntimeCanonicalLaw, ...],
+    families: tuple[RuntimeCanonicalFactFamily, ...],
+    families_by_id: Mapping[str, RuntimeCanonicalFactFamily],
+    dimensions: Mapping[str, set[str]],
+) -> None:
+    expected = {(family.id, value) for family in families for value in family.fact_values}
+    actual = {(law.family, law.fact_value) for law in laws}
+    if (
+        actual != expected
+        or len(actual) != len(laws)
+        or any(not _is_admissible_canonical_law(law, families_by_id, dimensions) for law in laws)
+    ):
+        raise _error("canonical_scheduling.laws", "does not have exact admissible coverage")
+
+
+def _is_admissible_canonical_law(
+    law: RuntimeCanonicalLaw,
+    families: Mapping[str, RuntimeCanonicalFactFamily],
+    dimensions: Mapping[str, set[str]],
+) -> bool:
+    family = families.get(law.family)
+    return (
+        bool(law.id)
+        and family is not None
+        and law.dimension in dimensions
+        and law.dimension == family.dimension
+        and law.pressure_value in dimensions[law.dimension]
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -478,104 +558,46 @@ class RuntimeProgram:
     source_hash: str
     engine_contract: RuntimeEngineContract
     glue_contract: RuntimeGlueContract
-    source_kind_values: tuple[RuntimeSourceKindValuePolicy, ...]
-    assignment_axes: tuple[RuntimeAssignmentAxis, ...]
-    slot_near_values: tuple[str, ...]
-    effect_match_dimensions: tuple[RuntimeEffectMatchDimension, ...]
-    effect_scoring: RuntimeEffectScoring
-    prefer_with_policy: RuntimePreferWithPolicy
-    constraint_execution_policies: tuple[RuntimeConstraintExecutionPolicy, ...]
-    warning_types: tuple[RuntimeWarningTypePolicy, ...]
-    warning_emitters: tuple[RuntimeWarningEmitterPolicy, ...]
-    warning_trait_actions: tuple[RuntimeWarningTraitAction, ...]
-    concern_catalog: tuple[RuntimeConcernCatalogEntry, ...]
-    relation_warning_rules: tuple[RuntimeRelationWarningRule, ...]
-    relation_presence_statuses: tuple[RuntimeRelationPresenceStatusPolicy, ...]
     selector_form_capabilities: tuple[RuntimeSelectorFormCapability, ...]
     dashboard_state_catalog: RuntimeDashboardStateCatalog
-    grooming_policy: RuntimeGroomingPolicy
-
-    @property
-    def effect_score_levels(self) -> frozenset[str]:
-        return frozenset(item.level for item in self.effect_scoring.scores)
-
-    @property
-    def effect_match_dimensions_by_key(self) -> Mapping[str, RuntimeEffectMatchDimension]:
-        return MappingProxyType({item.key: item for item in self.effect_match_dimensions})
-
-    @property
-    def warning_types_by_type(self) -> Mapping[str, RuntimeWarningTypePolicy]:
-        return MappingProxyType({item.warning_type: item for item in self.warning_types})
-
-    @property
-    def warning_emitters_by_emitter(self) -> Mapping[str, RuntimeWarningEmitterPolicy]:
-        return MappingProxyType({item.emitter: item for item in self.warning_emitters})
-
-    @property
-    def relation_presence_statuses_by_status(self) -> Mapping[str, RuntimeRelationPresenceStatusPolicy]:
-        return MappingProxyType({item.status: item for item in self.relation_presence_statuses})
-
-    @property
-    def relation_presence_statuses_by_active_side(self) -> Mapping[str, RuntimeRelationPresenceStatusPolicy]:
-        return MappingProxyType({item.active_side: item for item in self.relation_presence_statuses})
+    canonical_scheduling: RuntimeCanonicalScheduling
 
     @property
     def selector_form_capabilities_by_form(self) -> Mapping[str, RuntimeSelectorFormCapability]:
         return MappingProxyType({item.selector_form: item for item in self.selector_form_capabilities})
 
-    @property
-    def warning_trait_actions_by_trait(self) -> Mapping[str, RuntimeWarningTraitAction]:
-        return MappingProxyType({item.trait_id: item for item in self.warning_trait_actions})
 
-    @property
-    def concern_warning_catalog_by_kind(self) -> Mapping[str, str]:
-        return MappingProxyType({item.concern_kind: item.warning_type for item in self.concern_catalog})
-
-    def constraint_execution_policy_for(self, operation: str) -> RuntimeConstraintExecutionPolicy | None:
-        return next((item for item in self.constraint_execution_policies if item.operation == operation), None)
-
-
-# This is technical dispatch metadata, not an authored domain vocabulary.  The
-# compiler imports it to validate the descriptor tree, while the decoder uses
-# it to reject silently ignored projection branches and row fields.  Deriving
-# record fields from the DTOs keeps the two boundaries closed together when a
-# retained runtime field is added or removed.
-_PROJECTION_RECORDS: Mapping[str, type[object]] = {
+# This is technical dispatch metadata, not an authored domain vocabulary. The
+# compiler uses it to validate the closed runtime record contract, while the
+# decoder rejects silently ignored record fields. Deriving record fields from
+# the DTOs keeps the two boundaries closed together when a retained runtime
+# field is added or removed.
+_RUNTIME_RECORDS: Mapping[str, type[object]] = {
     "engine_contract": RuntimeEngineContract,
     "engine_contract.semantics": RuntimeEngineSemantic,
-    "engine_contract.conformance_scenarios": RuntimeEngineConformanceScenario,
     "glue_contract": RuntimeGlueContract,
-    "effect_scoring": RuntimeEffectScoring,
-    "prefer_with_policy": RuntimePreferWithPolicy,
-    "source_kind_values": RuntimeSourceKindValuePolicy,
-    "assignment_axes": RuntimeAssignmentAxis,
-    "effect_match_dimensions": RuntimeEffectMatchDimension,
-    "effect_scoring.scores": RuntimeEffectScore,
-    "constraint_execution_policies": RuntimeConstraintExecutionPolicy,
-    "warning_types": RuntimeWarningTypePolicy,
-    "warning_emitters": RuntimeWarningEmitterPolicy,
-    "warning_trait_actions": RuntimeWarningTraitAction,
-    "concern_catalog": RuntimeConcernCatalogEntry,
-    "relation_warning_rules": RuntimeRelationWarningRule,
-    "relation_presence_statuses": RuntimeRelationPresenceStatusPolicy,
+    "glue_contract.stack_partition": RuntimeStackPartition,
     "selector_form_capabilities": RuntimeSelectorFormCapability,
     "dashboard_state_catalog": RuntimeDashboardStateCatalog,
     "dashboard_state_catalog.usage_states": RuntimeDashboardUsageStateDefinition,
     "dashboard_state_catalog.product_tracking_states": RuntimeDashboardProductTrackingStateDefinition,
     "dashboard_state_catalog.usage_truth_table": RuntimeDashboardUsageTruthState,
     "dashboard_state_catalog.product_tracking_truth_table": RuntimeDashboardProductTrackingTruthState,
-    "grooming_policy": RuntimeGroomingPolicy,
-    "grooming_policy.rank_fields": RuntimeGroomingRankFieldPolicy,
+    "canonical_scheduling": RuntimeCanonicalScheduling,
+    "canonical_scheduling.dimensions": RuntimePressureDimension,
+    "canonical_scheduling.families": RuntimeCanonicalFactFamily,
+    "canonical_scheduling.evidence_sources": RuntimeEvidenceSource,
+    "canonical_scheduling.facts": RuntimeCanonicalSchedulingFact,
+    "canonical_scheduling.laws": RuntimeCanonicalLaw,
 }
 _MAPPING_RECORD_PATHS = frozenset({
     "engine_contract",
     "glue_contract",
-    "effect_scoring",
-    "prefer_with_policy",
+    "glue_contract.stack_partition",
     "dashboard_state_catalog",
-    "grooming_policy",
+    "canonical_scheduling",
 })
-RUNTIME_PROJECTION_FIELDS: Mapping[str, frozenset[str]] = MappingProxyType({
+RUNTIME_PROGRAM_FIELDS: Mapping[str, frozenset[str]] = MappingProxyType({
     "": frozenset(
         field.name
         for field in fields(RuntimeProgram)
@@ -583,17 +605,16 @@ RUNTIME_PROJECTION_FIELDS: Mapping[str, frozenset[str]] = MappingProxyType({
     ),
     **{
         path: frozenset(field.name for field in fields(record))
-        for path, record in _PROJECTION_RECORDS.items()
+        for path, record in _RUNTIME_RECORDS.items()
         if path in _MAPPING_RECORD_PATHS
     },
 })
-RUNTIME_PROJECTION_ROW_FIELDS: Mapping[str, frozenset[str]] = MappingProxyType({
+RUNTIME_PROGRAM_ROW_FIELDS: Mapping[str, frozenset[str]] = MappingProxyType({
     **{
         path: frozenset(field.name for field in fields(record))
-        for path, record in _PROJECTION_RECORDS.items()
+        for path, record in _RUNTIME_RECORDS.items()
         if path not in _MAPPING_RECORD_PATHS
     },
-    "glue_contract.relation_presence_truth_table": frozenset({"source_active", "target_active"}),
 })
 
 
@@ -611,140 +632,12 @@ def _typed_rows[T](
     return cast(tuple[T, ...], tuple(result))
 
 
-def _source_kind(row: Mapping[str, object], label: str) -> RuntimeSourceKindValuePolicy:
-    return RuntimeSourceKindValuePolicy(
-        _str(row["id"], f"{label}.id"),
-        _str(row["source_kind"], f"{label}.source_kind"),
-        _strings(row["applies_to"], f"{label}.applies_to"),
-    )
-
-
 def _engine_semantic(row: Mapping[str, object], label: str) -> RuntimeEngineSemantic:
     return RuntimeEngineSemantic(
         _str(row["id"], f"{label}.id"),
         _str(row["category"], f"{label}.category"),
         _str(row["rule"], f"{label}.rule"),
         _str(row["source_of_truth"], f"{label}.source_of_truth"),
-    )
-
-
-def _engine_scenario(row: Mapping[str, object], label: str) -> RuntimeEngineConformanceScenario:
-    return RuntimeEngineConformanceScenario(
-        _str(row["id"], f"{label}.id"),
-        _str(row["semantic"], f"{label}.semantic"),
-        _str(row["fixture"], f"{label}.fixture"),
-        _str(row["expected"], f"{label}.expected"),
-    )
-
-
-def _axis(row: Mapping[str, object], label: str) -> RuntimeAssignmentAxis:
-    minimum = _cardinality(row.get("minimum_cardinality", 0), f"{label}.minimum_cardinality")
-    maximum = _cardinality(row.get("maximum_cardinality", 1), f"{label}.maximum_cardinality")
-    if minimum is None:
-        minimum = 0
-    if maximum is not None and minimum > maximum:
-        raise _error(label, "minimum_cardinality exceeds maximum_cardinality")
-    return RuntimeAssignmentAxis(
-        _str(row["id"], f"{label}.id"),
-        _str(row["axis"], f"{label}.axis"),
-        _int(row["order"], f"{label}.order"),
-        _str(row["assignment_source"], f"{label}.assignment_source"),
-        _str(row["assignment_field"], f"{label}.assignment_field"),
-        minimum,
-        maximum,
-    )
-
-
-def axis_cardinality_violation(axis: RuntimeAssignmentAxis, count: int) -> str | None:
-    """Return a diagnostic when an assertion count violates one axis."""
-    if count < axis.minimum_cardinality:
-        return f"requires at least {axis.minimum_cardinality} value(s), got {count}"
-    if axis.maximum_cardinality is not None and count > axis.maximum_cardinality:
-        return f"allows at most {axis.maximum_cardinality} value(s), got {count}"
-    return None
-
-
-def _dimension(row: Mapping[str, object], label: str) -> RuntimeEffectMatchDimension:
-    return RuntimeEffectMatchDimension(
-        _str(row["id"], f"{label}.id"),
-        _str(row["key"], f"{label}.key"),
-        _str(row["slot_field"], f"{label}.slot_field"),
-        _str(row["value_type"], f"{label}.value_type"),
-    )
-
-
-def _policy(row: Mapping[str, object], label: str) -> RuntimeConstraintExecutionPolicy:
-    return RuntimeConstraintExecutionPolicy(
-        _str(row["id"], f"{label}.id"),
-        _str(row["operation"], f"{label}.operation"),
-        _str(row["match_direction"], f"{label}.match_direction"),
-        _str(row["aggregation"], f"{label}.aggregation"),
-        _str(row["selector_resolution"], f"{label}.selector_resolution"),
-        _bool(row["blocks_slots"], f"{label}.blocks_slots"),
-        _bool(row["scores_advisory"], f"{label}.scores_advisory"),
-        _int(row["score_delta"], f"{label}.score_delta"),
-    )
-
-
-def _score(row: Mapping[str, object], label: str) -> RuntimeEffectScore:
-    return RuntimeEffectScore(
-        _str(row["id"], f"{label}.id"), _str(row["level"], f"{label}.level"), _number(row["score"], f"{label}.score")
-    )
-
-
-def _warning_type(row: Mapping[str, object], label: str) -> RuntimeWarningTypePolicy:
-    return RuntimeWarningTypePolicy(
-        _str(row["id"], f"{label}.id"),
-        _str(row["warning_type"], f"{label}.warning_type"),
-        _str(row["label"], f"{label}.label"),
-        _str(row["action_text"], f"{label}.action_text"),
-    )
-
-
-def _warning_emitter(row: Mapping[str, object], label: str) -> RuntimeWarningEmitterPolicy:
-    return RuntimeWarningEmitterPolicy(
-        _str(row["id"], f"{label}.id"),
-        _str(row["emitter"], f"{label}.emitter"),
-        _str(row["warning_type"], f"{label}.warning_type"),
-        _str(row["default_message"], f"{label}.default_message"),
-    )
-
-
-def _warning_trait(row: Mapping[str, object], label: str) -> RuntimeWarningTraitAction:
-    return RuntimeWarningTraitAction(
-        _str(row["id"], f"{label}.id"),
-        _str(row["trait_id"], f"{label}.trait_id"),
-        _str(row["action_text"], f"{label}.action_text"),
-    )
-
-
-def _concern_catalog(row: Mapping[str, object], label: str) -> RuntimeConcernCatalogEntry:
-    return RuntimeConcernCatalogEntry(
-        _str(row["id"], f"{label}.id"),
-        _str(row["concern_kind"], f"{label}.concern_kind"),
-        _str(row["warning_type"], f"{label}.warning_type"),
-    )
-
-
-def _relation_warning(row: Mapping[str, object], label: str) -> RuntimeRelationWarningRule:
-    return RuntimeRelationWarningRule(
-        _str(row["id"], f"{label}.id"),
-        _str(row["relation_kind"], f"{label}.relation_kind"),
-        _str(row["filter_field"], f"{label}.filter_field"),
-        _str(row["filter_value"], f"{label}.filter_value"),
-        _str(row["active_side"], f"{label}.active_side"),
-        _str(row["warning_type"], f"{label}.warning_type"),
-        _bool(row["reverse_output"], f"{label}.reverse_output"),
-    )
-
-
-def _presence(row: Mapping[str, object], label: str) -> RuntimeRelationPresenceStatusPolicy:
-    return RuntimeRelationPresenceStatusPolicy(
-        _str(row["id"], f"{label}.id"),
-        _str(row["status"], f"{label}.status"),
-        _bool(row["source_active"], f"{label}.source_active"),
-        _bool(row["target_active"], f"{label}.target_active"),
-        _str(row["description"], f"{label}.description"),
     )
 
 
@@ -797,61 +690,195 @@ def _dashboard_tracking_truth_state(row: Mapping[str, object], label: str) -> Ru
     )
 
 
-def _grooming_rank_field(row: Mapping[str, object], label: str) -> RuntimeGroomingRankFieldPolicy:
-    field = _str(row["field"], f"{label}.field")
-    direction = _str(row["direction"], f"{label}.direction")
-    if field not in {"active_unique_product_count", "open_owned_item_count", "substance_id"}:
-        raise _error(f"{label}.field", f"is not an implemented grooming rank field: {field!r}")
-    if direction not in {"ascending", "descending"}:
-        raise _error(f"{label}.direction", f"is not an implemented grooming rank direction: {direction!r}")
-    return RuntimeGroomingRankFieldPolicy(
+def _closed_value(value: object, label: str, allowed: frozenset[str]) -> str:
+    result = _str(value, label)
+    if result not in allowed:
+        raise _error(label, f"is not an admitted value: {result!r}")
+    return result
+
+
+def _composition_role(row: Mapping[str, object], label: str) -> RuntimeCompositionRole:
+    return RuntimeCompositionRole(
         _str(row["id"], f"{label}.id"),
-        field,
-        direction,
+        _str(row["product"], f"{label}.product"),
+        _str(row["substance"], f"{label}.substance"),
     )
 
 
-def _grooming_policy(row: Mapping[str, object], label: str) -> RuntimeGroomingPolicy:
-    require_active_reachable = _bool(row["require_active_reachable"], f"{label}.require_active_reachable")
-    open_research_state = _str(row["open_research_state"], f"{label}.open_research_state")
-    if open_research_state not in {"unassessed", "anecdotal", "searched_insufficient", "mechanistic_only", "supported"}:
-        raise _error(f"{label}.open_research_state", "is not a declared ResearchState")
-    rank_fields = _typed_rows(
-        row["rank_fields"],
-        f"{label}.rank_fields",
-        _grooming_rank_field,
-        semantic_keys=(("field",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["grooming_policy.rank_fields"],
-    )
-    selection_count = _int(row["selection_count"], f"{label}.selection_count")
-    if selection_count != 1:
-        raise _error(f"{label}.selection_count", "must be exactly one")
-    relation_owner_field = _str(row["relation_owner_field"], f"{label}.relation_owner_field")
-    relation_owner_direction = _str(row["relation_owner_direction"], f"{label}.relation_owner_direction")
-    if relation_owner_field != "substance_id":
-        raise _error(f"{label}.relation_owner_field", "must be substance_id")
-    if relation_owner_direction not in {"ascending", "descending"}:
-        raise _error(f"{label}.relation_owner_direction", "must be ascending or descending")
-    return RuntimeGroomingPolicy(
-        _str(row["id"], f"{label}.id"),
-        require_active_reachable,
-        open_research_state,
-        cast(tuple[RuntimeGroomingRankFieldPolicy, ...], rank_fields),
-        selection_count,
-        relation_owner_field,
-        relation_owner_direction,
-    )
+def _evidence_source(row: Mapping[str, object], label: str) -> RuntimeEvidenceSource:
+    return RuntimeEvidenceSource(_str(row["id"], f"{label}.id"))
 
 
-def _validate_relation_presence_statuses(
-    truth: tuple[tuple[bool, bool], ...], statuses: Sequence[RuntimeRelationPresenceStatusPolicy]
-) -> None:
-    actual = {(row.source_active, row.target_active) for row in statuses}
-    if actual != set(truth):
-        raise _error(
-            "relation_presence_statuses",
-            "must have exact unique coverage matching glue_contract.relation_presence_truth_table",
+def _fact_subject(value: object, label: str) -> RuntimeFactSubject:
+    raw = _map(value, label)
+    allowed = {"substance", "composition_role", "product"}
+    unknown = set(raw) - allowed
+    if unknown:
+        raise _error(label, "has an invalid closed shape (unknown " + ", ".join(sorted(unknown)) + ")")
+    has_substance = "substance" in raw
+    has_role = "composition_role" in raw
+    has_product = "product" in raw
+    if sum((has_substance, has_role, has_product)) != 1:
+        raise _error(label, "must contain exactly one of substance, composition_role, or product")
+    substance = _str(raw["substance"], f"{label}.substance") if has_substance else None
+    composition_role = _str(raw["composition_role"], f"{label}.composition_role") if has_role else None
+    product = _str(raw["product"], f"{label}.product") if has_product else None
+    return RuntimeFactSubject(substance, composition_role, product)
+
+
+def _fact_applicability(value: object, label: str) -> RuntimeFactApplicability:
+    raw = _map(value, label)
+    allowed = {"substance", "composition_role", "product"}
+    unknown = set(raw) - allowed
+    if unknown:
+        raise _error(label, "has an invalid closed shape (unknown " + ", ".join(sorted(unknown)) + ")")
+    has_substance = "substance" in raw
+    has_role = "composition_role" in raw
+    has_product = "product" in raw
+    if sum((has_substance, has_role, has_product)) != 1:
+        raise _error(label, "must contain exactly one of substance, composition_role, or product")
+    substance = _str(raw["substance"], f"{label}.substance") if has_substance else None
+    composition_role = _str(raw["composition_role"], f"{label}.composition_role") if has_role else None
+    product = _str(raw["product"], f"{label}.product") if has_product else None
+    return RuntimeFactApplicability(substance, composition_role, product)
+
+
+def _fact_provenance(value: object, label: str) -> tuple[RuntimeEvidenceProvenance, ...]:
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        raise _error(label, "must be a list")
+    result: list[RuntimeEvidenceProvenance] = []
+    for index, item in enumerate(cast(Sequence[object], value)):
+        row = _map(item, f"{label}[{index}]")
+        unknown = set(row) - {"source", "locator", "quotation"}
+        if unknown:
+            raise _error(
+                f"{label}[{index}]",
+                "has an invalid closed shape (unknown " + ", ".join(sorted(unknown)) + ")",
+            )
+        quotation = row.get("quotation")
+        if quotation is not None and not isinstance(quotation, str):
+            raise _error(f"{label}[{index}].quotation", "must be a string")
+        locator = _str(row.get("locator"), f"{label}[{index}].locator")
+        if not locator.strip():
+            raise _error(f"{label}[{index}].locator", "must contain a non-whitespace character")
+        result.append(
+            RuntimeEvidenceProvenance(
+                _str(row.get("source"), f"{label}[{index}].source"),
+                locator,
+                quotation,
+            )
         )
+    if not result:
+        raise _error(label, "must contain at least one provenance witness")
+    return tuple(result)
+
+
+def _canonical_law(row: Mapping[str, object], label: str) -> RuntimeCanonicalLaw:
+    """Decode one closed compiler law row."""
+    expected = frozenset({"id", "family", "fact_value", "dimension", "pressure_value"})
+    _exact_map(row, label, expected)
+    return RuntimeCanonicalLaw(
+        _str(row["id"], f"{label}.id"),
+        _str(row["family"], f"{label}.family"),
+        _str(row["fact_value"], f"{label}.fact_value"),
+        _str(row["dimension"], f"{label}.dimension"),
+        _str(row["pressure_value"], f"{label}.pressure_value"),
+    )
+
+
+def _pressure_dimension(row: Mapping[str, object], label: str) -> RuntimePressureDimension:
+    _exact_map(row, label, RUNTIME_PROGRAM_ROW_FIELDS["canonical_scheduling.dimensions"])
+    return RuntimePressureDimension(
+        _str(row["id"], f"{label}.id"), _strings(row["pressure_values"], f"{label}.pressure_values")
+    )
+
+
+def _fact_family(row: Mapping[str, object], label: str) -> RuntimeCanonicalFactFamily:
+    _exact_map(row, label, RUNTIME_PROGRAM_ROW_FIELDS["canonical_scheduling.families"])
+    return RuntimeCanonicalFactFamily(
+        _str(row["id"], f"{label}.id"),
+        _strings(row["fact_values"], f"{label}.fact_values"),
+        _str(row["dimension"], f"{label}.dimension"),
+        _closed_value(row["target_kind"], f"{label}.target_kind", frozenset({"fact_subject", "product"})),
+    )
+
+
+def _canonical_fact(row: Mapping[str, object], label: str) -> RuntimeCanonicalSchedulingFact:
+    _exact_map(row, label, RUNTIME_PROGRAM_ROW_FIELDS["canonical_scheduling.facts"])
+    return RuntimeCanonicalSchedulingFact(
+        _str(row["id"], f"{label}.id"),
+        _str(row["family"], f"{label}.family"),
+        _fact_subject(row["subject"], f"{label}.subject"),
+        _fact_applicability(row["applicability"], f"{label}.applicability"),
+        _fact_provenance(row["provenance"], f"{label}.provenance"),
+        _str(row["value"], f"{label}.value"),
+    )
+
+
+def _canonical_scheduling(value: object) -> RuntimeCanonicalScheduling:
+    raw = _exact_map(value, "canonical_scheduling", RUNTIME_PROGRAM_FIELDS["canonical_scheduling"])
+    dimensions = _typed_rows(
+        raw["dimensions"],
+        "canonical_scheduling.dimensions",
+        _pressure_dimension,
+        semantic_keys=(("id",),),
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["canonical_scheduling.dimensions"],
+    )
+    families = _typed_rows(
+        raw["families"],
+        "canonical_scheduling.families",
+        _fact_family,
+        semantic_keys=(("id",),),
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["canonical_scheduling.families"],
+    )
+    sources = _typed_rows(
+        raw["evidence_sources"],
+        "canonical_scheduling.evidence_sources",
+        _evidence_source,
+        semantic_keys=(("id",),),
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["canonical_scheduling.evidence_sources"],
+    )
+    facts = _typed_rows(
+        raw["facts"],
+        "canonical_scheduling.facts",
+        _canonical_fact,
+        semantic_keys=(("id",),),
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["canonical_scheduling.facts"],
+    )
+    laws = _typed_rows(
+        raw["laws"],
+        "canonical_scheduling.laws",
+        _canonical_law,
+        semantic_keys=(("family", "fact_value"),),
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["canonical_scheduling.laws"],
+    )
+    dimensions_by_id = {row.id: set(row.pressure_values) for row in dimensions}
+    families_by_id = {row.id: row for row in families}
+    if not dimensions_by_id or len(dimensions_by_id) != len(dimensions) or len(families_by_id) != len(families):
+        raise _error("canonical_scheduling", "has duplicate or empty dimensions/families")
+    for family in families:
+        if family.dimension not in dimensions_by_id:
+            raise _error("canonical_scheduling.families", "references an unknown dimension")
+    for fact in facts:
+        family = families_by_id.get(fact.family)
+        if family is None or fact.value not in family.fact_values:
+            raise _error("canonical_scheduling.facts", "references an unknown family or unadmitted value")
+    expected = {(family.id, value) for family in families for value in family.fact_values}
+    actual = {(law.family, law.fact_value) for law in laws}
+    if actual != expected or any(
+        law.dimension not in dimensions_by_id
+        or law.dimension != families_by_id[law.family].dimension
+        or law.pressure_value not in dimensions_by_id.get(law.dimension, set())
+        for law in laws
+    ):
+        raise _error("canonical_scheduling.laws", "does not have exact admissible coverage")
+    return RuntimeCanonicalScheduling(
+        cast(tuple[RuntimePressureDimension, ...], dimensions),
+        cast(tuple[RuntimeCanonicalFactFamily, ...], families),
+        cast(tuple[RuntimeEvidenceSource, ...], sources),
+        cast(tuple[RuntimeCanonicalSchedulingFact, ...], facts),
+        cast(tuple[RuntimeCanonicalLaw, ...], laws),
+    )
 
 
 def _validate_dashboard_state_catalog(catalog: RuntimeDashboardStateCatalog) -> None:
@@ -921,47 +948,76 @@ def _validate_tracking_truth_table(catalog: RuntimeDashboardStateCatalog) -> Non
         )
 
 
-def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
-    """Decode a compiler-verified runtime snapshot."""
+def _decode_program_payload(payload: Mapping[str, object]) -> tuple[str, str, str, Mapping[str, object]]:
+    """Decode the closed envelope around the executable projection."""
     root = _map(payload, "")
     expected_root = {"format_version", "schema_version", "source_hash", "provenance", "projection"}
     if set(root) != expected_root:
         raise _error("", "has an invalid top-level shape")
-    projection = _exact_map(root.get("projection"), "projection", RUNTIME_PROJECTION_FIELDS[""])
+    schema_version = _str(root["schema_version"], "schema_version")
+    if schema_version != IMPLEMENTED_RUNTIME_PROGRAM_SCHEMA_VERSION:
+        raise _error("schema_version", f"is not implemented: {schema_version!r}")
+    _runtime_program_provenance(root["provenance"], schema_version)
+    projection = _exact_map(root.get("projection"), "projection", RUNTIME_PROGRAM_FIELDS[""])
+    return (
+        _str(root["format_version"], "format_version"),
+        schema_version,
+        _sha256(root["source_hash"], "source_hash"),
+        projection,
+    )
+
+
+def _runtime_program_provenance(value: object, schema_version: str) -> None:
+    provenance = _exact_map(
+        value,
+        "provenance",
+        frozenset({"source", "source_sha256", "manifest_schema_version", "compiler_sha256"}),
+    )
+    if _str(provenance["source"], "provenance.source") != _RUNTIME_PROGRAM_PROVENANCE_SOURCE:
+        raise _error("provenance.source", f"must be {_RUNTIME_PROGRAM_PROVENANCE_SOURCE!r}")
+    _sha256(provenance["source_sha256"], "provenance.source_sha256")
+    if _str(provenance["manifest_schema_version"], "provenance.manifest_schema_version") != schema_version:
+        raise _error("provenance.manifest_schema_version", "must match schema_version")
+    _sha256(provenance["compiler_sha256"], "provenance.compiler_sha256")
+
+
+def _decode_engine_contract(projection: Mapping[str, object]) -> RuntimeEngineContract:
+    """Decode and verify the closed exact-optimizer protocol section."""
     engine_raw = _exact_map(
         projection.get("engine_contract"),
         "engine_contract",
-        RUNTIME_PROJECTION_FIELDS["engine_contract"],
+        RUNTIME_PROGRAM_FIELDS["engine_contract"],
     )
     engine_semantics = _typed_rows(
         engine_raw["semantics"],
         "engine_contract.semantics",
         _engine_semantic,
         semantic_keys=(("id",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["engine_contract.semantics"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["engine_contract.semantics"],
     )
-    engine_scenarios = _typed_rows(
-        engine_raw["conformance_scenarios"],
-        "engine_contract.conformance_scenarios",
-        _engine_scenario,
-        semantic_keys=(("id",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["engine_contract.conformance_scenarios"],
-    )
-    if not engine_semantics or not engine_scenarios:
-        raise _error("engine_contract", "requires non-empty semantics and conformance_scenarios")
-    semantic_ids = {row.id for row in engine_semantics}
-    unknown_scenario_semantics = sorted({row.semantic for row in engine_scenarios} - semantic_ids)
-    if unknown_scenario_semantics:
-        raise _error(
-            "engine_contract.conformance_scenarios",
-            "references unknown semantics: " + ", ".join(unknown_scenario_semantics),
-        )
+    if not engine_semantics:
+        raise _error("engine_contract", "requires non-empty semantics")
     engine_contract = RuntimeEngineContract(
         _str(engine_raw["id"], "engine_contract.id"),
         _str(engine_raw["protocol_version"], "engine_contract.protocol_version"),
         _str(engine_raw["result_mode"], "engine_contract.result_mode"),
+        _strings(engine_raw["pressure_identity"], "engine_contract.pressure_identity"),
+        _closed_value(
+            engine_raw["applicability_expansion_strategy"],
+            "engine_contract.applicability_expansion_strategy",
+            frozenset({IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY}),
+        ),
+        _closed_value(
+            engine_raw["pressure_satisfaction_strategy"],
+            "engine_contract.pressure_satisfaction_strategy",
+            frozenset({IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY}),
+        ),
+        _str(engine_raw["domain_feasibility"], "engine_contract.domain_feasibility"),
+        _str(engine_raw["primary_objective"], "engine_contract.primary_objective"),
+        _str(engine_raw["secondary_objective"], "engine_contract.secondary_objective"),
+        _str(engine_raw["tie_break"], "engine_contract.tie_break"),
+        _strings(engine_raw["publication_statuses"], "engine_contract.publication_statuses"),
         cast(tuple[RuntimeEngineSemantic, ...], engine_semantics),
-        cast(tuple[RuntimeEngineConformanceScenario, ...], engine_scenarios),
     )
     if engine_contract.protocol_version != IMPLEMENTED_ENGINE_CONTRACT_PROTOCOL:
         raise _error(
@@ -973,170 +1029,82 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
             "engine_contract.result_mode",
             f"is not implemented: {engine_contract.result_mode!r}",
         )
-    scenario_semantics = {row.semantic for row in engine_scenarios}
-    missing_scenario_semantics = sorted(semantic_ids - scenario_semantics)
-    if missing_scenario_semantics:
+    if engine_contract.pressure_identity != IMPLEMENTED_PRESSURE_IDENTITY:
         raise _error(
-            "engine_contract.conformance_scenarios",
-            "missing semantic coverage: " + ", ".join(missing_scenario_semantics),
+            "engine_contract.pressure_identity",
+            "must be the unique (item_id, dimension, value) identity",
         )
-    glue_raw = _exact_map(projection.get("glue_contract"), "glue_contract", RUNTIME_PROJECTION_FIELDS["glue_contract"])
-    truth = _truth_table(
-        glue_raw.get("relation_presence_truth_table"),
-        "glue_contract.relation_presence_truth_table",
+    if engine_contract.domain_feasibility != IMPLEMENTED_DOMAIN_FEASIBILITY:
+        raise _error("engine_contract.domain_feasibility", "must declare unbounded logical domains")
+    if engine_contract.primary_objective != IMPLEMENTED_PRIMARY_OBJECTIVE:
+        raise _error("engine_contract.primary_objective", "must maximize unique pressure satisfaction")
+    if engine_contract.secondary_objective != IMPLEMENTED_SECONDARY_OBJECTIVE:
+        raise _error("engine_contract.secondary_objective", "must minimize integer squared load per domain")
+    if engine_contract.tie_break != IMPLEMENTED_TIE_BREAK:
+        raise _error("engine_contract.tie_break", "must use stable item ID and slot order")
+    if engine_contract.publication_statuses != IMPLEMENTED_PUBLICATION_STATUSES:
+        raise _error(
+            "engine_contract.publication_statuses",
+            "must exactly be the closed Optimal/Indeterminate statuses",
+        )
+    return engine_contract
+
+
+def _decode_glue_contract(projection: Mapping[str, object]) -> RuntimeGlueContract:
+    """Decode the executable integration capability and partition section."""
+    glue_raw = _exact_map(projection.get("glue_contract"), "glue_contract", RUNTIME_PROGRAM_FIELDS["glue_contract"])
+    partition_raw = _exact_map(
+        glue_raw["stack_partition"],
+        "glue_contract.stack_partition",
+        RUNTIME_PROGRAM_FIELDS["glue_contract.stack_partition"],
     )
+    partition = RuntimeStackPartition(
+        _str(partition_raw["id"], "glue_contract.stack_partition.id"),
+        _strings(partition_raw["routable_stack_names"], "glue_contract.stack_partition.routable_stack_names"),
+        _strings(partition_raw["excluded_stack_names"], "glue_contract.stack_partition.excluded_stack_names"),
+        _str(
+            partition_raw["tracked_unassigned_partition_name"],
+            "glue_contract.stack_partition.tracked_unassigned_partition_name",
+        ),
+    )
+    if not partition.routable_stack_names:
+        raise _error("glue_contract.stack_partition.routable_stack_names", "must not be empty")
+    if set(partition.routable_stack_names) & set(partition.excluded_stack_names):
+        raise _error("glue_contract.stack_partition", "routable and excluded stack names must be disjoint")
+    if partition.tracked_unassigned_partition_name in set(partition.routable_stack_names) | set(
+        partition.excluded_stack_names
+    ):
+        raise _error("glue_contract.stack_partition", "tracked-unassigned partition must be distinct")
+    if glue_raw["inactive_stack_name"] not in partition.excluded_stack_names:
+        raise _error("glue_contract.inactive_stack_name", "must be an excluded stack partition")
     glue = RuntimeGlueContract(
         _str(glue_raw["id"], "glue_contract.id"),
         _str(glue_raw["inactive_stack_name"], "glue_contract.inactive_stack_name"),
-        _strings(glue_raw["source_kinds"], "glue_contract.source_kinds"),
-        _strings(glue_raw["source_kind_roles"], "glue_contract.source_kind_roles"),
-        _strings(glue_raw["relation_warning_filter_fields"], "glue_contract.relation_warning_filter_fields"),
-        _strings(glue_raw["relation_warning_active_sides"], "glue_contract.relation_warning_active_sides"),
-        _strings(glue_raw["relation_presence_active_sides"], "glue_contract.relation_presence_active_sides"),
-        truth,
+        partition,
         _strings(glue_raw["relation_endpoint_selector_kinds"], "glue_contract.relation_endpoint_selector_kinds"),
         _strings(glue_raw["relation_selector_forms"], "glue_contract.relation_selector_forms"),
-        _strings(glue_raw["warning_emitter_ids"], "glue_contract.warning_emitter_ids"),
-        _strings(glue_raw["prefer_with_source_fields"], "glue_contract.prefer_with_source_fields"),
-        _strings(glue_raw["prefer_with_target_resolutions"], "glue_contract.prefer_with_target_resolutions"),
-        _strings(glue_raw["prefer_with_pair_modes"], "glue_contract.prefer_with_pair_modes"),
     )
     glue_capabilities: Mapping[str, tuple[str, ...]] = {
-        "source_kind_roles": glue.source_kind_roles,
-        "relation_warning_filter_fields": glue.relation_warning_filter_fields,
-        "relation_warning_active_sides": glue.relation_warning_active_sides,
-        "relation_presence_active_sides": glue.relation_presence_active_sides,
         "relation_endpoint_selector_kinds": glue.relation_endpoint_selector_kinds,
         "relation_selector_forms": glue.relation_selector_forms,
-        "warning_emitter_ids": glue.warning_emitter_ids,
-        "prefer_with_source_fields": glue.prefer_with_source_fields,
-        "prefer_with_target_resolutions": glue.prefer_with_target_resolutions,
-        "prefer_with_pair_modes": glue.prefer_with_pair_modes,
     }
     for field_name, expected in IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS.items():
+        if field_name not in glue_capabilities:
+            continue
         actual = glue_capabilities[field_name]
         if actual != expected:
             raise _error(f"glue_contract.{field_name}", "must exactly match executable capabilities")
-    scoring = _exact_map(
-        projection.get("effect_scoring"), "effect_scoring", RUNTIME_PROJECTION_FIELDS["effect_scoring"]
-    )
-    scoring_obj = RuntimeEffectScoring(
-        _str(scoring["id"], "effect_scoring.id"),
-        _str(scoring["aggregation_mode"], "effect_scoring.aggregation_mode"),
-        cast(
-            tuple[RuntimeEffectScore, ...],
-            _typed_rows(
-                scoring["scores"],
-                "effect_scoring.scores",
-                _score,
-                semantic_keys=(("level",),),
-                fields=RUNTIME_PROJECTION_ROW_FIELDS["effect_scoring.scores"],
-            ),
-        ),
-        _str(scoring["objective_function"], "effect_scoring.objective_function"),
-        _str(scoring["balance_penalty_expression"], "effect_scoring.balance_penalty_expression"),
-        _str(scoring["tie_break"], "effect_scoring.tie_break"),
-        _nonnegative_number(scoring["balance_weight"], "effect_scoring.balance_weight"),
-        _nonnegative_int(scoring["prefer_with_bonus"], "effect_scoring.prefer_with_bonus"),
-    )
-    _validate_effect_scoring_interlock(scoring_obj)
-    prefer = _exact_map(
-        projection.get("prefer_with_policy"),
-        "prefer_with_policy",
-        RUNTIME_PROJECTION_FIELDS["prefer_with_policy"],
-    )
-    prefer_obj = RuntimePreferWithPolicy(
-        _str(prefer["id"], "prefer_with_policy.id"),
-        _str(prefer["source_field"], "prefer_with_policy.source_field"),
-        _str(prefer["target_resolution"], "prefer_with_policy.target_resolution"),
-        _str(prefer["pair_mode"], "prefer_with_policy.pair_mode"),
-    )
-    source_kind_values = _typed_rows(
-        projection["source_kind_values"],
-        "source_kind_values",
-        _source_kind,
-        semantic_keys=(("source_kind",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["source_kind_values"],
-    )
-    assignment_axes = _typed_rows(
-        projection["assignment_axes"],
-        "assignment_axes",
-        _axis,
-        semantic_keys=(("axis",), ("order",)),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["assignment_axes"],
-    )
-    slot_near_values = _strings(projection["slot_near_values"], "slot_near_values")
-    if not slot_near_values:
-        raise _error("slot_near_values", "must be non-empty")
-    if len(set(slot_near_values)) != len(slot_near_values):
-        raise _error("slot_near_values", "must not contain duplicates")
-    effect_match_dimensions = _typed_rows(
-        projection["effect_match_dimensions"],
-        "effect_match_dimensions",
-        _dimension,
-        semantic_keys=(("key",), ("slot_field",)),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["effect_match_dimensions"],
-    )
-    constraint_execution_policies = _typed_rows(
-        projection["constraint_execution_policies"],
-        "constraint_execution_policies",
-        _policy,
-        semantic_keys=(("operation",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["constraint_execution_policies"],
-    )
-    warning_types = _typed_rows(
-        projection["warning_types"],
-        "warning_types",
-        _warning_type,
-        semantic_keys=(("warning_type",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["warning_types"],
-    )
-    warning_emitters = _typed_rows(
-        projection["warning_emitters"],
-        "warning_emitters",
-        _warning_emitter,
-        semantic_keys=(("emitter",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["warning_emitters"],
-    )
-    emitter_ids = tuple(item.emitter for item in warning_emitters)
-    expected_emitter_ids = IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS["warning_emitter_ids"]
-    if set(emitter_ids) != set(expected_emitter_ids) or len(emitter_ids) != len(expected_emitter_ids):
-        raise _error("warning_emitters", "must exactly match executable emitter IDs")
-    warning_trait_actions = _typed_rows(
-        projection["warning_trait_actions"],
-        "warning_trait_actions",
-        _warning_trait,
-        semantic_keys=(("trait_id",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["warning_trait_actions"],
-    )
-    concern_catalog = _typed_rows(
-        projection["concern_catalog"],
-        "concern_catalog",
-        _concern_catalog,
-        semantic_keys=(("concern_kind",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["concern_catalog"],
-    )
-    relation_warning_rules = _typed_rows(
-        projection["relation_warning_rules"],
-        "relation_warning_rules",
-        _relation_warning,
-        semantic_keys=(("relation_kind", "filter_field", "filter_value", "active_side", "reverse_output"),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["relation_warning_rules"],
-    )
-    relation_presence_statuses = _typed_rows(
-        projection["relation_presence_statuses"],
-        "relation_presence_statuses",
-        _presence,
-        semantic_keys=(("status",), ("source_active", "target_active")),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["relation_presence_statuses"],
-    )
-    _validate_relation_presence_statuses(truth, relation_presence_statuses)
+    return glue
+
+
+def _decode_relation_review_catalog(projection: Mapping[str, object]) -> tuple[RuntimeSelectorFormCapability, ...]:
+    """Decode review vocabulary that is independent of canonical scheduling facts."""
     selector_form_capabilities = _typed_rows(
         projection["selector_form_capabilities"],
         "selector_form_capabilities",
         _selector_form_capability,
         semantic_keys=(("selector_form",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["selector_form_capabilities"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["selector_form_capabilities"],
     )
     selector_forms = tuple(row.selector_form for row in selector_form_capabilities)
     if selector_forms != IMPLEMENTED_RELATION_SELECTOR_FORMS:
@@ -1147,38 +1115,43 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
     endpoint_kinds = {row.endpoint_kind for row in selector_form_capabilities}
     if endpoint_kinds != set(IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS):
         raise _error("selector_form_capabilities", "must declare exactly the executable endpoint kinds")
+    return cast(tuple[RuntimeSelectorFormCapability, ...], selector_form_capabilities)
+
+
+def _decode_dashboard_state_catalog(projection: Mapping[str, object]) -> RuntimeDashboardStateCatalog:
+    """Decode the complete dashboard state vocabulary and truth tables."""
     dashboard_catalog = _exact_map(
         projection.get("dashboard_state_catalog"),
         "dashboard_state_catalog",
-        RUNTIME_PROJECTION_FIELDS["dashboard_state_catalog"],
+        RUNTIME_PROGRAM_FIELDS["dashboard_state_catalog"],
     )
     usage_states = _typed_rows(
         dashboard_catalog["usage_states"],
         "dashboard_state_catalog.usage_states",
         _dashboard_usage_state,
         semantic_keys=(("state",), ("order",)),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["dashboard_state_catalog.usage_states"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["dashboard_state_catalog.usage_states"],
     )
     product_tracking_states = _typed_rows(
         dashboard_catalog["product_tracking_states"],
         "dashboard_state_catalog.product_tracking_states",
         _dashboard_product_tracking_state,
         semantic_keys=(("state",), ("order",)),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["dashboard_state_catalog.product_tracking_states"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["dashboard_state_catalog.product_tracking_states"],
     )
     usage_truth_table = _typed_rows(
         dashboard_catalog["usage_truth_table"],
         "dashboard_state_catalog.usage_truth_table",
         _dashboard_usage_truth_state,
         semantic_keys=(("active_stack_membership", "inactive_stack_membership", "tracked_product_presence"),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["dashboard_state_catalog.usage_truth_table"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["dashboard_state_catalog.usage_truth_table"],
     )
     product_tracking_truth_table = _typed_rows(
         dashboard_catalog["product_tracking_truth_table"],
         "dashboard_state_catalog.product_tracking_truth_table",
         _dashboard_tracking_truth_state,
         semantic_keys=(("tracked_product_presence",),),
-        fields=RUNTIME_PROJECTION_ROW_FIELDS["dashboard_state_catalog.product_tracking_truth_table"],
+        fields=RUNTIME_PROGRAM_ROW_FIELDS["dashboard_state_catalog.product_tracking_truth_table"],
     )
     dashboard_state_catalog = RuntimeDashboardStateCatalog(
         usage_states=cast(tuple[RuntimeDashboardUsageStateDefinition, ...], usage_states),
@@ -1191,40 +1164,27 @@ def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
         ),
     )
     _validate_dashboard_state_catalog(dashboard_state_catalog)
-    grooming_policy = _grooming_policy(
-        _exact_map(projection.get("grooming_policy"), "grooming_policy", RUNTIME_PROJECTION_FIELDS["grooming_policy"]),
-        "grooming_policy",
-    )
+    return dashboard_state_catalog
+
+
+def decode_runtime_program(payload: Mapping[str, object]) -> RuntimeProgram:
+    """Decode a compiler-verified runtime snapshot by its closed sections."""
+
+    format_version, schema_version, source_hash, projection = _decode_program_payload(payload)
+    if format_version != "ontology-runtime-program-v2":
+        raise _error("format_version", "is unsupported")
+    engine_contract = _decode_engine_contract(projection)
+    glue_contract = _decode_glue_contract(projection)
+    selector_form_capabilities = _decode_relation_review_catalog(projection)
+    dashboard_state_catalog = _decode_dashboard_state_catalog(projection)
+    canonical_scheduling = _canonical_scheduling(projection["canonical_scheduling"])
     return RuntimeProgram(
-        _str(root["format_version"], "format_version"),
-        _str(root["schema_version"], "schema_version"),
-        _str(root["source_hash"], "source_hash"),
+        format_version,
+        schema_version,
+        source_hash,
         engine_contract,
-        glue,
-        source_kind_values,
-        assignment_axes,
-        slot_near_values,
-        effect_match_dimensions,
-        scoring_obj,
-        prefer_obj,
-        constraint_execution_policies,
-        warning_types,
-        warning_emitters,
-        warning_trait_actions,
-        concern_catalog,
-        relation_warning_rules,
-        relation_presence_statuses,
+        glue_contract,
         selector_form_capabilities,
         dashboard_state_catalog,
-        grooming_policy,
+        canonical_scheduling,
     )
-
-
-def relation_presence_policy_for_active_side(
-    active_side: str,
-    relation_presence_by_active_side: Mapping[str, RuntimeRelationPresenceStatusPolicy],
-) -> RuntimeRelationPresenceStatusPolicy:
-    try:
-        return relation_presence_by_active_side[active_side]
-    except KeyError as error:
-        raise ValueError(f"unknown relation active side {active_side!r}") from error

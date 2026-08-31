@@ -1,4 +1,4 @@
-"""Auto-maintenance change detection."""
+"""Explicit normalization change detection."""
 
 from __future__ import annotations
 
@@ -19,13 +19,13 @@ from planner.maintenance_substance_resolution import (
 from planner.paths import Paths, strip_root_prefix
 
 
-def auto_maintenance_needed(
+def maintenance_needed(
     paths: Paths,
     *,
     contract: MaintenanceContract | None = None,
 ) -> bool | None:
     if contract is None:
-        print("auto-maintenance: verified ontology maintenance contract is required", file=sys.stderr)
+        print("normalize: verified ontology maintenance contract is required", file=sys.stderr)
         return None
     substance_dir = paths.root / contract.substance_path
     product_dir = paths.root / contract.product_path
@@ -54,7 +54,7 @@ def _cards_need_maintenance(
             card = load_card_mapping(path, cards_dir.name)
         except CardLoadError as e:
             print(
-                f"auto-maintenance: could not read {path}: {strip_root_prefix(e.message)}",
+                f"normalize: could not read {path}: {strip_root_prefix(e.message)}",
                 file=sys.stderr,
             )
             return None

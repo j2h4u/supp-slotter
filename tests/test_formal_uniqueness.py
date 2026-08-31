@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import cast
 
 import pytest
 import yaml
@@ -12,12 +11,55 @@ from planner.cards.product import load_product
 from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance
 from planner.contracts import CardLoadError, Relation, RelationSelector, Substance
+from planner.ontology.errors import OntologyInfrastructureError
+from planner.ontology.selector import hydrate_selector, resolve_selector
 from planner.paths import Paths
 from planner.query_model import build_stack_read_model
-from planner.query_model.surreal_records import relation_record
 from planner.schema_validation import schema_errors
 
 from tests.helpers import ontology_bundle
+
+
+def test_selector_hydration_enforces_canonical_entity_and_term_forms() -> None:
+    path = Path("selector.yaml")
+
+    assert hydrate_selector(
+        {"entity": {"entity_id": "sub_known000"}}, path=path, label="source", allow_entity_name=False
+    ) == RelationSelector(entity_id="sub_known000")
+    assert hydrate_selector(
+        {"entity": {"name": "Known"}, "scope": "current"},
+        path=path,
+        label="source",
+        allow_entity_name=True,
+        allow_scope=True,
+    ) == RelationSelector(entity_name="Known", scope="current")
+    assert hydrate_selector(
+        {"category": "kind", "term": "mineral"}, path=path, label="source", allow_entity_name=False
+    ) == RelationSelector(category="kind", term="mineral")
+
+
+@pytest.mark.parametrize(
+    ("raw", "allow_entity_name", "allow_scope", "match"),
+    [
+        ([], False, False, "must be a mapping"),
+        ({"entity": []}, False, False, "malformed source entity selector"),
+        ({"entity": {"entity_id": "sub_known000", "name": "Known"}}, True, False, "exactly one"),
+        ({"entity": {"name": "Known"}}, False, False, "requires stable entity_id"),
+        ({"entity": {"entity_id": "sub_known000"}, "scope": "current"}, False, False, "malformed source selector"),
+        ({"category": "kind", "term": ""}, False, False, "must be a non-empty string"),
+    ],
+)
+def test_selector_hydration_rejects_noncanonical_forms(
+    raw: object, allow_entity_name: bool, allow_scope: bool, match: str
+) -> None:
+    with pytest.raises(CardLoadError, match=match):
+        hydrate_selector(
+            raw,
+            path=Path("selector.yaml"),
+            label="source",
+            allow_entity_name=allow_entity_name,
+            allow_scope=allow_scope,
+        )
 
 
 def test_product_components_are_unique_by_substance_reference() -> None:
@@ -25,11 +67,17 @@ def test_product_components_are_unique_by_substance_reference() -> None:
         "id": "prd_aaaaaaaaaa",
         "name": "Duplicate component probe",
         "components": [
-            {"substance": "sub_aaaaaaaaaa", "label": "first"},
-            {"substance": "sub_aaaaaaaaaa", "label": "second"},
+            {"id": "cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa_first", "substance": "sub_aaaaaaaaaa", "label": "first"},
+            {"id": "cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa_second", "substance": "sub_aaaaaaaaaa", "label": "second"},
         ],
     }
-    distinct = {**duplicate, "components": [{"substance": "sub_aaaaaaaaaa"}, {"substance": "sub_bbbbbbbbbb"}]}
+    distinct = {
+        **duplicate,
+        "components": [
+            {"id": "cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa", "substance": "sub_aaaaaaaaaa"},
+            {"id": "cmp_prd_aaaaaaaaaa__sub_bbbbbbbbbb", "substance": "sub_bbbbbbbbbb"},
+        ],
+    }
 
     errors = schema_errors(duplicate, "product", Path("product.yaml"), ontology_bundle())
     assert any("duplicate value 'sub_aaaaaaaaaa'" in error for error in errors)
@@ -41,8 +89,8 @@ def test_product_loader_rejects_duplicate_component_substance(tmp_path: Path) ->
     path = tmp_path / "product.yaml"
     path.write_text(
         "id: prd_aaaaaaaaaa\nname: Duplicate component probe\ncomponents:\n"
-        "  - substance: sub_aaaaaaaaaa\n    label: first\n"
-        "  - substance: sub_aaaaaaaaaa\n    label: second\n",
+        "  - id: cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa_first\n    substance: sub_aaaaaaaaaa\n    label: first\n"
+        "  - id: cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa_second\n    substance: sub_aaaaaaaaaa\n    label: second\n",
         encoding="utf-8",
     )
 
@@ -54,9 +102,22 @@ def test_knowledge_assertion_values_are_unique_within_category(tmp_path: Path) -
     duplicate = {
         "id": "sub_aaaaaaaaaa",
         "name": "Duplicate knowledge probe",
-        "knowledge": {"kind": ["amino", "amino"]},
+        "knowledge": {
+            "kind": [
+                {"value": "amino", "research_state": "unassessed", "sources": []},
+                {"value": "amino", "research_state": "unassessed", "sources": []},
+            ]
+        },
     }
-    distinct = {**duplicate, "knowledge": {"kind": ["amino", "mineral"]}}
+    distinct = {
+        **duplicate,
+        "knowledge": {
+            "kind": [
+                {"value": "amino", "research_state": "unassessed", "sources": []},
+                {"value": "mineral", "research_state": "unassessed", "sources": []},
+            ]
+        },
+    }
 
     errors = schema_errors(duplicate, "substance", Path("substance.yaml"), ontology_bundle())
     assert any("knowledge" in error and "amino" in error for error in errors)
@@ -64,7 +125,7 @@ def test_knowledge_assertion_values_are_unique_within_category(tmp_path: Path) -
 
     path = tmp_path / "substance.yaml"
     path.write_text(
-        "id: sub_aaaaaaaaaa\nname: Duplicate knowledge probe\nknowledge:\n  kind: [amino, amino]\n",
+        "id: sub_aaaaaaaaaa\nname: Duplicate knowledge probe\nknowledge:\n  kind:\n  - value: amino\n    research_state: unassessed\n    sources: []\n  - value: amino\n    research_state: unassessed\n    sources: []\n",
         encoding="utf-8",
     )
     with pytest.raises(CardLoadError, match="knowledge"):
@@ -123,7 +184,9 @@ def _relation_entry(identifier: str, *, reason: str = "relation identity probe")
         "id": identifier,
         "relation_type": "supports",
         "assertion_kind": "ontology_assertion",
-        "semantic_family": "test",
+        "semantic_family": "biochemical_mechanism_assertion",
+        "research_state": "unassessed",
+        "sources": [],
         "reason": reason,
         "source_selector": {"category": "context", "term": "vascular_health"},
         "target_selector": {"category": "context", "term": "vascular_health"},
@@ -161,9 +224,11 @@ def test_relation_loader_rejects_cross_form_entity_duplicate(tmp_path: Path) -> 
     path = tmp_path / "data" / "relations.yaml"
     path.parent.mkdir()
     common = {
-        "relation_type": "review_with",
-        "assertion_kind": "clinical_review_signal",
+        "relation_type": "co_use_context",
+        "assertion_kind": "co_use_evidence",
         "semantic_family": "test",
+        "research_state": "unassessed",
+        "sources": [],
         "reason": "cross-form identity probe",
         "target_selector": {"entity": {"entity_id": "sub_other000"}},
     }
@@ -191,7 +256,7 @@ def test_relation_loader_rejects_cross_form_entity_duplicate(tmp_path: Path) -> 
         "sub_known000": Substance(id="sub_known000", name="Known"),
         "sub_other000": Substance(id="sub_other000", name="Other"),
     }
-    with pytest.raises(CardLoadError, match="non-directional relation type 'review_with'"):
+    with pytest.raises(CardLoadError, match="non-directional relation type 'co_use_context'"):
         load_global_relations(Paths.from_root(tmp_path), ontology_bundle(), substances)
 
 
@@ -206,7 +271,9 @@ def test_name_selector_resolves_new_same_name_form_in_runtime_record(tmp_path: P
                         "id": "rel_name_family",
                         "relation_type": "supports",
                         "assertion_kind": "ontology_assertion",
-                        "semantic_family": "test",
+                        "semantic_family": "biochemical_mechanism_assertion",
+                        "research_state": "unassessed",
+                        "sources": [],
                         "reason": "name family runtime probe",
                         "source_selector": {"entity": {"name": "Known"}},
                         "target_selector": {"entity": {"entity_id": "sub_other000"}},
@@ -224,12 +291,10 @@ def test_name_selector_resolves_new_same_name_form_in_runtime_record(tmp_path: P
     }
 
     [relation] = load_global_relations(Paths.from_root(tmp_path), ontology_bundle(), substances)
-    record = relation_record(relation, substances, ontology_bundle())
+    resolved = resolve_selector(relation.source_selector, substances, ontology_bundle())
 
     assert relation.source_selector == RelationSelector(entity_name="Known")
-    assert record["src_substances"] == ["sub_known000", "sub_knownform"]
-    assert record["src_member_names"] == ["Known", "Known (second form)"]
-    assert record["src_selector"] == {"form": "name", "kind": "entity", "id": None, "name": "Known"}
+    assert resolved.substance_ids == ("sub_known000", "sub_knownform")
 
 
 @pytest.mark.parametrize(
@@ -251,48 +316,12 @@ def test_selector_form_capabilities_are_semantic_not_cardinality(
     assert capability.endpoint_kind == expected_kind
     assert capability.show_match_details is expected_details
 
+
+def test_read_model_rejects_handcrafted_relation_absent_from_generated_catalog() -> None:
     substances = {
         "sub_known000": Substance(id="sub_known000", name="Known"),
         "sub_other000": Substance(id="sub_other000", name="Other"),
     }
-    relation = Relation(
-        id="rel_selector_capability",
-        type="supports",
-        assertion_kind="ontology_assertion",
-        semantic_family="biochemical_mechanism_assertion",
-        reason="selector capability probe",
-        source_selector=selector,
-        target_selector=RelationSelector(entity_id="sub_other000"),
-    )
-    record = relation_record(relation, substances, ontology_bundle())
-    source_selector = cast(dict[str, object], record["src_selector"])
-    assert source_selector["form"] == expected_form
-    assert source_selector["kind"] == ("term" if expected_form == "term" else "entity")
-
-
-@pytest.mark.parametrize(
-    ("substances", "expected_matches"),
-    [
-        (
-            {
-                "sub_known000": Substance(id="sub_known000", name="Known"),
-                "sub_other000": Substance(id="sub_other000", name="Other"),
-            },
-            ["Known"],
-        ),
-        (
-            {
-                "sub_known000": Substance(id="sub_known000", name="Known"),
-                "sub_knownform": Substance(id="sub_knownform", name="Known", form="second form"),
-                "sub_other000": Substance(id="sub_other000", name="Other"),
-            },
-            ["Known", "Known (second form)"],
-        ),
-    ],
-)
-def test_name_family_review_always_shows_match_details(
-    substances: dict[str, Substance], expected_matches: list[str]
-) -> None:
     relation = Relation(
         id="rel_name_family_review",
         type="supports",
@@ -302,11 +331,9 @@ def test_name_family_review_always_shows_match_details(
         source_selector=RelationSelector(entity_name="Known"),
         target_selector=RelationSelector(entity_id="sub_other000"),
     )
-    model = build_stack_read_model(substances, [relation], ontology_bundle=ontology_bundle())
-    rows = model.classify_relations(set(substances))
-    row = next(row for entries in rows.values() for row in entries)
-    assert row["show_matches"] is True
-    assert row["source_matches"] == expected_matches
+    bundle = ontology_bundle()
+    with pytest.raises(OntologyInfrastructureError, match="absent from the generated catalog"):
+        build_stack_read_model(substances, [relation], {}, {}, ontology_bundle=bundle)
 
 
 def test_relation_schema_rejects_unknown_top_level_field() -> None:
@@ -330,4 +357,4 @@ def test_read_model_rejects_duplicate_typed_relation_ids() -> None:
     )
 
     with pytest.raises(ValueError, match=r"relations\[1\]\.id duplicates 'rel_duplicate'"):
-        build_stack_read_model({}, [relation, relation], ontology_bundle=ontology_bundle())
+        build_stack_read_model({}, [relation, relation], {}, {}, ontology_bundle=ontology_bundle())

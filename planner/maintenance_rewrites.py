@@ -1,4 +1,4 @@
-"""Reference rewrite planning for auto-maintenance."""
+"""Reference rewrite planning for explicit normalization."""
 
 from __future__ import annotations
 
@@ -11,10 +11,9 @@ import yaml
 
 from planner.cards._common import load_card_mapping
 from planner.cards.product import canonical_product_filename
-from planner.cards.substance import canonical_substance_filename
 from planner.contracts import CardLoadError
 from planner.maintenance_atomic import EditPlan, EditPlanEntry
-from planner.maintenance_mapping import product_from_mapping, substance_from_mapping
+from planner.maintenance_mapping import product_from_mapping
 from planner.maintenance_substance_resolution import (
     MaintenanceContract,
     ReferenceResolution,
@@ -58,8 +57,6 @@ def plan_substance_ref_rewrites(  # noqa: PLR0913
         context,
     ):
         return False
-    if substance_renames:
-        _plan_substance_prefer_with_rewrites(context)
     return len(errors) == error_count
 
 
@@ -106,40 +103,10 @@ def _plan_product_substance_ref_rewrites(
     return not context.errors
 
 
-def _plan_substance_prefer_with_rewrites(context: _ProductSubstanceRewriteContext) -> None:
-    for resolution in context.contract.substance_preferences:
-        substances_dir = context.repository_root / resolution.document_path
-        for path in sorted(substances_dir.glob("*.yaml")):
-            _plan_substance_preference_file(context, path, resolution)
-
-
-def _plan_substance_preference_file(
-    context: _ProductSubstanceRewriteContext, path: Path, resolution: ReferenceResolution
-) -> None:
-    try:
-        substance = cast(dict[str, object], load_card_mapping(path, resolution.target_entity_class.casefold()))
-    except CardLoadError as e:
-        print(f"warning: skipping {path}: {strip_root_prefix(e.message)}", file=sys.stderr)
-        return
-
-    changed = rewrite_references(substance, resolution, context.substance_renames)
-    if not changed:
-        return
-
-    final_path = _planned_substance_path(path, substance, context.substance_renames)
-    _upsert_card_edit(context.plan, final_path, substance, path if final_path != path else None)
-
-
 def _planned_product_path(path: Path, card: dict[str, object], renames: dict[str, str]) -> Path:
     if path.stem in renames:
         card["id"] = renames[path.stem]
     return path.parent / canonical_product_filename(product_from_mapping(card))
-
-
-def _planned_substance_path(path: Path, card: dict[str, object], renames: dict[str, str]) -> Path:
-    if path.stem in renames:
-        card["id"] = renames[path.stem]
-    return path.parent / canonical_substance_filename(substance_from_mapping(card))
 
 
 def _upsert_card_edit(

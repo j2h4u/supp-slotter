@@ -4,25 +4,24 @@ aliases:
 - Lepidium meyenii
 - maca root
 - Peruvian ginseng
-notes: Knowledge-only libido/fertility and vitality botanical reference card. Added because maca is a mainstream men's/women's-health
-  supplement category and should be visible to expert panels without implying testosterone-like action. Sources checked -
-  NCBI LiverTox Maca monograph; PubMed maca review and clinical-trial records.
 concerns:
 - kind: data_quality
   text: Product cards should distinguish raw, gelatinized, extract, black/red/yellow maca, dose, and marker standardization;
     do not assume all maca products are interchangeable.
-- kind: safety
-  text: Review thyroid context for glucosinolate-containing botanicals, pregnancy, hormone-sensitive context, and product
-    quality before practical use discussion.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
-  - androgen_context
-  - fatigue_resilience_context
+  - value: androgen_context
+    research_state: unassessed
+    sources: []
+  - value: fatigue_resilience_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_q0ydljt7j7

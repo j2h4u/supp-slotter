@@ -102,6 +102,12 @@ def test_runtime_planner_has_no_linkml_compiler_symbols() -> None:
     assert offenders == []
 
 
+def test_runtime_has_no_legacy_stored_schedule_answer_consumers() -> None:
+    runtime_source = "\n".join(path.read_text(encoding="utf-8") for path in Path("planner").rglob("*.py"))
+    assert "scheduling_assessment" not in runtime_source
+    assert "prefer_with" not in runtime_source
+
+
 def test_generator_cli_compiles_once_then_dispatches_exactly_one_mode() -> None:
     tree = ast.parse(Path("scripts/generate_ontology.py").read_text(encoding="utf-8"))
     calls = [node for node in ast.walk(tree) if isinstance(node, ast.Call)]

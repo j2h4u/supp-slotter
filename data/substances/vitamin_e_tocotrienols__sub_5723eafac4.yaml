@@ -3,20 +3,20 @@ name: Vitamin E
 form: tocotrienols
 aliases:
 - Tocotrienols
-notes: Vitamin E form added separately from tocopherol for future tocopherol/tocotrienol competition modeling.
-concerns:
-- kind: safety
-  text: Review cumulative vitamin E dose, anticoagulant/antiplatelet medication context, vitamin K context, and co-use with
-    tocopherol products because tocotrienol and tocopherol handling may differ.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
-  - skin_support
+  - value: skin_support
+    research_state: unassessed
+    sources: []
   quality:
-  - fat_soluble
+  - value: fat_soluble
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

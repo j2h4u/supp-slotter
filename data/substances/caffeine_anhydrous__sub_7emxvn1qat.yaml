@@ -1,18 +1,28 @@
 id: sub_7emxvn1qat
 name: Caffeine
 form: anhydrous
-notes: Caffeine anhydrous stimulant form listed on ALLMAX Essentials Caffeine 200 mg tablets.
-schedule:
-  timing:
-  - energy_like
 knowledge:
   context:
-  - neurocognitive_support
-  - workout_performance
+  - value: neurocognitive_support
+    research_state: unassessed
+    sources: []
+  - value: workout_performance
+    research_state: unassessed
+    sources: []
   effect:
-  - stimulant_context
-  - alertness_context
-  - exercise_performance_context
+  - value: stimulant_context
+    research_state: unassessed
+    sources: []
+  - value: alertness_context
+    research_state: unassessed
+    sources: []
+  - value: exercise_performance_context
+    research_state: unassessed
+    sources: []
   role:
-  - ergogenic
-  - nootropic
+  - value: ergogenic
+    research_state: unassessed
+    sources: []
+  - value: nootropic
+    research_state: unassessed
+    sources: []

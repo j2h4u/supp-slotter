@@ -3,11 +3,16 @@ name: Vitamin B1
 form: benfotiamine
 aliases:
 - Benfotiamine
-notes: Fat-soluble thiamine derivative listed on Natural Factors Benfotiamine and Life Extension Mega Benfotiamine labels.
 knowledge:
   context:
-  - mitochondrial_health
+  - value: mitochondrial_health
+    research_state: unassessed
+    sources: []
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: unassessed
+    sources: []
   pathway:
-  - thiamine_energy_metabolism
+  - value: thiamine_energy_metabolism
+    research_state: unassessed
+    sources: []
