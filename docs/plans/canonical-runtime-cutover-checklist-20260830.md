@@ -171,7 +171,7 @@ answer.
 - [x] **Targeted acceptance, release, static quality, and corpus projection have one exact-head receipt.**
   - Evidence: R1; `scripts/run_unit_gate.py`; `tests/test_crap_gate.py`; `planner/ontology/projection.py`.
 
-## Final review holds
+## Final review records
 
 - [x] **Independent Sol panel.** The independent panel reviewed the remediated
   runtime candidate and returned `SHIP` without actionable Critical, High, or
@@ -180,11 +180,14 @@ answer.
     documentation head `3a940d87d4028c5e251fa4436ac6dc2231114b10`; runtime
     parent and R1 `eeb0663b5bbdea5e475f11d1f10aace2b95432f9`.
 
-- [ ] **Fresh-context final auditor.** Inspect this exact runtime candidate,
-  validate every checked record and R1, then save per-item verdicts and a final
-  `COMPLETE` or `INCOMPLETE` decision in `docs/decisions/`.
-  - Pending on `eeb0663b5bbdea5e475f11d1f10aace2b95432f9`: remediation is
-    present, but no fresh-context final-auditor report with `COMPLETE` exists.
+- [x] **Fresh-context final auditor.** A fresh-context auditor validated every
+  prior checked record and R1, then returned `COMPLETE` with no actionable
+  Critical, High, or Medium finding.
+  - Evidence: [fresh-context final audit](../decisions/canonical-runtime-fresh-context-final-audit-20260831.md);
+    documentation head `3ac1ab3271baa4ecd6171e6a8e98421fe5a12eb7`; runtime
+    parent and R1 `eeb0663b5bbdea5e475f11d1f10aace2b95432f9`; 56 cited test
+    nodes and 24 paths/commit IDs/Markdown targets resolved; focused
+    ontology-check, canonical-runtime-18, and smoke-14 passed.
 
 - [x] **Repeated same-optics convergence.** The product, ontology,
   portability, and QA optics repeated on the remediated heads and each returned
@@ -194,5 +197,6 @@ answer.
     documentation head `3a940d87d4028c5e251fa4436ac6dc2231114b10`; runtime
     parent and R1 `eeb0663b5bbdea5e475f11d1f10aace2b95432f9`.
 
-The cutover remains open until the fresh-context final auditor independently
-closes the remaining hold.
+All 35 checklist records are complete. The historical
+[superseded convergence report](../decisions/canonical-runtime-convergence-20260831.md)
+remains preserved as non-final history.
