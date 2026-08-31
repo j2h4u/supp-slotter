@@ -32,6 +32,35 @@ def test_substance_schema_accepts_nested_form() -> None:
     assert errors == [], f"Expected no errors, got: {errors}"
 
 
+@pytest.mark.parametrize(
+    "card",
+    [
+        _make_substance_card(notes="legacy substance notes"),
+        {
+            "id": "prd_zz0000zzzz",
+            "name": "Test Product",
+            "components": [
+                {
+                    "id": "cmp_prd_zz0000zzzz__sub_zz0000zzzz",
+                    "substance": "sub_zz0000zzzz",
+                    "notes": "legacy component notes",
+                }
+            ],
+        },
+        {
+            "id": "prd_zz0000zzzz",
+            "name": "Test Product",
+            "components": [{"id": "cmp_prd_zz0000zzzz__sub_zz0000zzzz", "substance": "sub_zz0000zzzz"}],
+            "notes": "legacy product notes",
+        },
+    ],
+)
+def test_card_schema_rejects_legacy_notes_at_every_card_position(card: dict[str, YamlValue]) -> None:
+    schema_name = "substance" if cast(str, card["id"]).startswith("sub_") else "product"
+    errors = schema_errors(card, schema_name, Path("legacy-notes.yaml"), ontology_bundle())
+    assert any("notes" in error for error in errors), errors
+
+
 def test_product_schema_rejects_unsupported_schedule_field() -> None:
     card: dict[str, YamlValue] = {
         "id": "prd_zz0000zzzz",

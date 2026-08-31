@@ -38,7 +38,6 @@ def load_product(path: Path, bundle: OntologyBundle) -> Product:
             components=tuple(_product_components(data.get("components"))),
             brand=cast(str | None, data.get("brand")),
             urls=tuple(_string_list(data.get("urls"))),
-            notes=cast(str | None, data.get("notes")),
             concerns=_concerns(data.get("concerns"), path, bundle),
             use_pattern=cast(str | None, data.get("use_pattern")),
         )
@@ -63,7 +62,6 @@ def _product_components(value: object) -> list[ProductComponent]:
                 id=cast(str, component_dict["id"]),
                 label=cast(str | None, component_dict.get("label")),
                 amount=cast(str | None, component_dict.get("amount")),
-                notes=cast(str | None, component_dict.get("notes")),
             )
         )
     return components

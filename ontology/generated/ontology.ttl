@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: c193760c0e05c8a0b7c2706e9346cb5522c900c145afa37d77186d18c9398921
+# source-hash: aa088a15e134efc9666165a999c29c4fe1574ea6029b4f611d0e02f64da02068
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -390,9 +390,6 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/name> a ss:SchemaSlot ;
   ss:name "name" .
-
-<https://j2h4u.github.io/supp-slotter/ontology/v1/notes> a ss:SchemaSlot ;
-  ss:name "notes" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/ontoclean_profile> a ss:SchemaSlot ;
   ss:name "ontoclean_profile" .

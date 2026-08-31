@@ -80,12 +80,12 @@ classes:
       label: {required: true}
   Substance:
     is_a: IdentifiedNode
-    slots: [aliases, form, notes, concerns, knowledge_assertions]
+    slots: [aliases, form, concerns, knowledge_assertions]
   Product:
     is_a: IdentifiedNode
-    slots: [brand, components, urls, notes, concerns, use_pattern]
+    slots: [brand, components, urls, concerns, use_pattern]
   ProductComponent:
-    slots: [id, substance, label, amount, notes]
+    slots: [id, substance, label, amount]
     slot_usage:
       id: {required: true, pattern: '^cmp_[a-z0-9][a-z0-9_:-]*$'}
   CompositionRole:
@@ -209,7 +209,7 @@ classes:
     # vocabulary catalog.  The base schema owns only this envelope.
   SubstanceCard:
     description: Source-facing canonical substance card contract.
-    slots: [id, name, form, aliases, notes, concerns, knowledge]
+    slots: [id, name, form, aliases, concerns, knowledge]
     slot_usage:
       id: {required: true, pattern: '^sub_[a-z0-9]{10}$'}
       name: {required: true, pattern: '^.+$'}
@@ -222,7 +222,7 @@ classes:
       component_uniqueness: required
       component_uniqueness_source: components[]
       component_uniqueness_field: substance
-    slots: [id, name, components, brand, urls, notes, concerns, use_pattern]
+    slots: [id, name, components, brand, urls, concerns, use_pattern]
     slot_usage:
       id: {required: true, pattern: '^prd_[a-z0-9]{10}$'}
       name: {required: true, pattern: '^.+$'}
@@ -244,7 +244,6 @@ slots:
   aliases: {multivalued: true}
   form: {}
   knowledge:
-  notes: {}
   brand: {}
   components: {multivalued: true, range: ProductComponent, inlined: true, inlined_as_list: true}
   urls: {multivalued: true}

@@ -48,12 +48,6 @@ def _product_projection() -> dict[str, object]:
                                 "subject": "components[]",
                                 "predicate": BASE + "substance",
                             },
-                            {
-                                "kind": "slot",
-                                "source": "components[].notes",
-                                "subject": "components[]",
-                                "predicate": BASE + "notes",
-                            },
                         ],
                     },
                 }
@@ -74,21 +68,21 @@ def _component_nodes(result: ProjectionResult) -> set[URIRef]:
     return set(graph.objects(URIRef(BASE + "product/prd_demo"), URIRef(BASE + "components")))
 
 
-def test_authored_component_identity_survives_reorder_and_notes_edit(tmp_path: Path) -> None:
+def test_authored_component_identity_survives_reorder(tmp_path: Path) -> None:
     products = tmp_path / "data/products"
     products.mkdir(parents=True)
     product_path = products / "demo.yaml"
     _write_product(
         product_path,
-        "  - id: cmp_prd_demo__sub_a\n    substance: sub_a\n    notes: first\n"
-        "  - id: cmp_prd_demo__sub_b\n    substance: sub_b\n    notes: second\n",
+        "  - id: cmp_prd_demo__sub_a\n    substance: sub_a\n"
+        "  - id: cmp_prd_demo__sub_b\n    substance: sub_b\n",
     )
     before = _component_nodes(_project_repository_with_projection(tmp_path, _product_projection()))
 
     _write_product(
         product_path,
-        "  - id: cmp_prd_demo__sub_b\n    substance: sub_b\n    notes: revised\n"
-        "  - id: cmp_prd_demo__sub_a\n    substance: sub_a\n    notes: first\n",
+        "  - id: cmp_prd_demo__sub_b\n    substance: sub_b\n"
+        "  - id: cmp_prd_demo__sub_a\n    substance: sub_a\n",
     )
     after = _component_nodes(_project_repository_with_projection(tmp_path, _product_projection()))
 

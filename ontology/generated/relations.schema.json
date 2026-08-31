@@ -1495,12 +1495,6 @@
         "label": {
           "type": "string"
         },
-        "notes": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "urls": {
           "items": {
             "type": "string"
@@ -1555,12 +1549,6 @@
           "pattern": "^.+$",
           "type": "string"
         },
-        "notes": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
         "urls": {
           "items": {
             "type": "string"
@@ -1597,12 +1585,6 @@
           "type": "string"
         },
         "label": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "notes": {
           "type": [
             "string",
             "null"
@@ -2515,12 +2497,6 @@
         },
         "label": {
           "type": "string"
-        },
-        "notes": {
-          "type": [
-            "string",
-            "null"
-          ]
         }
       },
       "required": [
@@ -2575,12 +2551,6 @@
         "name": {
           "pattern": "^.+$",
           "type": "string"
-        },
-        "notes": {
-          "type": [
-            "string",
-            "null"
-          ]
         }
       },
       "required": [

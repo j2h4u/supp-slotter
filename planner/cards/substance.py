@@ -37,7 +37,6 @@ def load_substance(path: Path, bundle: OntologyBundle) -> Substance:
             name=cast(str, data["name"]),
             form=cast(str | None, data.get("form")),
             aliases=_string_tuple(data.get("aliases") or ()),
-            notes=cast(str | None, data.get("notes")),
             concerns=_concerns(data.get("concerns"), path, bundle),
             knowledge_assertions=_knowledge_assertions(knowledge, path, bundle),
         )

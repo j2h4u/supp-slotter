@@ -1370,14 +1370,6 @@
         {
           "inlined": false,
           "inlined_as_list": false,
-          "multivalued": false,
-          "name": "notes",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
           "multivalued": true,
           "name": "urls",
           "range": "string",
@@ -1440,14 +1432,6 @@
         {
           "inlined": false,
           "inlined_as_list": false,
-          "multivalued": false,
-          "name": "notes",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
           "multivalued": true,
           "name": "urls",
           "range": "string",
@@ -1488,14 +1472,6 @@
           "inlined_as_list": false,
           "multivalued": false,
           "name": "label",
-          "range": "string",
-          "required": false
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "notes",
           "range": "string",
           "required": false
         },
@@ -2474,14 +2450,6 @@
           "name": "label",
           "range": "string",
           "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "notes",
-          "range": "string",
-          "required": false
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/Substance"
@@ -2536,14 +2504,6 @@
           "name": "name",
           "range": "string",
           "required": true
-        },
-        {
-          "inlined": false,
-          "inlined_as_list": false,
-          "multivalued": false,
-          "name": "notes",
-          "range": "string",
-          "required": false
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/SubstanceCard"
@@ -3014,12 +2974,6 @@
               "subject": "components[]"
             },
             {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/notes",
-              "source": "components[].notes",
-              "subject": "components[]"
-            },
-            {
               "kind": "reference",
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/substance",
               "source": "components[].substance",
@@ -3053,11 +3007,6 @@
               "kind": "alias",
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/label",
               "source": "name"
-            },
-            {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/notes",
-              "source": "notes"
             },
             {
               "kind": "sequence",
@@ -3241,11 +3190,6 @@
               "kind": "alias",
               "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/label",
               "source": "name"
-            },
-            {
-              "kind": "slot",
-              "predicate": "https://j2h4u.github.io/supp-slotter/ontology/v1/notes",
-              "source": "notes"
             }
           ],
           "maintenance": {

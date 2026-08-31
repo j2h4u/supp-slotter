@@ -9,6 +9,7 @@ import pytest
 import yaml
 from planner.cards import relations as relation_cards
 from planner.cards.dashboards import build_dashboard_review, load_dashboard
+from planner.cards.product import load_product
 from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance
 from planner.contracts import CardLoadError, Substance
@@ -16,6 +17,46 @@ from planner.ontology.selector import load_relation_type_contracts
 from planner.paths import Paths
 
 from tests.helpers import ontology_bundle
+
+
+@pytest.mark.parametrize(
+    ("kind", "document"),
+    [
+        ("substance", {"id": "sub_zz0000zzzz", "name": "Legacy", "notes": "unexpected"}),
+        (
+            "product",
+            {
+                "id": "prd_zz0000zzzz",
+                "name": "Legacy",
+                "components": [
+                    {
+                        "id": "cmp_prd_zz0000zzzz__sub_zz0000zzzz",
+                        "substance": "sub_zz0000zzzz",
+                        "notes": "unexpected",
+                    }
+                ],
+            },
+        ),
+        (
+            "product",
+            {
+                "id": "prd_zz0000zzzz",
+                "name": "Legacy",
+                "components": [{"id": "cmp_prd_zz0000zzzz__sub_zz0000zzzz", "substance": "sub_zz0000zzzz"}],
+                "notes": "unexpected",
+            },
+        ),
+    ],
+)
+def test_card_loaders_reject_legacy_notes_at_every_card_position(
+    tmp_path: Path, kind: str, document: dict[str, object]
+) -> None:
+    path = tmp_path / f"{kind}.yaml"
+    path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    loader = load_substance if kind == "substance" else load_product
+
+    with pytest.raises(CardLoadError, match="notes"):
+        loader(path, ontology_bundle())
 
 
 @pytest.mark.parametrize(

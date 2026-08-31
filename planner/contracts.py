@@ -73,7 +73,6 @@ class Substance:
     knowledge_assertions: tuple[KnowledgeAssertion, ...] = ()
     form: str | None = None
     aliases: tuple[str, ...] = ()
-    notes: str | None = None
     concerns: tuple[Concern, ...] = ()
 
 
@@ -83,7 +82,6 @@ class ProductComponent:
     id: str
     label: str | None = None
     amount: str | None = None
-    notes: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,7 +91,6 @@ class Product:
     components: tuple[ProductComponent, ...]
     brand: str | None = None
     urls: tuple[str, ...] = ()
-    notes: str | None = None
     concerns: tuple[Concern, ...] = ()
     use_pattern: str | None = None
 
