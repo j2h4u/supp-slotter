@@ -9,23 +9,21 @@ boundary decision is the
 [`canonical-instance ADR`](../decisions/canonical-instance-inference-boundary-20260822.md).
 
 This refresh audits durable source and test paths against the clean runtime
-candidate `64a312d787641f02bebeceeb650c93e71d07e18f` (`64a312d`,
-`refactor: project validated pillbox slots`). It is documentation-only:
+candidate `f02d27cd974e193ba37c0f665436e96d2a961b86` (`f02d27c`,
+`test: align review fixture with stack partition`). It is documentation-only:
 the receipt below is the release result for that exact source head, not a claim
 that a release recipe was rerun while updating this checklist.
 
 ## Exact release receipt (R1)
 
-- Candidate: `64a312d787641f02bebeceeb650c93e71d07e18f`; clean HEAD; release
+- Candidate: `f02d27cd974e193ba37c0f665436e96d2a961b86`; clean HEAD; release
   exit status `0`.
-- Reported release total: 430 passing tests; reported stage counters
-  `14/37/31/53/63/236`.
-- Coverage: `82%`; 6,774 statements with 969 missed; 2,262 branches with 569
+- Ordered release stages: `14/37/31/53/64/236 = 435` passing tests.
+- Coverage: `82%`; 6,787 statements with 970 missed; 2,268 branches with 570
   partial branches.
-- CRAP: 622 functions at threshold `30`; maximum `29.40`. The pillboxes file
-  has maximum `27.84` and zero threshold violations.
-- Corpus projection: conforms; `132.686189s` (PySHACL `128.171224s`).
-- Import inventory: 73 files and 309 dependencies; 10 contracts kept and 0
+- CRAP: 623 functions at threshold `30`; maximum `29.40`.
+- Corpus projection: conforms; `123.79511s` (PySHACL `119.9958s`).
+- Import inventory: 73 files and 310 dependencies; 10 contracts kept and 0
   broken.
 - The gate left the checkout clean and no repository processes remained.
 
@@ -95,7 +93,11 @@ answer.
 ## Medium — product and data integrity
 
 - [x] **Tracked-product ownership is explicit and closed.**
-  - Evidence: R1; `tests/test_runtime_contract_v2.py::test_authored_stack_partition_is_closed_and_reproduces_active_membership`; `data/stacks.yaml`.
+  Stack topology consumes the formal runtime-declared routable, excluded, and
+  tracked-unassigned partitions; no Python name is a policy authority. The
+  review fixture derives its complete canonical partition from that same
+  runtime policy.
+  - Evidence: R1; `f02d27cd974e193ba37c0f665436e96d2a961b86`; `tests/test_runtime_contract_v2.py::test_authored_stack_partition_is_closed_and_reproduces_active_membership`; `tests/test_stack_validation.py::test_partition_names_come_from_runtime_and_unknown_names_fail_closed`; `tests/test_review_command.py::test_cmd_review_accepts_canonical_typed_selector_relation`; `planner/cards/stacks.py`; `planner/engine/_plan_active_index.py`; `data/stacks.yaml`.
 
 - [x] **Pillbox/stack topology is one-to-one where authored as such.**
   - Evidence: R1; `tests/test_pillbox_loader_contract.py::test_loader_rejects_multiple_pillboxes_for_one_stack`; `tests/test_logical_slot_topology.py::test_distinct_topologies_keep_distinct_stack_references`.
@@ -170,21 +172,21 @@ answer.
 - [ ] **Independent Sol panel.** Re-run the independent panel against the
   remediated runtime candidate and return `SHIP` without actionable Critical,
   High, or Medium reservations.
-  - Pending on `64a312d787641f02bebeceeb650c93e71d07e18f`: the prior
+  - Pending on `f02d27cd974e193ba37c0f665436e96d2a961b86`: the prior
     [convergence record](../decisions/canonical-runtime-convergence-20260831.md)
     is superseded and cannot close this remediated head.
 
 - [ ] **Fresh-context final auditor.** Inspect this exact runtime candidate,
   validate every checked record and R1, then save per-item verdicts and a final
   `COMPLETE` or `INCOMPLETE` decision in `docs/decisions/`.
-  - Pending on `64a312d787641f02bebeceeb650c93e71d07e18f`: remediation is
+  - Pending on `f02d27cd974e193ba37c0f665436e96d2a961b86`: remediation is
     present, but no fresh-context final-auditor report with `COMPLETE` exists.
 
 - [ ] **Repeated same-optics convergence.** Repeat the product, ontology,
   portability, and QA optics after the fresh-context audit; compare the
   remediated head with the historical review and return `SHIP` only with no
   actionable reservation.
-  - Pending on `64a312d787641f02bebeceeb650c93e71d07e18f`: the prior
+  - Pending on `f02d27cd974e193ba37c0f665436e96d2a961b86`: the prior
     [convergence record](../decisions/canonical-runtime-convergence-20260831.md)
     is superseded and non-final.
 
