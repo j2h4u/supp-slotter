@@ -1,0 +1,25 @@
+date: 2026-08-31
+head: 4af5525dff19f689d1b7ff71a85108dabb12dab7
+branch: feature/actionable-scheduling-knowledge
+checkout: clean_before_and_after_gate
+command: just release
+invocations: 1
+status: failed
+exit_status: 1
+duration_seconds: 0.27
+stages:
+  format_check:
+    status: passed
+    command: uv run ruff format --check .
+    detail: 161 files already formatted
+  lint:
+    status: failed
+    command: uv run ruff check .
+    detail: "5 errors: planner/ontology/canonical_facts.py:87 too-many-arguments and too-many-positional-arguments; planner/ontology/canonical_inference.py:177 useless-if-else; planner/ontology/runtime_program.py:513 too-many-boolean-expressions; tests/test_actionable_scheduling_publication_trace.py:3 unsorted-imports"
+  ontology_check: not_run
+  release_unit: not_run
+  crap_check: not_run
+  corpus_projection: not_run
+process_cleanup: no repository pytest, basedpyright, run_bounded, release, or ruff processes remained after exit
+error: "Recipe `_lint` failed on line 18 with exit code 1"
+follow_up: leave release checkbox unchecked; do not fix or rerun in this receipt
