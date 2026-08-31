@@ -67,13 +67,12 @@ def load_plan_inputs(
             stacks_dict,
             {product_id: paths.products / product_id for product_id in products},
             paths.stacks_file,
-            bundle.runtime_program.glue_contract.inactive_stack_name,
+            bundle.runtime_program,
         )
         topology_errors = check_routable_topologies(
             paths.stacks_file,
-            stacks_dict,
             {pillbox.stack: 1 for pillbox in pillboxes.values()},
-            bundle.runtime_program.glue_contract.inactive_stack_name,
+            bundle.runtime_program,
         )
         if partition_errors or topology_errors:
             raise CardLoadError(paths.stacks_file, "\n".join((*partition_errors, *topology_errors)))
@@ -82,7 +81,7 @@ def load_plan_inputs(
         print(f"plan: {e.message}", file=sys.stderr)
         return None
     try:
-        stack_entries = normalize_stack_entries(stacks_dict)
+        stack_entries = normalize_stack_entries(stacks_dict, bundle.runtime_program)
     except ValueError as e:
         print(f"plan: {paths.stacks_file}: {e}", file=sys.stderr)
         return None

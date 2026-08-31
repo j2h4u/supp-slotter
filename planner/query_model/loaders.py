@@ -4,15 +4,16 @@ from __future__ import annotations
 
 from planner.cards.stacks import normalize_stack_entries
 from planner.contracts import CardLoadError
+from planner.ontology.runtime_program import RuntimeProgram
 from planner.paths import Paths
 from planner.yaml_io import load_yaml_mapping
 
 
-def stacks_for_read_model(paths: Paths) -> dict[str, list[str]]:
+def stacks_for_read_model(paths: Paths, runtime: RuntimeProgram) -> dict[str, list[str]]:
     """Read validated routable stack membership, excluding tracked-unassigned records."""
     raw = load_yaml_mapping(paths.stacks_file)
     try:
-        entries = normalize_stack_entries(raw)
+        entries = normalize_stack_entries(raw, runtime)
     except ValueError as error:
         raise CardLoadError(paths.stacks_file, f"{paths.stacks_file}: {error}") from error
 

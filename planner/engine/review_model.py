@@ -8,7 +8,6 @@ from typing import NamedTuple, cast
 from planner.cards.dashboards import build_dashboard_review
 from planner.cards.product import format_product_name, load_product_registry
 from planner.cards.relations import check_global_relations, load_global_relations
-from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import format_substance_name, load_substance_registry
 from planner.contracts import CardLoadError, ConcernRecord, Product, StackEntry, Substance
 from planner.ontology.artifacts import OntologyBundle
@@ -68,8 +67,12 @@ def build_review_model(  # noqa: PLR0914
     products = load_product_registry(paths, bundle)
     global_relations = load_global_relations(paths, bundle, substances)
     try:
-        stacks_data = stacks_for_read_model(paths)
-        stack_entries = normalize_stack_entries(cast(dict[str, object], stacks_data))
+        stacks_data = stacks_for_read_model(paths, bundle.runtime_program)
+        stack_entries: dict[str, StackEntry] = {
+            product_id: {"product": product_id, "stack": stack}
+            for stack, product_ids in stacks_data.items()
+            for product_id in product_ids
+        }
     except (CardLoadError, ValueError) as e:
         message = e.message if isinstance(e, CardLoadError) else str(e)
         return None, [f"review: {message}"]
