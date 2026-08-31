@@ -209,22 +209,26 @@ def _write_complete_canonical_catalog_fixture_cards(tmp_path: Path) -> None:
             "acute_sleep_effects",
             "pre_exercise_performance_effects",
             "post_exercise_recovery_effects",
+            "product_food_instructions",
         )
         for fact in cast(list[dict[str, object]], catalog[family])
     ]
-    substance_ids = {
-        cast(str, target["substance"])
+    fact_targets = [
+        cast(dict[str, object], fact[field])
         for fact in facts
-        for target in (cast(dict[str, object], fact["subject"]), cast(dict[str, object], fact["applicability"]))
-        if isinstance(target.get("substance"), str)
+        for field in ("subject", "applicability")
+        if isinstance(fact.get(field), dict)
+    ]
+    substance_ids = {
+        cast(str, target["substance"]) for target in fact_targets if isinstance(target.get("substance"), str)
     }
     role_ids = {
         cast(str, target["composition_role"])
-        for fact in facts
-        for target in (cast(dict[str, object], fact["subject"]), cast(dict[str, object], fact["applicability"]))
+        for target in fact_targets
         if isinstance(target.get("composition_role"), str)
     }
-    product_ids = {role_id.removeprefix("cmp_").split("__", 1)[0] for role_id in role_ids}
+    product_ids = {cast(str, fact["product"]) for fact in facts if isinstance(fact.get("product"), str)}
+    product_ids.update(role_id.removeprefix("cmp_").split("__", 1)[0] for role_id in role_ids)
     substance_ids.update(role_id.split("__", 1)[1] for role_id in role_ids)
     source_products = _ONTOLOGY_ROOT.parents[0] / "data/products"
     source_substances = _ONTOLOGY_ROOT.parents[0] / "data/substances"
