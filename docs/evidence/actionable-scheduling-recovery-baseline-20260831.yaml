@@ -1,0 +1,148 @@
+schema: actionable-scheduling-recovery-baseline/v1
+generated_at: 2026-08-31
+purpose: Frozen Wave-0 recovery witness; evidence only, never planner input.
+head:
+  branch: feature/actionable-scheduling-knowledge
+  sha: f9e4e594f5755210ce4e4f49da0870491d52ae0d
+  input_sha256:
+    data/stacks.yaml: be3d3a203bbf47df735f8fe49f58ded8cf400f8bb2e529d892240d84df736eb5
+    data/pillboxes.yaml: 6881abeb5280cadb4f48a058a19b31050b86f4374a02970b7e2a3c5e5206dc99
+    data/relations.yaml: 7a208ea0a62dcbca5deda18c4f5e89c36229e30b433ad6711bda54dc740c3397
+    ontology/canonical-facts.yaml: 029fa0f074a1683d7f2a073325945396f29f552c7e21ca6a7267be2ac468a9cb
+    ontology/relations.yaml: a4630796c3cadff5bc77d7b12b998c2c0d3b7d0ff033e8889336ef8ee025f065
+    ontology/relation-model.yaml: b11c649a284459728ea5a7d0a4f34dc9594b3c99305a67d74bb0cf25177a5e1d
+counts:
+  active_products: 18
+  composition_roles: 45
+  composition_roles_by_stack: {daily: 37, training: 8}
+  canonical_facts: 6
+  canonical_facts_active_applications: 4
+  canonical_facts_inactive_applications: 2
+  relations: 34
+  active_structured_memberships: 191
+  active_structured_memberships_by_category: {context: 38, effect: 56, kind: 31, pathway: 27, quality: 12, risk: 19, role: 8}
+  pressure_backed_placements: 4
+  balance_only_placements: 14
+active_products:
+  - {id: prd_0e92bc1674, name: L-Carnitine L-Tartrate (LCLT), stack: training}
+  - {id: prd_175251bd63, name: Nattokinase, stack: daily}
+  - {id: prd_20bf2df267, name: Electrolyte Caps, stack: training}
+  - {id: prd_2ca842627a, name: Creatine monohydrate, stack: training}
+  - {id: prd_33f3450f29, name: Tadalafil, stack: daily}
+  - {id: prd_7ae9a92d3b, name: Picamilon, stack: daily}
+  - {id: prd_8eff2491b7, name: Vitamin B5, stack: daily}
+  - {id: prd_8mvv1w128a, name: Astaxanthin, stack: daily}
+  - {id: prd_932319251f, name: Only Trace Minerals, stack: daily}
+  - {id: prd_9d0fca3201, name: Magnesium, stack: daily}
+  - {id: prd_bb212cffc2, name: Coenzyme B-Complex, stack: daily}
+  - {id: prd_cfce0b36b6, name: L-Citrulline Malate, stack: training}
+  - {id: prd_d0u8k66ypy, name: Ежовик гребенчатый с холином, stack: daily}
+  - {id: prd_e5cc3b4e7c, name: Astaxanthin, stack: daily}
+  - {id: prd_eb6337a6dc, name: Vitamin D3, stack: daily}
+  - {id: prd_htuhz2s2gt, name: Omega-3, stack: daily}
+  - {id: prd_vitamealc8, name: Vitamin C, stack: daily}
+  - {id: prd_w2s970gps4, name: Antarctiv Krill oil, stack: daily}
+composition_role_ids:
+  - cmp_prd_175251bd63__sub_877c24aad4
+  - cmp_prd_8eff2491b7__sub_7628e4f478
+  - cmp_prd_bb212cffc2__sub_230c5c820e
+  - cmp_prd_bb212cffc2__sub_67fc2be8aa
+  - cmp_prd_bb212cffc2__sub_6yp50f6ach
+  - cmp_prd_bb212cffc2__sub_7628e4f478
+  - cmp_prd_bb212cffc2__sub_799419116d
+  - cmp_prd_bb212cffc2__sub_a873e428ee
+  - cmp_prd_bb212cffc2__sub_meuw89u4ie
+  - cmp_prd_bb212cffc2__sub_fd899525d3
+  - cmp_prd_bb212cffc2__sub_d0034bd130
+  - cmp_prd_bb212cffc2__sub_157418854b
+  - cmp_prd_2ca842627a__sub_9c0908e7f7
+  - cmp_prd_eb6337a6dc__sub_2476bf9d4b
+  - cmp_prd_d0u8k66ypy__sub_e3af6f78d9
+  - cmp_prd_d0u8k66ypy__sub_kwudyhex2o
+  - cmp_prd_e5cc3b4e7c__sub_249199f726
+  - cmp_prd_932319251f__sub_8ppxce3s17
+  - cmp_prd_932319251f__sub_844a0cc551
+  - cmp_prd_932319251f__sub_7938ea248e
+  - cmp_prd_932319251f__sub_ddf8d310d2
+  - cmp_prd_932319251f__sub_c55378389c
+  - cmp_prd_932319251f__sub_25b049a598
+  - cmp_prd_932319251f__sub_3e3b246a6f
+  - cmp_prd_7ae9a92d3b__sub_396c221c31
+  - cmp_prd_0e92bc1674__sub_5bd641c116
+  - cmp_prd_w2s970gps4__sub_646e568f61
+  - cmp_prd_w2s970gps4__sub_66b783576c
+  - cmp_prd_w2s970gps4__sub_xsqvv2fop0
+  - cmp_prd_w2s970gps4__sub_t8sx7e49j7
+  - cmp_prd_w2s970gps4__sub_249199f726
+  - cmp_prd_8mvv1w128a__sub_249199f726
+  - cmp_prd_htuhz2s2gt__sub_sunkcr05vl
+  - cmp_prd_htuhz2s2gt__sub_66b783576c
+  - cmp_prd_htuhz2s2gt__sub_xsqvv2fop0
+  - cmp_prd_33f3450f29__sub_a3ec9f9c52
+  - cmp_prd_20bf2df267__sub_4j9fttkil9
+  - cmp_prd_20bf2df267__sub_f7780f899b
+  - cmp_prd_20bf2df267__sub_fhl7c4skmf
+  - cmp_prd_20bf2df267__sub_iqjdo9gvbv
+  - cmp_prd_20bf2df267__sub_p5qxdnxu9e
+  - cmp_prd_cfce0b36b6__sub_3918fe347e
+  - cmp_prd_vitamealc8__sub_vcnaasc800
+  - cmp_prd_vitamealc8__sub_4j9fttkil9
+  - cmp_prd_9d0fca3201__sub_7e02eab0d1
+canonical_pressures:
+  - {item: prd_bb212cffc2, dimension: meal_context, value: with_food, fact: fact_food_prd_bb212cffc2_sub_67fc2be8aa, law: law_food_bioavailability_increases, role: cmp_prd_bb212cffc2__sub_67fc2be8aa, satisfied: true}
+  - {item: prd_cfce0b36b6, dimension: exercise_anchor, value: before, fact: fact_pre_exercise_performance_prd_cfce0b36b6_sub_3918fe347e, law: law_pre_exercise_performance_improves, role: cmp_prd_cfce0b36b6__sub_3918fe347e, satisfied: true}
+  - {item: prd_eb6337a6dc, dimension: meal_context, value: with_food, fact: fact_food_prd_eb6337a6dc_sub_2476bf9d4b, law: law_food_bioavailability_increases, role: cmp_prd_eb6337a6dc__sub_2476bf9d4b, satisfied: true}
+  - {item: prd_htuhz2s2gt, dimension: meal_context, value: with_food, fact: fact_food_prd_htuhz2s2gt_sub_sunkcr05vl, law: law_food_bioavailability_increases, role: cmp_prd_htuhz2s2gt__sub_sunkcr05vl, satisfied: true}
+placements:
+  - {item: prd_0e92bc1674, slot: pre_workout, basis: balance_and_tie_break_only}
+  - {item: prd_175251bd63, slot: morning_empty, basis: balance_and_tie_break_only}
+  - {item: prd_20bf2df267, slot: post_workout, basis: balance_and_tie_break_only}
+  - {item: prd_2ca842627a, slot: post_workout, basis: balance_and_tie_break_only}
+  - {item: prd_33f3450f29, slot: morning_empty, basis: balance_and_tie_break_only}
+  - {item: prd_7ae9a92d3b, slot: morning_empty, basis: balance_and_tie_break_only}
+  - {item: prd_8eff2491b7, slot: morning_empty, basis: balance_and_tie_break_only}
+  - {item: prd_8mvv1w128a, slot: morning_food, basis: balance_and_tie_break_only}
+  - {item: prd_932319251f, slot: morning_food, basis: balance_and_tie_break_only}
+  - {item: prd_9d0fca3201, slot: morning_food, basis: balance_and_tie_break_only}
+  - {item: prd_bb212cffc2, slot: morning_food, basis: pressure_evidence}
+  - {item: prd_cfce0b36b6, slot: pre_workout, basis: pressure_evidence}
+  - {item: prd_d0u8k66ypy, slot: day_food, basis: balance_and_tie_break_only}
+  - {item: prd_e5cc3b4e7c, slot: evening_empty, basis: balance_and_tie_break_only}
+  - {item: prd_eb6337a6dc, slot: day_food, basis: pressure_evidence}
+  - {item: prd_htuhz2s2gt, slot: day_food, basis: pressure_evidence}
+  - {item: prd_vitamealc8, slot: evening_empty, basis: balance_and_tie_break_only}
+  - {item: prd_w2s970gps4, slot: evening_empty, basis: balance_and_tie_break_only}
+candidate_inventory:
+  rule: "Read-only mechanical reference scan: active role/product source spans whose exact source text contains food, meal, empty stomach, exercise, recovery, workout, before, after, sleep, wake, morning, or bedtime. No semantic adjudication is encoded."
+  named_directed_candidates:
+    - {id: cand_active_nattokinase_empty, claim: active nattokinase empty preference, source: data/substances/nattokinase__sub_877c24aad4.yaml#L3, disposition: pending_high_reasoning_adjudication}
+    - {id: cand_active_astaxanthin_food, claim: active astaxanthin food preference, source: data/substances/astaxanthin__sub_249199f726.yaml#L3, disposition: pending_high_reasoning_adjudication}
+    - {id: cand_active_krill_food, claim: active krill-oil food preference, source: data/substances/krill_oil__sub_646e568f61.yaml#L3, disposition: pending_high_reasoning_adjudication}
+    - {id: cand_only_trace_product_food, claim: Only Trace Minerals product-with-food instruction, source: data/products/life_extension__only_trace_minerals__prd_932319251f.yaml#L38-L40, disposition: pending_high_reasoning_adjudication}
+    - {id: cand_lclt_exercise_recovery, claim: LCLT exercise/recovery context, source: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml#L6-L24, disposition: pending_high_reasoning_adjudication}
+  other_mechanical_references:
+    - data/products/futurebiotics__vitamin_d3__prd_eb6337a6dc.yaml#L11-L13
+    - data/products/tim__electrolyte_caps__prd_20bf2df267.yaml#L37-L45
+    - data/substances/creatine_monohydrate__sub_9c0908e7f7.yaml#L12
+    - data/substances/calcium_dicalcium_phosphate__sub_iqjdo9gvbv.yaml#L14
+    - data/substances/calcium_lactate__sub_p5qxdnxu9e.yaml#L10
+    - data/substances/docosahexaenoic_acid__sub_xsqvv2fop0.yaml#L5
+    - data/substances/eicosapentaenoic_acid__sub_66b783576c.yaml#L5
+    - data/substances/l_citrulline_malate__sub_3918fe347e.yaml#L4-L13
+    - data/substances/magnesium_citrate__sub_fhl7c4skmf.yaml#L4-L9
+    - data/substances/magnesium_glycinate__sub_7e02eab0d1.yaml#L7-L10
+    - data/substances/picamilon_sodium_nicotinoyl_gamma_aminobutyrate__sub_396c221c31.yaml#L25
+    - data/substances/potassium_citrate__sub_f7780f899b.yaml#L4-L7
+    - data/substances/sodium__sub_4j9fttkil9.yaml#L11
+    - data/substances/vitamin_b2_riboflavin__sub_67fc2be8aa.yaml#L4
+    - data/substances/vitamin_d3_cholecalciferol__sub_2476bf9d4b.yaml#L4
+  adjudication: Every listed candidate remains individually open; this artifact applies no blanket neutral, outside_model, or pressure disposition.
+reproduction:
+  commands:
+    - git rev-parse HEAD
+    - sha256sum data/stacks.yaml data/pillboxes.yaml data/relations.yaml ontology/canonical-facts.yaml ontology/relations.yaml ontology/relation-model.yaml
+    - uv run python -m planner
+    - uv run python -m planner review
+  source_span_receipts:
+    product_notes: docs/evidence/actionable-scheduling-product-note-spans-20260831.jsonl
+    substance_notes: docs/evidence/actionable-scheduling-substance-note-spans-20260831.jsonl
