@@ -17,8 +17,6 @@ from planner.contracts import (
 from planner.ontology.artifacts import OntologyBundle
 from planner.schema_validation import schema_errors
 
-_TECHNICAL_FIELDS = frozenset({"label", "order"})
-
 
 @dataclass(frozen=True, slots=True)
 class _SlotLoadContext:
@@ -109,38 +107,17 @@ def _load_slot(
     raw_slot: object,
     dimensions: Mapping[str, frozenset[str]],
 ) -> Slot:
+    """Project one schema-validated logical slot into its runtime record."""
     path = context.path
-    if not isinstance(slot_id, str) or not slot_id.strip():
-        raise CardLoadError(path, f"{path}: slot ids must be non-empty strings")
-    if not isinstance(raw_slot, dict):
-        raise CardLoadError(path, f"{path}: slot {slot_id!r} must be a mapping")
     slot = cast(dict[str, object], raw_slot)
-    unknown = set(slot) - _TECHNICAL_FIELDS - set(dimensions)
-    if unknown:
-        raise CardLoadError(
-            path, f"{path}: slot {slot_id!r} has unknown fields: {', '.join(sorted(map(str, unknown)))}"
-        )
-    missing = _TECHNICAL_FIELDS - set(slot)
-    if missing:
-        raise CardLoadError(path, f"{path}: slot {slot_id!r} missing required fields: {', '.join(sorted(missing))}")
-    label = slot["label"]
-    order = slot["order"]
-    if not isinstance(label, str) or not label.strip():
+    label = cast(str, slot["label"])
+    if not label.strip():
         raise CardLoadError(path, f"{path}: slot {slot_id!r} requires a non-empty label")
-    if isinstance(order, bool) or not isinstance(order, int) or order < 1:
-        raise CardLoadError(path, f"{path}: slot {slot_id!r} order must be a positive integer")
-    anchors = {key: slot.get(key) for key in sorted(dimensions)}
-    invalid = [
-        key
-        for key, value in anchors.items()
-        if value is not None and (not isinstance(value, str) or value not in dimensions.get(key, frozenset()))
-    ]
-    if invalid:
-        raise CardLoadError(path, f"{path}: slot {slot_id!r} anchors contain unadmitted values")
+    anchors = {key: cast(str | None, slot.get(key)) for key in sorted(dimensions)}
     return Slot(
         slot_id,
         label,
-        order,
+        cast(int, slot["order"]),
         context.pillbox_name,
         context.pillbox_label,
         context.stack,
