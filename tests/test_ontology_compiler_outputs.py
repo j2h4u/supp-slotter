@@ -42,7 +42,7 @@ EXPECTED = {
 }
 
 
-type JsonScalar = None | bool | int | float | str
+type JsonScalar = bool | int | float | str | None
 type JsonValue = JsonScalar | list[JsonValue] | dict[str, JsonValue]
 type JsonMapping = dict[str, JsonValue]
 

@@ -60,8 +60,10 @@ def build_review_model(  # noqa: PLR0914
     if relation_errors:
         return None, [
             *relation_errors,
-            "review: refusing — data/relations.yaml has validation errors "
-            "(run `planner check` to surface and fix them)",
+            (
+                "review: refusing — data/relations.yaml has validation errors (run "
+                "`planner check` to surface and fix them)"
+            ),
         ]
 
     products = load_product_registry(paths, bundle)

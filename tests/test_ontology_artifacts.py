@@ -129,7 +129,7 @@ def test_runtime_decode_requires_exact_executable_capability_parity() -> None:
     payload = _runtime_payload()
     projection = cast(dict[str, object], payload["projection"])
     glue = cast(dict[str, object], projection["glue_contract"])
-    capability_field = sorted(IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS)[0]
+    capability_field = min(IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS)
     values = cast(list[object], glue[capability_field])
     values.pop()
 
