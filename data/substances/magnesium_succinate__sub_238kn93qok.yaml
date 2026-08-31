@@ -1,17 +1,20 @@
 id: sub_238kn93qok
 name: Magnesium
 form: succinate
-notes: Magnesium source in succinate form. Review context - treat as a magnesium source for enzyme/energy, glucose, blood-pressure,
-  nerve/muscle, bone-mineral, and vitamin-D/calcium-axis review while preserving the succinate form.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
-  - bone_mineral_metabolism_support
+  - value: bone_mineral_metabolism_support
+    research_state: unassessed
+    sources: []
   kind:
-  - mineral
+  - value: mineral
+    research_state: unassessed
+    sources: []
   pathway:
-  - vitamin_d_calcium_axis
+  - value: vitamin_d_calcium_axis
+    research_state: unassessed
+    sources: []
   quality:
-  - electrolyte
+  - value: electrolyte
+    research_state: unassessed
+    sources: []

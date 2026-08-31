@@ -27,19 +27,23 @@ _fmt-check:
 
 # Verify generated ontology artifacts are fresh and loadable.
 ontology-check:
-    uv run python scripts/generate_ontology.py --check
+    uv run --group ontology python scripts/generate_ontology.py --check
+
+# Regenerate checked-in ontology artifacts from canonical sources.
+ontology-generate:
+    scripts/run_bounded.sh -- uv run --group ontology python scripts/generate_ontology.py
 
 # Check repository RDF projection against generated SHACL shapes.
 ontology-projection-check:
-    scripts/run_bounded.sh -- uv run python scripts/ontology_check_benchmark.py --check-only
+    scripts/run_bounded.sh -- uv run --group ontology python scripts/ontology_check_benchmark.py --check-only
 
 # Benchmark repository RDF projection + SHACL validation using committed generated artifacts.
 ontology-check-benchmark:
-    scripts/run_bounded.sh -- uv run python scripts/ontology_check_benchmark.py
+    scripts/run_bounded.sh -- uv run --group ontology python scripts/ontology_check_benchmark.py
 
 # Benchmark the full ontology compile + repository RDF projection + SHACL path.
 ontology-full-check-benchmark:
-    scripts/run_bounded.sh -- uv run python scripts/ontology_check_benchmark.py --include-compile --cold-limit-seconds 30 --warm-limit-seconds 30
+    scripts/run_bounded.sh -- uv run --group ontology python scripts/ontology_check_benchmark.py --include-compile --cold-limit-seconds 30 --warm-limit-seconds 30
 
 # Check import-layer architecture contracts.
 _import-contracts:
@@ -55,7 +59,7 @@ _supply-chain-pins:
 
 # Check declared Python dependencies against imports.
 _deptry:
-    uv run deptry planner scripts tests --known-first-party planner --known-first-party scripts --known-first-party tests --per-rule-ignores "DEP004=coverage|linkml|linkml_runtime|pytest_crap"
+    uv run deptry planner scripts tests --known-first-party planner --known-first-party scripts --known-first-party tests --per-rule-ignores "DEP004=coverage|linkml|linkml_runtime|pyshacl|pytest_crap|rdflib"
 
 # Run the canonical static type checker.
 _typecheck:
@@ -63,7 +67,7 @@ _typecheck:
 
 # Scan for dead code with vulture.
 _dead-code:
-    uv run vulture
+    uv run vulture --ignore-names selector_kinds
 
 # Auto-fix ruff findings and formatting.
 fix:
@@ -71,7 +75,7 @@ fix:
     uv run ruff format .
 
 # Static quality gate: format, lint, types, imports, workflows, compile, dead code.
-check: ontology-check _fmt-check _lint _preview-complexity-lint _lock-check _typecheck _import-contracts _actionlint _supply-chain-pins _deptry _compile _dead-code
+check: _fmt-check _lint _preview-complexity-lint _lock-check _typecheck _import-contracts _actionlint _supply-chain-pins _deptry _compile _dead-code
 
 # Self-test the bounded runner without invoking the project test suite.
 bounded-runner-test:
@@ -90,9 +94,24 @@ smoke:
 fast-unit:
     scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py --suite fast-unit
 
+# Exact acceptance witnesses for the executable canonical-runtime boundary.
+canonical-runtime:
+    scripts/run_bounded.sh -- uv run --group ontology python scripts/run_unit_gate.py --suite canonical-runtime
+
+# Private tests-only variant used by `verify`: the current-shelf command owns
+# the one planner validation for that composition.  Standalone `fast-unit`
+# remains self-validating.
+_fast-unit-tests:
+    scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py --suite fast-unit-tests
+
+# Run the current shelf through canonical inference and the exact optimizer.
+# The test copies its data root before planning, so repository inputs stay read-only.
+current-shelf-smoke:
+    scripts/run_bounded.sh -- uv run pytest -q -m "not integration and not slow" tests/test_cutover_vertical_scenarios.py::test_real_shelf_daily_episodic_and_training_products_are_complete
+
 # Heavy ontology compiler/artifact/runtime contract tests.
 ontology-contract:
-    scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py --suite ontology-contract
+    scripts/run_bounded.sh -- uv run --group ontology python scripts/run_unit_gate.py --suite ontology-contract
 
 # Release runtime scenario tests over curated modules and cardinality nodes.
 runtime-scenarios:
@@ -117,19 +136,21 @@ unit-gate-check:
     scripts/run_bounded.sh -- uv run basedpyright scripts/crap_gate.py scripts/run_unit_gate.py tests/test_crap_gate.py tests/test_run_unit_gate.py --warnings
     uv run python -m compileall -q scripts/crap_gate.py scripts/run_unit_gate.py tests/test_crap_gate.py tests/test_run_unit_gate.py
 
-# Default local development confidence gate. Heavy gates stay explicit.
-verify: check smoke fast-unit corpus-projection
+# Default local development confidence gate. The private unit suite does not
+# validate; `current-shelf-smoke` calls cmd_plan, which owns exactly one check.
+# Ontology, formal, corpus, and release gates remain explicit.
+verify: check _fast-unit-tests current-shelf-smoke
 
 # Full release candidate gate. Run before review/merge, not in small loops.
 # The bounded CRAP stage is the blocking test-quality gate.
-release: check _release-unit corpus-projection
+release: check ontology-check _release-unit corpus-projection
 
 # One bounded release-unit run; the runner owns all six pytest stages and the
 # final CRAP check reuses the same curated coverage stage.
 _release-unit:
     coverage_file="$(mktemp /tmp/supp-slotter-quality-crap.XXXXXX)"; \
     trap 'rm -f "$coverage_file"' EXIT; \
-    scripts/run_bounded.sh -- env COVERAGE_FILE="$coverage_file" uv run python scripts/run_unit_gate.py --suite release && \
+    scripts/run_bounded.sh -- env COVERAGE_FILE="$coverage_file" uv run --group ontology python scripts/run_unit_gate.py --suite release && \
     uv run python scripts/crap_gate.py --coverage "$coverage_file" && \
     COVERAGE_FILE="$coverage_file" uv run coverage report
 
@@ -137,6 +158,6 @@ _release-unit:
 crap-check:
     coverage_file="$(mktemp /tmp/supp-slotter-quality-crap.XXXXXX)"; \
     trap 'rm -f "$coverage_file"' EXIT; \
-    scripts/run_bounded.sh -- env COVERAGE_FILE="$coverage_file" uv run python scripts/run_unit_gate.py --suite release && \
+    scripts/run_bounded.sh -- env COVERAGE_FILE="$coverage_file" uv run --group ontology python scripts/run_unit_gate.py --suite release && \
     uv run python scripts/crap_gate.py --coverage "$coverage_file" && \
     COVERAGE_FILE="$coverage_file" uv run coverage report

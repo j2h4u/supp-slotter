@@ -7,9 +7,7 @@ urls:
 - https://www.allstarhealth.com/f/paradise_herbs-african_mango_(150mg).htm
 components:
 - substance: sub_jmyif2xwft
+  id: cmp_prd_ffmechrinq__sub_jmyif2xwft
   label: African Mango seed extract 10:1 / Irvingia gabonensis
   amount: 150 mg
-notes: 'Serving size: 1 vegetarian capsule. Package: 60 vegetarian capsules. Suggested
-  use: 1 capsule 1-2 times daily 30 minutes before meals. Other ingredients: vegetarian
-  capsule / plant cellulose.'
 

@@ -51,7 +51,7 @@ def plan_card_dir(
 
         if final_path in destination_map and destination_map[final_path] != path:
             print(
-                f"auto-maintenance aborted: duplicate {cards_dir.name} filename destination",
+                f"normalize aborted: duplicate {cards_dir.name} filename destination",
                 file=sys.stderr,
             )
             return None
@@ -60,7 +60,7 @@ def plan_card_dir(
     for source, destination in file_moves:
         if destination.exists() and destination != source:
             print(
-                f"auto-maintenance aborted: destination exists: {strip_root_prefix(str(destination))}",
+                f"normalize aborted: destination exists: {strip_root_prefix(str(destination))}",
                 file=sys.stderr,
             )
             return None

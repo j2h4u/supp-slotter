@@ -2,22 +2,6 @@ id: sub_xsqvv2fop0
 name: Docosahexaenoic acid
 aliases:
 - DHA
-notes: 'DHA occurs here as low-dose krill phospholipid (40 mg) and higher-dose fish-oil ethyl ester (378 mg). Meal effects are formulation- and dose-dependent; no universal meal or clock-time rule is established. Platelet/bleeding, skin, and vascular findings are bounded by dose, formulation, and study context.'
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/30799231/
-    - https://pubmed.ncbi.nlm.nih.gov/26328782/
-    summary: Food effects vary by omega-3 chemical form, carrier, and product; bidirectional/formulation-sensitive evidence is insufficient for a universal meal preference for this low-dose krill reference.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/30799231/
-    - https://pubmed.ncbi.nlm.nih.gov/26328782/
-    summary: No comparative clock-time rule was demonstrated for DHA, and the form/carrier and dose do not support transferring a clock preference.
 knowledge:
   context:
   - value: skin_support

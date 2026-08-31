@@ -1,14 +1,15 @@
 id: sub_p62urjkldd
 name: Choline
-notes: Choline component listed on Jarrow MaculaPF as coming from sunflower lecithin. Product cards keep source-specific labels
-  and amounts.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
-  - cholinergic_support
+  - value: cholinergic_support
+    research_state: unassessed
+    sources: []
   kind:
-  - amino
+  - value: amino
+    research_state: unassessed
+    sources: []
   pathway:
-  - methylation_cycle
+  - value: methylation_cycle
+    research_state: unassessed
+    sources: []

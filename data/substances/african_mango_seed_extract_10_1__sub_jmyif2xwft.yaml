@@ -4,8 +4,8 @@ form: seed extract 10:1
 aliases:
 - Irvingia gabonensis
 - African Mango seed extract
-notes: Irvingia gabonensis seed extract 10:1 form listed on Paradise Herbs African Mango. Suggested use is 30 minutes before
-  meals. Review context - marketed for weight/metabolic support, but evidence and dose relevance should be treated cautiously.
 knowledge:
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []

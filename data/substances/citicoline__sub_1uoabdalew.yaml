@@ -3,15 +3,23 @@ aliases:
 - CDP-choline
 - Cytidine diphosphate choline
 - Cytidine 5'-diphosphocholine
-notes: 'Knowledge-only choline-donor and phospholipid-precursor reference card. Added because the current base had choline,
-  Alpha-GPC, DMAE, and phosphatidylcholine, but not the major CDP-choline branch. Source checked: PubChem citicoline records.'
 knowledge:
   effect:
-  - cholinergic_support
-  - phospholipid_membrane_context
-  - cognitive_performance_context
+  - value: cholinergic_support
+    research_state: unassessed
+    sources: []
+  - value: phospholipid_membrane_context
+    research_state: unassessed
+    sources: []
+  - value: cognitive_performance_context
+    research_state: unassessed
+    sources: []
   pathway:
-  - methylation_cycle
+  - value: methylation_cycle
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []
 id: sub_1uoabdalew

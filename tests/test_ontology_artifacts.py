@@ -9,11 +9,10 @@ from typing import cast
 
 import pytest
 import yaml
-from planner.ontology.artifacts import load_runtime_program
+from planner.ontology.artifacts import load_ontology
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
     IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
-    IMPLEMENTED_SOURCE_KIND_ROLES,
 )
 from planner.ontology.runtime_program import decode_runtime_program
 
@@ -83,17 +82,14 @@ def _copy_repository_shape(tmp_path: Path) -> Path:  # noqa: PLR0912, PLR0914
 
 
 def test_committed_runtime_program_decodes() -> None:
-    runtime = load_runtime_program(ONTOLOGY)
-    assert runtime.effect_scoring.aggregation_mode == "sum_unique_component_assignments"
-    assert runtime.effect_scoring.prefer_with_bonus > 0
-    assert runtime.constraint_execution_policy_for("separate_products_same_slot") is not None
-    declared_roles = set(runtime.glue_contract.source_kind_roles)
-    assert runtime.glue_contract.source_kind_roles == IMPLEMENTED_SOURCE_KIND_ROLES
-    assert all(set(row.applies_to) <= declared_roles for row in runtime.source_kind_values)
+    runtime = load_ontology(ONTOLOGY).runtime_program
+    assert runtime.engine_contract.protocol_version == "supp-slotter.engine-contract/v2"
+    assert runtime.engine_contract.pressure_identity == ("item_id", "dimension", "value")
+    assert runtime.engine_contract.publication_statuses == ("Optimal", "Indeterminate")
 
 
 def test_dashboard_state_rows_are_role_free_and_truth_table_driven() -> None:
-    runtime = load_runtime_program(ONTOLOGY)
+    runtime = load_ontology(ONTOLOGY).runtime_program
     payload = _runtime_payload()
     projection = cast(dict[str, object], payload["projection"])
     catalog = cast(dict[str, object], projection["dashboard_state_catalog"])
@@ -116,71 +112,16 @@ def test_runtime_decode_rejects_duplicate_dashboard_state_labels() -> None:
         decode_runtime_program(payload)
 
 
-def test_slot_near_values_are_authored_runtime_observations() -> None:
-    runtime = load_runtime_program(ONTOLOGY)
-
-    assert runtime.slot_near_values == (
-        "wake",
-        "breakfast",
-        "day_meal",
-        "sleep",
-        "workout_before",
-        "workout_after",
-    )
-
-
-def test_runtime_decode_rejects_invalid_slot_near_values() -> None:
+def test_runtime_decode_rejects_unimplemented_canonical_engine_contract() -> None:
     payload = cast(
         dict[str, object],
         json.loads((ONTOLOGY / "generated/runtime-program.json").read_text(encoding="utf-8")),
     )
     projection = cast(dict[str, object], payload["projection"])
-    projection["slot_near_values"] = []
+    engine_contract = cast(dict[str, object], projection["engine_contract"])
+    engine_contract["primary_objective"] = "unimplemented_objective"
 
-    with pytest.raises(OntologyInfrastructureError, match="slot_near_values"):
-        decode_runtime_program(payload)
-
-
-def test_runtime_decode_rejects_unimplemented_objective_contract() -> None:
-    payload = cast(
-        dict[str, object],
-        json.loads((ONTOLOGY / "generated/runtime-program.json").read_text(encoding="utf-8")),
-    )
-    projection = cast(dict[str, object], payload["projection"])
-    scoring = cast(dict[str, object], projection["effect_scoring"])
-    scoring["objective_function"] = "unimplemented_objective"
-
-    with pytest.raises(OntologyInfrastructureError, match="not implemented"):
-        decode_runtime_program(payload)
-
-
-def test_runtime_decode_rejects_missing_or_unknown_component_aggregation_mode() -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    scoring = cast(dict[str, object], projection["effect_scoring"])
-    scoring.pop("aggregation_mode")
-    with pytest.raises(OntologyInfrastructureError, match="invalid closed shape"):
-        decode_runtime_program(payload)
-
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    scoring = cast(dict[str, object], projection["effect_scoring"])
-    scoring["aggregation_mode"] = "collapse_policy_votes"
-    with pytest.raises(OntologyInfrastructureError, match="not implemented"):
-        decode_runtime_program(payload)
-
-
-@pytest.mark.parametrize(
-    ("field", "value"),
-    [("balance_weight", -0.5), ("prefer_with_bonus", -1)],
-)
-def test_runtime_decode_rejects_negative_optimizer_coefficients(field: str, value: int | float) -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    scoring = cast(dict[str, object], projection["effect_scoring"])
-    scoring[field] = value
-
-    with pytest.raises(OntologyInfrastructureError, match="non-negative"):
+    with pytest.raises(OntologyInfrastructureError, match="must maximize unique pressure satisfaction"):
         decode_runtime_program(payload)
 
 
@@ -196,79 +137,11 @@ def test_runtime_decode_requires_exact_executable_capability_parity() -> None:
         decode_runtime_program(payload)
 
 
-def test_runtime_derives_presence_active_side_from_endpoint_truth_state() -> None:
-    runtime = load_runtime_program(ONTOLOGY)
-    assert {(row.source_active, row.target_active): row.active_side for row in runtime.relation_presence_statuses} == {
-        (False, False): "none",
-        (False, True): "target",
-        (True, False): "source",
-        (True, True): "both",
-    }
-
-
 def _runtime_payload() -> dict[str, object]:
     return cast(
         dict[str, object],
         json.loads((ONTOLOGY / "generated/runtime-program.json").read_text(encoding="utf-8")),
     )
-
-
-@pytest.mark.parametrize(
-    ("section",),
-    [
-        ("source_kind_values",),
-    ],
-)
-def test_runtime_decode_rejects_duplicate_semantic_keys_with_distinct_ids(section: str) -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    rows = cast(list[dict[str, object]], projection[section])
-    rows.append({**rows[0], "id": f"{rows[0]['id']}_collision"})
-
-    with pytest.raises(OntologyInfrastructureError, match="duplicate semantic key"):
-        decode_runtime_program(payload)
-
-
-def test_runtime_decode_rejects_duplicate_relation_rule_match_with_distinct_id() -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    rows = cast(list[dict[str, object]], projection["relation_warning_rules"])
-    rows.append({**rows[0], "id": f"{rows[0]['id']}_collision"})
-
-    with pytest.raises(OntologyInfrastructureError, match="duplicate semantic key"):
-        decode_runtime_program(payload)
-
-
-def test_runtime_decode_rejects_non_boolean_truth_table_values() -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    glue = cast(dict[str, object], projection["glue_contract"])
-    truth = cast(list[dict[str, object]], glue["relation_presence_truth_table"])
-    truth[0]["source_active"] = "false"
-
-    with pytest.raises(OntologyInfrastructureError, match="must be boolean"):
-        decode_runtime_program(payload)
-
-
-def test_runtime_decode_requires_exact_unique_four_state_truth_table() -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    glue = cast(dict[str, object], projection["glue_contract"])
-    truth = cast(list[dict[str, object]], glue["relation_presence_truth_table"])
-    truth.pop()
-
-    with pytest.raises(OntologyInfrastructureError, match="exact unique four-state coverage"):
-        decode_runtime_program(payload)
-
-
-def test_runtime_decode_requires_presence_status_for_each_truth_state() -> None:
-    payload = _runtime_payload()
-    projection = cast(dict[str, object], payload["projection"])
-    statuses = cast(list[dict[str, object]], projection["relation_presence_statuses"])
-    statuses.pop()
-
-    with pytest.raises(OntologyInfrastructureError, match="relation_presence_statuses"):
-        decode_runtime_program(payload)
 
 
 def test_runtime_decode_rejects_unsupported_relation_endpoint_selector_kind() -> None:

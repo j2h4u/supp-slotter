@@ -8,32 +8,27 @@ from typing import NamedTuple, cast
 from planner.cards.dashboards import build_dashboard_review
 from planner.cards.product import format_product_name, load_product_registry
 from planner.cards.relations import check_global_relations, load_global_relations
-from planner.cards.stacks import normalize_stack_entries
 from planner.cards.substance import format_substance_name, load_substance_registry
 from planner.contracts import CardLoadError, ConcernRecord, Product, StackEntry, Substance
-from planner.engine._types import RelationReviewRow
 from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.policies import load_scheduling_policies
-from planner.ontology.presentation import ReviewPresentation, load_relation_type_order, load_review_presentation
+from planner.ontology.presentation import RelationPresentation, authored_relation_presentation, authored_term_label
 from planner.ontology.runtime_program import RuntimeDashboardStateCatalog
-from planner.ontology.warning_policy import authored_relation_label, authored_term_label
 from planner.paths import Paths
 from planner.query_model import build_stack_read_model, stacks_for_read_model
-from planner.query_model.surreal import SurrealLoadContext
+from planner.query_model.types import RelationReviewRow
 from planner.schedule_types import DashboardReviewEntryWithMembers, DashboardReviewResult
 from planner.yaml_io import load_yaml
 
-ReviewRelationRows = dict[str, list[RelationReviewRow]]
+ReviewRelationRows = list[RelationReviewRow]
 
 
 @dataclass(frozen=True, slots=True)
 class ReviewModel:
     concerns_by_kind: dict[str, list[ConcernEntry]]
     concern_kind_labels: dict[str, str]
-    relations_by_status: ReviewRelationRows
-    relation_type_labels: dict[str, str]
+    relation_rows: ReviewRelationRows
+    relation_type_presentations: dict[str, RelationPresentation]
     relation_type_order: tuple[str, ...]
-    relation_status_order: tuple[str, ...]
     knowledge_index: dict[str, dict[str, list[str]]]
     knowledge_namespace_labels: dict[str, str]
     knowledge_index_order: tuple[str, ...]
@@ -60,11 +55,6 @@ def build_review_model(  # noqa: PLR0914
     paths: Paths, bundle: OntologyBundle
 ) -> tuple[ReviewModel | None, list[str]]:
     substances = load_substance_registry(paths, bundle)
-    try:
-        policies = load_scheduling_policies(bundle)
-    except CardLoadError as e:
-        return None, [f"review: {e.message}"]
-
     relations_data = load_yaml(paths.relations_file)
     relation_errors = check_global_relations(relations_data, substances, paths, bundle)
     if relation_errors:
@@ -77,40 +67,30 @@ def build_review_model(  # noqa: PLR0914
     products = load_product_registry(paths, bundle)
     global_relations = load_global_relations(paths, bundle, substances)
     try:
-        stacks_data = stacks_for_read_model(paths) if paths.stacks_file.exists() else {}
-        stack_entries = normalize_stack_entries(cast(dict[str, object], stacks_data))
+        stacks_data = stacks_for_read_model(paths, bundle.runtime_program)
+        stack_entries: dict[str, StackEntry] = {
+            product_id: {"product": product_id, "stack": stack}
+            for stack, product_ids in stacks_data.items()
+            for product_id in product_ids
+        }
     except (CardLoadError, ValueError) as e:
         message = e.message if isinstance(e, CardLoadError) else str(e)
         return None, [f"review: {message}"]
-    read_model = build_stack_read_model(
-        substances,
-        global_relations,
-        products,
-        context=SurrealLoadContext(
-            policies=policies,
-            stacks_data=stacks_data,
-            pillbox_stack_names=None,
-            dashboards=None,
-        ),
-        ontology_bundle=bundle,
-    )
-    active_substances = read_model.active_substance_ids()
-    inactive_stack_name = bundle.runtime_program.glue_contract.inactive_stack_name
-    active_products = {
-        product_id for product_id, entry in stack_entries.items() if entry["stack"] != inactive_stack_name
-    }
-    presentation = load_review_presentation(bundle)
-    relation_type_order = load_relation_type_order(bundle)
-    concern_kind_order = presentation.concern_kinds
-    knowledge_index_order = presentation.active_fact_namespaces
     try:
-        presentation_labels = _review_presentation_labels(
-            bundle,
-            presentation,
-            relation_type_order,
+        read_model = build_stack_read_model(
+            substances,
+            global_relations,
+            products,
+            stacks_data,
+            ontology_bundle=bundle,
         )
-    except ValueError as e:
-        return None, [f"review: {e}"]
+    except ValueError as error:
+        return None, [f"review: {error}"]
+    active_substances = read_model.active_substance_ids()
+    routable_stack_names = set(bundle.runtime_program.glue_contract.stack_partition.routable_stack_names)
+    active_products = {
+        product_id for product_id, entry in stack_entries.items() if entry["stack"] in routable_stack_names
+    }
     try:
         dashboard_summary = _dashboard_summary(
             paths,
@@ -121,23 +101,33 @@ def build_review_model(  # noqa: PLR0914
         )
     except CardLoadError as e:
         return None, [f"review: {e.message}"]
+    concerns_by_kind = _concerns_by_kind(
+        _ConcernFilterContext(
+            substances={key: value for key, value in substances.items() if key in active_substances},
+            products={key: value for key, value in products.items() if key in active_products},
+        ),
+        (),
+    )
+    relation_rows = read_model.classify_relations(active_substances)
+    relation_type_presentations = {
+        relation_type: authored_relation_presentation(relation_type, bundle)
+        for relation_type in {row["type"] for row in relation_rows}
+    }
+    relation_type_order = tuple(
+        relation_type
+        for relation_type, _ in sorted(relation_type_presentations.items(), key=lambda item: item[1].order)
+    )
+    knowledge_index = _knowledge_index(active_substances, substances, bundle)
     return (
         ReviewModel(
-            concerns_by_kind=_concerns_by_kind(
-                _ConcernFilterContext(
-                    substances={key: value for key, value in substances.items() if key in active_substances},
-                    products={key: value for key, value in products.items() if key in active_products},
-                ),
-                concern_kind_order,
-            ),
-            concern_kind_labels=presentation_labels[0],
-            relations_by_status=cast(ReviewRelationRows, read_model.classify_relations(active_substances)),
-            relation_type_labels=presentation_labels[2],
+            concerns_by_kind=concerns_by_kind,
+            concern_kind_labels={kind: kind for kind in concerns_by_kind},
+            relation_rows=relation_rows,
+            relation_type_presentations=relation_type_presentations,
             relation_type_order=relation_type_order,
-            relation_status_order=tuple(row.status for row in bundle.runtime_program.relation_presence_statuses),
-            knowledge_index=_knowledge_index(active_substances, substances, bundle),
-            knowledge_namespace_labels=presentation_labels[1],
-            knowledge_index_order=knowledge_index_order,
+            knowledge_index=knowledge_index,
+            knowledge_namespace_labels={namespace: namespace for namespace in knowledge_index},
+            knowledge_index_order=tuple(sorted(knowledge_index)),
             dashboard_summary=dashboard_summary,
             dashboard_state_catalog=bundle.runtime_program.dashboard_state_catalog,
         ),
@@ -183,21 +173,6 @@ def _knowledge_index(
             term_label = authored_term_label(f"{assertion.category}:{assertion.value}", bundle)
             index.setdefault(assertion.category, {}).setdefault(term_label, []).append(format_substance_name(substance))
     return index
-
-
-def _review_presentation_labels(
-    bundle: OntologyBundle,
-    presentation: ReviewPresentation,
-    relation_type_order: tuple[str, ...],
-) -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
-    return (
-        {kind: presentation.label("concern_annotations", kind) for kind in presentation.concern_kinds},
-        {
-            namespace: presentation.label("active_fact_index", namespace)
-            for namespace in presentation.active_fact_namespaces
-        },
-        {relation_type: authored_relation_label(relation_type, bundle) for relation_type in relation_type_order},
-    )
 
 
 def _dashboard_summary(

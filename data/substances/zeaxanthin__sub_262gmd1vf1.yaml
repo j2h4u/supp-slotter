@@ -1,17 +1,19 @@
 id: sub_262gmd1vf1
 name: Zeaxanthin
-notes: Carotenoid commonly sourced from marigold flower / Tagetes erecta in eye-health formulas. Use concrete form cards such
-  as meso-zeaxanthin or RR-zeaxanthin when the label distinguishes stereoisomers. Review context - zeaxanthin is a non-provitamin-A
-  carotenoid that accumulates in retina/macular pigment context.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - ocular_retina_context
+  - value: ocular_retina_context
+    research_state: unassessed
+    sources: []
   kind:
-  - carotenoid
+  - value: carotenoid
+    research_state: unassessed
+    sources: []
   quality:
-  - fat_soluble
+  - value: fat_soluble
+    research_state: unassessed
+    sources: []

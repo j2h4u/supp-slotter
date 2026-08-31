@@ -3,18 +3,23 @@ name: L-Lysine
 form: HCl
 aliases:
 - L-lysine hydrochloride
-notes: L-Lysine HCl form listed on Solgar Skin, Nails & Hair Advanced MSM Formula. Review context - essential amino acid and
-  collagen-matrix substrate context; preserve HCl form from the label.
-schedule:
-  intake:
-  - empty_preferred
 knowledge:
   context:
-  - connective_tissue_support
+  - value: connective_tissue_support
+    research_state: unassessed
+    sources: []
   effect:
-  - collagen_matrix_support
-  - protein_synthesis_support
+  - value: collagen_matrix_support
+    research_state: unassessed
+    sources: []
+  - value: protein_synthesis_support
+    research_state: unassessed
+    sources: []
   kind:
-  - amino
+  - value: amino
+    research_state: unassessed
+    sources: []
   pathway:
-  - collagen_matrix
+  - value: collagen_matrix
+    research_state: unassessed
+    sources: []

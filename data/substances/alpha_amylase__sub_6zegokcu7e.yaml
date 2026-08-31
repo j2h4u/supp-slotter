@@ -3,14 +3,15 @@ name: Alpha amylase
 aliases:
 - amylase
 - starch-digesting enzyme
-notes: Carbohydrate-digesting enzyme; common in digestive-enzyme blends. Review context - food-timed digestive enzyme support
-  rather than systemic effect.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
-  - carbohydrate_digestion_support
-  - digestive_enzyme_context
+  - value: carbohydrate_digestion_support
+    research_state: unassessed
+    sources: []
+  - value: digestive_enzyme_context
+    research_state: unassessed
+    sources: []
   kind:
-  - enzyme
+  - value: enzyme
+    research_state: unassessed
+    sources: []

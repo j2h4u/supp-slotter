@@ -1,7 +1,7 @@
 """Frozen dataclass contracts for every stable yaml shape under data/.
 
 The schedule.yaml output stays as typed dictionary records — only the inputs
-(Substance/Product/Dashboard/Relation/SchedulingPolicy/Pillbox/Slot) become
+(Substance/Product/Dashboard/Relation/Pillbox/Slot) become
 dataclasses. Schedule warnings are polymorphic typed dictionaries constructed
 inside the planner engine.
 
@@ -14,16 +14,15 @@ owned by generated ontology metadata, not by this runtime contract.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import NamedTuple, TypedDict
 
 type SlotNear = str
 type RelationType = str
-type Severity = str
 type ConcernKind = str
 type ResearchState = str
-type AssignmentSourceKind = str
 
 
 @dataclass(frozen=True, slots=True)
@@ -68,116 +67,21 @@ class KnowledgeAssertion:
 
 
 @dataclass(frozen=True, slots=True)
-class ScheduleAssertion:
-    axis: str
-    value: str
-
-
-@dataclass(frozen=True, slots=True)
-class SchedulingAssessment:
-    """One substance-only, review-facing assessment for a formal axis."""
-
-    axis: str
-    conclusion: str
-    policy: str | None
-    sources: tuple[str, ...]
-    summary: str
-
-
-@dataclass(frozen=True, slots=True)
-class SlotObservation:
-    """One authored effect-match observation exposed by a slot."""
-
-    key: str
-    value: str | bool
-
-
-@dataclass(frozen=True, slots=True)
-class ScheduleAssignmentSource:
-    """Uniform projection-boundary record for one scheduling source."""
-
-    source_kind: AssignmentSourceKind
-    source_card_id: str
-    component_id: str | None
-    assertions: tuple[ScheduleAssertion, ...] = ()
-
-
-@dataclass(frozen=True, slots=True)
-class ScheduleAssignment:
-    assignment_id: str
-    axis: str
-    policy_id: str
-    source_kind: AssignmentSourceKind
-    source_card_id: str
-    component_id: str | None
-    score_weight: float = 1.0
-
-
-@dataclass(frozen=True, slots=True)
-class SchedulePolicyGroup:
-    axis: str
-    policy_id: str
-    assignment_ids: tuple[str, ...]
-    score_weight: float
-
-
-@dataclass(frozen=True, slots=True)
-class ScheduleProjection:
-    assignments: tuple[ScheduleAssignment, ...]
-    groups: tuple[SchedulePolicyGroup, ...]
-
-
-@dataclass(frozen=True, slots=True)
-class ProjectedEffectTrace:
-    policy_id: str
-    assignment_ids: tuple[str, ...]
-    source_card_ids: tuple[str, ...]
-    weight: float
-    match: TraitEffectMatch
-    original_level: str | None
-    projected_level: str | None
-    delta: int
-    vote_count: int = 1
-
-
-@dataclass(frozen=True, slots=True)
-class SlotScoreTrace:
-    score: int
-    blocked: bool
-    effects: tuple[ProjectedEffectTrace, ...]
-    diagnostics: tuple[str, ...]
-
-
-@dataclass(frozen=True, slots=True)
-class SlotCandidateTrace:
-    slot_id: str
-    score: int
-    blocked: bool
-    effects: tuple[ProjectedEffectTrace, ...]
-    diagnostics: tuple[str, ...]
-    block_contributors: tuple[tuple[str, str, str], ...]
-
-
-@dataclass(frozen=True, slots=True)
 class Substance:
     id: str
     name: str
     knowledge_assertions: tuple[KnowledgeAssertion, ...] = ()
-    schedule_assertions: tuple[ScheduleAssertion, ...] = ()
-    prefer_with: tuple[str, ...] = ()
     form: str | None = None
     aliases: tuple[str, ...] = ()
-    notes: str | None = None
     concerns: tuple[Concern, ...] = ()
-    scheduling_assessments: tuple[SchedulingAssessment, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
 class ProductComponent:
     substance: str
+    id: str
     label: str | None = None
     amount: str | None = None
-    notes: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -187,7 +91,6 @@ class Product:
     components: tuple[ProductComponent, ...]
     brand: str | None = None
     urls: tuple[str, ...] = ()
-    notes: str | None = None
     concerns: tuple[Concern, ...] = ()
     use_pattern: str | None = None
 
@@ -225,9 +128,7 @@ class Dashboard:
 class RelationSelector:
     """A canonical endpoint: exactly one entity or category/term pair.
 
-    ``scope`` is scheduling-constraint metadata.  Generic selector resolution
-    deliberately ignores it; the scheduling compiler validates the only
-    supported value (``exact_form``) before resolving the selector.
+    ``scope`` is retained only as raw relation evidence metadata.
     """
 
     entity_id: str | None = None
@@ -235,19 +136,6 @@ class RelationSelector:
     category: str | None = None
     term: str | None = None
     scope: str | None = None
-
-
-@dataclass(frozen=True, slots=True)
-class SchedulingConstraint:
-    id: str
-    source_selector: RelationSelector
-    target_selector: RelationSelector
-    operation: str
-    action: str | None = None
-    rationale: str | None = None
-    blocks_slots: bool | None = None
-    scores_advisory: bool | None = None
-    score_delta: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -261,8 +149,6 @@ class OntologyAssertion:
     reason: str
     source_selector: RelationSelector
     target_selector: RelationSelector
-    action: str | None = None
-    severity: Severity | None = None
     research_state: ResearchState = "unassessed"
     sources: tuple[str, ...] = ()
 
@@ -274,36 +160,10 @@ class Relation:
     reason: str
     source_selector: RelationSelector
     target_selector: RelationSelector
-    action: str | None = None
-    severity: Severity | None = None
     assertion_kind: str | None = None
     semantic_family: str | None = None
     research_state: ResearchState = "unassessed"
     sources: tuple[str, ...] = ()
-
-
-@dataclass(frozen=True, slots=True)
-class TraitEffectMatch:
-    values: tuple[tuple[str, str | bool], ...] = ()
-
-
-@dataclass(frozen=True, slots=True)
-class TraitEffect:
-    match: TraitEffectMatch
-    level: str | None = None
-
-
-@dataclass(frozen=True, slots=True)
-class SchedulingPolicy:
-    id: str
-    namespace: str
-    short_name: str
-    label: str
-    description: str
-    applies_when: str
-    effects: tuple[TraitEffect, ...] = ()
-    warning: bool = False
-    action: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -317,10 +177,10 @@ class Slot:
     slot_id: str
     label: str
     order: int
-    observations: tuple[SlotObservation, ...]
     pillbox: str
     pillbox_label: str
     stack: str
+    anchors: Mapping[str, str | None] = field(default_factory=dict)
 
 
 @dataclass(frozen=True, slots=True)

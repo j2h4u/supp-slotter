@@ -4,19 +4,25 @@ form: Paecilomyces hepiali 8:1 mycelia, std 7% cordycepic acid
 aliases:
 - Paecilomyces hepiali
 - Cordyceps sinensis (mycelial form)
-notes: Mycelial cordyceps extract used in Life Extension Adrenal Energy Formula proprietary blend; per-component amount not
-  disclosed by label. Adaptogen with energy and endurance positioning; mild HR/BP/immunomodulatory effects possible, relevant
-  in vascular-review context.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
-  - fatigue_resilience_context
-  - endurance_context
-  - immune_modulation_context
+  - value: fatigue_resilience_context
+    research_state: unassessed
+    sources: []
+  - value: endurance_context
+    research_state: unassessed
+    sources: []
+  - value: immune_modulation_context
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - serotonergic_med_interaction
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: serotonergic_med_interaction
+    research_state: unassessed
+    sources: []
   role:
-  - adaptogen
+  - value: adaptogen
+    research_state: unassessed
+    sources: []

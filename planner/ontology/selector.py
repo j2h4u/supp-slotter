@@ -162,24 +162,45 @@ def hydrate_selector(
         raise CardLoadError(path, f"{label} selector must be a mapping")
     selector = cast(Mapping[object, object], raw)
     if "entity" in selector:
-        allowed_selector_fields = {"entity", "scope"} if allow_scope else {"entity"}
-        if not set(selector) <= allowed_selector_fields:
-            raise CardLoadError(path, f"malformed {label} selector")
-        entity = selector["entity"]
-        if not isinstance(entity, Mapping):
-            raise CardLoadError(path, f"malformed {label} entity selector")
-        entity_mapping = cast(Mapping[object, object], entity)
-        if not set(entity_mapping).issubset({"entity_id", "name"}):
-            raise CardLoadError(path, f"malformed {label} entity selector")
-        entity_id = _optional_non_empty_string(entity_mapping.get("entity_id"), path, "entity_id")
-        entity_name = _optional_non_empty_string(entity_mapping.get("name"), path, "name")
-        if (entity_id is None) == (entity_name is None):
-            raise CardLoadError(path, "entity selector requires exactly one non-empty entity_id/name")
-        if entity_name is not None and not allow_entity_name:
-            raise CardLoadError(path, f"{label} entity selector requires stable entity_id")
-        scope = _hydrate_selector_scope(selector, path=path, label=label, allow_scope=allow_scope)
-        return RelationSelector(entity_id=entity_id, entity_name=entity_name, scope=scope)
+        return _hydrate_entity_selector(
+            selector,
+            path=path,
+            label=label,
+            allow_entity_name=allow_entity_name,
+            allow_scope=allow_scope,
+        )
 
+    return _hydrate_term_selector(selector, path=path, label=label)
+
+
+def _hydrate_entity_selector(
+    selector: Mapping[object, object],
+    *,
+    path: Path,
+    label: str,
+    allow_entity_name: bool,
+    allow_scope: bool,
+) -> RelationSelector:
+    allowed_fields = {"entity", "scope"} if allow_scope else {"entity"}
+    if not set(selector) <= allowed_fields:
+        raise CardLoadError(path, f"malformed {label} selector")
+    entity = selector["entity"]
+    if not isinstance(entity, Mapping):
+        raise CardLoadError(path, f"malformed {label} entity selector")
+    entity_mapping = cast(Mapping[object, object], entity)
+    if not set(entity_mapping).issubset({"entity_id", "name"}):
+        raise CardLoadError(path, f"malformed {label} entity selector")
+    entity_id = _optional_non_empty_string(entity_mapping.get("entity_id"), path, "entity_id")
+    entity_name = _optional_non_empty_string(entity_mapping.get("name"), path, "name")
+    if (entity_id is None) == (entity_name is None):
+        raise CardLoadError(path, "entity selector requires exactly one non-empty entity_id/name")
+    if entity_name is not None and not allow_entity_name:
+        raise CardLoadError(path, f"{label} entity selector requires stable entity_id")
+    scope = _hydrate_selector_scope(selector, path=path)
+    return RelationSelector(entity_id=entity_id, entity_name=entity_name, scope=scope)
+
+
+def _hydrate_term_selector(selector: Mapping[object, object], *, path: Path, label: str) -> RelationSelector:
     if set(selector) != {"category", "term"}:
         raise CardLoadError(path, f"{label} selector requires non-empty category and term")
     category = _optional_non_empty_string(selector.get("category"), path, "category")
@@ -207,17 +228,9 @@ def resolve_selector(
     return _resolve_term_selector(selector, substances, ontology_bundle)
 
 
-def _hydrate_selector_scope(
-    selector: Mapping[object, object],
-    *,
-    path: Path,
-    label: str,
-    allow_scope: bool,
-) -> str | None:
+def _hydrate_selector_scope(selector: Mapping[object, object], *, path: Path) -> str | None:
     if "scope" not in selector:
         return None
-    if not allow_scope:
-        raise CardLoadError(path, f"{label} selector does not support scope")
     return _optional_non_empty_string(selector.get("scope"), path, "scope")
 
 
@@ -277,23 +290,46 @@ def _resolve_term_selector(
     substances: Mapping[str, Substance],
     ontology_bundle: OntologyBundle,
 ) -> SelectorResolution:
+    identity = _term_selector_identity(selector)
+    if identity is None:
+        return SelectorResolution((), "malformed_selector")
+    category, term = identity
+    if not _supported_canonical_term(category, term, ontology_bundle):
+        return SelectorResolution((), "unsupported_selector")
+    ids = _matching_substance_ids(category, term, substances, ontology_bundle)
+    if ids is None:
+        return SelectorResolution((), "unsupported_selector")
+    return SelectorResolution(ids, "resolved" if ids else "empty")
+
+
+def _term_selector_identity(selector: RelationSelector) -> tuple[str, str] | None:
     if selector.category is None or selector.term is None:
-        return SelectorResolution((), "malformed_selector")
+        return None
     if not selector.category.strip() or not selector.term.strip():
-        return SelectorResolution((), "malformed_selector")
-    if allowed_predicate_fields_for_category(ontology_bundle, selector.category) is None:
-        return SelectorResolution((), "unsupported_selector")
-    if not _canonical_term_exists(selector.category, selector.term, ontology_bundle):
-        return SelectorResolution((), "unsupported_selector")
+        return None
+    return selector.category, selector.term
+
+
+def _supported_canonical_term(category: str, term: str, ontology_bundle: OntologyBundle) -> bool:
+    return allowed_predicate_fields_for_category(ontology_bundle, category) is not None and _canonical_term_exists(
+        category, term, ontology_bundle
+    )
+
+
+def _matching_substance_ids(
+    category: str,
+    term: str,
+    substances: Mapping[str, Substance],
+    ontology_bundle: OntologyBundle,
+) -> tuple[str, ...] | None:
     ids: list[str] = []
     for substance_id, substance in sorted(substances.items()):
-        terms = substance_terms_for_category(substance, selector.category, ontology_bundle)
+        terms = substance_terms_for_category(substance, category, ontology_bundle)
         if terms is None:
-            return SelectorResolution((), "unsupported_selector")
-        if selector.term in terms:
+            return None
+        if term in terms:
             ids.append(substance_id)
-    result = tuple(ids)
-    return SelectorResolution(result, "resolved" if result else "empty")
+    return tuple(ids)
 
 
 def _canonical_term_exists(category: str, term: str, ontology_bundle: OntologyBundle) -> bool:

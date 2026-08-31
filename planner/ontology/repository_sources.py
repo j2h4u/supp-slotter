@@ -102,10 +102,6 @@ def _discover_repository_sources(  # noqa: C901, PLR0912
     return tuple(found)
 
 
-# Short alias used by callers that already have a repository-source context.
-discover_sources = discover_repository_sources
-
-
 def _load_flat_root(
     repository_root: Path,
     source_id: str,
@@ -201,13 +197,9 @@ def _projection_mapping(raw: Mapping[str, object]) -> dict[str, object]:
 
 def _catalog_paths_mapping(raw: Mapping[str, object]) -> dict[str, str]:
     catalogs = raw.get("catalogs")
-    result: dict[str, str] = {}
-    if isinstance(catalogs, Mapping):
-        for catalog_id, path in catalogs.items():
-            _add_catalog_path(result, catalog_id, path)
-        return result
     if not isinstance(catalogs, list):
-        return {}
+        raise OntologyInfrastructureError("Compiled projection catalogs must be a list")
+    result: dict[str, str] = {}
     for item in catalogs:
         if not isinstance(item, Mapping):
             raise OntologyInfrastructureError("Compiled projection catalog entries must be mappings")

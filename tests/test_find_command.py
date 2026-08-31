@@ -19,22 +19,11 @@ def _write_find_fixture(tmp_path: Path) -> None:
                 "prd_glycine000": {"stack": "inactive"},
             },
             products={
-                "prd_magnesium1": [("sub_magnesium1", ["timing:energy_like"])],
-                "prd_citrulline": [("sub_citrulline", ["schedule.activity:any_workout"])],
-                "prd_glycine000": [("sub_glycine000", ["timing:energy_like"])],
+                "prd_magnesium1": [("sub_magnesium1", ["effect:nitric_oxide_support"])],
+                "prd_citrulline": [("sub_citrulline", ["effect:exercise_performance_context"])],
+                "prd_glycine000": [("sub_glycine000", ["effect:nitric_oxide_support"])],
             },
-            traits={
-                "timing:energy_like": {
-                    "label": "Energy-like",
-                    "description": "Fixture energy-like timing.",
-                    "applies_when": "Fixture only.",
-                },
-                "schedule.activity:any_workout": {
-                    "label": "Workout",
-                    "description": "Fixture workout activity.",
-                    "applies_when": "Fixture only.",
-                },
-            },
+            traits={},
         ),
     )
     data_dir = tmp_path / "data"
@@ -56,8 +45,9 @@ def _write_find_fixture(tmp_path: Path) -> None:
 
     citrulline_path = find_card_path_by_id(data_dir / "substances", "sub_citrulline")
     citrulline = cast(dict[str, object], yaml.safe_load(citrulline_path.read_text()))
-    assert citrulline["schedule"] == {"activity": ["any_workout"]}
-    assert "schedule.activity" not in cast(dict[str, object], citrulline.get("knowledge", {}))
+    assert citrulline["knowledge"] == {
+        "effect": [{"value": "exercise_performance_context", "research_state": "unassessed", "sources": []}]
+    }
     citrulline["name"] = "L-Citrulline"
     citrulline["form"] = "malate"
     citrulline_path.write_text(yaml.safe_dump(citrulline, sort_keys=False))

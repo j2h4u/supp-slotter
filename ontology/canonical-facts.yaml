@@ -1,0 +1,185 @@
+# Authoritative reusable canonical evidence catalog.
+#
+evidence_sources:
+  - id: src_pubmed_25441954
+  - id: src_pubmed_20200983
+  - id: src_doi_10_1002_jps_2600550305
+  - id: src_doi_10_1002_jps_2600560112
+  - id: src_solgar_triple_strength_omega3
+  - id: src_pubmed_2847723
+  - id: src_pubmed_30799231
+  - id: src_pubmed_17953788
+  - id: src_pubmed_39662304
+  - id: src_pmc_13304508
+  - id: src_card_sub_85w45nbob4_notes
+  - id: src_card_sub_iu7b8h87g2_notes
+  - id: src_pubmed_19734684
+  - id: src_pubmed_12885395
+  - id: src_card_sub_249199f726_notes
+  - id: src_card_prd_8mvv1w128a
+  - id: src_card_prd_e5cc3b4e7c
+  - id: src_card_prd_w2s970gps4
+  - id: src_pubmed_25884846
+  - id: src_pubmed_26328782
+  - id: src_nih_ods_omega3
+  - id: src_nccih_omega3
+  - id: src_life_extension_only_trace_minerals
+  - id: src_biograce_vitamin_b5_instruction
+  - id: src_vitameal_vitamin_c_product
+  - id: src_vitameal_vitamin_c_certificate
+food_effects:
+  - id: fact_food_prd_eb6337a6dc_sub_2476bf9d4b
+    subject:
+      substance: sub_2476bf9d4b
+    applicability:
+      substance: sub_2476bf9d4b
+    provenance:
+      - source: src_pubmed_25441954
+        locator: https://pubmed.ncbi.nlm.nih.gov/25441954/
+      - source: src_pubmed_20200983
+        locator: https://pubmed.ncbi.nlm.nih.gov/20200983/
+    value: bioavailability_increases
+  - id: fact_food_prd_bb212cffc2_sub_67fc2be8aa
+    subject:
+      substance: sub_67fc2be8aa
+    applicability:
+      substance: sub_67fc2be8aa
+    provenance:
+      - source: src_doi_10_1002_jps_2600550305
+        locator: https://doi.org/10.1002/jps.2600550305
+      - source: src_doi_10_1002_jps_2600560112
+        locator: https://doi.org/10.1002/jps.2600560112
+    value: bioavailability_increases
+  - id: fact_food_prd_htuhz2s2gt_sub_sunkcr05vl
+    subject:
+      composition_role: cmp_prd_htuhz2s2gt__sub_sunkcr05vl
+    applicability:
+      composition_role: cmp_prd_htuhz2s2gt__sub_sunkcr05vl
+    provenance:
+      - source: src_solgar_triple_strength_omega3
+        locator: https://www.solgar.com/products/solgar-triple-strength-omega-3-950-mg-softgels
+      - source: src_pubmed_2847723
+        locator: https://pubmed.ncbi.nlm.nih.gov/2847723/
+      - source: src_pubmed_30799231
+        locator: https://pubmed.ncbi.nlm.nih.gov/30799231/
+    value: bioavailability_increases
+  - id: fact_food_prd_io1peb9syp_sub_85w45nbob4
+    subject:
+      substance: sub_85w45nbob4
+    applicability:
+      substance: sub_85w45nbob4
+    provenance:
+      - source: src_card_sub_85w45nbob4_notes
+        locator: data/substances/l_glutamine__sub_85w45nbob4.yaml#/notes
+        quotation: Empty stomach preferred for systemic absorption away from food amino-acid competition.
+    value: bioavailability_decreases
+  - id: fact_food_prd_io1peb9syp_sub_iu7b8h87g2
+    subject:
+      substance: sub_iu7b8h87g2
+    applicability:
+      substance: sub_iu7b8h87g2
+    provenance:
+      - source: src_card_sub_iu7b8h87g2_notes
+        locator: data/substances/alpha_lipoic_acid__sub_iu7b8h87g2.yaml#/notes
+        quotation: food may reduce absorption.
+    value: bioavailability_decreases
+  - id: fact_food_prd_e5cc3b4e7c_sub_249199f726
+    subject:
+      composition_role: cmp_prd_e5cc3b4e7c__sub_249199f726
+    applicability:
+      composition_role: cmp_prd_e5cc3b4e7c__sub_249199f726
+    provenance:
+      - source: src_pubmed_19734684
+        locator: https://pubmed.ncbi.nlm.nih.gov/19734684/
+      - source: src_pubmed_12885395
+        locator: https://pubmed.ncbi.nlm.nih.gov/12885395/
+      - source: src_card_sub_249199f726_notes
+        locator: data/substances/astaxanthin__sub_249199f726.yaml#/notes
+    value: bioavailability_increases
+  - id: fact_food_prd_8mvv1w128a_sub_249199f726
+    subject:
+      composition_role: cmp_prd_8mvv1w128a__sub_249199f726
+    applicability:
+      composition_role: cmp_prd_8mvv1w128a__sub_249199f726
+    provenance:
+      - source: src_pubmed_19734684
+        locator: https://pubmed.ncbi.nlm.nih.gov/19734684/
+      - source: src_pubmed_12885395
+        locator: https://pubmed.ncbi.nlm.nih.gov/12885395/
+      - source: src_card_prd_8mvv1w128a
+        locator: data/products/psalae__astaxanthin__prd_8mvv1w128a.yaml
+    value: bioavailability_increases
+  - id: fact_food_prd_w2s970gps4_sub_249199f726
+    subject:
+      composition_role: cmp_prd_w2s970gps4__sub_249199f726
+    applicability:
+      composition_role: cmp_prd_w2s970gps4__sub_249199f726
+    provenance:
+      - source: src_pubmed_19734684
+        locator: https://pubmed.ncbi.nlm.nih.gov/19734684/
+      - source: src_pubmed_12885395
+        locator: https://pubmed.ncbi.nlm.nih.gov/12885395/
+      - source: src_card_prd_w2s970gps4
+        locator: data/products/psalae__antarctiv_krill_oil__prd_w2s970gps4.yaml
+    value: bioavailability_increases
+  - id: fact_food_prd_w2s970gps4_sub_646e568f61
+    subject:
+      composition_role: cmp_prd_w2s970gps4__sub_646e568f61
+    applicability:
+      composition_role: cmp_prd_w2s970gps4__sub_646e568f61
+    provenance:
+      - source: src_pubmed_30799231
+        locator: https://pubmed.ncbi.nlm.nih.gov/30799231/
+      - source: src_pubmed_25884846
+        locator: https://pubmed.ncbi.nlm.nih.gov/25884846/
+      - source: src_pubmed_26328782
+        locator: https://pubmed.ncbi.nlm.nih.gov/26328782/
+      - source: src_nih_ods_omega3
+        locator: https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
+      - source: src_nccih_omega3
+        locator: https://www.nccih.nih.gov/health/omega3-supplements-in-depth
+      - source: src_card_prd_w2s970gps4
+        locator: data/products/psalae__antarctiv_krill_oil__prd_w2s970gps4.yaml
+    value: bioavailability_increases
+product_food_instructions:
+  - id: fact_product_food_prd_932319251f
+    product: prd_932319251f
+    provenance:
+      - source: src_life_extension_only_trace_minerals
+        locator: https://www.lifeextension.com/vitamins-supplements/item01328/only-trace-minerals
+        quotation: Take one capsule daily with food.
+    value: take_with_food
+  - id: fact_product_food_prd_8eff2491b7
+    product: prd_8eff2491b7
+    provenance:
+      - source: src_biograce_vitamin_b5_instruction
+        locator: https://reestrinform.ru/reestr-sgr/reg-RU.77.99.88.003.R.000803.04.25.html
+        quotation: Взрослым принимать по 1 таблетке в день во время еды
+    value: take_with_food
+  - id: fact_product_food_prd_vitamealc8
+    product: prd_vitamealc8
+    provenance:
+      - source: src_vitameal_vitamin_c_product
+        locator: https://vitameal.com/catalog/product-239/
+        quotation: Взрослым по 1 капсуле в день во время еды
+      - source: src_vitameal_vitamin_c_certificate
+        locator: https://vitameal.com/upload/certificate/%D0%92%D0%B8%D1%82.%D0%A1%20%D0%BA%D0%B0%D0%BF%D1%81%20%D1%81%D0%BE%D0%B4%D0%B8%D1%83%D0%BC.pdf
+        quotation: Взрослым по 1 капсуле в день во время еды
+    value: take_with_food
+acute_alertness_effects: []
+acute_sleep_effects: []
+pre_exercise_performance_effects:
+  - id: fact_pre_exercise_performance_prd_cfce0b36b6_sub_3918fe347e
+    subject:
+      composition_role: cmp_prd_cfce0b36b6__sub_3918fe347e
+    applicability:
+      composition_role: cmp_prd_cfce0b36b6__sub_3918fe347e
+    provenance:
+      - source: src_pubmed_17953788
+        locator: https://pubmed.ncbi.nlm.nih.gov/17953788/
+      - source: src_pubmed_39662304
+        locator: https://pubmed.ncbi.nlm.nih.gov/39662304/
+      - source: src_pmc_13304508
+        locator: https://pmc.ncbi.nlm.nih.gov/articles/PMC13304508/
+    value: performance_improves
+post_exercise_recovery_effects: []

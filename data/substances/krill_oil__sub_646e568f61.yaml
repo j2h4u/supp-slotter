@@ -1,31 +1,5 @@
 id: sub_646e568f61
 name: Krill Oil
-notes: 'Omega-3 oil from Antarctic krill (Euphausia superba). The active Psalae label lists 500 mg krill oil providing 120 mg omega-3 (80 mg EPA and 40 mg DHA), 100 mg phospholipids, and 200 mcg astaxanthin per softgel; the matrix is unverified. A soft food preference is bounded; extra dietary fat is not required. Krill oil is not a blood thinner, while bleeding-medication evidence remains insufficient for a categorical claim. Sources: PMID 30799231; PMID 25884846; PMID 26328782; NIH ODS Omega-3 Fatty Acids; NCCIH Omega-3 Supplements.'
-schedule:
-  intake:
-  - food_preferred
-scheduling_assessment:
-  intake:
-    conclusion: supports_preference
-    policy: food_preferred
-    sources:
-    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/30799231/
-    - https://pubmed.ncbi.nlm.nih.gov/25884846/
-    - https://pubmed.ncbi.nlm.nih.gov/26328782/
-    summary: 'Low-confidence soft food preference: human relative-bioavailability findings are mixed across different formulations, carriers, and doses; the active Psalae product provides 100 mg phospholipids per softgel but its matrix is unverified. A high-fat meal is not required.'
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/30799231/
-    summary: No comparative morning or evening rule was demonstrated for krill oil.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
-    - https://www.nccih.nih.gov/health/omega3-supplements-what-you-need-to-know
-    summary: The cited evidence does not establish a workout- or activity-linked timing rule for krill oil.
 knowledge:
   context:
   - value: skin_support

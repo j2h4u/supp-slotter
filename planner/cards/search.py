@@ -92,8 +92,8 @@ def combined_search_score(
     When identity_score > 0: returns max(identity_score, full_score) — full context can
     only help, never hurt.
     When identity_score == 0: returns full_score * 0.75 — a 25% penalty applied to
-    matches that hit only secondary fields (notes, aliases, components) without matching
-    the primary identity fields (id, name).
+    matches that hit only secondary fields (aliases, components) without matching the
+    primary identity fields (id, name).
     """
     identity_score = search_score(query, identity_values)
     full_score = search_score(query, full_values)

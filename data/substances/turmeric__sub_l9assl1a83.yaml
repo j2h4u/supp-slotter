@@ -4,19 +4,26 @@ aliases:
 - Curcuma longa
 - turmeric root
 - turmeric rhizome
-notes: Curcuminoid-bearing rhizome with anti-inflammatory and joint-comfort positioning; may potentiate antiplatelets and
-  modulate CYP enzymes. Relevant to bleeding-load review.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
-  - anti_inflammatory_context
-  - joint_comfort_context
+  - value: anti_inflammatory_context
+    research_state: unassessed
+    sources: []
+  - value: joint_comfort_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - bleeding_med_interaction
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: bleeding_med_interaction
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

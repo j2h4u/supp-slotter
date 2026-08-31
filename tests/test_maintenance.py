@@ -1,9 +1,9 @@
-"""Regression tests for maintenance, io error handling, and auto-maintenance sentinel changes.
+"""Regression tests for explicit normalization, io error handling, and maintenance sentinels.
 
 Covers:
   - C1: guarded stacks.yaml write in maintenance pipeline
   - EH9: vocal load_global_relations on non-mapping data
-  - EH10: auto_maintenance_needed None vs False disambiguation
+  - EH10: maintenance_needed None vs False disambiguation
 """
 
 from __future__ import annotations
@@ -11,14 +11,15 @@ from __future__ import annotations
 from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
-from typing import NotRequired, TypedDict, cast
+from typing import TypedDict, cast
 
 import pytest
 import yaml
 from planner.contracts import CardLoadError
+from planner.engine import cmd_plan, cmd_review, cmd_show
 from planner.maintenance import (
-    auto_maintenance_needed,
-    run_auto_maintenance,
+    maintenance_needed,
+    run_maintenance,
 )
 from planner.maintenance_atomic import EditPlan
 from planner.maintenance_card_plan import plan_card_dir
@@ -28,9 +29,9 @@ from planner.maintenance_substance_resolution import (
     rewrite_references,
 )
 from planner.ontology.errors import OntologyInfrastructureError
-from planner.paths import Paths
+from planner.paths import ROOT, Paths
 
-from tests.helpers import ontology_bundle
+from tests.helpers import formal_ontology_bundle, ontology_bundle
 from tests.planner_fixture import (
     PlannerFixtureInput,
     check_in_temp_dir,
@@ -45,14 +46,9 @@ from tests.planner_fixture import (
 # ---------------------------------------------------------------------------
 
 
-class _Schedule(TypedDict):
-    prefer_with: list[str]
-
-
 class _SubstanceCard(TypedDict):
     id: str
     name: str
-    schedule: NotRequired[_Schedule]
 
 
 class _ProductComponent(TypedDict):
@@ -68,6 +64,27 @@ class _ProductCard(TypedDict):
 def _write_yaml(path: Path, data: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(yaml.safe_dump(data, sort_keys=False, allow_unicode=True))
+
+
+def _canonical_input_snapshot(root: Path) -> dict[Path, bytes]:
+    """Snapshot fixture cards plus every live authored ontology source."""
+    snapshots: dict[Path, bytes] = {}
+    for label, source_root in (("data", root / "data"), ("ontology", ROOT / "ontology")):
+        for path in sorted(source_root.rglob("*")):
+            if path.is_file() and not path.is_relative_to(ROOT / "ontology" / "generated"):
+                snapshots[Path(label) / path.relative_to(source_root)] = path.read_bytes()
+    return snapshots
+
+
+def _write_valid_planner_fixture(root: Path) -> None:
+    write_minimal_planner_fixture(
+        root,
+        PlannerFixtureInput(
+            stack_items={"magnesium_product": {"product": "magnesium_product", "stack": "daily"}},
+            products={"magnesium_product": [("magnesium_glycinate", [])]},
+            traits={},
+        ),
+    )
 
 
 def _minimal_substance(
@@ -89,7 +106,7 @@ def _minimal_product(
     }
 
 
-def test_auto_maintenance_rewrites_nested_prefer_with_and_product_refs(
+def test_explicit_normalization_rewrites_product_references(
     tmp_path: Path,
 ) -> None:
     data_dir = tmp_path / "data"
@@ -100,7 +117,7 @@ def test_auto_maintenance_rewrites_nested_prefer_with_and_product_refs(
 
     _write_yaml(
         substances_dir / "source.yaml",
-        {"name": "Source", "schedule": {"prefer_with": ["friend"]}},
+        {"name": "Source"},
     )
     _write_yaml(substances_dir / "friend.yaml", {"name": "Friend"})
     _write_yaml(
@@ -108,7 +125,7 @@ def test_auto_maintenance_rewrites_nested_prefer_with_and_product_refs(
         {"name": "Source Product", "components": [{"substance": "source"}]},
     )
 
-    result = run_auto_maintenance(Paths.from_root(tmp_path), suppress_output=True, ontology=ontology_bundle())
+    result = run_maintenance(Paths.from_root(tmp_path), suppress_output=True, ontology=formal_ontology_bundle())
 
     assert result == 0
     source_cards = list(substances_dir.glob("source__sub_*.yaml"))
@@ -119,32 +136,49 @@ def test_auto_maintenance_rewrites_nested_prefer_with_and_product_refs(
     assert len(product_cards) == 1
 
     source = cast(_SubstanceCard, yaml.safe_load(source_cards[0].read_text()))
-    friend = cast(_SubstanceCard, yaml.safe_load(friend_cards[0].read_text()))
     product = cast(_ProductCard, yaml.safe_load(product_cards[0].read_text()))
 
-    assert "schedule" in source
-    assert source["schedule"]["prefer_with"] == [friend["id"]]
     assert product["components"][0]["substance"] == source["id"]
 
 
-def test_auto_maintenance_fails_closed_without_verified_bundle(tmp_path: Path) -> None:
+def test_explicit_normalization_fails_closed_without_verified_bundle(tmp_path: Path) -> None:
     products_dir = tmp_path / "data" / "products"
     products_dir.mkdir(parents=True)
     product = products_dir / "draft.yaml"
     original: dict[str, object] = {"name": "Draft", "components": [{"substance": "source"}]}
     _write_yaml(product, original)
 
-    assert run_auto_maintenance(Paths.from_root(tmp_path), suppress_output=True) == 1
+    assert run_maintenance(Paths.from_root(tmp_path), suppress_output=True) == 1
     assert yaml.safe_load(product.read_text()) == original
 
 
 def test_rewrite_reference_path_is_contract_driven() -> None:
-    contract = load_maintenance_contract(ontology_bundle())
+    contract = load_maintenance_contract(formal_ontology_bundle())
     resolution = replace(contract.product_substance, reference_path="ingredients[].substance")
     document: dict[str, object] = {"ingredients": [{"substance": "old"}]}
 
     assert rewrite_references(document, resolution, {"old": "new"})
     assert document == {"ingredients": [{"substance": "new"}]}
+
+
+def test_rewrite_reference_path_walks_keyed_lists_and_ignores_non_lists() -> None:
+    contract = load_maintenance_contract(formal_ontology_bundle())
+    nested = replace(contract.product_substance, reference_path="<key>[].substance")
+    document: dict[str, object] = {
+        "daily": [{"substance": "old"}, {"substance": "keep"}],
+        "metadata": {"substance": "old"},
+    }
+
+    assert rewrite_references(document, nested, {"old": "new"})
+    assert document == {
+        "daily": [{"substance": "new"}, {"substance": "keep"}],
+        "metadata": {"substance": "old"},
+    }
+
+    terminal = replace(contract.product_substance, reference_path="<key>[]")
+    keyed_lists: dict[str, object] = {"daily": ["old"], "inactive": ["keep"], "metadata": {"old": "old"}}
+    assert rewrite_references(keyed_lists, terminal, {"old": "new"})
+    assert keyed_lists == {"daily": ["new"], "inactive": ["keep"], "metadata": {"old": "old"}}
 
 
 def test_plan_card_dir_adds_ids_and_plans_canonical_renames(tmp_path: Path) -> None:
@@ -183,38 +217,83 @@ def test_plan_card_dir_rejects_duplicate_canonical_destination(tmp_path: Path) -
     assert result is None
 
 
-def test_check_resolves_product_component_name_to_substance_id(tmp_path: Path) -> None:
-    write_minimal_planner_fixture(
-        tmp_path,
-        PlannerFixtureInput(
-            stack_items={"magnesium_product": {"product": "magnesium_product", "stack": "daily"}},
-            products={"magnesium_product": [("magnesium_glycinate", [])]},
-            traits={
-                "kind:mineral": {
-                    "label": "Mineral",
-                    "description": "Fixture trait for validation.",
-                    "applies_when": "Use only in tests.",
-                },
-            },
-        ),
-    )
+def test_check_reports_product_component_name_without_rewriting(tmp_path: Path) -> None:
+    _write_valid_planner_fixture(tmp_path)
     product_path = find_card_path_by_id(
         tmp_path / "data/products",
         fixture_id("prd", "magnesium_product"),
     )
     product = cast(_ProductCard, yaml.safe_load(product_path.read_text()))
-    expected_substance_id = product["components"][0]["substance"]
     product["components"][0]["substance"] = "Magnesium Glycinate"
     write_yaml(product_path, product)
+    before = _canonical_input_snapshot(tmp_path)
+
+    result = check_in_temp_dir(tmp_path)
+
+    assert result.exit_code == 1
+    assert any("references unknown substance" in error for error in result.errors)
+    assert _canonical_input_snapshot(tmp_path) == before
+
+
+def test_check_succeeds_without_mutating_canonical_inputs(tmp_path: Path) -> None:
+    _write_valid_planner_fixture(tmp_path)
+    before = _canonical_input_snapshot(tmp_path)
 
     result = check_in_temp_dir(tmp_path)
 
     assert result.exit_code == 0, "\n".join(result.errors)
-    rewritten = cast(_ProductCard, yaml.safe_load(product_path.read_text()))
-    assert rewritten["components"][0]["substance"] == expected_substance_id
+    assert _canonical_input_snapshot(tmp_path) == before
 
 
-def test_auto_maintenance_resolves_component_alias_to_substance_id(tmp_path: Path) -> None:
+def test_plan_succeeds_without_mutating_canonical_inputs(tmp_path: Path) -> None:
+    _write_valid_planner_fixture(tmp_path)
+    before = _canonical_input_snapshot(tmp_path)
+
+    result = cmd_plan(data_root=tmp_path)
+
+    assert result.exit_code == 0, "\n".join(result.errors)
+    assert (tmp_path / "schedule.yaml").exists()
+    assert _canonical_input_snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize("command", ("show", "review"))
+def test_show_and_review_do_not_mutate_authored_inputs(tmp_path: Path, command: str) -> None:
+    """Only successful show may replace its ignored derived schedule lease."""
+    _write_valid_planner_fixture(tmp_path)
+    before = _canonical_input_snapshot(tmp_path)
+
+    if command == "show":
+        result = cmd_show(data_root=tmp_path)
+        assert result.exit_code == 0
+        assert (tmp_path / "schedule.yaml").exists()
+        assert "Current plan:" in result.output
+    else:
+        result = cmd_review(data_root=tmp_path)
+        assert result.exit_code == 0, result.stderr
+        assert not (tmp_path / "schedule.yaml").exists()
+
+    assert _canonical_input_snapshot(tmp_path) == before
+
+
+def test_plan_validation_failure_does_not_mutate_canonical_inputs(tmp_path: Path) -> None:
+    _write_valid_planner_fixture(tmp_path)
+    product_path = find_card_path_by_id(
+        tmp_path / "data/products",
+        fixture_id("prd", "magnesium_product"),
+    )
+    product = cast(_ProductCard, yaml.safe_load(product_path.read_text()))
+    product["components"][0]["substance"] = "Magnesium Glycinate"
+    write_yaml(product_path, product)
+    before = _canonical_input_snapshot(tmp_path)
+
+    result = cmd_plan(data_root=tmp_path)
+
+    assert result.exit_code == 1
+    assert not (tmp_path / "schedule.yaml").exists()
+    assert _canonical_input_snapshot(tmp_path) == before
+
+
+def test_explicit_normalization_resolves_component_alias_to_substance_id(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     substances_dir = data_dir / "substances"
     products_dir = data_dir / "products"
@@ -239,7 +318,7 @@ def test_auto_maintenance_resolves_component_alias_to_substance_id(tmp_path: Pat
         },
     )
 
-    result = run_auto_maintenance(Paths.from_root(tmp_path), suppress_output=True, ontology=ontology_bundle())
+    result = run_maintenance(Paths.from_root(tmp_path), suppress_output=True, ontology=formal_ontology_bundle())
 
     assert result == 0
     product_cards = list(products_dir.glob("unknown__b6_product__prd_abc1234567.yaml"))
@@ -248,7 +327,7 @@ def test_auto_maintenance_resolves_component_alias_to_substance_id(tmp_path: Pat
     assert product["components"][0]["substance"] == "sub_abc1234567"
 
 
-def test_auto_maintenance_rejects_ambiguous_component_name(tmp_path: Path) -> None:
+def test_explicit_normalization_rejects_ambiguous_component_name(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     substances_dir = data_dir / "substances"
     products_dir = data_dir / "products"
@@ -273,11 +352,11 @@ def test_auto_maintenance_rejects_ambiguous_component_name(tmp_path: Path) -> No
         },
     )
 
-    result = run_auto_maintenance(
+    result = run_maintenance(
         Paths.from_root(tmp_path),
         suppress_output=True,
         collect_errors=errors,
-        ontology=ontology_bundle(),
+        ontology=formal_ontology_bundle(),
     )
 
     assert result == 1
@@ -286,7 +365,7 @@ def test_auto_maintenance_rejects_ambiguous_component_name(tmp_path: Path) -> No
     assert any("sub_def1234567 Magnesium (citrate)" in error for error in errors)
 
 
-def test_auto_maintenance_rejects_unknown_component_name(tmp_path: Path) -> None:
+def test_explicit_normalization_rejects_unknown_component_name(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     substances_dir = data_dir / "substances"
     products_dir = data_dir / "products"
@@ -307,11 +386,11 @@ def test_auto_maintenance_rejects_unknown_component_name(tmp_path: Path) -> None
         },
     )
 
-    result = run_auto_maintenance(
+    result = run_maintenance(
         Paths.from_root(tmp_path),
         suppress_output=True,
         collect_errors=errors,
-        ontology=ontology_bundle(),
+        ontology=formal_ontology_bundle(),
     )
 
     assert result == 1
@@ -350,10 +429,8 @@ def _build_rename_tree(tmp_path: Path) -> tuple[Path, Path, Path]:
     return substances_dir, products_dir, stacks_path
 
 
-def test_run_auto_maintenance_returns_1_when_stacks_write_fails(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    from planner.maintenance import run_auto_maintenance
+def test_run_maintenance_returns_1_when_stacks_write_fails(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    from planner.maintenance import run_maintenance
 
     _build_rename_tree(tmp_path)
 
@@ -363,7 +440,7 @@ def test_run_auto_maintenance_returns_1_when_stacks_write_fails(
     data_dir.chmod(0o555)
 
     try:
-        result = run_auto_maintenance(Paths.from_root(tmp_path), ontology=ontology_bundle())
+        result = run_maintenance(Paths.from_root(tmp_path), ontology=formal_ontology_bundle())
     finally:
         data_dir.chmod(0o755)
 
@@ -372,9 +449,7 @@ def test_run_auto_maintenance_returns_1_when_stacks_write_fails(
     assert "stacks.yaml" in captured.err
 
 
-def test_run_auto_maintenance_rolls_back_on_partial_stage_failure(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_run_maintenance_rolls_back_on_partial_stage_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Partial staging failure leaves the data dir byte-identical and no .tmp orphans."""
     import planner.maintenance as _maint
 
@@ -412,7 +487,7 @@ def test_run_auto_maintenance_rolls_back_on_partial_stage_failure(
 
     monkeypatch.setattr(_maint.EditPlan, "stage", _patched_stage)
 
-    result = _maint.run_auto_maintenance(Paths.from_root(tmp_path), ontology=ontology_bundle())
+    result = _maint.run_maintenance(Paths.from_root(tmp_path), ontology=formal_ontology_bundle())
 
     assert result == 1
 
@@ -464,6 +539,8 @@ def test_load_global_relations_rejects_unknown_ontology_relation_type(
                 "source_selector": {"entity": {"entity_id": "sub_src"}},
                 "target_selector": {"entity": {"entity_id": "sub_tgt"}},
                 "reason": "unknown relation type should not be silently dropped",
+                "research_state": "unassessed",
+                "sources": [],
             }
         ]
     }
@@ -475,11 +552,11 @@ def test_load_global_relations_rejects_unknown_ontology_relation_type(
 
 
 # ---------------------------------------------------------------------------
-# Task 4 — EH10: auto_maintenance_needed None vs False disambiguation
+# Task 4 — EH10: maintenance_needed None vs False disambiguation
 # ---------------------------------------------------------------------------
 
 
-def test_auto_maintenance_needed_returns_none_on_card_load_error(
+def test_maintenance_needed_returns_none_on_card_load_error(
     tmp_path: Path,
 ) -> None:
     substances_dir = tmp_path / "data" / "substances"
@@ -493,12 +570,12 @@ def test_auto_maintenance_needed_returns_none_on_card_load_error(
 
     from planner.maintenance_substance_resolution import load_maintenance_contract
 
-    result = auto_maintenance_needed(Paths.from_root(tmp_path), contract=load_maintenance_contract(ontology_bundle()))
+    result = maintenance_needed(Paths.from_root(tmp_path), contract=load_maintenance_contract(formal_ontology_bundle()))
 
     assert result is None
 
 
-def test_run_auto_maintenance_returns_1_without_acquiring_lock_on_load_error(
+def test_run_maintenance_returns_1_without_acquiring_lock_on_load_error(
     tmp_path: Path,
 ) -> None:
     substances_dir = tmp_path / "data" / "substances"
@@ -510,7 +587,7 @@ def test_run_auto_maintenance_returns_1_without_acquiring_lock_on_load_error(
     broken.write_text(":\n  - bad: [")
 
     paths = Paths.from_root(tmp_path)
-    result = run_auto_maintenance(paths, suppress_output=True, ontology=ontology_bundle())
+    result = run_maintenance(paths, suppress_output=True, ontology=formal_ontology_bundle())
 
     assert result == 1
     assert not paths.maintenance_lock.exists()

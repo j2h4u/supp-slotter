@@ -5,26 +5,29 @@ aliases:
 - Tulsi
 - Ocimum tenuiflorum
 - Ocimum sanctum
-notes: OciBest branded holy basil extract used in Life Extension Adrenal Energy Formula at 600 mg per serving. Preclinical
-  evidence (PMC5234046) for choline acetyltransferase upregulation and acetylcholinesterase inhibition in cerebral microvascular
-  endothelium; cholinergic-load context applies in stack review. Treat stress/adaptogen positioning as review context, not
-  as a proven cortisol-lowering claim.
-concerns:
-- kind: safety
-  text: Review-level reports of palpitations at chronic doses around 1500 mg/day; threshold not actionable until a dose model
-    exists, but worth recalling given user vascular context.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
-  - cortisol_reduction
+  - value: cortisol_reduction
+    research_state: unassessed
+    sources: []
   effect:
-  - cholinergic_support
-  - stress_resilience_context
-  - hpa_axis_context
+  - value: cholinergic_support
+    research_state: unassessed
+    sources: []
+  - value: stress_resilience_context
+    research_state: unassessed
+    sources: []
+  - value: hpa_axis_context
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - serotonergic_med_interaction
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: serotonergic_med_interaction
+    research_state: unassessed
+    sources: []
   role:
-  - adaptogen
+  - value: adaptogen
+    research_state: unassessed
+    sources: []

@@ -4,19 +4,26 @@ form: Na-RALA sodium R-alpha lipoate
 aliases:
 - RLA
 - Na-RALA
-notes: 'Stabilized R-lipoic acid salt form listed on Doctor''s Best Stabilized R-Lipoic Acid. Product label suggests taking
-  preferably on an empty stomach. Review context: lipoic acid is a mitochondrial redox cofactor for oxidative metabolism.'
-schedule:
-  intake:
-  - empty_preferred
 knowledge:
   context:
-  - mitochondrial_health
-  - antioxidant_protection
+  - value: mitochondrial_health
+    research_state: unassessed
+    sources: []
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - mitochondrial_redox_cofactor
-  - redox_metabolism_support
+  - value: mitochondrial_redox_cofactor
+    research_state: unassessed
+    sources: []
+  - value: redox_metabolism_support
+    research_state: unassessed
+    sources: []
   pathway:
-  - glutathione_metabolism
+  - value: glutathione_metabolism
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

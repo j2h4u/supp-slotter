@@ -1,30 +1,6 @@
 id: sub_fd899525d3
 name: Vitamin B7
 form: biotin
-notes: 'Coenzyme B-Complex component. NIH ODS describes biotin as a cofactor for carboxylases involved in fatty-acid, glucose, and amino-acid metabolism. Lab-interference evidence commonly concerns 5–10 mg/day, versus the active product serving at 0.2 mg; applicability to the active serving and any withholding duration remain unresolved and do not establish a universal threshold or interval.'
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Biotin-HealthProfessional/
-    - https://www.ncbi.nlm.nih.gov/books/NBK114297/
-    summary: Research on biotin does not directly establish a general fed or fasted preference for this exact form.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Biotin-HealthProfessional/
-    - https://www.ncbi.nlm.nih.gov/books/NBK114297/
-    summary: No general clock-time rule was demonstrated for biotin supplementation.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Biotin-HealthProfessional/
-    - https://www.ncbi.nlm.nih.gov/books/NBK114297/
-    summary: No workout- or activity-linked placement rule was demonstrated for biotin supplementation.
-concerns:
-- kind: safety
-  text: Biotin can interfere with some lab immunoassays and produce falsely high or low results; NIH ODS/FDA highlight thyroid-test distortion and falsely low troponin
-    results as clinically important examples. Applicability to the active 200 mcg serving and any withholding duration remain unresolved; the appropriate action is assay-specific, with no universal threshold or interval established.
 knowledge:
   effect:
   - value: carboxylase_cofactor

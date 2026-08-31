@@ -3,21 +3,27 @@ name: Nicotinamide Riboside
 form: tartrate
 aliases:
 - NRT
-notes: 'NAD precursor form listed on California Gold Nutrition Nicotinamide Riboside Tartrate Complex. `NRT` is kept as an
-  alias for this form, not as a separate substance. Review context: NAD availability is central to cellular energy metabolism
-  and mitochondrial function.'
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
-  - mitochondrial_health
+  - value: mitochondrial_health
+    research_state: unassessed
+    sources: []
   effect:
-  - nad_precursor_support
-  - redox_metabolism_support
+  - value: nad_precursor_support
+    research_state: unassessed
+    sources: []
+  - value: redox_metabolism_support
+    research_state: unassessed
+    sources: []
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: unassessed
+    sources: []
   pathway:
-  - nad_metabolism
+  - value: nad_metabolism
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []

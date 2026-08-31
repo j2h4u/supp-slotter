@@ -3,8 +3,5 @@ name: Tadalafil
 brand: Tadalista
 components:
 - substance: sub_a3ec9f9c52
+  id: cmp_prd_33f3450f29__sub_a3ec9f9c52
   amount: 1.25 mg
-  notes: User-confirmed microdosing amount. Kept as label/context metadata for
-    interaction review, not as a computed dose model.
-notes: Medication product retained only as an interaction/review placeholder. The
-  source URL was not captured; user reports microdosing at 1.25 mg.

@@ -1,0 +1,42 @@
+{
+  "format_version": "ontology-runtime-lock-v1",
+  "outputs": [
+    {
+      "path": "card.schema.json",
+      "sha256": "424d239b6b2bd2f1a8df9a9f25dfb639f70d0e73797defd1a32af9cbb62d7ee0"
+    },
+    {
+      "path": "dashboard.schema.json",
+      "sha256": "b2709ba80d664a03a5fd99f46ee9208643bfabdcbc5940a49545eb82a0d675d6"
+    },
+    {
+      "path": "pillboxes.schema.json",
+      "sha256": "1516700d5b56597d263489896b9f4e8f4542fbc810555b3c8cf931f70c914277"
+    },
+    {
+      "path": "product.schema.json",
+      "sha256": "ec9033ee365110c859b58f33e8a0382e2937b3fa2a50ac763df76098c5c661f3"
+    },
+    {
+      "path": "relations.schema.json",
+      "sha256": "ef092e18334a685f1983583c66bba70a80dafa1cbea1624bd7e3785f54f4216f"
+    },
+    {
+      "path": "runtime-program.json",
+      "sha256": "b46d20ef5b7536c1ab431035d4cb0962d8e184b3213d567c28283c1900b6d3d0"
+    },
+    {
+      "path": "runtime-vocabulary.yaml",
+      "sha256": "639eb1ee520785b7cde169be8b85d1832aed3183a2e8bef5dd4bbd2d4f620f7a"
+    },
+    {
+      "path": "schema.json",
+      "sha256": "3881c3fe8fa208f826d4378b2c8679b3c9a19bc84ac6fe58496243e2be45129c"
+    },
+    {
+      "path": "stacks.schema.json",
+      "sha256": "bcdb084f7eeeacaecff22fd83f878509889720523e1285c2eff7a732f2a02f7d"
+    }
+  ],
+  "schema_version": "2"
+}

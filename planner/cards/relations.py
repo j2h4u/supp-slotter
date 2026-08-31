@@ -12,7 +12,6 @@ from planner.contracts import (
     RelationSelector,
     RelationType,
     ResearchState,
-    Severity,
     Substance,
 )
 from planner.ontology.artifacts import OntologyBundle
@@ -97,7 +96,7 @@ def _validated_relation_entry(raw: object, path: Path, label: str, bundle: Ontol
     if not isinstance(raw, dict):
         raise CardLoadError(path, f"{label} must be a mapping")
     entry = cast(dict[str, object], raw)
-    required = ("id", "relation_type", "source_selector", "target_selector", "reason")
+    required = ("id", "relation_type", "source_selector", "target_selector", "reason", "research_state", "sources")
     missing = tuple(field for field in required if field not in entry)
     if missing:
         raise CardLoadError(path, f"{label} missing required field(s): {', '.join(missing)}")
@@ -105,15 +104,15 @@ def _validated_relation_entry(raw: object, path: Path, label: str, bundle: Ontol
         value = entry[field]
         if not isinstance(value, str) or not value.strip():
             raise CardLoadError(path, f"{label}.{field} must be a non-empty string")
-    for field in ("action", "severity", "assertion_kind", "semantic_family", "research_state"):
+    for field in ("assertion_kind", "semantic_family", "research_state"):
         value = entry.get(field)
         if value is not None and (not isinstance(value, str) or not value.strip()):
             raise CardLoadError(path, f"{label}.{field} must be a non-empty string when present")
-    state = entry.get("research_state", "unassessed")
+    state = entry["research_state"]
     state_values = frozenset(schema_enum_values(bundle, "ResearchState"))
     if state not in state_values:
         raise CardLoadError(path, f"{label}.research_state is not in ontology ResearchState")
-    sources = entry.get("sources", [])
+    sources = entry["sources"]
     if not isinstance(sources, list) or any(not isinstance(source, str) or not source.strip() for source in sources):
         raise CardLoadError(path, f"{label}.sources must be a list of non-empty strings")
     if state != "unassessed" and not sources:
@@ -163,12 +162,10 @@ def _relation_from_mapping(  # noqa: PLR0913, PLR0917
         reason=cast(str, relation.get("reason", "")),
         source_selector=source,
         target_selector=target,
-        action=_optional_str(relation.get("action")),
-        severity=cast(Severity | None, relation.get("severity")),
         assertion_kind=_optional_str(relation.get("assertion_kind")),
         semantic_family=_optional_str(relation.get("semantic_family")),
-        research_state=cast(ResearchState, relation.get("research_state", "unassessed")),
-        sources=tuple(cast(list[str], relation.get("sources", []))),
+        research_state=cast(ResearchState, relation["research_state"]),
+        sources=tuple(cast(list[str], relation["sources"])),
     )
 
 

@@ -2,18 +2,17 @@ name: Saccharomyces boulardii
 aliases:
 - S. boulardii
 - Saccharomyces cerevisiae var. boulardii
-notes: 'Knowledge-only probiotic yeast reference card. Added because S. boulardii is a common standalone probiotic category
-  distinct from generic Lactobacillus/Bifidobacterium blends. Sources checked: NCCIH probiotics safety page; NIH ODS probiotics
-  fact sheet.'
-concerns:
-- kind: safety
-  text: Review immunocompromised state, critical illness, central venous catheter, severe gut disease, and antifungal/antibiotic
-    context because rare Saccharomyces fungemia has been reported with probiotic yeast use.
 knowledge:
   effect:
-  - gut_microbiome_context
+  - value: gut_microbiome_context
+    research_state: unassessed
+    sources: []
   kind:
-  - probiotic
+  - value: probiotic
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_2gjf5yx7cz

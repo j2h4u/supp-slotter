@@ -3,13 +3,17 @@ aliases:
 - UMP
 - Uridine 5'-monophosphate
 - 5'-uridylic acid
-notes: 'Knowledge-only nucleotide/membrane-support reference card. Added to make the CDP-choline/uridine/phospholipid neurocognitive
-  review pattern visible without creating a new pathway. Source checked: PubChem CID 6030.'
 knowledge:
   effect:
-  - phospholipid_membrane_context
+  - value: phospholipid_membrane_context
+    research_state: unassessed
+    sources: []
   kind:
-  - nucleotide
+  - value: nucleotide
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []
 id: sub_p9vfq9aiq5

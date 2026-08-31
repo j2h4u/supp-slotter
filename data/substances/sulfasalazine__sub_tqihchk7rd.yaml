@@ -1,16 +1,11 @@
 id: sub_tqihchk7rd
 name: Sulfasalazine
-notes: 'Anti-inflammatory medication used in inflammatory bowel disease and rheumatology contexts. Sulfasalazine can reduce
-  folate absorption/status. Source: NIH ODS Folate Fact Sheet.'
-concerns:
-- kind: safety
-  text: Prescription anti-inflammatory medication context; folate-related supplement decisions should be reviewed against
-    the prescribing indication, medication tolerance, and clinician-directed plan.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - pharmaceutical
+  - value: pharmaceutical
+    research_state: unassessed
+    sources: []

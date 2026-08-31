@@ -7,15 +7,13 @@ urls:
 - https://www.iherb.com/r/Natrol-Melatonin-Calm-Sleep-Fast-Dissolve-Strawberry-60-Tablets/36898
 components:
 - substance: sub_vkp4f3tqf0
+  id: cmp_prd_bio5mh6irn__sub_vkp4f3tqf0
   label: L-Theanine
   amount: 25 mg
 - substance: sub_6z3m3zbxgb
+  id: cmp_prd_bio5mh6irn__sub_6z3m3zbxgb
   label: Melatonin
   amount: 6 mg
-notes: 'Serving size: 1 fast-dissolve tablet. Package: strawberry, 60 tablets. Other
-  ingredients reported include xylitol, cellulose gum, soy polysaccharides,
-  maltodextrin, dextrose, starches, acids, flavor system, and beet root extract.
-  Secondary label source reports wheat and soy.'
 concerns:
 - kind: data_quality
   text: Discontinued iHerb product; Supplement Facts came from secondary sources

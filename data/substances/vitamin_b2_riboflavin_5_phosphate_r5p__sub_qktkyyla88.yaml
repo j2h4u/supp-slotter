@@ -6,13 +6,19 @@ aliases:
 - FMN
 - riboflavin-5-phosphate
 - riboflavin-5'-phosphate
-notes: Active phosphorylated B2 form (FMN precursor); used in coenzymated B-complex products such as Natural Factors BioCoenzymated
-  Active B Complex.
 knowledge:
   context:
-  - mitochondrial_health
+  - value: mitochondrial_health
+    research_state: unassessed
+    sources: []
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: unassessed
+    sources: []
   pathway:
-  - flavin_redox
-  - methylation_cycle
+  - value: flavin_redox
+    research_state: unassessed
+    sources: []
+  - value: methylation_cycle
+    research_state: unassessed
+    sources: []

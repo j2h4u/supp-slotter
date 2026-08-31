@@ -40,7 +40,7 @@ class ProvenanceRecord:
 
 @dataclass(frozen=True)
 class ProjectionResult:
-    """RDF graph plus stable serializable and source-provenance views."""
+    """RDF graph plus stable serializable and provenance views."""
 
     graph: Graph
     triples: tuple[tuple[str, str, str], ...]
@@ -49,10 +49,6 @@ class ProjectionResult:
     @property
     def canonical_ntriples(self) -> bytes:
         return ("".join(f"{subject} {predicate} {obj} .\n" for subject, predicate, obj in self.triples)).encode("utf-8")
-
-    @property
-    def source_provenance(self) -> tuple[ProvenanceRecord, ...]:
-        return self.provenance
 
 
 @dataclass
@@ -616,6 +612,12 @@ def _entity_iri(base_iri: str, root_class: str, value: object) -> str:
 
 
 def _child_entity_iri(base_iri: str, root_class: str, parent: object, path: tuple[str, ...], value: object) -> str:
+    if root_class == "ProductComponent":
+        if isinstance(value, Mapping):
+            authored_id = value.get("id")
+            if isinstance(authored_id, str) and authored_id:
+                return _entity_iri(base_iri, root_class, authored_id)
+        raise OntologyInfrastructureError(f"ProductComponent at {_display_path(path)} has no authored id")
     segment = root_class[:1].lower() + root_class[1:]
     payload = json.dumps(
         {"parent": _term_text(parent), "path": _display_path(path), "value": value},

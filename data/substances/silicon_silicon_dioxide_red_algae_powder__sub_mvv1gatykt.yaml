@@ -4,17 +4,19 @@ form: silicon dioxide / red algae powder
 aliases:
 - Lithothamnion calcareum
 - red algae powder
-notes: Silicon source listed on Solgar Skin, Nails & Hair as silicon dioxide and Lithothamnion calcareum / red algae powder.
-  Review context - silicon/connective-tissue matrix and skin/hair/nail product-positioning context; preserve the exact source
-  form.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
-  - skin_support
+  - value: skin_support
+    research_state: unassessed
+    sources: []
   effect:
-  - connective_tissue_matrix_context
-  - skin_barrier_context
+  - value: connective_tissue_matrix_context
+    research_state: unassessed
+    sources: []
+  - value: skin_barrier_context
+    research_state: unassessed
+    sources: []
   kind:
-  - mineral
+  - value: mineral
+    research_state: unassessed
+    sources: []

@@ -2,18 +2,23 @@
 
 ## Current product boundary
 
-Supp Slotter is a local, deterministic planner for turning product and
-substance cards into a reviewable pillbox schedule. YAML source data lives in
-`data/`; `data/pillboxes.yaml` defines pillboxes and slots, while nested
-`knowledge:` and `schedule:` card sections carry reviewer facts and scheduling
-terms. Dashboard selectors project review clusters from authored card facts.
+Supp Slotter is a local deterministic planner that turns world facts into a
+reviewable logical pillbox layout. The active runtime path is canonical facts
+-> universal laws -> normalized pressures -> exact optimizer -> `Optimal`
+publisher. Conflicts and unproved work remain layout-free `Indeterminate`.
+
+YAML source data lives in `data/`: product/substance identity and composition,
+stack membership, logical slots, and review facts. Canonical evidence facts
+live in `ontology/canonical-facts.yaml`; universal pressure laws live in
+`ontology/canonical-laws.yaml`. Cards do not store desired placements, pair
+preferences, weights, policies, constraints, or inferred answers.
 
 The canonical ontology is authored under `ontology/`, with
-`ontology/manifest.yaml` as the compilation boundary and
-`ontology/runtime-policy.yaml` governing executable scheduling behavior.
-Generated ontology artifacts are checked-in build outputs. Python under
-`planner/` is generic runtime glue and must not become a second ontology
-registry.
+`ontology/manifest.yaml` as the compilation boundary. Generated ontology
+artifacts are checked-in build outputs. Python under `planner/` is generic
+runtime glue and must not become a second ontology registry. Ordinary commands
+load the compact typed runtime program and schemas; RDF/SHACL projection is an
+explicit offline ontology/release gate.
 
 ## Authoritative references
 

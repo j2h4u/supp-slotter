@@ -11,7 +11,6 @@ from planner.ontology.artifacts import load_ontology
 from planner.ontology.presentation import (
     load_category_predicates,
     load_ontoclean_profiles,
-    load_review_presentation,
     load_term_catalog,
 )
 from planner.ontology.substance_fields import canonical_terms_by_predicate
@@ -28,7 +27,6 @@ def test_verified_bundle_reuses_immutable_presentation_decoders() -> None:
         load_category_predicates,
         load_ontoclean_profiles,
         load_term_catalog,
-        load_review_presentation,
         canonical_terms_by_predicate,
     )
     for decoder in decoders:
