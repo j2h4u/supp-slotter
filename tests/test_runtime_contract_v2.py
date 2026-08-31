@@ -12,7 +12,9 @@ from types import SimpleNamespace
 from typing import cast
 
 import pytest
-from planner.contracts import Product, ProductComponent, Substance
+import yaml
+from planner.cards.dashboards import build_dashboard_review
+from planner.contracts import KnowledgeAssertion, Product, ProductComponent, Substance
 from planner.engine import grooming, review_model
 from planner.engine.review_model import _ConcernFilterContext
 from planner.ontology.errors import OntologyInfrastructureError
@@ -114,7 +116,11 @@ def test_second_excluded_partition_cannot_enter_current_review_grooming_or_relat
     test_bundle = SimpleNamespace(runtime_program=runtime)
 
     active = Substance("sub_aaaaaaaaaa", "Active")
-    excluded = Substance("sub_bbbbbbbbbb", "Archived")
+    excluded = Substance(
+        "sub_bbbbbbbbbb",
+        "Archived",
+        knowledge_assertions=(KnowledgeAssertion("context", "vascular_health"),),
+    )
     active_product = Product(
         "prd_aaaaaaaaaa", "Active product", (ProductComponent(active.id, "cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa"),)
     )
@@ -148,6 +154,44 @@ def test_second_excluded_partition_cannot_enter_current_review_grooming_or_relat
     assert grooming._active_role_ids(Paths.from_root(tmp_path), products, test_bundle) == {  # type: ignore[arg-type]
         active_product.components[0].id
     }
+
+    dashboard = tmp_path / "data" / "dashboards" / "archived.yaml"
+    dashboard.parent.mkdir(parents=True)
+    dashboard.write_text(
+        yaml.safe_dump(
+            {
+                "id": "archived_dashboard",
+                "name": "Archived dashboard",
+                "description": "Second excluded partition regression",
+                "benefit": {"description": "Archived benefit"},
+                "selectors": [{"category": "context", "term": "vascular_health"}],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    dashboard_review = build_dashboard_review(
+        dashboard_files=[dashboard],
+        products=products,
+        stack_entries={
+            product_id: {"product": product_id, "stack": stack}
+            for stack, product_ids in stacks.items()
+            for product_id in product_ids
+        },
+        substances=substances,
+        bundle=SimpleNamespace(
+            root=bundle.root,
+            decoded=bundle.decoded,
+            runtime_program=runtime,
+            runtime_vocabulary=bundle.runtime_vocabulary,
+        ),  # type: ignore[arg-type]
+    )
+    dashboard_benefit = cast(list[dict[str, object]], dashboard_review["benefits"])[0]
+    dashboard_member = cast(list[dict[str, object]], dashboard_benefit["members"])[0]
+    usage = cast(dict[str, object], dashboard_member["usage"])
+    assert usage["state"] == "on_shelf"
+    assert usage["state"] != "current"
+    assert usage["stacks"] == ["archived"]
 
     captured: dict[str, _ConcernFilterContext] = {}
     monkeypatch.setattr(review_model, "load_substance_registry", lambda *_args: substances)
