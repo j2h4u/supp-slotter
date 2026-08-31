@@ -6,9 +6,10 @@
 
 ## Decision
 
-Scheduler-consumable input is restricted to five typed canonical fact families:
+Scheduler-consumable input is restricted to six typed canonical fact families:
 `FoodEffect`, `AcuteAlertnessEffect`, `AcuteSleepEffect`,
-`PreExercisePerformanceEffect`, and `PostExerciseRecoveryEffect`. Every fact
+`PreExercisePerformanceEffect`, `PostExerciseRecoveryEffect`, and
+`ProductFoodInstruction`. Every fact
 has typed subject and applicability roles plus evidence provenance.
 
 `stacks.yaml` selects scenario items and domains. Pillbox data supplies

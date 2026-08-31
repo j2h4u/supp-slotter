@@ -33,9 +33,10 @@ layout-free `Indeterminate`.
 ## Author a new product or substance
 
 1. Capture the physical label losslessly: bottle-facing name, manufacturer,
-   label components/forms, source URL, and relevant notes. Keep a product name
-   commercial and concise; route amounts and formulation details to their
-   dedicated fields.
+   label components/forms, and source URL. Keep a product name commercial and
+   concise; route amounts and formulation details to their dedicated typed
+   fields. Put unresolved research in offline evidence or gitignored
+   `docs/private/`; generic card `notes` are not an authoring surface.
 2. Search for the exact product and concrete substance/form identity with
    `uv run python -m planner find "<name form alias>"`. Reuse the existing
    identity when it matches; do not create spelling variants or generic parent

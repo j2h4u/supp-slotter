@@ -20,7 +20,7 @@ unproved work is layout-free `Indeterminate`.
 
 | Source | Owns |
 |---|---|
-| `data/products/` | Bottle identity, label components, URLs, and notes |
+| `data/products/` | Bottle identity, label components, and source URLs |
 | `data/substances/` | Reusable substance/form identity and review facts |
 | `data/stacks.yaml` | Product membership in logical planning domains |
 | `data/pillboxes.yaml` | Unbounded logical slots and their anchors |
@@ -68,6 +68,8 @@ Neither value is an authored fact or scheduling input.
 
 Product cards may use `use_pattern: not_every_day` as a presentation marker. It
 does not add recurrence, frequency, dose, or a second placement semantics.
+Unresolved research belongs in offline evidence or gitignored `docs/private/`,
+not in a generic card `notes` field.
 
 ## Runtime and formal validation
 
@@ -101,6 +103,8 @@ pySHACL, and LinkML are not ordinary planning dependencies.
   canonical authoring procedure.
 - [Domain model](docs/domain-model.md) — authoritative field ownership and
   ontology boundary.
+- [Ontology facts](docs/ontology-facts.md) — closed fact families and
+  canonical authoring boundary.
 - [Substance template](schema/templates/substance.yaml) — copy-ready card
   skeleton.
 

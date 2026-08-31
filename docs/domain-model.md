@@ -18,9 +18,9 @@ and the accepted
 
 The authoritative inputs are:
 
-- the five typed fact families: `FoodEffect`, `AcuteAlertnessEffect`,
-  `AcuteSleepEffect`, `PreExercisePerformanceEffect`, and
-  `PostExerciseRecoveryEffect`;
+- the six typed fact families: `FoodEffect`, `AcuteAlertnessEffect`,
+  `AcuteSleepEffect`, `PreExercisePerformanceEffect`,
+  `PostExerciseRecoveryEffect`, and `ProductFoodInstruction`;
 - typed subject, composition-role applicability, and evidence provenance for
   every fact;
 - scenario membership from `data/stacks.yaml`; and
@@ -40,9 +40,10 @@ produce `Indeterminate`.
 
 ## Closed Scheduling Fact Vocabulary
 
-The only scheduler facts are these five typed families and their nine admitted
+The only scheduler facts are these six typed families and their ten admitted
 values. Each fact has exactly one typed subject, explicit typed applicability
-(a substance or composition role), and evidence provenance. There is no
+(a substance, composition role, or product intake item as required by the
+family), and evidence provenance. There is no
 generic predicate/value extension.
 
 | Family | Admitted values | Derived law |
@@ -52,6 +53,7 @@ generic predicate/value extension.
 | `AcuteSleepEffect` | `onset_latency_decreases`, `continuity_improves` | `circadian_anchor=sleep` |
 | `PreExercisePerformanceEffect` | `performance_improves` | `exercise_anchor=before` |
 | `PostExerciseRecoveryEffect` | `recovery_improves` | `exercise_anchor=after` |
+| `ProductFoodInstruction` | `take_with_food` | `meal_context=with_food` |
 
 The laws are complete, universal, and identity-free. They never encode an item,
 product, slot, desired placement, weight, action, or explanation.

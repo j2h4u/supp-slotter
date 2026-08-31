@@ -32,7 +32,8 @@ edits. Do not write product cards unless the user has approved data enrichment.
 
 Before treating an amount, form, marker, or standardization as unknown:
 
-- inspect the product card `components`, `notes`, and `urls`;
+- inspect the product card `components` and `urls`; consult typed identity,
+  composition, and provenance fields for the claim in question;
 - open existing manufacturer or retailer label URLs when available;
 - if the card has no usable source URL, search for the exact brand + product +
   supplement facts/label;

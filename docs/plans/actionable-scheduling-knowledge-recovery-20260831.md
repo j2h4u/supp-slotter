@@ -13,6 +13,19 @@ facts; derive their normalized pressures through universal laws; prove the exact
 result; and publish a concise derived trace. It does not attempt to close every
 unknown scheduling question before the shelf may be scheduled.
 
+## Final SOL review dispositions
+
+The final SOL reviews identified documentation-boundary drift, not permission
+to restore the retired runtime catalog, coverage certificates, grooming, or
+generic card notes. This docs-only pass reconciles the living contract and
+canonical ADR to the already admitted `ProductFoodInstruction` family
+(`take_with_food`) alongside the five earlier families. The disposition is
+**addressed in owned docs**; it is not a claim that all release reviews passed.
+Any runtime publication fallback concern remains outside this docs-only scope,
+and the independent product/ontology, Kaizen/YAGNI, and fresh-context
+release-review items below remain unchecked until their exact-head evidence
+exists.
+
 ## Product invariants
 
 1. Every admitted directed scheduling claim is a formal typed fact with exact
