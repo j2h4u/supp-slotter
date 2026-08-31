@@ -9,20 +9,20 @@ boundary decision is the
 [`canonical-instance ADR`](../decisions/canonical-instance-inference-boundary-20260822.md).
 
 This refresh audits durable source and test paths against the clean runtime
-candidate `f02d27cd974e193ba37c0f665436e96d2a961b86` (`f02d27c`,
-`test: align review fixture with stack partition`). It is documentation-only:
+candidate `7cde07bf59e247f19662f5562e9103b0b5f322b1` (`7cde07b`,
+`fix: use routable stacks for active review views`). It is documentation-only:
 the receipt below is the release result for that exact source head, not a claim
 that a release recipe was rerun while updating this checklist.
 
 ## Exact release receipt (R1)
 
-- Candidate: `f02d27cd974e193ba37c0f665436e96d2a961b86`; clean HEAD; release
+- Candidate: `7cde07bf59e247f19662f5562e9103b0b5f322b1`; clean HEAD; release
   exit status `0`.
-- Ordered release stages: `14/37/31/53/64/236 = 435` passing tests.
-- Coverage: `82%`; 6,787 statements with 970 missed; 2,268 branches with 570
+- Ordered release stages: `14/37/31/54/64/236 = 436` passing tests.
+- Coverage: `82%`; 6,789 statements with 970 missed; 2,268 branches with 570
   partial branches.
 - CRAP: 623 functions at threshold `30`; maximum `29.40`.
-- Corpus projection: conforms; `123.79511s` (PySHACL `119.9958s`).
+- Corpus projection: conforms; `135.070494s` (PySHACL `130.330914s`).
 - Import inventory: 73 files and 310 dependencies; 10 contracts kept and 0
   broken.
 - The gate left the checkout clean and no repository processes remained.
@@ -94,10 +94,12 @@ answer.
 
 - [x] **Tracked-product ownership is explicit and closed.**
   Stack topology consumes the formal runtime-declared routable, excluded, and
-  tracked-unassigned partitions; no Python name is a policy authority. The
-  review fixture derives its complete canonical partition from that same
-  runtime policy.
-  - Evidence: R1; `f02d27cd974e193ba37c0f665436e96d2a961b86`; `tests/test_runtime_contract_v2.py::test_authored_stack_partition_is_closed_and_reproduces_active_membership`; `tests/test_stack_validation.py::test_partition_names_come_from_runtime_and_unknown_names_fail_closed`; `tests/test_review_command.py::test_cmd_review_accepts_canonical_typed_selector_relation`; `planner/cards/stacks.py`; `planner/engine/_plan_active_index.py`; `data/stacks.yaml`.
+  tracked-unassigned partitions; no Python name is a policy authority. Active
+  review, grooming, relation, and dashboard paths consume
+  `routable_stack_names`; a focused second-excluded-partition contract proves
+  excluded membership cannot enter their active inputs. The review fixture
+  derives its complete canonical partition from that same runtime policy.
+  - Evidence: R1; `7cde07bf59e247f19662f5562e9103b0b5f322b1`; `tests/test_runtime_contract_v2.py::test_authored_stack_partition_is_closed_and_reproduces_active_membership`; `tests/test_runtime_contract_v2.py::test_second_excluded_partition_cannot_enter_current_review_grooming_or_relation_inputs`; `tests/test_stack_validation.py::test_partition_names_come_from_runtime_and_unknown_names_fail_closed`; `tests/test_review_command.py::test_cmd_review_accepts_canonical_typed_selector_relation`; `planner/cards/stacks.py`; `planner/engine/_plan_active_index.py`; `planner/cards/dashboards.py`; `planner/engine/grooming.py`; `planner/engine/review_model.py`; `planner/query_model/facts.py`; `planner/query_model/read_model.py`; `data/stacks.yaml`.
 
 - [x] **Pillbox/stack topology is one-to-one where authored as such.**
   - Evidence: R1; `tests/test_pillbox_loader_contract.py::test_loader_rejects_multiple_pillboxes_for_one_stack`; `tests/test_logical_slot_topology.py::test_distinct_topologies_keep_distinct_stack_references`.
@@ -172,21 +174,21 @@ answer.
 - [ ] **Independent Sol panel.** Re-run the independent panel against the
   remediated runtime candidate and return `SHIP` without actionable Critical,
   High, or Medium reservations.
-  - Pending on `f02d27cd974e193ba37c0f665436e96d2a961b86`: the prior
+  - Pending on `7cde07bf59e247f19662f5562e9103b0b5f322b1`: the prior
     [convergence record](../decisions/canonical-runtime-convergence-20260831.md)
     is superseded and cannot close this remediated head.
 
 - [ ] **Fresh-context final auditor.** Inspect this exact runtime candidate,
   validate every checked record and R1, then save per-item verdicts and a final
   `COMPLETE` or `INCOMPLETE` decision in `docs/decisions/`.
-  - Pending on `f02d27cd974e193ba37c0f665436e96d2a961b86`: remediation is
+  - Pending on `7cde07bf59e247f19662f5562e9103b0b5f322b1`: remediation is
     present, but no fresh-context final-auditor report with `COMPLETE` exists.
 
 - [ ] **Repeated same-optics convergence.** Repeat the product, ontology,
   portability, and QA optics after the fresh-context audit; compare the
   remediated head with the historical review and return `SHIP` only with no
   actionable reservation.
-  - Pending on `f02d27cd974e193ba37c0f665436e96d2a961b86`: the prior
+  - Pending on `7cde07bf59e247f19662f5562e9103b0b5f322b1`: the prior
     [convergence record](../decisions/canonical-runtime-convergence-20260831.md)
     is superseded and non-final.
 
