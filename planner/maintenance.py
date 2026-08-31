@@ -1,4 +1,4 @@
-"""Auto-maintenance orchestration for card ids, filenames, and refs."""
+"""Explicit normalization for card ids, filenames, and references."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ from planner.maintenance_lock import (
     release_maintenance_lock,
 )
 from planner.maintenance_mapping import product_from_mapping, substance_from_mapping
-from planner.maintenance_probe import auto_maintenance_needed
+from planner.maintenance_probe import maintenance_needed
 from planner.maintenance_rewrites import (
     plan_substance_ref_rewrites,
     rewrite_stack_product_refs,
@@ -30,24 +30,36 @@ from planner.maintenance_substance_resolution import (
     ReferenceResolution,
     load_maintenance_contract,
 )
-from planner.ontology.artifacts import OntologyBundle
+from planner.ontology.artifacts import OntologyBundle, load_formal_ontology
 from planner.ontology.errors import OntologyInfrastructureError
-from planner.paths import Paths
+from planner.paths import ROOT, Paths
 from planner.yaml_io import load_yaml
 
 __all__ = [
     "acquire_maintenance_lock",
-    "auto_maintenance_needed",
     "clear_stale_lock",
+    "cmd_normalize",
+    "maintenance_needed",
     "process_is_running",
     "read_lock_pid",
     "release_maintenance_lock",
     "rewrite_stack_product_refs",
-    "run_auto_maintenance",
+    "run_maintenance",
 ]
 
 
-def run_auto_maintenance(
+def cmd_normalize(data_root: Path | None = None) -> int:
+    """Rewrite draft card identities and references only on explicit request."""
+    paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
+    try:
+        bundle = load_formal_ontology(ROOT / "ontology")
+    except OntologyInfrastructureError as error:
+        print(f"normalize: ontology: {error}", file=sys.stderr)
+        return 1
+    return run_maintenance(paths, ontology=bundle)
+
+
+def run_maintenance(
     paths: Paths,
     *,
     suppress_output: bool = False,
@@ -58,15 +70,15 @@ def run_auto_maintenance(
     lock_acquired = False
     try:
         if ontology is None:
-            raise OntologyInfrastructureError("Auto-maintenance requires a verified ontology bundle")
+            raise OntologyInfrastructureError("Normalization requires a verified ontology bundle")
         contract = load_maintenance_contract(ontology)
     except OntologyInfrastructureError as error:
-        message = f"auto-maintenance: ontology contract unavailable: {error}"
+        message = f"normalize: ontology contract unavailable: {error}"
         if collect_errors is not None:
             collect_errors.append(message)
         print(message, file=sys.stderr)
         return 1
-    needs = auto_maintenance_needed(paths, contract=contract)
+    needs = maintenance_needed(paths, contract=contract)
     if needs is None:
         return 1
     if needs:
@@ -78,7 +90,7 @@ def run_auto_maintenance(
         lock_acquired = True
 
     try:
-        return _run_auto_maintenance_unlocked(
+        return _run_maintenance_unlocked(
             paths,
             suppress_output=suppress_output,
             collect_errors=collect_errors,
@@ -89,7 +101,7 @@ def run_auto_maintenance(
             release_maintenance_lock(paths.maintenance_lock)
 
 
-def _run_auto_maintenance_unlocked(
+def _run_maintenance_unlocked(
     paths: Paths,
     *,
     suppress_output: bool = False,
@@ -151,7 +163,7 @@ def _run_auto_maintenance_unlocked(
 def _plan_stack_ref_rewrites(
     stacks_path: Path,
     product_renames: dict[str, str],
-    resolution: ReferenceResolution,
+    resolutions: tuple[ReferenceResolution, ...],
     edit_plan: EditPlan,
 ) -> None:
     if not stacks_path.exists() or not product_renames:
@@ -161,7 +173,8 @@ def _plan_stack_ref_rewrites(
     if not isinstance(stacks_data, dict):
         return
 
-    rewrite_stack_product_refs(cast(dict[str, object], stacks_data), product_renames, resolution)
+    for resolution in resolutions:
+        rewrite_stack_product_refs(cast(dict[str, object], stacks_data), product_renames, resolution)
     stacks_content = yaml.safe_dump(
         stacks_data,
         sort_keys=False,
@@ -191,7 +204,7 @@ def _print_summary(
 
     if suppress_output:
         print(
-            "auto-maintenance: normalized "
+            "normalize: normalized "
             f"{len(substance_renames)} substance ID(s), {substance_file_moves} substance file move(s), "
             f"{len(product_renames)} product ID(s), and {product_file_moves} product file move(s)",
             file=sys.stderr,

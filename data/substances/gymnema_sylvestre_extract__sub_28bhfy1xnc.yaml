@@ -3,21 +3,20 @@ form: extract
 aliases:
 - Gymnema
 - Gurmar
-notes: Knowledge-only glucose-metabolism botanical reference card. Added as a common supplement-store companion to cinnamon,
-  berberine, chromium, and alpha-lipoic acid in blood-sugar stacks.
-concerns:
-- kind: safety
-  text: Review antidiabetes medications, hypoglycemia risk, pregnancy/breastfeeding, and product standardization before practical
-    use discussion.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
-  - insulin_signaling_context
+  - value: insulin_signaling_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - glucose_med_interaction
-  - manual_review
+  - value: glucose_med_interaction
+    research_state: unassessed
+    sources: []
+  - value: manual_review
+    research_state: unassessed
+    sources: []
 id: sub_28bhfy1xnc

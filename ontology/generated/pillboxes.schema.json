@@ -15,24 +15,18 @@
           "additionalProperties": {
             "additionalProperties": false,
             "properties": {
-              "food": {
-                "type": "boolean"
+              "circadian_anchor": {
+                "$ref": "#/$defs/CircadianAnchor"
+              },
+              "exercise_anchor": {
+                "$ref": "#/$defs/ExerciseAnchor"
               },
               "label": {
                 "minLength": 1,
                 "type": "string"
               },
-              "near": {
-                "enum": [
-                  "breakfast",
-                  "day_meal",
-                  "sleep",
-                  "wake",
-                  "workout_after",
-                  "workout_before"
-                ],
-                "minLength": 1,
-                "type": "string"
+              "meal_context": {
+                "$ref": "#/$defs/MealContext"
               },
               "order": {
                 "minimum": 1,
@@ -41,9 +35,7 @@
             },
             "required": [
               "label",
-              "order",
-              "near",
-              "food"
+              "order"
             ],
             "type": "object"
           },
@@ -80,7 +72,7 @@
     "slot_order": {
       "field": "order",
       "minimum": 1,
-      "scope": "pillbox",
+      "scope": "topology",
       "source": "<pillbox_key>.slots.<slot_key>",
       "uniqueness": "required"
     },

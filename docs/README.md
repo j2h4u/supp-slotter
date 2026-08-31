@@ -11,14 +11,15 @@ Use this page as the map. The README is the product front door; these docs are t
 ## Agents And Operators
 
 - [SKILL.md](../SKILL.md) — quick operating guide for agents.
-- [Domain Model](domain-model.md) — source-of-truth rules for products, substances, traits, relations, stacks, dashboards, and generated schedules.
+- [Domain Model](domain-model.md) — living contract for canonical facts,
+  universal inference laws, runtime ownership, and V-model acceptance.
 - [Templates](../schema/templates/) — copy-ready product and substance card skeletons.
 
 ## Maintainers
 
-- [Ontology Cutover Decision And Completion Plan](decisions/ontology-cutover-decision-20260821.md) — expert-panel record, bounded completion cluster, and final branch acceptance criteria.
+- [Canonical Instance and Inference Boundary](decisions/canonical-instance-inference-boundary-20260822.md) — governing decision for canonical scheduler inputs, inference, optimization, and publication.
 - [Ontology Facts](ontology-facts.md) — current unresolved ontology pressure points only.
-- [Evidence Coverage Grooming](evidence-coverage-grooming.md) — current card-level grooming contract and evidence-state boundaries.
+- [Actionable Scheduling Status](actionable-scheduling-status.md) — current architecture, state, and readiness boundary.
 - [MCP Position](mcp-position.md) — why an MCP server is deferred until the product surface is clearer.
 - [planner/](../planner/) — CLI/runtime package.
 - [tests/](../tests/) — regression tests for validation, review, scheduling, and maintenance behavior.

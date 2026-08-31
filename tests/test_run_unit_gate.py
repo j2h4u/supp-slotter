@@ -78,8 +78,7 @@ def test_fast_unit_suite_selects_curated_modules_in_one_invocation(
     tests_root = _make_modules(
         tmp_path,
         [
-            "test_plan_search.py",
-            "test_warning_humanization.py",
+            "test_canonical_optimizer.py",
             "test_ontology_artifacts.py",
         ],
     )
@@ -98,11 +97,10 @@ def test_fast_unit_suite_selects_curated_modules_in_one_invocation(
         "-q",
         "-m",
         run_unit_gate.PYTEST_MARKERS,
-        str(tests_root / "test_plan_search.py"),
-        str(tests_root / "test_warning_humanization.py"),
+        str(tests_root / "test_canonical_optimizer.py"),
     ]
     output = capsys.readouterr().out
-    assert "Running fast-unit suite (2 targets)\n" in output
+    assert "Running fast-unit suite (1 targets)\n" in output
     assert output.count("elapsed=") == 2
 
 
@@ -125,7 +123,7 @@ def test_runtime_scenarios_selects_exact_modules_and_nodes_in_order(
     expected_modules = [
         str(tests_root / path.relative_to(Path("tests"))) for path in run_unit_gate.RUNTIME_SCENARIOS_MODULES
     ]
-    expected_targets = [*expected_modules, *run_unit_gate.RUNTIME_SCENARIOS_NODE_IDS]
+    expected_targets = expected_modules
     assert pytest_command == [
         run_unit_gate.sys.executable,
         "-m",
@@ -139,7 +137,7 @@ def test_runtime_scenarios_selects_exact_modules_and_nodes_in_order(
     assert "-n" not in pytest_command
     assert "--dist" not in pytest_command
     output = capsys.readouterr().out
-    assert "Running runtime-scenarios suite (18 targets)\n" in output
+    assert f"Running runtime-scenarios suite ({len(expected_targets)} targets)\n" in output
     assert output.count("elapsed=") == 2
 
 
@@ -162,11 +160,8 @@ def test_runtime_scenarios_inventory_and_coverage_boundaries() -> None:
     suites = cast(dict[str, object], run_unit_gate.suite_inventory()["suites"])
     runtime_inventory = cast(dict[str, object], suites["runtime-scenarios"])
     assert runtime_inventory == {
-        "selection": "curated-module-list-plus-fixed-node-ids",
-        "items": [
-            *(path.as_posix() for path in run_unit_gate.RUNTIME_SCENARIOS_MODULES),
-            *run_unit_gate.RUNTIME_SCENARIOS_NODE_IDS,
-        ],
+        "selection": "curated-module-list",
+        "items": [path.as_posix() for path in run_unit_gate.RUNTIME_SCENARIOS_MODULES],
     }
     release_inventory = cast(dict[str, object], suites["release"])
     release_components = cast(list[str], release_inventory["components"])
@@ -178,7 +173,6 @@ def test_runtime_scenarios_inventory_and_coverage_boundaries() -> None:
     )
     runtime_only_modules = set(run_unit_gate.RUNTIME_SCENARIOS_MODULES) - preexisting_module_overlaps
     assert not {path.as_posix() for path in runtime_only_modules} & coverage_inventory
-    assert not set(run_unit_gate.RUNTIME_SCENARIOS_NODE_IDS) & coverage_inventory
 
 
 def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
@@ -189,7 +183,6 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
         [
             *(path.relative_to(Path("tests")).as_posix() for path in run_unit_gate.FAST_UNIT_MODULES),
             *(path.relative_to(Path("tests")).as_posix() for path in run_unit_gate.COVERAGE_ONLY_MODULES),
-            "test_scheduler_reviewer_authority.py",
         ],
     )
     calls: list[list[str]] = []
@@ -201,30 +194,30 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
     assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, suite="coverage") == 0
     assert len(calls) == 2
     expected_inventory = [
+        "tests/test_canonical_fact_catalog_integration.py",
+        "tests/test_canonical_inference.py",
+        "tests/test_canonical_inference_plan_integration.py",
+        "tests/test_canonical_optimizer.py",
+        "tests/test_canonical_optimizer_plan_integration.py",
+        "tests/test_canonical_publication.py",
         "tests/test_card_reference_integrity.py",
         "tests/test_cli_surface.py",
         "tests/test_crap_gate.py",
         "tests/test_dashboard_review.py",
         "tests/test_dashboard_schema.py",
-        "tests/test_fact_labels.py",
         "tests/test_formal_uniqueness.py",
         "tests/test_loader_fail_closed.py",
+        "tests/test_logical_slot_topology.py",
         "tests/test_maintenance.py",
         "tests/test_pillbox_loader_contract.py",
-        "tests/test_plan_relation_scheduling.py",
-        "tests/test_plan_search.py",
+        "tests/test_product_food_instruction.py",
         "tests/test_product_validation.py",
-        "tests/test_query_model_loaders.py",
         "tests/test_read_model_relations.py",
-        "tests/test_relation_conflicts.py",
         "tests/test_review_command.py",
         "tests/test_run_unit_gate.py",
-        "tests/test_scheduling_constraint_runtime.py",
-        "tests/test_scheduling_units.py",
+        "tests/test_scheduler_reviewer_authority.py",
         "tests/test_schemas.py",
         "tests/test_substance_similarity.py",
-        "tests/test_warning_humanization.py",
-        "tests/test_scheduler_reviewer_authority.py::test_reviewer_only_knowledge_does_not_change_slot_assignment",
     ]
     expected_coverage_modules = [Path(item) for item in expected_inventory if "::" not in item]
     assert calls[1] == [
@@ -235,7 +228,6 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
         "-m",
         run_unit_gate.PYTEST_MARKERS,
         *(str(tests_root / path.relative_to(Path("tests"))) for path in expected_coverage_modules),
-        "tests/test_scheduler_reviewer_authority.py::test_reviewer_only_knowledge_does_not_change_slot_assignment",
         "--cov=planner",
         "--cov-report=",
         "--crap",
@@ -244,10 +236,6 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
     assert not any(argument.startswith("--cov-fail-under=") for argument in calls[1])
     assert "-n" not in calls[1]
     assert "--dist" not in calls[1]
-    smoke_node = (
-        "tests/test_scheduler_reviewer_authority.py::test_reviewer_only_knowledge_does_not_change_slot_assignment"
-    )
-    assert calls[1].count(smoke_node) == 1
     assert len(calls[1][6:-2]) == len(set(calls[1][6:-2]))
     assert run_unit_gate._coverage_inventory_items() == expected_inventory
     assert not set(expected_inventory) & {path.as_posix() for path in run_unit_gate.ONTOLOGY_CONTRACT_MODULES}
@@ -257,7 +245,7 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
 
 
 def test_coverage_suite_propagates_pytest_failure_without_followup_process(tmp_path: Path) -> None:
-    tests_root = _make_modules(tmp_path, ["test_plan_search.py"])
+    tests_root = _make_modules(tmp_path, ["test_canonical_optimizer.py"])
     calls: list[list[str]] = []
 
     def runner(command: run_unit_gate.Command) -> int:
@@ -273,18 +261,22 @@ def test_ontology_contract_suite_runs_three_curated_groups_in_order(tmp_path: Pa
         tmp_path,
         [
             "test_ontology_artifacts.py",
-            "test_ontology_assertion_runtime.py",
             "test_ontology_presentation_cache.py",
             "test_ontology_compiler_outputs.py",
+            "test_composition_role_identity.py",
+            "test_canonical_fact_catalog_runtime.py",
+            "test_canonical_law_catalog.py",
             "test_linkml_core_schema.py",
+            "test_real_canonical_catalog.py",
             "test_architecture_contracts.py",
-            "test_canonical_scheduling_policies.py",
+            "test_cluster1_vright_contract.py",
             "test_ontology_formal_runtime_assertions.py",
             "test_ontology_ontoclean_contract.py",
             "test_ontology_repository_contract.py",
             "test_ontology_repository_projection.py",
             "test_ontology_runtime_loader.py",
             "test_ontology_shacl_fixtures.py",
+            "test_runtime_contract_v2.py",
             "test_yaml_duplicate_keys.py",
         ],
     )
@@ -302,24 +294,27 @@ def test_ontology_contract_suite_runs_three_curated_groups_in_order(tmp_path: Pa
 
     assert [[target_name(target) for target in call[6:]] for call in calls[1:]] == [
         [
+            "test_composition_role_identity.py",
             "test_linkml_core_schema.py",
+            "test_canonical_fact_catalog_runtime.py",
+            "test_canonical_law_catalog.py",
             "test_ontology_compiler_outputs.py",
-            "tests/test_runtime_axis_cardinality.py::test_compiler_rejects_unknown_projection_target",
+            "test_real_canonical_catalog.py",
         ],
         [
             "test_architecture_contracts.py",
-            "test_canonical_scheduling_policies.py",
+            "test_cluster1_vright_contract.py",
             "test_ontology_formal_runtime_assertions.py",
             "test_ontology_ontoclean_contract.py",
             "test_ontology_repository_contract.py",
         ],
         [
             "test_ontology_artifacts.py",
-            "test_ontology_assertion_runtime.py",
-            "test_ontology_presentation_cache.py",
             "test_ontology_repository_projection.py",
             "test_ontology_runtime_loader.py",
+            "test_ontology_presentation_cache.py",
             "test_ontology_shacl_fixtures.py",
+            "test_runtime_contract_v2.py",
             "test_yaml_duplicate_keys.py",
         ],
     ]
@@ -374,33 +369,37 @@ def test_release_suite_runs_six_ordered_pytest_stages_without_fast_unit(
         end = call.index("--cov=planner") if "--cov=planner" in call else len(call)
         return call[6:end]
 
-    assert pytest_targets(pytest_calls[0]) == list(run_unit_gate.SMOKE_NODE_IDS)
+    assert pytest_targets(pytest_calls[0]) == [
+        str(tests_root / path.relative_to(Path("tests"))) for path in run_unit_gate.SMOKE_MODULES
+    ]
     assert [[target_name(target) for target in pytest_targets(call)] for call in pytest_calls[1:4]] == [
         [
+            "test_composition_role_identity.py",
             "test_linkml_core_schema.py",
+            "test_canonical_fact_catalog_runtime.py",
+            "test_canonical_law_catalog.py",
             "test_ontology_compiler_outputs.py",
-            "tests/test_runtime_axis_cardinality.py::test_compiler_rejects_unknown_projection_target",
+            "test_real_canonical_catalog.py",
         ],
         [
             "test_architecture_contracts.py",
-            "test_canonical_scheduling_policies.py",
+            "test_cluster1_vright_contract.py",
             "test_ontology_formal_runtime_assertions.py",
             "test_ontology_ontoclean_contract.py",
             "test_ontology_repository_contract.py",
         ],
         [
             "test_ontology_artifacts.py",
-            "test_ontology_assertion_runtime.py",
-            "test_ontology_presentation_cache.py",
             "test_ontology_repository_projection.py",
             "test_ontology_runtime_loader.py",
+            "test_ontology_presentation_cache.py",
             "test_ontology_shacl_fixtures.py",
+            "test_runtime_contract_v2.py",
             "test_yaml_duplicate_keys.py",
         ],
     ]
     runtime_targets = [
         *(str(tests_root / path.relative_to(Path("tests"))) for path in run_unit_gate.RUNTIME_SCENARIOS_MODULES),
-        *run_unit_gate.RUNTIME_SCENARIOS_NODE_IDS,
     ]
     assert pytest_targets(pytest_calls[4]) == runtime_targets
     assert pytest_calls[5][-4:] == ["--cov=planner", "--cov-report=", "--cov-append", "--crap"]
@@ -428,8 +427,11 @@ def test_release_suite_fails_fast_at_each_pytest_stage(tmp_path: Path, *, failur
     assert len(calls) == failure_call
 
 
-def test_smoke_suite_uses_one_short_node_invocation_without_discovery(tmp_path: Path) -> None:
-    tests_root = _make_modules(tmp_path, ["test_unused.py"])
+def test_smoke_suite_uses_complete_curated_modules(tmp_path: Path) -> None:
+    tests_root = _make_modules(
+        tmp_path,
+        [path.relative_to(Path("tests")).as_posix() for path in run_unit_gate.SMOKE_MODULES],
+    )
     calls: list[list[str]] = []
 
     def runner(command: run_unit_gate.Command) -> int:
@@ -446,7 +448,7 @@ def test_smoke_suite_uses_one_short_node_invocation_without_discovery(tmp_path: 
             "-q",
             "-m",
             run_unit_gate.PYTEST_MARKERS,
-            *run_unit_gate.SMOKE_NODE_IDS,
+            *(str(tests_root / path.relative_to(Path("tests"))) for path in run_unit_gate.SMOKE_MODULES),
         ],
     ]
 
@@ -493,17 +495,86 @@ def test_suite_inventory_is_machine_readable_without_running_planner(
     assert payload == run_unit_gate.suite_inventory()
 
 
-def test_release_inventory_represents_every_discovered_test_module() -> None:
+def test_canonical_runtime_inventory_is_exact_stable_and_release_covered() -> None:
+    expected_capabilities = {
+        "finite_law_table",
+        "applicability_and_proofs",
+        "normalization",
+        "contradiction",
+        "exact_objective_stages",
+        "stable_tie_break",
+        "exhaustive_oracle",
+        "no_publication_failures",
+    }
+    assert set(run_unit_gate.CANONICAL_RUNTIME_CAPABILITY_NODES) == expected_capabilities
+    nodes = run_unit_gate.canonical_runtime_nodes()
+    assert nodes == tuple(sorted(nodes))
+    assert nodes and len(nodes) == len(set(nodes))
+    assert not run_unit_gate.canonical_runtime_inventory_errors(Path(__file__).resolve().parent)
+    assert {Path(node.split("::", 1)[0]) for node in nodes} <= run_unit_gate.release_module_inventory()
+
+
+def test_private_fast_unit_tests_suite_skips_planner_validation(tmp_path: Path) -> None:
+    tests_root = _make_modules(
+        tmp_path,
+        [path.relative_to(Path("tests")).as_posix() for path in run_unit_gate.FAST_UNIT_MODULES],
+    )
+    calls: list[list[str]] = []
+
+    def runner(command: run_unit_gate.Command) -> int:
+        calls.append(list(command))
+        return 0
+
+    assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, suite="fast-unit-tests") == 0
+    assert len(calls) == 1
+    assert calls[0][2:4] == ["pytest", "-q"]
+
+
+def test_verify_composition_has_one_planner_validation_owner() -> None:
+    """Static checks are not planner validation; the shelf scenario owns it once."""
+
+    justfile = Path(__file__).resolve().parents[1] / "justfile"
+    text = justfile.read_text(encoding="utf-8")
+    assert "verify: check _fast-unit-tests current-shelf-smoke" in text
+    assert "check: _fmt-check _lint _preview-complexity-lint _lock-check _typecheck" in text
+    assert "check: " in text and "planner" not in next(line for line in text.splitlines() if line.startswith("check: "))
+    assert (
+        "_fast-unit-tests:\n    scripts/run_bounded.sh -- uv run python scripts/run_unit_gate.py --suite fast-unit-tests"
+        in text
+    )
+    assert (
+        'current-shelf-smoke:\n    scripts/run_bounded.sh -- uv run pytest -q -m "not integration and not slow" '
+        "tests/test_cutover_vertical_scenarios.py::test_real_shelf_daily_episodic_and_training_products_are_complete"
+        in text
+    )
+    assert "canonical-runtime:\n    scripts/run_bounded.sh -- uv run --group ontology python" in text
+    assert "the one planner validation for that composition" in text
+    assert "current-shelf-smoke` calls cmd_plan, which owns exactly one check" in text
+
+
+def test_release_inventory_is_bidirectional_and_rejects_unlisted_modules(tmp_path: Path) -> None:
     repository_root = Path(__file__).resolve().parents[1]
     discovered = {
         path.relative_to(repository_root) for path in run_unit_gate.discover_test_modules(repository_root / "tests")
     }
-    full_module_inventories = (
-        set(run_unit_gate.FAST_UNIT_MODULES)
-        | set(run_unit_gate.COVERAGE_ONLY_MODULES)
-        | set(run_unit_gate.ONTOLOGY_CONTRACT_MODULES)
-        | set(run_unit_gate.RUNTIME_SCENARIOS_MODULES)
-    )
-    exact_node_modules = {Path(node_id.split("::", 1)[0]) for node_id in run_unit_gate.RELEASE_EXACT_NODE_IDS}
-    represented = full_module_inventories | exact_node_modules
-    assert not discovered - represented
+    represented = set(run_unit_gate.release_module_inventory())
+    exclusions = set(run_unit_gate.EXPLICITLY_EXCLUDED_RELEASE_MODULES)
+    assert discovered == represented | exclusions
+    assert not represented & exclusions
+    assert all(reason.strip() for reason in run_unit_gate.EXPLICITLY_EXCLUDED_RELEASE_MODULES.values())
+    assert run_unit_gate.release_inventory_errors(repository_root / "tests") == []
+
+    tests_root = _make_release_test_root(tmp_path)
+    (tests_root / "test_unlisted.py").write_text("# fixture\n")
+    assert run_unit_gate.release_inventory_errors(tests_root) == [
+        "release inventory omits discovered modules: tests/test_unlisted.py"
+    ]
+
+    calls: list[list[str]] = []
+
+    def runner(command: run_unit_gate.Command) -> int:
+        calls.append(list(command))
+        return 0
+
+    assert run_unit_gate.run_unit_gate(tests_root, command_runner=runner, suite="release") == 5
+    assert calls == [[run_unit_gate.sys.executable, "-m", "planner", "check"]]

@@ -28,14 +28,8 @@ def _write_product_validation_fixture(tmp_path: Path) -> Path:
         tmp_path,
         PlannerFixtureInput(
             stack_items={"prd_aaa0000001": {"stack": "daily"}},
-            products={"prd_aaa0000001": [("sub_aaa0000001", ["timing:energy_like"])]},
-            traits={
-                "timing:energy_like": {
-                    "label": "Energy-like",
-                    "description": "Fixture energy-like timing.",
-                    "applies_when": "Fixture only.",
-                }
-            },
+            products={"prd_aaa0000001": [("sub_aaa0000001", ["effect:nitric_oxide_support"])]},
+            traits={},
         ),
     )
     return tmp_path / "data"

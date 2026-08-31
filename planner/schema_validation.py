@@ -14,31 +14,28 @@ from jsonschema.protocols import Validator
 
 from planner.contracts import CardLoadError
 from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.glue_capabilities import IMPLEMENTED_EFFECT_MATCH_VALUE_HANDLERS
-from planner.ontology.runtime_program import RuntimeProgram
 from planner.paths import SCHEMA_DIR, Paths, strip_root_prefix
 from planner.yaml_io import YamlValue, load_yaml
 
 
 def load_schema(name: str, bundle: OntologyBundle) -> dict[str, object]:
+    generated_name: str | None = None
     if name == "pillboxes":
-        generated = bundle.decoded.get("pillboxes.schema.json")
-        if not isinstance(generated, dict):
-            raise RuntimeError("verified ontology bundle is missing generated pillboxes.schema.json")
-        return cast(dict[str, object], generated)
-    generated_names = {
-        "dashboard": "dashboard.schema.json",
-        "substance": "card.schema.json",
-        "product": "product.schema.json",
-        "relations": "relations.schema.json",
-        "stacks": "stacks.schema.json",
-    }
-    generated_name = generated_names.get(name)
+        generated_name = "pillboxes.schema.json"
+    else:
+        generated_names = {
+            "dashboard": "dashboard.schema.json",
+            "substance": "card.schema.json",
+            "product": "product.schema.json",
+            "relations": "relations.schema.json",
+            "stacks": "stacks.schema.json",
+        }
+        generated_name = generated_names.get(name)
     if generated_name is not None:
         generated = bundle.decoded.get(generated_name)
         if not isinstance(generated, dict):
             raise RuntimeError(f"verified ontology bundle is missing generated {generated_name}")
-        return cast(dict[str, object], generated)
+        return _resolved_generated_schema(cast(Mapping[str, object], generated), bundle)
     schema_path = SCHEMA_DIR / f"{name}.schema.json"
     try:
         text = schema_path.read_text(encoding="utf-8")
@@ -48,6 +45,28 @@ def load_schema(name: str, bundle: OntologyBundle) -> dict[str, object]:
         return cast(dict[str, object], json.loads(text))
     except json.JSONDecodeError as e:
         raise RuntimeError(f"could not parse schema {schema_path}: {e}") from e
+
+
+def _resolved_generated_schema(schema: Mapping[str, object], bundle: OntologyBundle) -> dict[str, object]:
+    """Supply the generated LinkML definitions to its rooted schema views.
+
+    Manifest-facing schemas are intentionally narrow projections.  LinkML may
+    express one of their typed fields with a local ``#/$defs`` reference, whose
+    definition resides in the verified complete generated schema.  Reattach
+    that verified definition namespace generically at validation time; this
+    adds no domain vocabulary or compatibility interpretation.
+    """
+    resolved = dict(schema)
+    if "$defs" in resolved:
+        return resolved
+    raw_complete = bundle.decoded.get("schema.json")
+    if not isinstance(raw_complete, Mapping):
+        raise RuntimeError("verified ontology bundle is missing generated schema.json")
+    complete = cast(Mapping[str, object], raw_complete)
+    definitions: object = complete.get("$defs")
+    if isinstance(definitions, Mapping):
+        resolved["$defs"] = definitions
+    return resolved
 
 
 def schema_errors(
@@ -72,8 +91,6 @@ def schema_errors(
         for err in errors
         for detail in (_nested_unique_item_errors(err) or [err])
     ]
-    if schema_name == "pillboxes":
-        formatted.extend(_pillbox_slot_anchor_errors(data, file_path, bundle.runtime_program))
     formatted.extend(_generated_contract_errors(data, file_path, schema, reference_values))
     return formatted
 
@@ -334,31 +351,6 @@ def _parent_scope_bindings(source: object, bindings: Mapping[str, str]) -> tuple
     """Group a sourced record by its parent placeholders for non-global rules."""
     leaf = _last_placeholder(source)
     return tuple(sorted((key, value) for key, value in bindings.items() if key != leaf))
-
-
-def _pillbox_slot_anchor_errors(data: YamlValue, file_path: Path, runtime: RuntimeProgram) -> list[str]:
-    if not isinstance(data, dict):
-        return []
-    errors: list[str] = []
-    dimensions = runtime.effect_match_dimensions
-    for pillbox_id, pillbox in data.items():
-        if not isinstance(pillbox_id, str) or not isinstance(pillbox, dict):
-            continue
-        slots = pillbox.get("slots")
-        if not isinstance(slots, dict):
-            continue
-        for slot_id, slot in slots.items():
-            if not isinstance(slot_id, str) or not isinstance(slot, dict):
-                continue
-            for dimension in dimensions:
-                handler = IMPLEMENTED_EFFECT_MATCH_VALUE_HANDLERS.get(dimension.value_type)
-                value = slot.get(dimension.slot_field)
-                if handler == "capability_values" and isinstance(value, str) and value not in runtime.slot_near_values:
-                    errors.append(
-                        f"{file_path}: {pillbox_id}.slots.{slot_id}.{dimension.slot_field} "
-                        f"'{value}' is not in ontology slot anchors"
-                    )
-    return errors
 
 
 def _format_schema_error(

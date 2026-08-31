@@ -3,21 +3,20 @@ name: Huperzia serrata
 form: whole plant extract standardized to 1% huperzine A
 aliases:
 - Huperzine A
-notes: Huperzia serrata whole plant extract listed on The Genius Brand Genius Pre label at 10 mg per scoop, standardized to
-  1% huperzine A.
-concerns:
-- kind: safety
-  text: Huperzine A is a cholinesterase-inhibitor context; review cumulative cholinergic load, anticholinergic or cholinergic
-    medications, bradycardia tendency, and product standardization before active use.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
-  - neurocognitive_support
+  - value: neurocognitive_support
+    research_state: unassessed
+    sources: []
   effect:
-  - cholinergic_support
+  - value: cholinergic_support
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []

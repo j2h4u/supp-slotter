@@ -4,20 +4,26 @@ form: beta carotene
 aliases:
 - mixed carotenoids
 - pro-vitamin A carotenoids
-notes: Plant-source pro-vitamin A carotenoid; converted to retinol on demand. Less toxicity risk at high intake compared with
-  preformed retinol. Used in Optimum Nutrition Opti-Men. Review context - provitamin-A/vision and epithelial/immune context
-  without treating beta-carotene as preformed retinol exposure.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
-  - antioxidant_protection
+  - value: antioxidant_protection
+    research_state: unassessed
+    sources: []
   effect:
-  - epithelial_immune_context
-  - vision_retinoid_support
+  - value: epithelial_immune_context
+    research_state: unassessed
+    sources: []
+  - value: vision_retinoid_support
+    research_state: unassessed
+    sources: []
   kind:
-  - carotenoid
-  - vitamin
+  - value: carotenoid
+    research_state: unassessed
+    sources: []
+  - value: vitamin
+    research_state: unassessed
+    sources: []
   quality:
-  - fat_soluble
+  - value: fat_soluble
+    research_state: unassessed
+    sources: []

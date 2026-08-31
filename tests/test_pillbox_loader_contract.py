@@ -2,24 +2,18 @@
 
 from __future__ import annotations
 
-import json
-from dataclasses import replace
 from pathlib import Path
 
 import pytest
 from planner.cards.pillboxes import load_pillboxes
 from planner.contracts import CardLoadError
-from planner.ontology.runtime_program import decode_runtime_program
 from planner.schema_validation import schema_errors
 
 from tests.helpers import ontology_bundle
 
 
-def _runtime():
-    payload = json.loads(
-        (Path(__file__).resolve().parents[1] / "ontology/generated/runtime-program.json").read_text(encoding="utf-8")
-    )
-    return decode_runtime_program(payload)
+def _bundle():
+    return ontology_bundle()
 
 
 def _write(path: Path, slot: str) -> None:
@@ -31,31 +25,30 @@ def _write(path: Path, slot: str) -> None:
     )
 
 
-def test_loader_projects_authored_dimension_key_from_independent_slot_field(tmp_path: Path) -> None:
-    runtime = _runtime()
-    dimensions = tuple(
-        replace(dimension, key="context" if dimension.key == "near" else dimension.key)
-        for dimension in runtime.effect_match_dimensions
-    )
-    runtime = replace(runtime, effect_match_dimensions=dimensions)
+def test_loader_projects_independent_topology_fields(tmp_path: Path) -> None:
     path = tmp_path / "pillboxes.yaml"
-    _write(path, "label: Morning\norder: 1\nnear: wake\nfood: false")
+    _write(path, "label: Morning\norder: 1\nmeal_context: without_food\ncircadian_anchor: wake")
 
-    slot = load_pillboxes(path, runtime)["daily"].slots["morning"]
+    slot = load_pillboxes(path, _bundle())["daily"].slots["morning"]
 
-    assert {observation.key: observation.value for observation in slot.observations} == {
-        "context": "wake",
-        "food": False,
+    assert slot.anchors == {
+        "meal_context": "without_food",
+        "circadian_anchor": "wake",
+        "exercise_anchor": None,
     }
 
 
 @pytest.mark.parametrize(
     "slot",
     (
-        "order: 1\nnear: wake\nfood: false",
-        "label: ''\norder: 1\nnear: wake\nfood: false",
-        "label: Morning\norder: nope\nnear: wake\nfood: false",
-        "label: Morning\norder: 1\nnear: wake\nfood: 1",
+        "order: 1\nmeal_context: without_food",
+        "label: Morning\nmeal_context: without_food",
+        "label: ''\norder: 1\nmeal_context: without_food",
+        "label: 42\norder: 1\nmeal_context: without_food",
+        "label: Morning\norder: nope\nmeal_context: without_food",
+        "label: Morning\norder: 0\nmeal_context: without_food",
+        "label: Morning\norder: true\nmeal_context: without_food",
+        "label: Morning\norder: 1\nmeal_context: invalid",
     ),
 )
 def test_loader_rejects_missing_or_malformed_slot_fields(tmp_path: Path, slot: str) -> None:
@@ -63,7 +56,7 @@ def test_loader_rejects_missing_or_malformed_slot_fields(tmp_path: Path, slot: s
     _write(path, slot)
 
     with pytest.raises(CardLoadError):
-        load_pillboxes(path, _runtime())
+        load_pillboxes(path, _bundle())
 
 
 def test_generated_contract_rejects_global_slot_and_scoped_order_duplicates() -> None:
@@ -72,15 +65,15 @@ def test_generated_contract_rejects_global_slot_and_scoped_order_duplicates() ->
             "label": "Daily",
             "stack": "daily",
             "slots": {
-                "morning": {"label": "Morning", "order": 1, "near": "wake", "food": False},
-                "evening": {"label": "Evening", "order": 1, "near": "sleep", "food": False},
+                "morning": {"label": "Morning", "order": 1, "circadian_anchor": "wake"},
+                "evening": {"label": "Evening", "order": 1, "circadian_anchor": "sleep"},
             },
         },
         "training": {
             "label": "Training",
             "stack": "training",
             "slots": {
-                "morning": {"label": "Training morning", "order": 2, "near": "wake", "food": False},
+                "morning": {"label": "Training morning", "order": 2, "circadian_anchor": "wake"},
             },
         },
     }
@@ -96,7 +89,7 @@ def test_generated_contract_resolves_stack_references_from_validation_context() 
         "daily": {
             "label": "Daily",
             "stack": "missing",
-            "slots": {"morning": {"label": "Morning", "order": 1, "near": "wake", "food": False}},
+            "slots": {"morning": {"label": "Morning", "order": 1, "circadian_anchor": "wake"}},
         }
     }
 
@@ -109,3 +102,29 @@ def test_generated_contract_resolves_stack_references_from_validation_context() 
     )
 
     assert any("unknown reference 'missing'" in error for error in errors)
+
+
+def test_loader_rejects_multiple_pillboxes_for_one_stack(tmp_path: Path) -> None:
+    path = tmp_path / "pillboxes.yaml"
+    path.write_text(
+        """
+first:
+  label: First
+  stack: daily
+  slots:
+    first_slot:
+      label: First slot
+      order: 1
+second:
+  label: Second
+  stack: daily
+  slots:
+    second_slot:
+      label: Second slot
+      order: 1
+""",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(CardLoadError, match="duplicate pillbox stack reference"):
+        load_pillboxes(path, _bundle())

@@ -20,8 +20,8 @@ relation_types:
     directional: true
     source_selector_forms: [term, entity]
     target_selector_forms: [term, entity]
-  - id: review_with
-    label: Review together
+  - id: co_use_context
+    label: Co-use context
     order: 30
     directional: false
     source_selector_forms: [term, entity]

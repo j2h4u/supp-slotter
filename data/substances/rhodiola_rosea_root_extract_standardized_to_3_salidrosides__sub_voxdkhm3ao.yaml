@@ -1,19 +1,22 @@
 id: sub_voxdkhm3ao
 name: Rhodiola rosea
 form: root extract standardized to 3% salidrosides
-notes: Rhodiola rosea root extract listed on The Genius Brand Genius Pre label at 100 mg per scoop, standardized to 3% salidrosides.
-  Review context - stress, fatigue, energy, mood/cognition, and athletic-performance positioning; NCCIH characterizes the
-  evidence as insufficient, so do not treat these as established outcome claims.
-concerns:
-- kind: safety
-  text: Review stimulant-like tolerance, sleep disruption, mood/bipolar history, antidepressant medication context, and extract
-    standardization before active use.
 knowledge:
   effect:
-  - stress_resilience_context
-  - fatigue_resilience_context
-  - cognitive_performance_context
+  - value: stress_resilience_context
+    research_state: unassessed
+    sources: []
+  - value: fatigue_resilience_context
+    research_state: unassessed
+    sources: []
+  - value: cognitive_performance_context
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - adaptogen
+  - value: adaptogen
+    research_state: unassessed
+    sources: []

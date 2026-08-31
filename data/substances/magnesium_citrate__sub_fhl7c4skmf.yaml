@@ -1,28 +1,6 @@
 id: sub_fhl7c4skmf
 name: Magnesium
 form: citrate
-notes: Magnesium citrate component from the TiM Electrolyte Caps label. Comparative citrate-over-oxide bioavailability is not universal and does not establish a meal, clock-time, sleep, or exercise rule. NIH ODS describes magnesium as a cofactor for more
-  than 300 enzyme systems, including energy production, glucose and blood-pressure regulation, muscle/nerve function, calcium/potassium
-  ion transport, normal heart rhythm, and bone structure.
-scheduling_assessment:
-  intake:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/14596323/
-    summary: Citrate formulation bioavailability does not establish a general fed or fasted preference; tolerability and any practical meal choice remain product- and person-dependent.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/14596323/
-    summary: No general clock-time rule was demonstrated; formulation bioavailability is not clock evidence.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://pubmed.ncbi.nlm.nih.gov/30388775/
-    - https://pubmed.ncbi.nlm.nih.gov/29637897/
-    summary: Exercise studies are confounded and non-form-specific; they do not establish pre-, during-, or post-workout placement for magnesium citrate.
 knowledge:
   context:
   - value: workout_performance

@@ -1,0 +1,41 @@
+# Closed, identity-free universal inference laws.
+#
+# Each row maps one admitted typed fact value to exactly one typed anchor
+# value.  These are the complete scheduling laws; they never name an item,
+# product, component, slot, condition, weight, action, or explanation.
+food_effect_laws:
+  - id: law_food_bioavailability_increases
+    fact_value: bioavailability_increases
+    meal_context: with_food
+  - id: law_food_bioavailability_decreases
+    fact_value: bioavailability_decreases
+    meal_context: without_food
+  - id: law_food_tolerability_improves
+    fact_value: tolerability_improves
+    meal_context: with_food
+  - id: law_food_tolerability_worsens
+    fact_value: tolerability_worsens
+    meal_context: without_food
+acute_alertness_effect_laws:
+  - id: law_acute_alertness_increases
+    fact_value: acute_alertness_increases
+    circadian_anchor: wake
+acute_sleep_effect_laws:
+  - id: law_acute_sleep_onset_latency_decreases
+    fact_value: onset_latency_decreases
+    circadian_anchor: sleep
+  - id: law_acute_sleep_continuity_improves
+    fact_value: continuity_improves
+    circadian_anchor: sleep
+pre_exercise_performance_effect_laws:
+  - id: law_pre_exercise_performance_improves
+    fact_value: performance_improves
+    exercise_anchor: before
+post_exercise_recovery_effect_laws:
+  - id: law_post_exercise_recovery_improves
+    fact_value: recovery_improves
+    exercise_anchor: after
+product_food_instruction_laws:
+  - id: law_product_food_take_with_food
+    fact_value: take_with_food
+    meal_context: with_food

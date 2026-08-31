@@ -9,15 +9,54 @@ import pytest
 import yaml
 from planner.cards import relations as relation_cards
 from planner.cards.dashboards import build_dashboard_review, load_dashboard
+from planner.cards.product import load_product
 from planner.cards.relations import load_global_relations
 from planner.cards.substance import load_substance
 from planner.contracts import CardLoadError, Substance
 from planner.ontology.selector import load_relation_type_contracts
 from planner.paths import Paths
-from planner.query_model.loaders import dashboards_for_read_model
-from planner.query_model.surreal_records import dashboard_record
 
 from tests.helpers import ontology_bundle
+
+
+@pytest.mark.parametrize(
+    ("kind", "document"),
+    [
+        ("substance", {"id": "sub_zz0000zzzz", "name": "Legacy", "notes": "unexpected"}),
+        (
+            "product",
+            {
+                "id": "prd_zz0000zzzz",
+                "name": "Legacy",
+                "components": [
+                    {
+                        "id": "cmp_prd_zz0000zzzz__sub_zz0000zzzz",
+                        "substance": "sub_zz0000zzzz",
+                        "notes": "unexpected",
+                    }
+                ],
+            },
+        ),
+        (
+            "product",
+            {
+                "id": "prd_zz0000zzzz",
+                "name": "Legacy",
+                "components": [{"id": "cmp_prd_zz0000zzzz__sub_zz0000zzzz", "substance": "sub_zz0000zzzz"}],
+                "notes": "unexpected",
+            },
+        ),
+    ],
+)
+def test_card_loaders_reject_legacy_notes_at_every_card_position(
+    tmp_path: Path, kind: str, document: dict[str, object]
+) -> None:
+    path = tmp_path / f"{kind}.yaml"
+    path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    loader = load_substance if kind == "substance" else load_product
+
+    with pytest.raises(CardLoadError, match="notes"):
+        loader(path, ontology_bundle())
 
 
 @pytest.mark.parametrize(
@@ -68,11 +107,6 @@ def test_dashboard_loader_preserves_canonical_identity_and_declared_context(tmp_
 
     assert dashboard.id == "identity_probe"
     assert dashboard.declares_context == ("vascular_health",)
-    record = dashboard_record(dashboard, ontology_bundle())
-    assert record["id"] == "identity_probe"
-    assert "slug" not in record
-    assert record["declares_context"] == ["vascular_health"]
-    assert record["declares_context_labels"] == ["Vascular Health"]
 
 
 def test_dashboard_rename_preserves_authored_identity_and_behavior(tmp_path: Path) -> None:
@@ -111,23 +145,6 @@ def test_dashboard_rename_preserves_authored_identity_and_behavior(tmp_path: Pat
     assert after.id == "stable_dashboard_id"
     assert after.source_path == renamed_path
     assert before_review == after_review
-
-
-def test_dashboard_registry_rejects_duplicate_authored_ids(tmp_path: Path) -> None:
-    dashboards_dir = tmp_path / "data" / "dashboards"
-    dashboards_dir.mkdir(parents=True)
-    card = {
-        "id": "stable_dashboard_id",
-        "name": "Duplicate probe",
-        "description": "duplicate authored id",
-        "benefit": {"description": "duplicate authored id"},
-        "selectors": [{"category": "context", "term": "vascular_health"}],
-    }
-    for filename in ("first_source.yaml", "renamed_source.yaml"):
-        (dashboards_dir / filename).write_text(yaml.safe_dump(card, sort_keys=False), encoding="utf-8")
-
-    with pytest.raises(CardLoadError, match="duplicate dashboard id"):
-        dashboards_for_read_model(Paths.from_root(tmp_path), ontology_bundle())
 
 
 def test_dashboard_loader_rejects_unknown_declared_context(tmp_path: Path) -> None:
@@ -174,6 +191,8 @@ def test_relation_loader_rejects_non_list_and_invalid_selector_entry(tmp_path: P
                     "source_selector": {"category": "context"},
                     "target_selector": {"category": "context", "term": "foo"},
                     "reason": "invalid selector",
+                    "research_state": "unassessed",
+                    "sources": [],
                 }
             ]
         }),
@@ -188,7 +207,7 @@ def test_relation_loader_rejects_non_list_and_invalid_selector_entry(tmp_path: P
         load_global_relations(Paths.from_root(tmp_path), ontology_bundle(), {})
 
 
-def test_relation_loader_normalizes_legacy_and_reads_research_state_metadata(tmp_path: Path) -> None:
+def test_relation_loader_requires_explicit_research_state_metadata(tmp_path: Path) -> None:
     path = tmp_path / "data" / "relations.yaml"
     path.parent.mkdir()
     relation = {
@@ -198,16 +217,15 @@ def test_relation_loader_normalizes_legacy_and_reads_research_state_metadata(tmp
         "target_selector": {"entity": {"name": "Target"}},
         "reason": "research-state loader probe",
         "assertion_kind": "ontology_assertion",
-        "semantic_family": "research_state_probe",
+        "semantic_family": "biochemical_mechanism_assertion",
     }
     path.write_text(yaml.safe_dump({"relations": [relation]}), encoding="utf-8")
     substances = {
         "sub_known000": Substance("sub_known000", "Known"),
         "sub_target00": Substance("sub_target00", "Target"),
     }
-    legacy = load_global_relations(Paths.from_root(tmp_path), ontology_bundle(), substances)[0]
-    assert legacy.research_state == "unassessed"
-    assert legacy.sources == ()
+    with pytest.raises(CardLoadError, match=r"missing required field\(s\): research_state, sources"):
+        load_global_relations(Paths.from_root(tmp_path), ontology_bundle(), substances)
 
     relation.update({"research_state": "mechanistic_only", "sources": ["https://example.test/mechanism"]})
     path.write_text(yaml.safe_dump({"relations": [relation]}), encoding="utf-8")
@@ -247,6 +265,8 @@ def test_relation_loader_enforces_per_side_selector_forms(
                             else {"entity": {"name": "Known"}}
                         ),
                         "reason": "selector form probe",
+                        "research_state": "unassessed",
+                        "sources": [],
                     }
                 ]
             },
@@ -263,10 +283,12 @@ def test_relation_loader_rejects_reversed_directionless_duplicate(tmp_path: Path
     path = tmp_path / "data" / "relations.yaml"
     path.parent.mkdir()
     common = {
-        "relation_type": "review_with",
-        "assertion_kind": "clinical_review_signal",
+        "relation_type": "co_use_context",
+        "assertion_kind": "co_use_evidence",
         "semantic_family": "test",
         "reason": "direction probe",
+        "research_state": "unassessed",
+        "sources": [],
     }
     path.write_text(
         yaml.safe_dump(
@@ -295,7 +317,7 @@ def test_relation_loader_rejects_reversed_directionless_duplicate(tmp_path: Path
         "sub_known000": Substance("sub_known000", "Known"),
         "sub_other000": Substance("sub_other000", "Other"),
     }
-    with pytest.raises(CardLoadError, match="non-directional relation type 'review_with'"):
+    with pytest.raises(CardLoadError, match="non-directional relation type 'co_use_context'"):
         load_global_relations(Paths.from_root(tmp_path), ontology_bundle(), substances)
 
 
@@ -335,6 +357,8 @@ def test_relation_loader_rejects_unresolved_selector_references(
                         "source_selector": selector,
                         "target_selector": {"entity": {"entity_id": "sub_known000"}},
                         "reason": "unresolved selector must not be omitted",
+                        "research_state": "unassessed",
+                        "sources": [],
                     }
                 ]
             },
@@ -352,7 +376,6 @@ def test_relation_loader_rejects_unresolved_selector_references(
     ("section", "field", "predicate"),
     [
         ("knowledge", "effect", "knowledge.effect"),
-        ("schedule", "intake", "schedule.intake"),
     ],
 )
 def test_substance_loader_rejects_unknown_canonical_terms(
@@ -364,7 +387,7 @@ def test_substance_loader_rejects_unknown_canonical_terms(
             {
                 "id": "sub_zz0000zzzz",
                 "name": "Unknown term probe",
-                section: {field: ["not_a_registered_term"]},
+                section: {field: [{"value": "not_a_registered_term", "research_state": "unassessed", "sources": []}]},
             },
             sort_keys=False,
         ),
@@ -384,10 +407,7 @@ def test_substance_loader_accepts_known_and_registered_unused_terms(tmp_path: Pa
             {
                 "id": "sub_zz0000zzzz",
                 "name": "Known term probe",
-                "knowledge": {"kind": ["mineral"]},
-                # Authored in the registry but intentionally unused by the
-                # repository's current substance cards.
-                "schedule": {"intake": ["fat_meal_required"]},
+                "knowledge": {"kind": [{"value": "mineral", "research_state": "unassessed", "sources": []}]},
             },
             sort_keys=False,
         ),
@@ -398,19 +418,16 @@ def test_substance_loader_accepts_known_and_registered_unused_terms(tmp_path: Pa
 
     assert substance.knowledge_assertions[0].category == "kind"
     assert substance.knowledge_assertions[0].value == "mineral"
-    assert substance.schedule_assertions[0].axis == "intake"
-    assert substance.schedule_assertions[0].value == "fat_meal_required"
 
 
-def test_substance_loader_normalizes_legacy_and_reads_research_state_metadata(tmp_path: Path) -> None:
+def test_substance_loader_requires_explicit_research_state_metadata(tmp_path: Path) -> None:
     legacy_path = tmp_path / "legacy.yaml"
     legacy_path.write_text(
         yaml.safe_dump({"id": "sub_zz0000zzzz", "name": "Legacy", "knowledge": {"kind": ["mineral"]}}),
         encoding="utf-8",
     )
-    legacy = load_substance(legacy_path, ontology_bundle())
-    assert legacy.knowledge_assertions[0].research_state == "unassessed"
-    assert legacy.knowledge_assertions[0].sources == ()
+    with pytest.raises(CardLoadError, match="must be a mapping with explicit research metadata"):
+        load_substance(legacy_path, ontology_bundle())
 
     structured_path = tmp_path / "structured.yaml"
     structured_path.write_text(
@@ -445,32 +462,4 @@ def test_substance_loader_rejects_research_state_without_sources(tmp_path: Path)
         encoding="utf-8",
     )
     with pytest.raises(CardLoadError, match="sources"):
-        load_substance(path, ontology_bundle())
-
-
-def test_substance_loader_joins_preference_assessment_to_same_axis_schedule_fact(tmp_path: Path) -> None:
-    path = tmp_path / "probe.yaml"
-    card = {
-        "id": "sub_zz0000zzzz",
-        "name": "Assessment join probe",
-        "schedule": {"intake": ["food_preferred"]},
-        "scheduling_assessment": {
-            "intake": {
-                "conclusion": "supports_preference",
-                "policy": "food_preferred",
-                "sources": ["https://example.test/source"],
-                "summary": "The source supports the same authored preference.",
-            }
-        },
-    }
-    path.write_text(yaml.safe_dump(card, sort_keys=False), encoding="utf-8")
-
-    substance = load_substance(path, ontology_bundle())
-
-    assert substance.scheduling_assessments[0].axis == "intake"
-    assert substance.scheduling_assessments[0].policy == "food_preferred"
-
-    card["scheduling_assessment"]["intake"]["policy"] = "empty_preferred"
-    path.write_text(yaml.safe_dump(card, sort_keys=False), encoding="utf-8")
-    with pytest.raises(CardLoadError, match="no matching schedule assertion"):
         load_substance(path, ontology_bundle())

@@ -3,17 +3,19 @@ name: Pyrroloquinoline Quinone
 form: disodium salt
 aliases:
 - PQQ
-notes: PQQ disodium salt form listed on California Gold Nutrition Nicotinamide Riboside Tartrate Complex. Review context -
-  redox-active quinone and mitochondrial-biogenesis research context; human outcome evidence is limited, so keep as review
-  context rather than a strong efficacy claim.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
-  - mitochondrial_health
+  - value: mitochondrial_health
+    research_state: unassessed
+    sources: []
   effect:
-  - mitochondrial_biogenesis_context
-  - redox_metabolism_support
+  - value: mitochondrial_biogenesis_context
+    research_state: unassessed
+    sources: []
+  - value: redox_metabolism_support
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []

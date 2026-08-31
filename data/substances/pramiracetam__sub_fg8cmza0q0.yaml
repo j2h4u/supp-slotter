@@ -1,19 +1,23 @@
 name: Pramiracetam
 aliases:
 - CI-879
-notes: 'Knowledge-only racetam-family nootropic reference card. Added as a high-potency racetam comparator for cholinergic/cognitive
-  review, not as an active-stack recommendation. Source checked: PubChem CID 51712.'
-concerns:
-- kind: safety
-  text: Synthetic racetam-like nootropic; keep as manual review because regulatory status, product quality, and cholinergic-load
-    relevance must be assessed before any practical recommendation.
 knowledge:
   effect:
-  - cholinergic_support
-  - cognitive_performance_context
-  - memory_recall_context
+  - value: cholinergic_support
+    research_state: unassessed
+    sources: []
+  - value: cognitive_performance_context
+    research_state: unassessed
+    sources: []
+  - value: memory_recall_context
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
+  - value: manual_review
+    research_state: unassessed
+    sources: []
   role:
-  - nootropic
+  - value: nootropic
+    research_state: unassessed
+    sources: []
 id: sub_fg8cmza0q0

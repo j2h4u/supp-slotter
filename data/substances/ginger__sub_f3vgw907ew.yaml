@@ -3,18 +3,25 @@ name: Ginger
 aliases:
 - Zingiber officinale
 - ginger root
-notes: Anti-inflammatory and digestive-comfort rhizome with mild antiplatelet activity at higher doses; relevant to bleeding-load
-  review when combined with omega-3, aspirin, nattokinase, or other antiplatelet agents.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
-  - anti_inflammatory_context
-  - digestive_comfort_context
-  - joint_comfort_context
+  - value: anti_inflammatory_context
+    research_state: unassessed
+    sources: []
+  - value: digestive_comfort_context
+    research_state: unassessed
+    sources: []
+  - value: joint_comfort_context
+    research_state: unassessed
+    sources: []
   kind:
-  - botanical
+  - value: botanical
+    research_state: unassessed
+    sources: []
   risk:
-  - manual_review
-  - bleeding_med_interaction
+  - value: manual_review
+    research_state: unassessed
+    sources: []
+  - value: bleeding_med_interaction
+    research_state: unassessed
+    sources: []

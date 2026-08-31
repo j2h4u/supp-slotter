@@ -8,9 +8,10 @@ import shutil
 from pathlib import Path
 from typing import cast
 
+import planner.ontology.artifacts as artifacts
 import pytest
 import yaml
-from planner.ontology.artifacts import OntologyBundle, load_ontology, load_runtime_vocabulary
+from planner.ontology.artifacts import OntologyBundle, load_formal_ontology, load_ontology
 from planner.ontology.errors import (
     MALFORMED,
     MISSING,
@@ -35,24 +36,49 @@ def _fixture(tmp_path: Path) -> Path:
     return repository / "ontology"
 
 
-def _raises(root: Path, code: str) -> None:
+def _raises(root: Path, code: str, *, formal: bool = False) -> None:
     with pytest.raises(OntologyInfrastructureError) as raised:
-        load_ontology(root)
+        (load_formal_ontology if formal else load_ontology)(root)
     assert raised.value.code == code
 
 
-def test_success_and_runtime_vocabulary_delegate_to_one_bundle(tmp_path: Path) -> None:
+def test_runtime_bundle_exposes_vocabulary_and_profiles(tmp_path: Path) -> None:
     root = _fixture(tmp_path)
     bundle = load_ontology(root)
     assert isinstance(bundle, OntologyBundle)
     assert bundle.runtime_vocabulary["format"] == "supp-slotter.runtime-vocabulary/v2"
-    assert load_runtime_vocabulary(root) == bundle.runtime_vocabulary
     profiles = bundle.ontoclean_profiles
     assert set(profiles) == {"rigid_identity", "anti_rigid_dependent", "dependent_assertion"}
     categories = cast(dict[str, dict[str, object]], bundle.runtime_vocabulary["categories"])
     for term in cast(list[dict[str, object]], bundle.runtime_vocabulary["terms"]):
         category = cast(str, term["semantic_category"])
         assert term["ontoclean_profile"] == categories[category]["ontoclean_profile"]
+
+
+def test_runtime_bundle_retains_no_formal_projection_artifacts_or_reads(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = _fixture(tmp_path)
+    seen_reads: list[Path] = []
+    original_read_bytes = artifacts._read_bytes
+
+    def record_read(path: Path, *, code: str) -> bytes:
+        seen_reads.append(path)
+        return original_read_bytes(path, code=code)
+
+    monkeypatch.setattr(artifacts, "_read_bytes", record_read)
+    runtime = load_ontology(root)
+    online_read_names = {path.name for path in seen_reads}
+    assert online_read_names == {"runtime-lock.json", *runtime.artifacts}
+    assert {"artifact-lock.json", "context.json", "ontology.ttl", "projection-map.json", "shapes.ttl"}.isdisjoint(
+        online_read_names
+    )
+
+    monkeypatch.setattr(artifacts, "_read_bytes", original_read_bytes)
+    formal = load_formal_ontology(root)
+
+    assert {"ontology.ttl", "shapes.ttl", "context.json", "projection-map.json"}.isdisjoint(runtime.artifacts)
+    assert {"ontology.ttl", "shapes.ttl", "context.json", "projection-map.json"} <= set(formal.artifacts)
 
 
 def test_missing_output_fails_closed(tmp_path: Path) -> None:
@@ -64,7 +90,8 @@ def test_missing_output_fails_closed(tmp_path: Path) -> None:
 def test_source_and_output_hash_mismatch_are_stale(tmp_path: Path) -> None:
     root = _fixture(tmp_path)
     (root / "model.yaml").write_text((root / "model.yaml").read_text() + "\n# mutation\n")
-    _raises(root, STALE)
+    load_ontology(root)
+    _raises(root, STALE, formal=True)
 
     root = _fixture(tmp_path / "second")
     output = root / "generated/runtime-vocabulary.yaml"
@@ -76,12 +103,7 @@ def test_malformed_and_unsupported_contracts_fail_closed(tmp_path: Path) -> None
     root = _fixture(tmp_path)
     output = root / "generated/runtime-program.json"
     output.write_bytes(b"{")
-    lock_path = root / "generated/artifact-lock.json"
-    lock = cast(dict[str, object], json.loads(lock_path.read_text()))
-    for record in cast(list[dict[str, object]], lock["outputs"]):
-        if record["path"] == "runtime-program.json":
-            record["sha256"] = hashlib.sha256(b"{").hexdigest()
-    lock_path.write_text(json.dumps(lock, indent=2) + "\n")
+    _rehash_runtime_output(root, "runtime-program.json", b"{")
     _raises(root, MALFORMED)
 
     root = _fixture(tmp_path / "second")
@@ -89,7 +111,7 @@ def test_malformed_and_unsupported_contracts_fail_closed(tmp_path: Path) -> None
     lock = cast(dict[str, object], json.loads(lock_path.read_text()))
     lock["format_version"] = "unknown-lock"
     lock_path.write_text(json.dumps(lock, indent=2) + "\n")
-    _raises(root, UNSUPPORTED)
+    _raises(root, UNSUPPORTED, formal=True)
 
 
 @pytest.mark.parametrize(
@@ -138,15 +160,15 @@ def test_bundle_registration_rejects_malformed_catalog_before_card_load(tmp_path
         profiles["rigid_identity"]["rigidity"] = "anti_rigid"
     content = yaml.safe_dump(vocabulary, sort_keys=False).encode("utf-8")
     vocabulary_path.write_bytes(content)
-    _rehash_runtime_vocabulary(root, content)
+    _rehash_runtime_output(root, "runtime-vocabulary.yaml", content)
 
     _raises(root, MALFORMED)
 
 
-def _rehash_runtime_vocabulary(root: Path, content: bytes) -> None:
-    lock_path = root / "generated/artifact-lock.json"
+def _rehash_runtime_output(root: Path, output_name: str, content: bytes) -> None:
+    lock_path = root / "generated/runtime-lock.json"
     lock = cast(dict[str, object], json.loads(lock_path.read_text(encoding="utf-8")))
     for record in cast(list[dict[str, object]], lock["outputs"]):
-        if record["path"] == "runtime-vocabulary.yaml":
+        if record["path"] == output_name:
             record["sha256"] = hashlib.sha256(content).hexdigest()
     lock_path.write_text(json.dumps(lock, indent=2) + "\n")

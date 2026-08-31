@@ -1,13 +1,10 @@
 relations:
-- severity: medium
-  reason: Sustained high zinc exposure can lower copper status; this is a chronic balance-review signal, not evidence for acute
-    co-dose harm or same-product separation.
-  action: Review zinc/copper balance for sustained high-zinc exposure; do not split the same product or apply a universal zinc-copper
-    interval.
+- reason: Sustained high zinc exposure can lower copper status; this is chronic nutrient-balance context only. It does not
+    establish an acute co-dose effect, a same-product split, or a universal interval.
   id: rel_balance_001
   relation_type: balance
-  assertion_kind: clinical_review_signal
-  semantic_family: nutrient_balance_review_signal
+  assertion_kind: co_use_evidence
+  semantic_family: nutrient_balance_context
   research_state: supported
   sources:
   - https://ods.od.nih.gov/factsheets/zinc-healthprofessional/
@@ -18,14 +15,13 @@ relations:
   target_selector:
     entity:
       name: Copper
-- severity: medium
-  reason: Folate and B12 should be reviewed together for methylation/homocysteine context; methionine synthase requires both,
-    and high folate can complicate B12-deficiency interpretation.
-  action: Review folate and B12 status together; this is a clinical review signal, not a co-dose or separation rule.
+- reason: Folate and B12 participate in methylation and homocysteine context; methionine synthase requires both, and high
+    folate can complicate B12-deficiency interpretation. This is nutrient-balance context only and establishes no co-dose
+    or timing rule.
   id: rel_balance_002
   relation_type: balance
-  assertion_kind: clinical_review_signal
-  semantic_family: nutrient_balance_review_signal
+  assertion_kind: co_use_evidence
+  semantic_family: nutrient_balance_context
   research_state: supported
   sources:
   - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
@@ -41,13 +37,17 @@ relations:
   relation_type: supports
   assertion_kind: ontology_assertion
   semantic_family: biochemical_mechanism_assertion
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       name: Selenium
   target_selector:
     entity:
       entity_id: sub_d997f98e03
-- reason: Molybdenum is a molybdopterin constituent used by sulfite oxidase in sulfur-amino-acid catabolism; NAC is the N-acetyl derivative/prodrug of L-cysteine. A small registered combination study changed the NAC form and added selenium, molybdenum, and glycine, but posted no results, so no molybdenum-attributable outcome is established.
+- reason: Molybdenum is a molybdopterin constituent used by sulfite oxidase in sulfur-amino-acid catabolism; NAC is the N-acetyl
+    derivative of L-cysteine. A small registered combination study changed the NAC form and added selenium, molybdenum, and
+    glycine, but posted no results, so no molybdenum-attributable outcome, co-dose, timing, or separation rule is established.
   id: rel_supports_002
   relation_type: supports
   assertion_kind: ontology_assertion
@@ -57,14 +57,14 @@ relations:
   - https://ods.od.nih.gov/factsheets/Molybdenum-HealthProfessional/
   - https://www.cancer.gov/publications/dictionaries/cancer-drug/def/acetylcysteine
   - https://clinicaltrials.gov/study/NCT06252519
-  action: No co-dose, separation, timing, or outcome rule is established by this relationship.
   source_selector:
     entity:
       entity_id: sub_c55378389c
   target_selector:
     entity:
       entity_id: sub_d997f98e03
-- reason: Magnesium participates in generic calcium-ion transport and bone physiology; this biochemical relationship is not a form-specific clinical claim.
+- reason: Magnesium participates in generic calcium-ion transport and bone physiology; this biochemical relationship is not
+    a form-specific clinical claim and establishes no co-dose, separation, or timing rule.
   id: rel_supports_003
   relation_type: supports
   assertion_kind: ontology_assertion
@@ -72,14 +72,14 @@ relations:
   research_state: mechanistic_only
   sources:
   - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
-  action: No co-dose, separation, or timing rule is established by this relationship.
   source_selector:
     entity:
       name: Magnesium
   target_selector:
     entity:
       name: Calcium
-- reason: 'Magnesium participates as a cofactor in vitamin D metabolism; this biochemical relationship does not establish a requirement for magnesium supplementation. Sources: https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/; https://pubmed.ncbi.nlm.nih.gov/24228832/.'
+- reason: Magnesium participates as a cofactor in vitamin D metabolism; this biochemical relationship does not establish a
+    requirement for magnesium supplementation, a co-dose, a separation, or a timing rule.
   id: rel_supports_004
   relation_type: supports
   assertion_kind: ontology_assertion
@@ -88,7 +88,6 @@ relations:
   sources:
   - https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/
   - https://pubmed.ncbi.nlm.nih.gov/24228832/
-  action: No magnesium supplement requirement, co-dose, separation, or timing rule is established by this relationship.
   source_selector:
     entity:
       name: Magnesium
@@ -100,13 +99,16 @@ relations:
   relation_type: supports
   assertion_kind: ontology_assertion
   semantic_family: absorption_interaction_claim
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       name: Vitamin E
   target_selector:
     entity:
       name: Vitamin A
-- reason: 'Vitamin D3 supports intestinal calcium absorption and bone physiology; this does not establish a calcium supplement requirement. Source: https://ods.od.nih.gov/factsheets/Vitamind-HealthProfessional/.'
+- reason: Vitamin D3 supports intestinal calcium absorption and bone physiology; this does not establish a calcium supplement
+    requirement, co-dose, separation, or timing rule.
   id: rel_supports_007
   relation_type: supports
   assertion_kind: ontology_assertion
@@ -114,28 +116,29 @@ relations:
   research_state: supported
   sources:
   - https://ods.od.nih.gov/factsheets/Vitamind-HealthProfessional/
-  action: No calcium supplement requirement, co-dose, separation, or timing rule is established by this relationship.
   source_selector:
     entity:
       entity_id: sub_2476bf9d4b
   target_selector:
     entity:
       name: Calcium
-- reason: Selenium-dependent deiodinases support thyroid hormone activation and metabolism; iodine and selenium should be
-    reviewed together in thyroid-axis context.
+- reason: Selenium-dependent deiodinases support thyroid hormone activation and metabolism; iodine and selenium are related
+    through thyroid-axis context.
   id: rel_supports_008
   relation_type: supports
   assertion_kind: ontology_assertion
   semantic_family: biochemical_mechanism_assertion
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       name: Selenium
   target_selector:
     entity:
       name: Iodine
-- severity: low
-  reason: Vitamin C can enhance nonheme iron absorption by reducing ferric iron and forming soluble iron-ascorbate complexes, but the effect depends on the iron matrix, meal composition, iron status, and form; review this context only when relevant iron supplementation is active.
-  action: Review only when nonheme iron supplementation or other relevant iron context is active; no required vitamin C supplement, co-dose, separation interval, or guaranteed outcome is established.
+- reason: Vitamin C can enhance nonheme iron absorption by reducing ferric iron and forming soluble iron-ascorbate complexes,
+    but the effect depends on the iron matrix, meal composition, iron status, and form. This relationship does not establish
+    a required vitamin C supplement, co-dose, separation interval, or guaranteed outcome.
   id: rel_supports_009
   relation_type: supports
   assertion_kind: ontology_assertion
@@ -150,29 +153,26 @@ relations:
   target_selector:
     entity:
       name: Iron
-- severity: low
-  reason: GLP-1/GIP/incretin drugs can reduce appetite and total intake; adequate protein is a practical lean-mass preservation
+- reason: GLP-1/GIP/incretin drugs can reduce appetite and total intake; adequate protein is a practical lean-mass preservation
     context during weight loss, while whey is only one possible protein source.
-  action: Review total dietary protein and resistance-training context before treating a GLP-assisted weight-loss stack as
-    metabolically complete.
   id: rel_supports_010
   relation_type: supports
   assertion_kind: ontology_assertion
-  semantic_family: nutritional_adequacy_advisory
+  semantic_family: nutritional_adequacy_context
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       entity_id: sub_7ehuhfcly5
   target_selector:
     category: context
     term: incretin_drug_context
-- severity: medium
-  reason: Convergence is mechanistic; no isolated controlled citrulline-PDE5 hemodynamic study establishes a clinical interaction,
-    and this is not organic-nitrate equivalence.
-  action: Surface for human review only; do not infer a contraindication or scheduling rule.
-  id: rel_review_with_001
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: The convergence is mechanistic; no isolated controlled citrulline-PDE5 hemodynamic study establishes a clinical
+    interaction, and this is not organic-nitrate equivalence. It establishes no scheduling consequence.
+  id: rel_co_use_context_001
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
   research_state: mechanistic_only
   sources:
   - https://pubmed.ncbi.nlm.nih.gov/17662090/
@@ -188,13 +188,12 @@ relations:
   target_selector:
     category: effect
     term: pde5_inhibition
-- severity: medium
-  reason: Metformin can reduce vitamin B12 absorption/status; review B12 context when metformin is active.
-  action: Review B12 status and metformin exposure when metformin is active; no interval or scheduling penalty is established.
-  id: rel_review_with_002
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Metformin can reduce vitamin B12 absorption and status. This context does not establish an interval or scheduling
+    penalty.
+  id: rel_co_use_context_002
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
   research_state: supported
   sources:
   - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
@@ -207,14 +206,12 @@ relations:
   target_selector:
     entity:
       name: Vitamin B12
-- severity: medium
-  reason: Gastric acid suppression can reduce absorption of food-bound vitamin B12; review B12 context when acid-suppressing
-    medication is active.
-  action: Review B12 status and duration of acid-suppressing medication exposure, distinguishing food-bound from crystalline supplemental B12; no separation rule is established.
-  id: rel_review_with_003
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Gastric acid suppression can reduce absorption of food-bound vitamin B12; crystalline supplemental B12 is a distinct
+    context. This relationship establishes no separation rule.
+  id: rel_co_use_context_003
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
   research_state: supported
   sources:
   - https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/
@@ -227,13 +224,11 @@ relations:
   target_selector:
     entity:
       name: Vitamin B12
-- severity: high
-  reason: Methotrexate is a folate antagonist; review folate context when methotrexate is active.
-  action: Review folate context with the prescribing clinician when methotrexate is active; no L-5-MTHF regimen, add/withhold, substitution, or scheduling rule is established.
-  id: rel_review_with_004
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Methotrexate is a folate antagonist. This context establishes no L-5-MTHF regimen, substitution, or scheduling rule.
+  id: rel_co_use_context_004
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
   research_state: supported
   sources:
   - https://ods.od.nih.gov/factsheets/Folate-HealthProfessional/
@@ -245,12 +240,12 @@ relations:
   target_selector:
     entity:
       name: Vitamin B9
-- reason: Sulfasalazine can reduce folate absorption/status; review folate context when sulfasalazine is active.
-  action: Review folate context when sulfasalazine is active; no folate requirement, dose, or scheduling rule is established.
-  id: rel_review_with_005
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Sulfasalazine can reduce folate absorption and status. This context establishes no folate requirement, dose, or
+    scheduling rule.
+  id: rel_co_use_context_005
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
   research_state: supported
   sources:
   - https://ods.od.nih.gov/factsheets/Folate-HealthProfessional/
@@ -260,91 +255,97 @@ relations:
   target_selector:
     entity:
       name: Vitamin B9
-- severity: medium
-  reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors; review together when vitamin E is active.
-  id: rel_review_with_006
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors; this is context limited to high vitamin
+    E exposure and establishes no scheduling rule.
+  id: rel_co_use_context_006
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       name: Vitamin E
   target_selector:
     entity:
       name: Vitamin K1
-- severity: medium
-  reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors; review together when vitamin E is active.
-  id: rel_review_with_007
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: High-dose vitamin E can antagonize vitamin K-dependent clotting factors; this is context limited to high vitamin
+    E exposure and establishes no scheduling rule.
+  id: rel_co_use_context_007
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       name: Vitamin E
   target_selector:
     entity:
       name: Vitamin K2
-- severity: medium
-  reason: Preformed vitamin A / retinol may reduce vitamin K cellular uptake/function; review together when both are active.
-    This stays review_with-only because the practical separation advice is dose-dependent and the planner does not compute
-    dose. Beta-carotene is intentionally excluded because it is provitamin A and not treated as preformed retinol exposure
-    in this ontology.
-  id: rel_review_with_008
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Preformed vitamin A or retinol may reduce vitamin K cellular uptake or function. The relationship is dose-dependent,
+    the planner does not represent dose, and beta-carotene is excluded because it is provitamin A rather than preformed retinol
+    exposure. No scheduling conclusion is established.
+  id: rel_co_use_context_008
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       entity_id: sub_31a1408cad
   target_selector:
     entity:
       name: Vitamin K1
-- severity: medium
-  reason: Preformed vitamin A / retinol may reduce vitamin K cellular uptake/function; review together when both are active.
-    This stays review_with-only because the practical separation advice is dose-dependent and the planner does not compute
-    dose. Beta-carotene is intentionally excluded because it is provitamin A and not treated as preformed retinol exposure
-    in this ontology.
-  id: rel_review_with_009
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Preformed vitamin A or retinol may reduce vitamin K cellular uptake or function. The relationship is dose-dependent,
+    the planner does not represent dose, and beta-carotene is excluded because it is provitamin A rather than preformed retinol
+    exposure. No scheduling conclusion is established.
+  id: rel_co_use_context_009
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       entity_id: sub_31a1408cad
   target_selector:
     entity:
       name: Vitamin K2
-- severity: medium
-  reason: Ginkgo can induce CYP metabolism and may reduce efavirenz exposure; review medication context.
-  id: rel_review_with_010
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Ginkgo can induce CYP metabolism and may reduce efavirenz exposure; this is medication-context evidence only.
+  id: rel_co_use_context_010
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       entity_id: sub_45587454c0
   target_selector:
     entity:
       entity_id: sub_gjaf5119cu
-- severity: medium
-  reason: Ginkgo can alter CYP3A substrate exposure; review medication context.
-  id: rel_review_with_011
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Ginkgo can alter CYP3A substrate exposure; this is medication-context evidence only.
+  id: rel_co_use_context_011
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
+  research_state: unassessed
+  sources: []
   source_selector:
     entity:
       entity_id: sub_45587454c0
   target_selector:
     entity:
       entity_id: sub_ug92bkq5dh
-- severity: high
-  reason: Pyridoxine HCl can reduce levodopa effect by increasing aromatic amino-acid decarboxylation when levodopa is used without carbidopa or another peripheral decarboxylase inhibitor; carbidopa inhibits this peripheral conversion.
-  action: Review the pyridoxine/levodopa pairing and whether carbidopa or another peripheral decarboxylase inhibitor is present; never infer that slot separation resolves this interaction.
-  id: rel_review_with_012
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Pyridoxine HCl can reduce levodopa effect by increasing aromatic amino-acid decarboxylation when levodopa is used
+    without carbidopa or another peripheral decarboxylase inhibitor; carbidopa inhibits this peripheral conversion. This relationship
+    does not establish a slot-timing resolution.
+  id: rel_co_use_context_012
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
   research_state: supported
   sources:
   - https://dailymed.nlm.nih.gov/dailymed/fdaDrugXsl.cfm?setid=a7e669fc-c011-4e51-85e6-b68d4e4738a8&type=display
@@ -354,13 +355,14 @@ relations:
   target_selector:
     entity:
       entity_id: sub_7c38pzz3wa
-- severity: low
-  reason: Heterogeneous supplement glucose evidence ranges from possible additive antidiabetes lowering to weak insulin-mimetic/pharmacologic evidence that does not represent ordinary exposure; incretin labels identify hypoglycemia with insulin/secretagogues, but direct incretin-plus-supplement evidence is absent.
-  action: Review active incretin + matched supplement use in the full medication list and with glucose monitoring; no direct or pair hypoglycemia evidence or dose, co-dose, timing, or separation rule is established.
-  id: rel_review_with_013
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Heterogeneous supplement glucose evidence ranges from possible additive antidiabetes lowering to weak insulin-mimetic
+    or pharmacologic evidence that does not represent ordinary exposure; incretin labels identify hypoglycemia with insulin
+    or secretagogues, but direct incretin-plus-supplement evidence is absent. No direct pair, dose, co-dose, timing, or separation
+    rule is established.
+  id: rel_co_use_context_013
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
   research_state: mechanistic_only
   sources:
   - https://ods.od.nih.gov/factsheets/Chromium-HealthProfessional/
@@ -376,42 +378,42 @@ relations:
   target_selector:
     category: risk
     term: glucose_med_interaction
-- severity: low
-  reason: Metformin and GLP-1/GIP/incretin drugs are commonly combined clinically, but both can contribute to gastrointestinal
-    intolerance and the combination changes glycemic interpretation.
-  action: Review prescribing context, GI tolerance, hydration, B12 status, renal context, and glucose monitoring rather than
-    treating the pair as independent.
-  id: rel_review_with_014
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Metformin and GLP-1/GIP/incretin drugs are commonly combined clinically, but both can contribute to gastrointestinal
+    intolerance and the combination changes glycemic interpretation. This is contextual evidence only.
+  id: rel_co_use_context_014
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
+  research_state: unassessed
+  sources: []
   source_selector:
     category: context
     term: incretin_drug_context
   target_selector:
     entity:
       entity_id: sub_605u9zvqt2
-- severity: low
-  reason: GLP-1/GIP/incretin drugs slow gastric emptying and commonly cause GI adverse effects; viscous or fermentable fibers
-    can add bloating, constipation, satiety load, or oral-medication absorption complexity.
-  action: Review fiber type, dose titration, water intake, constipation/bloating, and medication separation timing.
-  id: rel_review_with_015
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: GLP-1/GIP/incretin drugs slow gastric emptying and commonly cause gastrointestinal adverse effects; viscous or fermentable
+    fibers can add bloating, constipation, satiety load, or oral-medication absorption complexity. This is contextual evidence
+    only.
+  id: rel_co_use_context_015
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
+  research_state: unassessed
+  sources: []
   source_selector:
     category: context
     term: incretin_drug_context
   target_selector:
     category: kind
     term: fiber
-- severity: medium
-  reason: Calcium can reduce iron absorption in some acute, dose- and meal-dependent contexts, but human evidence is mixed and the planner does not represent elemental dose, iron form, or food composition.
-  action: Review calcium and iron context together; prefer separate slots when feasible without treating co-presence as proof of harm or promising a fixed interval.
-  id: rel_review_with_016
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Calcium can reduce iron absorption in some acute, dose- and meal-dependent contexts, but human evidence is mixed
+    and the planner does not represent elemental dose, iron form, or food composition. No universal interval or scheduling
+    conclusion is established.
+  id: rel_co_use_context_016
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
   research_state: supported
   sources:
   - https://ods.od.nih.gov/factsheets/Iron%20%20-HealthProfessional/
@@ -424,13 +426,13 @@ relations:
   target_selector:
     entity:
       name: Iron
-- severity: medium
-  reason: Calcium reduced zinc absorption in some high-calcium/co-ingestion studies while ordinary-food studies did not; the signal is dose-, meal-, phytate-, salt-, and endpoint-dependent, and long-term relevance remains unresolved.
-  action: Review calcium and zinc context together; prefer separate slots only when feasible for independently schedulable products, never split a combination or impose a universal interval.
-  id: rel_review_with_017
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Calcium reduced zinc absorption in some high-calcium co-ingestion studies while ordinary-food studies did not; the
+    signal is dose-, meal-, phytate-, salt-, and endpoint-dependent, and long-term relevance remains unresolved. No universal
+    interval or scheduling conclusion is established.
+  id: rel_co_use_context_017
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
   research_state: supported
   sources:
   - https://pubmed.ncbi.nlm.nih.gov/8194505/
@@ -442,13 +444,13 @@ relations:
   target_selector:
     entity:
       name: Zinc
-- severity: low
-  reason: L-lysine and L-arginine share cationic amino-acid transport, with human antagonism demonstrated at unusually high arginine exposure; routine supplement co-dosing effects are unproven.
-  action: Review unusually high-dose lysine/arginine use; no automatic slot separation is justified by the current dose-blind planner.
-  id: rel_review_with_018
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: L-lysine and L-arginine share cationic amino-acid transport, with human antagonism demonstrated at unusually high
+    arginine exposure; routine supplement co-dosing effects are unproven. The dose-blind planner has no scheduling rule for
+    this relationship.
+  id: rel_co_use_context_018
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
   research_state: supported
   sources:
   - https://pubmed.ncbi.nlm.nih.gov/32187681/
@@ -460,13 +462,13 @@ relations:
   target_selector:
     entity:
       name: L-Arginine
-- severity: low
-  reason: Glycine and beta-alanine share transport and can interact at glycine-receptor systems in mechanistic preparations, but an ordinary-dose human supplement interaction is not established.
-  action: Treat glycine/beta-alanine transport or receptor competition as low-confidence review knowledge; do not separate slots automatically.
-  id: rel_review_with_019
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Glycine and beta-alanine share transport and can interact at glycine-receptor systems in mechanistic preparations,
+    but an ordinary-dose human supplement interaction is not established. This remains low-confidence contextual evidence
+    without an automatic scheduling rule.
+  id: rel_co_use_context_019
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
   research_state: mechanistic_only
   sources:
   - https://pubmed.ncbi.nlm.nih.gov/7563025/
@@ -478,13 +480,13 @@ relations:
   target_selector:
     entity:
       name: Beta-alanine
-- severity: low
-  reason: Glycine and taurine share some transport and receptor pharmacology in mechanistic preparations, but a practical human co-dose interaction is not established.
-  action: Treat glycine/taurine transport or receptor competition as low-confidence review knowledge; do not separate slots automatically.
-  id: rel_review_with_020
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Glycine and taurine share some transport and receptor pharmacology in mechanistic preparations, but a practical
+    human co-dose interaction is not established. This remains low-confidence contextual evidence without an automatic scheduling
+    rule.
+  id: rel_co_use_context_020
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
   research_state: mechanistic_only
   sources:
   - https://pubmed.ncbi.nlm.nih.gov/7563025/
@@ -497,13 +499,12 @@ relations:
   target_selector:
     entity:
       name: Taurine
-- severity: low
-  reason: Tocopherol and tocotrienol forms have overlapping vitamin E handling but differential absorption and hepatic retention; human evidence does not establish harm from co-administration or a timing rule.
-  action: Review cumulative vitamin E dose and formulation when exact tocopherol and tocotrienol forms are both active; do not automatically separate slots.
-  id: rel_review_with_021
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Tocopherol and tocotrienol forms have overlapping vitamin E handling but differential absorption and hepatic retention;
+    human evidence does not establish harm from co-administration or a timing rule.
+  id: rel_co_use_context_021
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
   research_state: mechanistic_only
   sources:
   - https://ods.od.nih.gov/factsheets/VitaminE-HealthProfessional/
@@ -516,13 +517,12 @@ relations:
   target_selector:
     entity:
       entity_id: sub_5723eafac4
-- severity: low
-  reason: Small human studies show reduced manganese absorption or plasma uptake in human milk or after a 40 mg calcium load; the signal is matrix- and dose-specific and does not establish a universal calcium-manganese scheduling rule.
-  action: Review calcium and manganese as independently schedulable supplements; prefer separate slots when feasible, but never split a fixed multi-mineral product or impose a universal interval.
-  id: rel_review_with_022
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Small human studies show reduced manganese absorption or plasma uptake in human milk or after a 40 mg calcium load;
+    the signal is matrix- and dose-specific and does not establish a universal calcium-manganese scheduling rule.
+  id: rel_co_use_context_022
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
   research_state: supported
   sources:
   - https://ods.od.nih.gov/factsheets/Manganese-HealthProfessional/
@@ -534,13 +534,12 @@ relations:
   target_selector:
     entity:
       name: Manganese
-- severity: medium
-  reason: Iron and manganese absorption can compete or vary in dose-, matrix-, and iron-status-dependent contexts; human evidence supports a bidirectional absorption-review signal rather than proof of harm.
-  action: Review independently schedulable iron and manganese supplements and iron status; prefer separate slots when feasible, but do not infer harm or impose a universal interval.
-  id: rel_review_with_023
-  relation_type: review_with
-  assertion_kind: clinical_review_signal
-  semantic_family: clinical_review_signal
+- reason: Iron and manganese absorption can compete or vary in dose-, matrix-, and iron-status-dependent contexts; human evidence
+    supports a bidirectional absorption context rather than proof of harm.
+  id: rel_co_use_context_023
+  relation_type: co_use_context
+  assertion_kind: co_use_evidence
+  semantic_family: co_use_evidence
   research_state: supported
   sources:
   - https://ods.od.nih.gov/factsheets/Iron-HealthProfessional/

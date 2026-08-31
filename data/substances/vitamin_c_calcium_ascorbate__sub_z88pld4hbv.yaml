@@ -1,17 +1,19 @@
 id: sub_z88pld4hbv
 name: Vitamin C
 form: calcium ascorbate
-notes: Buffered vitamin C form listed on NOW Foods Vitamin C-1000 Complex. Product cards retain elemental calcium contribution
-  separately when the label exposes it. Reviewer context mirrors vitamin C antioxidant and collagen-hydroxylation cofactor
-  roles without treating the calcium salt as a separate collagen substrate.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   context:
-  - connective_tissue_support
-  - skin_support
+  - value: connective_tissue_support
+    research_state: unassessed
+    sources: []
+  - value: skin_support
+    research_state: unassessed
+    sources: []
   kind:
-  - vitamin
+  - value: vitamin
+    research_state: unassessed
+    sources: []
   role:
-  - antioxidant
+  - value: antioxidant
+    research_state: unassessed
+    sources: []

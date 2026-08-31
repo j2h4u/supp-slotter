@@ -17,8 +17,5 @@ class OntologyInfrastructureError(RuntimeError):
 
     def __init__(self, message: str, *, code: str = MALFORMED, path: object | None = None) -> None:
         self.code: str = code
-        # ``violation_code`` is retained as a descriptive alias for callers
-        # that use the terminology from the artifact contract.
-        self.violation_code: str = code
         self.path: object | None = path
         super().__init__(message)

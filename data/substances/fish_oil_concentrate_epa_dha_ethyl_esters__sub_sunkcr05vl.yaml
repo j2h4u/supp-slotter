@@ -2,44 +2,6 @@ name: Fish Oil Concentrate
 form: EPA/DHA ethyl esters
 aliases:
 - fish oil concentrate
-notes: 'Concrete fish-oil concentrate identity for the Solgar Omega-3 product. The
-  official formulation supplies 1400 mg fish-oil concentrate per softgel and 950 mg
-  total omega-3, including EPA 504 mg and DHA 378 mg; the remaining 68 mg is other
-  omega-3 by arithmetic (950 - 504 - 378). The nested EPA/DHA amounts are product
-  composition facts and are not additive to the concentrate amount. Food scheduling
-  is a soft ethyl-ester formulation heuristic, not a generic rule for EPA, DHA, or
-  krill oil. Bleeding is a conditional medication and surgery review context, not a
-  categorical blood-thinner claim. No supplemental vitamin E requirement is encoded;
-  see PMID 9168460 and PMID 31128941. Sources: Solgar official label; PMID 2847723;
-  PMID 30799231.'
-schedule:
-  intake:
-  - food_preferred
-scheduling_assessment:
-  intake:
-    conclusion: supports_preference
-    policy: food_preferred
-    sources:
-    - https://www.solgar.com/products/solgar-triple-strength-omega-3-950-mg-softgels
-    - https://pubmed.ncbi.nlm.nih.gov/2847723/
-    - https://pubmed.ncbi.nlm.nih.gov/30799231/
-    summary: The exact Solgar ethyl-ester formulation is labeled preferably with a
-      meal, and human omega-3 absorption evidence supports a soft food preference
-      for this concentrate; this does not transfer to formulation-general EPA or DHA.
-  timing:
-    conclusion: insufficient
-    sources:
-    - https://pubmed.ncbi.nlm.nih.gov/2847723/
-    - https://pubmed.ncbi.nlm.nih.gov/30799231/
-    summary: The bounded evidence does not establish a general morning or evening
-      clock-time preference for this fish-oil concentrate.
-  activity:
-    conclusion: insufficient
-    sources:
-    - https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
-    - https://pubmed.ncbi.nlm.nih.gov/30799231/
-    summary: The bounded evidence does not establish a workout- or activity-linked
-      timing rule for this fish-oil concentrate.
 knowledge:
   kind:
   - value: omega3

@@ -26,8 +26,7 @@ name: ""     # Required. Concise bottle-facing/commercial product title.
              # Route technical detail to the field that owns it:
              #   chemical form -> substance.form or component.label
              #   dose/strength -> component.amount
-             #   package count -> product notes
-             #   ontology semantics -> substance knowledge/notes
+             #   ontology semantics -> substance knowledge
              # Examples: "Acetyl L-Carnitine", "Ultra-Mag", "Vitamin D3"
 
 # brand: ""  # Manufacturer or brand name. Example: "Source Naturals", "Jarrow Formulas"
@@ -52,10 +51,10 @@ name: ""     # Required. Concise bottle-facing/commercial product title.
 
 components:
 - substance: sub_XXXXXXXXXX  # Required. Use sub_* or an exact draft name resolved by check.
+  id: cmp_<product_id>__<substance_id>  # Required stable composition-role identity; unchanged by reorder.
   # label: ""      # Optional display label if the product uses a different name
                    # for this ingredient (e.g. "Vitamin B6 as pyridoxine HCl").
   # amount: ""     # Dose as printed on the label, e.g. "500 mg", "1000 IU", "10 mcg".
-  # notes: ""      # Component-level notes, e.g. sourcing caveat or form clarification.
 
 # Add more components as needed:
 # - substance: "Magnesium glycinate"
@@ -67,12 +66,8 @@ components:
 # use_pattern: not_every_day
 
 # ---------------------------------------------------------------------------
-# NOTES & CONCERNS
+# CONCERNS
 # ---------------------------------------------------------------------------
-
-# notes: ""  # Free-form notes about this product — label discrepancies between
-             # sources, serving size, package size, suggested use, verification
-             # status. Reference the sources you used.
 
 # concerns:
 # - kind: data_quality  # See ontology/model.yaml ConcernKind.

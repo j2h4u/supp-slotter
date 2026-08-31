@@ -1,9 +1,7 @@
 id: https://j2h4u.github.io/supp-slotter/ontology/v1/scheduling-model
 name: supp_slotter_scheduling
 title: Generic scheduling ontology
-description: >-
-  Open scheduling structures. Values such as intake, timing, activity, slot
-  names, and effects are authored instances, never schema enums.
+description: Canonical scheduling fact families and universal inference laws.
 prefixes:
   ss: https://j2h4u.github.io/supp-slotter/ontology/v1/
   linkml: https://w3id.org/linkml/
@@ -16,218 +14,280 @@ imports:
   - vocabulary-model
 
 enums:
-  SchedulingConstraintScope:
+  ProductFoodInstructionValue:
+    description: Sole closed value for an exact product food instruction.
     permissible_values:
-      exact_form:
+      take_with_food:
 
 classes:
-  SchedulingConstraint:
-    slots: [id, key, effect, condition, action, rationale]
+  # Universal inference laws are authored separately from evidence facts.  A
+  # law is deliberately tiny: its closed typed fact value and the one anchor
+  # value it derives.  There are no predicates, conditions, weights, or
+  # item-specific selectors in this catalog.
+  CanonicalLawCatalog:
+    description: Closed universal law catalog for canonical pressure inference.
+    annotations:
+      closed_universal_laws: true
+    slots: [food_effect_laws, acute_alertness_effect_laws, acute_sleep_effect_laws, pre_exercise_performance_effect_laws, post_exercise_recovery_effect_laws, product_food_instruction_laws]
     slot_usage:
-      key: {required: true}
-      effect: {required: true}
-      action: {range: Action, inlined: true}
+      food_effect_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: FoodEffectLaw, inlined: true, inlined_as_list: true}
+      acute_alertness_effect_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: AcuteAlertnessEffectLaw, inlined: true, inlined_as_list: true}
+      acute_sleep_effect_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: AcuteSleepEffectLaw, inlined: true, inlined_as_list: true}
+      pre_exercise_performance_effect_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: PreExercisePerformanceEffectLaw, inlined: true, inlined_as_list: true}
+      post_exercise_recovery_effect_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: PostExerciseRecoveryEffectLaw, inlined: true, inlined_as_list: true}
+      product_food_instruction_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: ProductFoodInstructionLaw, inlined: true, inlined_as_list: true}
 
-  # Source-facing catalog contract for real scheduling constraints.
-  SchedulingPolicyCatalog:
-    description: Authored planner policy catalog for slot preferences, warnings, and presentation.
-    slots: [scheduling_policies, schedule_presentation]
+  ProductFoodInstructionLaw:
+    description: Universal product-only food instruction to meal-context law.
+    slots: [id, fact_value, meal_context]
+    annotations:
+      canonical_fact_family: ProductFoodInstruction
+      canonical_fact_value_slot: fact_value
+      canonical_pressure_dimension: meal_context
+      canonical_pressure_value_slot: meal_context
     slot_usage:
-      scheduling_policies: {required: true, inlined: true, inlined_as_list: false}
-      schedule_presentation: {required: true, inlined: true}
+      id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
+      fact_value: {required: true, range: ProductFoodInstructionValue, multivalued: false}
+      meal_context: {required: true, range: MealContext, multivalued: false}
 
-  SchedulingPolicyRecord:
-    slots: [id, term, applies_when, effects, warning, action]
+  FoodEffectLaw:
+    description: Universal FoodEffect to meal-context pressure law.
+    slots: [id, fact_value, meal_context]
+    annotations:
+      canonical_fact_family: FoodEffect
+      canonical_pressure_dimension: meal_context
+      canonical_fact_value_slot: fact_value
+      canonical_pressure_value_slot: meal_context
     slot_usage:
-      id: {required: true}
-      term: {required: true}
-      applies_when: {required: true}
-      effects: {required: true, range: SchedulingPolicyEffectRecord, inlined: true, inlined_as_list: true}
-      warning: {required: true}
-      action: {range: string, inlined: false}
+      id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
+      fact_value: {required: true, range: FoodEffectValue, multivalued: false}
+      meal_context: {required: true, range: MealContext, multivalued: false}
 
-  SchedulingPolicyEffectRecord:
-    slots: [match, level]
+  AcuteAlertnessEffectLaw:
+    description: Universal acute-alertness to wake pressure law.
+    slots: [id, fact_value, circadian_anchor]
+    annotations:
+      canonical_fact_family: AcuteAlertnessEffect
+      canonical_pressure_dimension: circadian_anchor
+      canonical_fact_value_slot: fact_value
+      canonical_pressure_value_slot: circadian_anchor
     slot_usage:
-      match: {required: true, inlined: true}
-      level: {required: true}
+      id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
+      fact_value: {required: true, range: AcuteAlertnessEffectValue, multivalued: false}
+      circadian_anchor: {required: true, range: CircadianAnchor, multivalued: false}
 
-  SchedulingPolicyEffectMatch:
-    slots: [near, food]
-
-  SchedulePresentationPolicy:
-    slots: [concern_annotations, review_tags, active_fact_index, zero_effect]
+  AcuteSleepEffectLaw:
+    description: Universal acute-sleep to sleep pressure law.
+    slots: [id, fact_value, circadian_anchor]
+    annotations:
+      canonical_fact_family: AcuteSleepEffect
+      canonical_pressure_dimension: circadian_anchor
+      canonical_fact_value_slot: fact_value
+      canonical_pressure_value_slot: circadian_anchor
     slot_usage:
-      concern_annotations: {required: true, inlined: true}
-      review_tags: {required: true, inlined: true}
-      active_fact_index: {required: true, inlined: true}
-      zero_effect: {required: true, inlined: true}
+      id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
+      fact_value: {required: true, range: AcuteSleepEffectValue, multivalued: false}
+      circadian_anchor: {required: true, range: CircadianAnchor, multivalued: false}
 
-  SchedulePresentationZeroEffect:
-    description: Authored explanation for a placement with no non-zero scheduling effect.
-    slots: [condition, template]
+  PreExercisePerformanceEffectLaw:
+    description: Universal pre-exercise-performance to before-exercise pressure law.
+    slots: [id, fact_value, exercise_anchor]
+    annotations:
+      canonical_fact_family: PreExercisePerformanceEffect
+      canonical_pressure_dimension: exercise_anchor
+      canonical_fact_value_slot: fact_value
+      canonical_pressure_value_slot: exercise_anchor
     slot_usage:
-      condition: {required: true, range: string}
-      template: {required: true, range: string}
+      id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
+      fact_value: {required: true, range: PreExercisePerformanceEffectValue, multivalued: false}
+      exercise_anchor: {required: true, range: ExerciseAnchor, multivalued: false}
 
-  SchedulePresentationConcernAnnotations:
-    slots: [include_kinds, labels]
+  PostExerciseRecoveryEffectLaw:
+    description: Universal post-exercise-recovery to after-exercise pressure law.
+    slots: [id, fact_value, exercise_anchor]
+    annotations:
+      canonical_fact_family: PostExerciseRecoveryEffect
+      canonical_pressure_dimension: exercise_anchor
+      canonical_fact_value_slot: fact_value
+      canonical_pressure_value_slot: exercise_anchor
     slot_usage:
-      include_kinds: {required: true, multivalued: true}
-      labels: {required: true, multivalued: true, inlined: true, inlined_as_list: true}
+      id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
+      fact_value: {required: true, range: PostExerciseRecoveryEffectValue, multivalued: false}
+      exercise_anchor: {required: true, range: ExerciseAnchor, multivalued: false}
 
-  SchedulePresentationLabel:
-    slots: [key, label]
+  CanonicalFactCatalog:
+    description: Catalog of scheduler-consumable canonical evidence facts.
+    annotations:
+      source_reference_resolution: runtime_validation_required
+      composition_role_reference_resolution: runtime_validation_required
+    slots: [evidence_sources, food_effects, acute_alertness_effects, acute_sleep_effects, pre_exercise_performance_effects, post_exercise_recovery_effects, product_food_instructions]
     slot_usage:
-      key: {required: true}
-      label: {required: true}
+      evidence_sources: {required: false, multivalued: true, range: EvidenceSource, inlined: true, inlined_as_list: true}
+      food_effects: {required: false, multivalued: true, range: FoodEffect, inlined: true, inlined_as_list: true}
+      acute_alertness_effects: {required: false, multivalued: true, range: AcuteAlertnessEffect, inlined: true, inlined_as_list: true}
+      acute_sleep_effects: {required: false, multivalued: true, range: AcuteSleepEffect, inlined: true, inlined_as_list: true}
+      pre_exercise_performance_effects: {required: false, multivalued: true, range: PreExercisePerformanceEffect, inlined: true, inlined_as_list: true}
+      post_exercise_recovery_effects: {required: false, multivalued: true, range: PostExerciseRecoveryEffect, inlined: true, inlined_as_list: true}
+      product_food_instructions: {required: false, multivalued: true, range: ProductFoodInstruction, inlined: true, inlined_as_list: true}
 
-  SchedulePresentationReviewTags:
-    slots: [include_namespaces, exclude_policy_ids]
-
-  SchedulePresentationActiveFactIndex:
-    slots: [include_namespaces, labels]
+  CanonicalSchedulingFact:
+    abstract: true
+    description: >-
+      Shared evidence boundary for one typed, admitted scheduling fact.  The
+      concrete subclasses below are the only scheduler fact families.
+    annotations:
+      typed_subject_role: fact_subject
+      typed_applicability_role: fact_applicability
+      typed_provenance_role: evidence_provenance
+      admission_mode: by_construction
+      subject_applicability_invariant: 'runtime_required: subject.substance == applicability.substance OR subject.composition_role == applicability.composition_role'
+    slots: [id, subject, applicability, provenance]
     slot_usage:
-      labels: {required: true, multivalued: true, inlined: true, inlined_as_list: true}
+      id: {required: true, pattern: '^[a-z][a-z0-9_:-]*$'}
+      subject: {required: true, range: FactSubject, inlined: true, multivalued: false}
+      applicability: {required: true, range: FactApplicability, inlined: true, multivalued: false}
+      provenance: {required: true, minimum_cardinality: 1, multivalued: true, range: EvidenceProvenance, inlined: true, inlined_as_list: true}
 
-  SchedulingConstraintCatalog:
-    slots: [scheduling_constraints]
-
-  SchedulingConstraintRecord:
-    slots:
-      - id
-      - operation
-      - source_selector
-      - target_selector
-      - rationale
-      - action
-      - blocks_slots
-      - scores_advisory
-      - score_delta
+  FoodEffect:
+    is_a: CanonicalSchedulingFact
+    description: Closed food-context effect fact family.
+    slots: [value]
+    annotations:
+      canonical_fact_family: FoodEffect
+      canonical_fact_value_slot: value
     slot_usage:
-      operation: {required: true}
-      source_selector:
-        required: true
-        range: SchedulingConstraintSelector
-        multivalued: false
-        inlined: true
-      target_selector:
-        required: true
-        range: SchedulingConstraintSelector
-        multivalued: false
-        inlined: true
-      rationale: {required: true}
-      action:
-        required: true
-        range: string
-        multivalued: false
-        inlined: false
-      blocks_slots: {range: boolean, required: false}
-      scores_advisory: {range: boolean, required: false}
-      score_delta: {range: integer, required: false}
+      value: {required: true, range: FoodEffectValue, multivalued: false}
 
-  SchedulingConstraintSelector:
-    slots: [entity, category, term, scope]
+  AcuteAlertnessEffect:
+    is_a: CanonicalSchedulingFact
+    description: Closed acute alertness effect fact family.
+    slots: [value]
+    annotations:
+      canonical_fact_family: AcuteAlertnessEffect
+      canonical_fact_value_slot: value
+    slot_usage:
+      value: {required: true, range: AcuteAlertnessEffectValue, multivalued: false}
+
+  AcuteSleepEffect:
+    is_a: CanonicalSchedulingFact
+    description: Closed acute sleep effect fact family.
+    slots: [value]
+    annotations:
+      canonical_fact_family: AcuteSleepEffect
+      canonical_fact_value_slot: value
+    slot_usage:
+      value: {required: true, range: AcuteSleepEffectValue, multivalued: false}
+
+  PreExercisePerformanceEffect:
+    is_a: CanonicalSchedulingFact
+    description: Closed pre-exercise performance effect fact family.
+    slots: [value]
+    annotations:
+      canonical_fact_family: PreExercisePerformanceEffect
+      canonical_fact_value_slot: value
+    slot_usage:
+      value: {required: true, range: PreExercisePerformanceEffectValue, multivalued: false}
+
+  PostExerciseRecoveryEffect:
+    is_a: CanonicalSchedulingFact
+    description: Closed post-exercise recovery effect fact family.
+    slots: [value]
+    annotations:
+      canonical_fact_family: PostExerciseRecoveryEffect
+      canonical_fact_value_slot: value
+    slot_usage:
+      value: {required: true, range: PostExerciseRecoveryEffectValue, multivalued: false}
+
+  ProductFoodInstruction:
+    description: Closed product-scoped instruction; it never targets components.
+    slots: [id, product, provenance, value]
+    annotations:
+      canonical_fact_family: ProductFoodInstruction
+      canonical_fact_value_slot: value
+      canonical_fact_target_kind: product
+    slot_usage:
+      id: {required: true, pattern: '^[a-z][a-z0-9_:-]*$'}
+      product: {required: true, range: Product, inlined: false, multivalued: false}
+      provenance: {required: true, minimum_cardinality: 1, multivalued: true, range: EvidenceProvenance, inlined: true, inlined_as_list: true}
+      value: {required: true, range: ProductFoodInstructionValue, multivalued: false}
+
+  FactSubject:
+    description: >-
+      Typed subject role for a canonical fact. The role points to the stable
+      composition identity; no inline component payload or free EAV subject exists.
+    slots: [substance, composition_role]
     exactly_one_of:
       - slot_conditions:
-          entity: {required: true}
-          category: {maximum_cardinality: 0}
-          term: {maximum_cardinality: 0}
+          substance: {required: true}
+          composition_role: {maximum_cardinality: 0}
       - slot_conditions:
-          entity: {maximum_cardinality: 0}
-          category: {required: true}
-          term: {required: true}
-          scope: {maximum_cardinality: 0}
+          substance: {maximum_cardinality: 0}
+          composition_role: {required: true}
     slot_usage:
-      entity:
-        range: SchedulingConstraintEntitySelector
-        multivalued: false
-        inlined: true
-      category: {range: string, required: false}
-      term: {range: string, required: false}
-      scope: {range: SchedulingConstraintScope, required: false}
+      substance: {required: false, range: Substance, inlined: false, multivalued: false}
+      composition_role: {required: false, range: CompositionRole, inlined: false, multivalued: false}
 
-  SchedulingConstraintEntitySelector:
-    description: Stable identity selector used by executable scheduling constraints.
-    slots: [entity_id, name]
+  FactApplicability:
+    description: >-
+      Typed target selector for a canonical fact. A substance target applies to
+      every exact-form composition role with that substance; a composition-role
+      target applies only to that role.
+    slots: [substance, composition_role]
     exactly_one_of:
       - slot_conditions:
-          entity_id: {required: true}
-          name: {maximum_cardinality: 0}
+          substance: {required: true}
+          composition_role: {maximum_cardinality: 0}
       - slot_conditions:
-          entity_id: {maximum_cardinality: 0}
-          name: {required: true}
+          substance: {maximum_cardinality: 0}
+          composition_role: {required: true}
     slot_usage:
-      entity_id: {required: false, range: Substance, pattern: '\S'}
-      name: {required: false, pattern: '\S'}
+      substance: {required: false, range: Substance, inlined: false, multivalued: false}
+      composition_role: {required: false, range: CompositionRole, inlined: false, multivalued: false}
+
+  EvidenceSource:
+    description: Stable source identity; witness locators do not live here.
+    slots: [id]
+    annotations:
+      source_identity_only: true
+      canonical_evidence_source_role: true
+    slot_usage:
+      id: {required: true, pattern: '^src_[a-z0-9][a-z0-9_:-]*$', multivalued: false}
+
+  EvidenceProvenance:
+    description: >-
+      Admitted evidence witness for one fact. Source identity is referenced
+      separately from this witness's locator and optional raw quotation.
+    annotations:
+      quotation_is_evidence_material: true
+      quotation_is_not_executable: true
+    slots: [source, locator, quotation]
+    slot_usage:
+      source: {required: true, range: EvidenceSource, inlined: false, multivalued: false}
+      locator: {required: true, pattern: '^\S+$', multivalued: false}
+      quotation: {required: false, multivalued: false}
 
 slots:
+  food_effect_laws: {multivalued: true, range: FoodEffectLaw, inlined: true, inlined_as_list: true}
+  acute_alertness_effect_laws: {multivalued: true, range: AcuteAlertnessEffectLaw, inlined: true, inlined_as_list: true}
+  acute_sleep_effect_laws: {multivalued: true, range: AcuteSleepEffectLaw, inlined: true, inlined_as_list: true}
+  pre_exercise_performance_effect_laws: {multivalued: true, range: PreExercisePerformanceEffectLaw, inlined: true, inlined_as_list: true}
+  post_exercise_recovery_effect_laws: {multivalued: true, range: PostExerciseRecoveryEffectLaw, inlined: true, inlined_as_list: true}
+  product_food_instruction_laws: {multivalued: true, range: ProductFoodInstructionLaw, inlined: true, inlined_as_list: true}
+  fact_value:
+  evidence_sources: {multivalued: true, range: EvidenceSource, inlined: true, inlined_as_list: true}
+  food_effects: {multivalued: true, range: FoodEffect, inlined: true, inlined_as_list: true}
+  acute_alertness_effects: {multivalued: true, range: AcuteAlertnessEffect, inlined: true, inlined_as_list: true}
+  acute_sleep_effects: {multivalued: true, range: AcuteSleepEffect, inlined: true, inlined_as_list: true}
+  pre_exercise_performance_effects: {multivalued: true, range: PreExercisePerformanceEffect, inlined: true, inlined_as_list: true}
+  post_exercise_recovery_effects: {multivalued: true, range: PostExerciseRecoveryEffect, inlined: true, inlined_as_list: true}
+  product_food_instructions: {multivalued: true, range: ProductFoodInstruction, inlined: true, inlined_as_list: true}
+  applicability: {range: FactApplicability, inlined: true, multivalued: false}
+  provenance: {multivalued: true, range: EvidenceProvenance, inlined: true, inlined_as_list: true}
+  composition_role: {range: CompositionRole, inlined: false, multivalued: false}
+  source: {range: EvidenceSource, inlined: false, multivalued: false}
+  locator: {multivalued: false}
+  quotation: {multivalued: false}
   id: {identifier: true, required: true}
-  key:
-  effect:
   label:
   description:
   value:
-  axis:
-  effects: {multivalued: true}
-  subject: {range: Selector, inlined: false}
-  constraints: {multivalued: true, range: SchedulingConstraint, inlined: false}
-  condition: {range: Condition, inlined: true}
-  action:
-  operation: {range: ConstraintExecutionOperation}
-  entity:
-    range: SchedulingConstraintEntitySelector
-    inlined: true
-  category:
-    range: string
-  term:
-  scope:
-  name:
-  expression:
-  weight: {range: decimal}
-  rationale:
-  precedence: {range: integer}
-  scheduling_constraints:
-    multivalued: true
-    range: SchedulingConstraintRecord
-    inlined: true
-    inlined_as_list: false
-  scheduling_policies:
-    multivalued: true
-    range: SchedulingPolicyRecord
-    inlined: true
-    inlined_as_list: false
-  schedule_presentation:
-    range: SchedulePresentationPolicy
-    inlined: true
-  applies_when:
-    range: string
-  warning:
-    range: boolean
-  match:
-    range: SchedulingPolicyEffectMatch
-    inlined: true
-  review_tags:
-    range: SchedulePresentationReviewTags
-
-  concern_annotations:
-    range: SchedulePresentationConcernAnnotations
-    inlined: true
-  active_fact_index:
-    range: SchedulePresentationActiveFactIndex
-    inlined: true
-  zero_effect:
-    range: SchedulePresentationZeroEffect
-    inlined: true
-  template:
-  include_namespaces:
-    multivalued: true
-  include_kinds:
-    multivalued: true
-  labels:
-    multivalued: true
-    range: SchedulePresentationLabel
-    inlined: true
-    inlined_as_list: true
-  exclude_policy_ids:
-    multivalued: true

@@ -3,14 +3,15 @@ name: Lipase
 aliases:
 - pancreatic lipase
 - fat-digesting enzyme
-notes: Fat-digesting enzyme; common in digestive-enzyme blends. Review context - food-timed digestive enzyme support rather
-  than systemic effect.
-schedule:
-  intake:
-  - food_preferred
 knowledge:
   effect:
-  - digestive_enzyme_context
-  - fat_digestion_support
+  - value: digestive_enzyme_context
+    research_state: unassessed
+    sources: []
+  - value: fat_digestion_support
+    research_state: unassessed
+    sources: []
   kind:
-  - enzyme
+  - value: enzyme
+    research_state: unassessed
+    sources: []

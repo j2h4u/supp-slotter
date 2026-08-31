@@ -4,17 +4,12 @@ from __future__ import annotations
 
 import contextlib
 import io as _io
-import sys
 from collections.abc import Iterable, Mapping
 from pathlib import Path
-from typing import cast
 
-from planner.contracts import CardLoadError
 from planner.engine.plan import cmd_plan
 from planner.engine.results import ShowResult
-from planner.paths import Paths
-from planner.schedule_types import ScheduleData, SchedulePillbox, ScheduleSlotEntry
-from planner.yaml_io import load_yaml
+from planner.schedule_types import CanonicalScheduleData, SchedulePillbox, ScheduleProductEntry, ScheduleSlotEntry
 
 SEPARATOR = "─" * 41
 
@@ -31,68 +26,67 @@ def cmd_show(data_root: Path | None = None) -> ShowResult:
     Returns ShowResult with exit_code 0 on success. When data_root is not None,
     captures printed output into ShowResult.output; otherwise prints to real stdout.
     """
-    paths = Paths.from_root(data_root) if data_root is not None else Paths.default()
     plan_result = cmd_plan(data_root=data_root)
-    if plan_result.exit_code != 0:
+    if plan_result.exit_code != 0 or plan_result.schedule is None:
         return ShowResult(exit_code=plan_result.exit_code, output="")
 
     if data_root is not None:
         stdout_buf = _io.StringIO()
         with contextlib.redirect_stdout(stdout_buf):
-            exit_code = _show_inner(paths.schedule_file)
+            exit_code = _show_inner(plan_result.schedule)
         return ShowResult(exit_code=exit_code, output=stdout_buf.getvalue())
-    exit_code = _show_inner(paths.schedule_file)
+    exit_code = _show_inner(plan_result.schedule)
     return ShowResult(exit_code=exit_code, output="")
 
 
-def _show_inner(schedule_path: Path) -> int:
-    schedule = _load_schedule(schedule_path)
-    if schedule is None:
-        return 1
-
+def _show_inner(schedule: CanonicalScheduleData) -> int:
     pillboxes = schedule["pillboxes"]
+    balance_only_items = _balance_only_items(schedule)
 
     print()
-    print("Here's your schedule for today:")
+    print("Current plan:")
     print()
 
-    _print_daily_usage_groups(schedule)
+    _print_current_plan_groups(schedule)
     for pillbox_key, pillbox in pillboxes.items():
         if pillbox_key != "training":
             continue
         non_empty = _non_empty_slots(pillbox)
         if non_empty:
-            _print_pillbox(pillbox_key, pillbox, non_empty)
+            _print_pillbox(pillbox_key, pillbox, non_empty, balance_only_items)
 
-    _print_footer(schedule)
+    print(SEPARATOR)
+    print("[balance-only] = no pressure match was satisfied; load balance and stable tie-break chose the slot.")
     return 0
 
 
-def _print_daily_usage_groups(schedule: ScheduleData) -> None:
-    """Print active daily products by presentation marker, retaining slot detail."""
-    groups = _usage_groups(schedule)
+def _print_current_plan_groups(schedule: CanonicalScheduleData) -> None:
+    """Print current-plan placement groups, retaining their logical-slot detail."""
+    groups = _placement_groups(schedule)
     pillboxes = schedule["pillboxes"]
     daily_products = _daily_products(pillboxes)
-    for group_key, label in (("daily_base", "Daily base"), ("not_every_day", "Not every day")):
+    for group_key, label in (("routine", "Routine placements"), ("episodic", "Episodic placements")):
         names = _active_group_names(groups.get(group_key, []), daily_products)
         if not names:
             continue
-        _print_usage_group(label, names, pillboxes)
+        _print_usage_group(label, names, pillboxes, _balance_only_items(schedule))
 
 
-def _usage_groups(schedule: ScheduleData) -> dict[str, list[str]]:
+def _placement_groups(schedule: CanonicalScheduleData) -> dict[str, list[str]]:
     summary = schedule.get("summary", {})
-    raw_groups = summary.get("usage_groups", {}) if isinstance(summary, dict) else {}
+    raw_groups = summary.get("placement_groups", {}) if isinstance(summary, dict) else {}
     return raw_groups if isinstance(raw_groups, dict) else {}
 
 
 def _daily_products(pillboxes: dict[str, SchedulePillbox]) -> set[str]:
     return {
-        product
+        item_id
         for key, pillbox in pillboxes.items()
         if key != "training"
         for _slot_key, slot in _non_empty_slots(pillbox)
         for product in slot["products"]
+        if isinstance(product.get("item_id"), str)
+        for item_id in [product["item_id"]]
     }
 
 
@@ -104,6 +98,7 @@ def _print_usage_group(
     label: str,
     names: list[str],
     pillboxes: dict[str, SchedulePillbox],
+    balance_only_items: set[str],
 ) -> None:
     print(label)
     print(SEPARATOR)
@@ -113,7 +108,7 @@ def _print_usage_group(
             continue
         filtered = _group_slots(pillbox, wanted)
         if filtered:
-            _print_pillbox_slots(pillbox, filtered, wanted)
+            _print_pillbox_slots(pillbox, filtered, wanted, balance_only_items)
     print()
 
 
@@ -124,21 +119,8 @@ def _group_slots(
     return [
         (slot_key, slot)
         for slot_key, slot in _non_empty_slots(pillbox)
-        if any(product in wanted for product in slot["products"])
+        if any(product["item_id"] in wanted for product in slot["products"])
     ]
-
-
-def _load_schedule(schedule_path: Path) -> ScheduleData | None:
-    try:
-        data = cast(object, load_yaml(schedule_path))
-    except CardLoadError as e:
-        print(f"show: {e.message}", file=sys.stderr)
-        return None
-
-    if not isinstance(data, dict):
-        print(f"show: {schedule_path}: expected mapping", file=sys.stderr)
-        return None
-    return cast(ScheduleData, data)
 
 
 def _non_empty_slots(pillbox: SchedulePillbox) -> list[tuple[str, ScheduleSlotEntry]]:
@@ -154,6 +136,7 @@ def _print_pillbox(
     pillbox_key: str,
     pillbox: SchedulePillbox,
     non_empty: list[tuple[str, ScheduleSlotEntry]],
+    balance_only_items: set[str],
 ) -> None:
     pillbox_label = _str_field(pillbox, "label", pillbox_key)
     print(pillbox_label)
@@ -163,9 +146,9 @@ def _print_pillbox(
         slot_label = _str_field(slot, "label", slot_key)
         products = slot["products"]
         print()
-        print(slot_label)
+        print(_slot_heading(slot_key, slot_label))
         for product in products:
-            print(f"  • {product}")
+            _print_product(product, balance_only_items)
 
     print()
 
@@ -174,33 +157,46 @@ def _print_pillbox_slots(
     pillbox: SchedulePillbox,
     non_empty: list[tuple[str, ScheduleSlotEntry]],
     wanted: set[str],
+    balance_only_items: set[str],
 ) -> None:
     """Render filtered slots for one daily presentation group."""
     del pillbox
     for slot_key, slot in non_empty:
-        _print_filtered_slot(slot_key, slot, wanted)
+        _print_filtered_slot(slot_key, slot, wanted, balance_only_items)
 
 
-def _print_filtered_slot(slot_key: str, slot: ScheduleSlotEntry, wanted: set[str]) -> None:
-    products = [product for product in slot["products"] if product in wanted]
+def _print_filtered_slot(
+    slot_key: str, slot: ScheduleSlotEntry, wanted: set[str], balance_only_items: set[str]
+) -> None:
+    products = [product for product in slot["products"] if product["item_id"] in wanted]
     if not products:
         return
     print()
-    print(_str_field(slot, "label", slot_key))
+    print(_slot_heading(slot_key, _str_field(slot, "label", slot_key)))
     for product in products:
-        print(f"  • {product}")
+        _print_product(product, balance_only_items)
 
 
-def _print_footer(schedule: ScheduleData) -> None:
-    print(SEPARATOR)
-    sections: list[str] = []
-    warnings = schedule["warnings"]
-    if len(warnings) > 0:
-        sections.append(f"warnings ({len(warnings)})")
-    if schedule["placement_notes"]:
-        sections.append("placement notes")
+def _balance_only_items(schedule: CanonicalScheduleData) -> set[str]:
+    explanations = schedule.get("canonical_explanations", {})
+    if not isinstance(explanations, dict):
+        return set()
+    return {
+        item_id
+        for explanation in explanations.values()
+        for item_id in [str(explanation.get("item_id", ""))]
+        if isinstance(explanation, dict)
+        if isinstance(explanation, dict)
+        and explanation.get("placement_basis") == "balance_and_tie_break_only"
+        and item_id
+    }
 
-    if sections:
-        print(f"Full details in schedule.yaml — {', '.join(sections)}.")
-    else:
-        print("Full details in schedule.yaml.")
+
+def _slot_heading(slot_key: str, label: str) -> str:
+    del slot_key
+    return label
+
+
+def _print_product(product: ScheduleProductEntry, balance_only_items: set[str]) -> None:
+    marker = " [balance-only]" if product["item_id"] in balance_only_items else ""
+    print(f"  • {product['label']}{marker}")

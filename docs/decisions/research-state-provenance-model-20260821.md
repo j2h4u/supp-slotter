@@ -18,33 +18,31 @@ sources, to reviewer knowledge assertions and relation assertions.
 | supported | Stronger independent medical or biochemical evidence supports the exact assertion and applicability. This is not a safety approval or universal clinical recommendation. | At least one reference |
 
 This is a categorical research/evidence state, not a numeric confidence score.
-It is independent of assertion_kind, semantic_family, relation_type, and
-severity: those fields describe meaning, not evidence strength. Use the best
+It is independent of assertion_kind, semantic_family, and relation_type: those
+fields describe meaning, not evidence strength. Use the best
 current basis for the exact assertion. If a search finds no adequate support,
 use searched_insufficient rather than anecdotal. Do not infer state from a URL
 embedded in reason, vendor identity, or assertion_kind.
 
 ## Existing primitives and scope
 
-Reuse SchedulingAssessmentRecord.sources as the repeated reference convention,
-but do not reuse scheduling_assessment.conclusion. That contract is tied to one
-Substance and one scheduling axis. semantic_enrichment_attempted_on is a
-card-level queue marker, not fact-level state. assertion_kind and
-semantic_family are semantic/runtime classifiers. reason and notes are
-explanatory text, not queryable provenance.
+This decision applies only to reviewer facts and relations. It defines no
+scheduler input, scheduling assessment, or placement authority.
+`semantic_enrichment_attempted_on` is a card-level queue marker, not fact-level
+state. `assertion_kind` and `semantic_family` are semantic/runtime classifiers.
+`reason` and `notes` are explanatory text, not queryable provenance.
 
 Metadata applies to:
 
 - KnowledgeAssertion records for reviewer knowledge.* categories: kind, effect,
   risk, context, pathway, role, quality, and future reviewer categories.
 - RelationAssertionRecord records for both current assertion kinds:
-  ontology_assertion and clinical_review_signal, and all relation types:
-  supports, review_with, and balance.
+  ontology_assertion and co_use_evidence, and all relation types:
+  supports, co_use_context, and balance.
 
-Metadata does not apply to individual schedule.* strings: scheduling evidence
-remains owned by scheduling_assessment. Concerns, product labels, and
-scheduling constraints are not reusable evidence assertions and receive no new
-state in this design.
+Concerns and product labels are not reviewer assertions and receive no new
+state in this design. The canonical scheduling boundary is governed separately
+by the canonical-instance ADR and domain model.
 
 ## Minimal ontology shape
 
@@ -72,9 +70,7 @@ classes:
       - relation_type
       - assertion_kind
       - semantic_family
-      - severity
       - reason
-      - action
       - research_state
       - sources
       - source_selector
@@ -85,18 +81,19 @@ slots:
   sources: {multivalued: true}
 ~~~
 
-Keep the new fields optional at the raw compatibility boundary. Normalization
-exposes omission as research_state: unassessed and sources: []. Canonical new
-non-unassessed records require a non-empty source reference. References are
+Require both fields on every authored assertion. Canonical non-unassessed
+records require a non-empty source reference. References are
 URLs, DOI/PubMed/guideline identifiers, or similarly stable locators; this is
 not a source warehouse.
 
-Existing knowledge string shorthand remains valid:
+Every knowledge assertion has the same explicit shape:
 
 ~~~yaml
-# Legacy input: normalized to unassessed and empty sources
 knowledge:
-  kind: [mineral]
+  kind:
+    - value: mineral
+      research_state: unassessed
+      sources: []
 
 # Canonical enriched fact
 knowledge:
@@ -127,7 +124,7 @@ Generated projections and the read model expose research_state and sources as
 ordinary assertion fields. Agents can query:
 
 - reviewer facts with state unassessed;
-- review_with or balance relations with state anecdotal or mechanistic_only;
+- co_use_context or balance relations with state anecdotal or mechanistic_only;
 - supports facts with state supported and their source references; and
 - searched_insufficient assertions separately from never-researched facts.
 
@@ -140,28 +137,27 @@ A derived grooming view groups findings as follows:
    unassessed or repeatedly treat as a fresh search gap.
 4. supported: no coverage gap solely due to state; retain sources for display.
 
-State is reviewer/grooming metadata only. It never suppresses or creates a
-relation warning, changes severity, affects slot assignment, creates a
-scheduling constraint, or changes a planner score. There is no automatic state
-promotion.
+State is reviewer/grooming metadata only. It never changes slot assignment,
+creates a scheduling constraint, or changes a planner score. There is no
+automatic state promotion.
 
-## Migration default
+## Migration
 
-Do not mass-edit existing facts or infer provenance from prose. Legacy
-knowledge strings and relation records lacking research_state normalize to
-unassessed. This conservatively records repository state, not proof that prior
-research did not happen. URLs embedded in relation reason remain readable
-context until explicitly extracted into sources and assigned a state.
+Mass-convert legacy scalar knowledge assertions and relations that lack
+metadata to explicit `research_state: unassessed` and `sources: []`. This
+records repository state, not proof that prior research did not happen. URLs
+embedded in relation reason remain readable context until explicitly extracted
+into sources and assigned a state. Loaders reject scalar assertions and any
+missing provenance metadata; there is no compatibility normalization.
 
-For new or materially revised facts, author research_state explicitly. A
-bounded search with no usable conclusion is searched_insufficient. Existing
-scheduling cards retain their current assessment contract and axis glossary.
+For new or materially revised reviewer facts, author research_state explicitly.
+A bounded search with no usable conclusion is searched_insufficient.
 
 ## Options considered
 
 | Option | Decision | Reason |
 | --- | --- | --- |
-| Reuse scheduling_assessment for every assertion | Reject | Substance/axis-specific and policy-coupled; cannot represent relation endpoints or reviewer facts. |
+| Reuse a scheduler assessment for every assertion | Reject | Scheduler outputs are not reviewer-fact authority and cannot represent relation endpoints. |
 | Encode state in reason, notes, or semantic_family | Reject | Not reliably queryable and conflates meaning with evidence. |
 | Add a generic numeric confidence score | Reject | Hides why evidence is weak, is not comparable across assertions, and is out of scope. |
 | Add an EvidenceClaim/source graph with governance fields | Reject for now | A provenance warehouse and workflow would overengineer this query need. |
@@ -171,18 +167,16 @@ scheduling cards retain their current assessment contract and axis glossary.
 
 1. Generated card and relation schemas expose the closed five-value ResearchState
    vocabulary and repeated sources only on the two assertion classes.
-2. Legacy knowledge and relation inputs normalize to unassessed/empty sources;
-   no bulk rewrite is required.
+2. Every authored knowledge and relation assertion explicitly supplies
+   research_state and sources; scalar and incomplete records are rejected.
 3. Structured facts and relations validate, project to RDF/JSON/TypeDB-compatible
    scalar attributes, and preserve source lists.
 4. Non-unassessed assertions without a source are rejected; explicit
    unassessed without sources is valid.
 5. Queries and grooming distinguish all five states, especially unassessed,
    searched_insufficient, and mechanistic_only.
-6. Scheduling assessments, planner scores, relation warnings, and constraints
-   are behaviorally unchanged.
-7. Reviewer output may display state and source references without changing
-   warning semantics.
+6. Planner scheduling behavior and constraints are behaviorally unchanged.
+7. Reviewer output may display state and source references as passive evidence.
 8. A TypeDB/RDF smoke filters assertion nodes by state without a source entity,
    custom scalar type, or evidence graph join.
 
@@ -195,7 +189,7 @@ relation role is required.
 
 Do not add owner, reviewer, approval, lifecycle, expiry, freshness, safety,
 automatic grading, source ranking, numeric aggregation, or scheduling state.
-Do not infer supported from severity, relation type, vendor identity, or a URL.
+Do not infer supported from relation type, vendor identity, or a URL.
 The only remaining implementation choice is whether source syntax is validated
 beyond non-empty strings; the smallest portable choice is non-empty strings plus
 human review.
