@@ -45,6 +45,7 @@ def test_product_food_instruction_targets_intake_item_without_component_fanout()
     proof = next(row for row in pressure.derivations if row.family == "ProductFoodInstruction")
     assert proof.path.target_kind == "product"
     assert proof.path.target_id == product
+    assert proof.path.role_id is None
 
 
 def test_product_food_instructions_preserve_exact_product_provenance() -> None:

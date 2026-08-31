@@ -23,7 +23,7 @@ def test_real_shelf_pressure_trace_retains_normalized_identity_and_proof(tmp_pat
     schedule = _fresh_schedule(tmp_path)
     matches = cast(list[dict[str, object]], schedule["pressure_matches"])
 
-    assert len(matches) == 8
+    assert len(matches) == 10
     assert all(
         {
             "item_id",
@@ -54,10 +54,16 @@ def test_real_shelf_pressure_trace_retains_normalized_identity_and_proof(tmp_pat
     assert len(cast(list[object], krill[0]["fact_ids"])) == 2
     assert len(cast(list[object], krill[0]["applicability_role_ids"])) == 2
 
-    only_trace = [match for match in matches if match["item_id"] == "prd_932319251f"]
-    assert len(only_trace) == 1
-    assert only_trace[0]["applicability_role_ids"] == []
-    assert only_trace[0]["applicability_product_ids"] == ["prd_932319251f"]
+    product_only = [
+        match for match in matches if match["item_id"] in {"prd_932319251f", "prd_8eff2491b7", "prd_vitamealc8"}
+    ]
+    assert {match["item_id"] for match in product_only} == {
+        "prd_932319251f",
+        "prd_8eff2491b7",
+        "prd_vitamealc8",
+    }
+    assert all(match["applicability_role_ids"] == [] for match in product_only)
+    assert all(match["applicability_product_ids"] == [match["item_id"]] for match in product_only)
 
 
 def test_real_shelf_recovery_objective_and_balance_only_count(tmp_path: Path) -> None:
@@ -66,11 +72,11 @@ def test_real_shelf_recovery_objective_and_balance_only_count(tmp_path: Path) ->
     explanations = cast(dict[str, dict[str, object]], schedule["canonical_explanations"])
 
     assert schedule["status"] == "Optimal"
-    assert objective["satisfied_pressures"] == 8
-    assert objective["squared_load"] == 58
+    assert objective["satisfied_pressures"] == 10
+    assert objective["squared_load"] == 62
     assert (
         sum(explanation["placement_basis"] == "balance_and_tie_break_only" for explanation in explanations.values())
-        == 10
+        == 8
     )
 
 
