@@ -24,6 +24,9 @@ evidence_sources:
   - id: src_nih_ods_omega3
   - id: src_nccih_omega3
   - id: src_life_extension_only_trace_minerals
+  - id: src_biograce_vitamin_b5_instruction
+  - id: src_vitameal_vitamin_c_product
+  - id: src_vitameal_vitamin_c_certificate
 food_effects:
   - id: fact_food_prd_eb6337a6dc_sub_2476bf9d4b
     subject:
@@ -145,6 +148,23 @@ product_food_instructions:
       - source: src_life_extension_only_trace_minerals
         locator: https://www.lifeextension.com/vitamins-supplements/item01328/only-trace-minerals
         quotation: Take one capsule daily with food.
+    value: take_with_food
+  - id: fact_product_food_prd_8eff2491b7
+    product: prd_8eff2491b7
+    provenance:
+      - source: src_biograce_vitamin_b5_instruction
+        locator: https://reestrinform.ru/reestr-sgr/reg-RU.77.99.88.003.R.000803.04.25.html
+        quotation: Взрослым принимать по 1 таблетке в день во время еды
+    value: take_with_food
+  - id: fact_product_food_prd_vitamealc8
+    product: prd_vitamealc8
+    provenance:
+      - source: src_vitameal_vitamin_c_product
+        locator: https://vitameal.com/catalog/product-239/
+        quotation: Взрослым по 1 капсуле в день во время еды
+      - source: src_vitameal_vitamin_c_certificate
+        locator: https://vitameal.com/upload/certificate/%D0%92%D0%B8%D1%82.%D0%A1%20%D0%BA%D0%B0%D0%BF%D1%81%20%D1%81%D0%BE%D0%B4%D0%B8%D1%83%D0%BC.pdf
+        quotation: Взрослым по 1 капсуле в день во время еды
     value: take_with_food
 acute_alertness_effects: []
 acute_sleep_effects: []

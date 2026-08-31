@@ -94,6 +94,15 @@
         },
         {
           "id": "src_life_extension_only_trace_minerals"
+        },
+        {
+          "id": "src_biograce_vitamin_b5_instruction"
+        },
+        {
+          "id": "src_vitameal_vitamin_c_product"
+        },
+        {
+          "id": "src_vitameal_vitamin_c_certificate"
         }
       ],
       "facts": [
@@ -352,6 +361,47 @@
           ],
           "subject": {
             "product": "prd_932319251f"
+          },
+          "value": "take_with_food"
+        },
+        {
+          "applicability": {
+            "product": "prd_8eff2491b7"
+          },
+          "family": "ProductFoodInstruction",
+          "id": "fact_product_food_prd_8eff2491b7",
+          "provenance": [
+            {
+              "locator": "https://reestrinform.ru/reestr-sgr/reg-RU.77.99.88.003.R.000803.04.25.html",
+              "quotation": "Взрослым принимать по 1 таблетке в день во время еды",
+              "source": "src_biograce_vitamin_b5_instruction"
+            }
+          ],
+          "subject": {
+            "product": "prd_8eff2491b7"
+          },
+          "value": "take_with_food"
+        },
+        {
+          "applicability": {
+            "product": "prd_vitamealc8"
+          },
+          "family": "ProductFoodInstruction",
+          "id": "fact_product_food_prd_vitamealc8",
+          "provenance": [
+            {
+              "locator": "https://vitameal.com/catalog/product-239/",
+              "quotation": "Взрослым по 1 капсуле в день во время еды",
+              "source": "src_vitameal_vitamin_c_product"
+            },
+            {
+              "locator": "https://vitameal.com/upload/certificate/%D0%92%D0%B8%D1%82.%D0%A1%20%D0%BA%D0%B0%D0%BF%D1%81%20%D1%81%D0%BE%D0%B4%D0%B8%D1%83%D0%BC.pdf",
+              "quotation": "Взрослым по 1 капсуле в день во время еды",
+              "source": "src_vitameal_vitamin_c_certificate"
+            }
+          ],
+          "subject": {
+            "product": "prd_vitamealc8"
           },
           "value": "take_with_food"
         }
@@ -705,5 +755,5 @@
     "source_sha256": "09669cccb6e9d100d96299cd7bb3a6f42d47acd61931d90d6422f9fd1401c066"
   },
   "schema_version": "2",
-  "source_hash": "aa088a15e134efc9666165a999c29c4fe1574ea6029b4f611d0e02f64da02068"
+  "source_hash": "ba56f5f4c78eeb2d030d3bb192ba467ed06877b8953af43286df5d63cb58148c"
 }

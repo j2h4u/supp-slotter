@@ -23,11 +23,11 @@
     },
     {
       "path": "runtime-program.json",
-      "sha256": "99ec17d551a62c74de1527dbfc7a83ee67ea445c1e84f5d8e03be13658805266"
+      "sha256": "b46d20ef5b7536c1ab431035d4cb0962d8e184b3213d567c28283c1900b6d3d0"
     },
     {
       "path": "runtime-vocabulary.yaml",
-      "sha256": "6654620e824c41d98346e3d24fe1301ffc02ebc26d88d180d31b2b85d9291f4b"
+      "sha256": "639eb1ee520785b7cde169be8b85d1832aed3183a2e8bef5dd4bbd2d4f620f7a"
     },
     {
       "path": "schema.json",

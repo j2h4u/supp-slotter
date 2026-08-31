@@ -47,6 +47,37 @@ def test_product_food_instruction_targets_intake_item_without_component_fanout()
     assert proof.path.target_id == product
 
 
+def test_product_food_instructions_preserve_exact_product_provenance() -> None:
+    runtime = _runtime()
+    facts = {
+        fact.subject.product: fact
+        for fact in runtime.canonical_scheduling.facts
+        if fact.family == "ProductFoodInstruction"
+    }
+
+    assert set(facts) == {"prd_932319251f", "prd_8eff2491b7", "prd_vitamealc8"}
+    assert [(p.source, p.locator, p.quotation) for p in facts["prd_8eff2491b7"].provenance] == [
+        (
+            "src_biograce_vitamin_b5_instruction",
+            "https://reestrinform.ru/reestr-sgr/reg-RU.77.99.88.003.R.000803.04.25.html",
+            "Взрослым принимать по 1 таблетке в день во время еды",
+        ),
+    ]
+    assert [(p.source, p.locator, p.quotation) for p in facts["prd_vitamealc8"].provenance] == [
+        (
+            "src_vitameal_vitamin_c_product",
+            "https://vitameal.com/catalog/product-239/",
+            "Взрослым по 1 капсуле в день во время еды",
+        ),
+        (
+            "src_vitameal_vitamin_c_certificate",
+            "https://vitameal.com/upload/certificate/%D0%92%D0%B8%D1%82.%D0%A1%20%D0%BA%D0%B0%D0%BF%D1%81%20%D1%81%D0%BE%D0%B4%D0%B8%D1%83%D0%BC.pdf",
+            "Взрослым по 1 капсуле в день во время еды",
+        ),
+    ]
+    assert all(fact.value == "take_with_food" for fact in facts.values())
+
+
 def test_psalae_role_facts_normalize_to_one_pressure_with_both_proofs() -> None:
     runtime = _runtime()
     product = "prd_w2s970gps4"

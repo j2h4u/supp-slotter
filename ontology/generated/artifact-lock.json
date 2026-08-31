@@ -23,7 +23,7 @@
     },
     {
       "path": "ontology.ttl",
-      "sha256": "bcc486023ae51cd6e5d27d549a9ca077aa90441d04b7307bad93800477af3854"
+      "sha256": "1ab667a0417fe6798e3578fb968ba5612b0208b24c2f20533675db40b042c7a5"
     },
     {
       "path": "pillboxes.schema.json",
@@ -43,15 +43,15 @@
     },
     {
       "path": "runtime-lock.json",
-      "sha256": "5ec6c47549fbc2d4a0aab3d2c250305dcbd3253264ecd772af9c9f73009d8b75"
+      "sha256": "255abc7439f598390e851ba2f8661da37ffc3b73dc20a8e9be8b400db81ffd9e"
     },
     {
       "path": "runtime-program.json",
-      "sha256": "99ec17d551a62c74de1527dbfc7a83ee67ea445c1e84f5d8e03be13658805266"
+      "sha256": "b46d20ef5b7536c1ab431035d4cb0962d8e184b3213d567c28283c1900b6d3d0"
     },
     {
       "path": "runtime-vocabulary.yaml",
-      "sha256": "6654620e824c41d98346e3d24fe1301ffc02ebc26d88d180d31b2b85d9291f4b"
+      "sha256": "639eb1ee520785b7cde169be8b85d1832aed3183a2e8bef5dd4bbd2d4f620f7a"
     },
     {
       "path": "schema.json",
@@ -59,7 +59,7 @@
     },
     {
       "path": "shapes.ttl",
-      "sha256": "127e924d7d76cef0737612649deede87d8267fcdd948fad6e76231e460fc15e8"
+      "sha256": "821f3813b42401866e3d2475de18da86734141610fe3911cb61f64f3bbe2355e"
     },
     {
       "path": "stacks.schema.json",
@@ -74,7 +74,7 @@
     },
     {
       "path": "ontology/canonical-facts.yaml",
-      "sha256": "7f26e7e19137c6cc7788da502614f3d5ba9576728b92cdb87e568d9e3f26a4a9"
+      "sha256": "327d494ca45020b6f0e59064e9a3bba9025d482b313a53af4e59249b602be01e"
     },
     {
       "path": "ontology/canonical-laws.yaml",
