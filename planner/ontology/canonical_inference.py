@@ -34,16 +34,17 @@ class UnaryPressureIdentity:
 
 @dataclass(frozen=True, slots=True)
 class CompositionApplicabilityPath:
-    """The explicit role traversal used to reach a selected product item."""
+    """The explicit applicability path used to reach a selected product item."""
 
     target_kind: str
     target_id: str
-    resolved_role: str
+    # Product-scoped applicability reaches the product directly and has no role.
+    resolved_role: str | None
     product: str
     substance: str
 
     @property
-    def role_id(self) -> str:
+    def role_id(self) -> str | None:
         return self.resolved_role
 
 
@@ -218,7 +219,7 @@ def _derivations_for_fact(
                     path=CompositionApplicabilityPath(
                         target_kind="product",
                         target_id=product_id,
-                        resolved_role=product_id,
+                        resolved_role=None,
                         product=product_id,
                         substance="",
                     ),

@@ -48,7 +48,9 @@ def _assert_current_shelf_proof(schedule: dict[str, object], stacks: dict[str, l
     assert len(pressure_matches) == 8
     assert all(match["satisfied"] is True and match["slot_anchor"] == match["value"] for match in pressure_matches)
     assert all(
-        bool(match["fact_ids"]) and bool(match["law_ids"]) and bool(match["applicability_role_ids"])
+        bool(match["fact_ids"])
+        and bool(match["law_ids"])
+        and (bool(match["applicability_role_ids"]) or bool(match["applicability_product_ids"]))
         for match in pressure_matches
     )
     objective = cast(dict[str, object], schedule["objective"])

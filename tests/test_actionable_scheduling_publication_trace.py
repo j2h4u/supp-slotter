@@ -42,7 +42,10 @@ def test_real_shelf_pressure_trace_retains_normalized_identity_and_proof(tmp_pat
     assert all(match["satisfied"] is True for match in matches)
     assert all(cast(list[object], match["fact_ids"]) for match in matches)
     assert all(cast(list[object], match["law_ids"]) for match in matches)
-    assert all(cast(list[object], match["applicability_role_ids"]) for match in matches)
+    assert all(
+        cast(list[object], match["applicability_role_ids"]) or cast(list[object], match["applicability_product_ids"])
+        for match in matches
+    )
     assert all(cast(list[object], match["applicability_product_ids"]) for match in matches)
     assert all(cast(list[object], match["provenance_refs"]) for match in matches)
 
@@ -50,6 +53,11 @@ def test_real_shelf_pressure_trace_retains_normalized_identity_and_proof(tmp_pat
     assert len(krill) == 1
     assert len(cast(list[object], krill[0]["fact_ids"])) == 2
     assert len(cast(list[object], krill[0]["applicability_role_ids"])) == 2
+
+    only_trace = [match for match in matches if match["item_id"] == "prd_932319251f"]
+    assert len(only_trace) == 1
+    assert only_trace[0]["applicability_role_ids"] == []
+    assert only_trace[0]["applicability_product_ids"] == ["prd_932319251f"]
 
 
 def test_real_shelf_recovery_objective_and_balance_only_count(tmp_path: Path) -> None:
