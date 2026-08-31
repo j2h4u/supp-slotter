@@ -7,7 +7,6 @@ authority:
   plan: docs/plans/actionable-scheduling-knowledge-recovery-20260831.md
   adjudication: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
   canonical_facts: ontology/canonical-facts.yaml
-  candidate_catalog: data/scheduling-candidates.yaml
 source_receipts:
   spans:
     path: docs/evidence/actionable-scheduling-product-note-spans-20260831.jsonl

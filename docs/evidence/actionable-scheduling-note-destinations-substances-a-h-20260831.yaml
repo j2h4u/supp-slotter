@@ -3,7 +3,6 @@ authority:
   recovery_plan: docs/plans/actionable-scheduling-knowledge-recovery-20260831.md
   substance_span_receipt: docs/evidence/actionable-scheduling-substance-note-spans-20260831.jsonl
   substance_atom_receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
-  candidate_catalog: data/scheduling-candidates.yaml
 selection:
   basename_initials: a-h
   source_span_count: 90
@@ -85,7 +84,7 @@ destinations:
     substance_id: sub_jmyif2xwft
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_dcf05847619838d9f01423a0d95f63d71f50beb41348c2685f23c28537e310a7
   disposition: typed_destination
 - atom_id: 85bb5f56df9b2001f91fd8168d21e6332d2bbfee978599db38cfb5a57971e3da
@@ -216,7 +215,7 @@ destinations:
     substance_id: sub_6zegokcu7e
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_1e935a7665f93fdc17c0925c677fadeb154a49cb6f2cc1905335523896738f49
   disposition: typed_destination
 - atom_id: a367a5b5ff6974413757af24858f8b640339203ef65974e01d3cc6aa3e345925
@@ -615,7 +614,7 @@ destinations:
     substance_id: sub_j92h8kgjru
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_733d87f39ad61bd3f7224f84a2af3040981e623da05c7198d45971a6dcfa8d4c
   disposition: typed_destination
 - atom_id: a92e408659ba9212e4da681cf3e9a84a60d291f593b7b60872fc53af04ed2b6f
@@ -679,7 +678,7 @@ destinations:
     substance_id: sub_abb9604e58
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_c4e6324eacce70c13c0a0ec9ab4592f069232d8032cd32b9cd3c155fdafcabf1
   disposition: typed_destination
 - atom_id: b3a777463104435a43f5963b578ca5e805d83115fc780e200639a55982048510
@@ -700,7 +699,7 @@ destinations:
     substance_id: sub_abb9604e58
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_f61c436e56d7d766ac34ffd2a50c4a5a3b44a86ddfeeaa2d65fee172054abe3c
   disposition: typed_destination
 - atom_id: 149de02fc2397b435211731bfad3e0aed9b58989decc4b372a7f2e843a4c3407
@@ -763,7 +762,7 @@ destinations:
     substance_id: sub_zhz9m31edv
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_f3d58d83411d0e8c4fb99ffdab18c207487e58e37386fa1b1fbeb4977e567cca
   disposition: typed_destination
 - atom_id: 7c2aba1c215807fe3e76b0b1beda64753515cd387dc311aca23da23c46dbcd66
@@ -840,7 +839,7 @@ destinations:
     substance_id: sub_fmuptat7pw
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_d81564e08e85ca68806eb8f3bffebb45f40e52a44a897f6250c13a85092a8baf
   disposition: typed_destination
 - atom_id: 5c888ccb6bfb633bd3bdc14c89a7074ea858a82974b27b59ecc7b0f4f8e047fa
@@ -1098,7 +1097,7 @@ destinations:
     substance_id: sub_6tk5moz0wh
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_0b6624033909105acf7b5e025f6b0aa37ff8bb185cbe62b3c9dd332f571d1b5b
   disposition: typed_destination
 - atom_id: 3cdab89e570d5a766392a5b2d2c71ec62ed1d88b88c0bef8d11a11661cf0eb96
@@ -1109,7 +1108,7 @@ destinations:
     substance_id: sub_6tk5moz0wh
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_3cdab89e570d5a766392a5b2d2c71ec62ed1d88b88c0bef8d11a11661cf0eb96
   disposition: typed_destination
 - atom_id: 2820c8320c617329ee64f9c9eb33f3e4ca2dc26a19f4d0f51d70b0395df27968
@@ -1120,7 +1119,7 @@ destinations:
     substance_id: sub_6tk5moz0wh
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_2820c8320c617329ee64f9c9eb33f3e4ca2dc26a19f4d0f51d70b0395df27968
   disposition: typed_destination
 - atom_id: 8d0c0139aa42ee13ec9bce207b42923f6e1064f42834b0eed9436d734db366c5
@@ -1279,7 +1278,7 @@ destinations:
     substance_id: sub_iqjdo9gvbv
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_0c26f105bf8fb918c3469fd5d5fbab23a83e011ae3f200051b807f192e42a1c0
   disposition: typed_destination
 - atom_id: cbff5b9b80da136af52ee02ae53ceaeac167119a38b41f6f6fb7726fa99fc63b
@@ -1574,7 +1573,7 @@ destinations:
     substance_id: sub_kwudyhex2o
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_bcde71885c1365835992e502661b88f1795e4626f658dba108d89f89d388d97b
   disposition: typed_destination
 - atom_id: 688f005be374a1357dbf4a7da73e73b3a1f50e6708effdb6f85210704b9e74ca
@@ -2191,7 +2190,7 @@ destinations:
     substance_id: sub_844a0cc551
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_21c3336cc1d29cc3bec40c093036a7035f31d33a96cfd3e1e80cc1b66bd6fe6d
   disposition: typed_destination
 - atom_id: 71df2541cbd6b8aa01fe9f4b91611104ccf009895c935416c555d1ed5afcd171
@@ -2356,7 +2355,7 @@ destinations:
     substance_id: sub_9c0908e7f7
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_a4c29445b00bf66d3b403d617dadfc78f495f88561d5008409b100f3c38ac9bd
   disposition: typed_destination
 - atom_id: e5370a242e20fd9365d441047835534c30149fc41024cfb97bd53f9136e95d4a
@@ -2391,7 +2390,7 @@ destinations:
     substance_id: sub_jwqo8ptntd
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_3da0895bedf599a13744fbb6550616fe1d6a117f12bd77fe94eb3b8e2221f121
   disposition: typed_destination
 - atom_id: bd11a039cd10fc0d14e0c4547b0a117fcfe8ec6a27441606a6ff9aac2c232622
@@ -2402,7 +2401,7 @@ destinations:
     substance_id: sub_jwqo8ptntd
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_bd11a039cd10fc0d14e0c4547b0a117fcfe8ec6a27441606a6ff9aac2c232622
   disposition: typed_destination
 - atom_id: ff7e0d1e03120cf6af000bfb4ee486b4773ef68b7705e2d55e3b3de2acf50f79
@@ -2489,7 +2488,7 @@ destinations:
     substance_id: sub_rt2lr29xqs
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_a6542984ac42867f48fad53cfa98fdb6e774e2b83ef1de0f79c60467489074d4
   disposition: typed_destination
 - atom_id: 32b5f3086fbff4b81396847a641430f3a924bd18dc1df3e908b0359aa2cdeb4c
@@ -2660,7 +2659,7 @@ destinations:
     substance_id: sub_xsqvv2fop0
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_437a35c9b59607d8c3e89eec7a66e8f4070d6f41e7b4174725a874787aeeb43e
   disposition: typed_destination
 - atom_id: d9bb7a793eab2aecf9efb718abb60717a0a44b53c1e3f6e7d7163b7e1f26a3a1
@@ -2671,7 +2670,7 @@ destinations:
     substance_id: sub_xsqvv2fop0
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_d9bb7a793eab2aecf9efb718abb60717a0a44b53c1e3f6e7d7163b7e1f26a3a1
   disposition: typed_destination
 - atom_id: bf462bc96782ae002cd434e64fefd57d2fddd7b3ad1e53228d528d5b92aa2dfe
@@ -2838,7 +2837,7 @@ destinations:
     substance_id: sub_66b783576c
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_013c76f349b740764c1fb456e9032d9fb6852e5f24e7fed29224f4e15a11430b
   disposition: typed_destination
 - atom_id: 35d72b839bd233605033542cfdab9698d1c0df763e2479ba632796c9e1ee4c04
@@ -3207,7 +3206,7 @@ destinations:
     substance_id: sub_sunkcr05vl
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_766ea2ca981fb200e036aa8c57acb701f6c4e854190d56c102e90e174a840081
   disposition: typed_destination
 - atom_id: eb98dd775616c4c9ca0f6ee6c706e3a8fc8cc24b3ac238111b396812ee91a83e
@@ -3366,7 +3365,7 @@ destinations:
     substance_id: sub_be55xf4yb7
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_551e84493e65009c8c07a399c6db54f8e323504844271387981c8648ce9062e0
   disposition: typed_destination
 - atom_id: cf5ebe180ddf371d55ac402b96f0783778f9cf67ea6935a8a39e6f92eea1c561
@@ -3405,7 +3404,7 @@ destinations:
     substance_id: sub_f3vgw907ew
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_3b55992a050a8cd6391c4d5df723b2bd0dda2224c07e948f3306ab5e672f8805
   disposition: typed_destination
 - atom_id: 02920d96eb0634fcf63a4e9bcb100632e69c562dcfa4f90553714421ea3bbe1f
@@ -3595,7 +3594,7 @@ destinations:
     substance_id: sub_c9720c7240
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_note_103ad5d1c1cac1632aeea36e647d08f6b249e763047af929aa6d67b19dd87162
   disposition: typed_destination
 - atom_id: ea3b54cb52cd2287282a272d4b0cdb9382b57325d844273103c0526879e360d3

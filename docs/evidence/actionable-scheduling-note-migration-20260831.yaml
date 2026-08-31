@@ -13,7 +13,6 @@ authority:
   recovery_plan: docs/plans/actionable-scheduling-knowledge-recovery-20260831.md
   adjudication: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
   kaizen_yagni: docs/decisions/canonical-runtime-final-convergence-20260831.md
-  candidate_catalog: data/scheduling-candidates.yaml
   canonical_facts: ontology/canonical-facts.yaml
   canonical_laws: ontology/canonical-laws.yaml
 source_receipts:
@@ -112,7 +111,6 @@ reference_integrity:
   destination_source_paths_match_atoms: true
   typed_target_paths_resolve: true
   candidate_ids_referenced: 64
-  candidate_catalog_ids: 64
   unresolved_candidate_ids: 0
   fact_ids_referenced: 8
   unresolved_fact_ids: 0

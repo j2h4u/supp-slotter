@@ -4,7 +4,7 @@
 
 **Accepted semantic adjudication.** This record fixes the individual
 dispositions for the named active food/empty candidates. It is an input to the
-closed candidate catalog and does not itself author facts, alter the ontology,
+consolidated candidate map and does not itself author facts, alter the ontology,
 or publish a layout.
 
 It is governed by the [actionable scheduling knowledge coverage
@@ -35,8 +35,8 @@ The existing identity-free law
 applicability deliberately confine every formulation-sensitive fact to one
 active product role.
 
-The candidate IDs in this record are the stable IDs to materialize in the
-candidate catalog. They are source-indexed adjudication identities, not fact
+The candidate IDs in this record are stable source-indexed adjudication
+identities. They are not fact
 IDs, optimizer input, placement, action, or score.
 
 ## Decisions

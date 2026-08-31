@@ -69,7 +69,7 @@ answer.
   - Evidence: R1; `tests/test_composition_role_identity.py::test_authored_component_identity_survives_reorder_and_notes_edit`; `tests/test_composition_role_identity.py::test_product_formula_validator_rejects_dangling_mismatched_and_duplicate_roles`.
 
 - [x] **The legacy evidence migration is retired to a compact immutable receipt.**
-  - Evidence: R1; `docs/migrations/legacy-atom-ledger.yaml`; `tests/test_grooming.py::test_receipts_are_operational_and_not_a_plan_runtime_input`; no migration generator is a runtime or release input.
+  - Evidence: R1; `docs/migrations/legacy-atom-ledger.yaml`; no migration generator is a runtime or release input.
 
 - [x] **The canonical-runtime acceptance inventory is explicit and release-covered.**
   - Evidence: R1; `tests/test_run_unit_gate.py::test_canonical_runtime_inventory_is_exact_stable_and_release_covered`; `scripts/run_unit_gate.py`; `tests/test_canonical_publication.py::test_invalid_source_mapping_product_domain_or_slot_publishes_nothing`.
@@ -95,22 +95,19 @@ answer.
 - [x] **Tracked-product ownership is explicit and closed.**
   Stack topology consumes the formal runtime-declared routable, excluded, and
   tracked-unassigned partitions; no Python name is a policy authority. Active
-  review, grooming, relation, and dashboard paths consume
+  review, relation, and dashboard paths consume
   `routable_stack_names`; a focused second-excluded-partition contract proves
   excluded membership cannot enter their active inputs. Its real dashboard
   witness executes `build_dashboard_review` and classifies the archived product
   as `on_shelf`, never `current`. The review fixture derives its complete
   canonical partition from that same runtime policy.
-  - Evidence: R1; `eeb0663b5bbdea5e475f11d1f10aace2b95432f9`; `tests/test_runtime_contract_v2.py::test_authored_stack_partition_is_closed_and_reproduces_active_membership`; `tests/test_runtime_contract_v2.py::test_second_excluded_partition_cannot_enter_current_review_grooming_or_relation_inputs`; `tests/test_stack_validation.py::test_partition_names_come_from_runtime_and_unknown_names_fail_closed`; `tests/test_review_command.py::test_cmd_review_accepts_canonical_typed_selector_relation`; `planner/cards/stacks.py`; `planner/engine/_plan_active_index.py`; `planner/cards/dashboards.py::build_dashboard_review`; `planner/engine/grooming.py`; `planner/engine/review_model.py`; `planner/query_model/facts.py`; `planner/query_model/read_model.py`; `data/stacks.yaml`.
+  - Evidence: R1; `eeb0663b5bbdea5e475f11d1f10aace2b954f9`; `tests/test_runtime_contract_v2.py::test_authored_stack_partition_is_closed_and_reproduces_active_membership`; `tests/test_runtime_contract_v2.py::test_second_excluded_partition_cannot_enter_current_review_or_relation_inputs`; `tests/test_stack_validation.py::test_partition_names_come_from_runtime_and_unknown_names_fail_closed`; `tests/test_review_command.py::test_cmd_review_accepts_canonical_typed_selector_relation`; `planner/cards/stacks.py`; `planner/engine/_plan_active_index.py`; `planner/cards/dashboards.py::build_dashboard_review`; `planner/engine/review_model.py`; `planner/query_model/facts.py`; `planner/query_model/read_model.py`; `data/stacks.yaml`.
 
 - [x] **Pillbox/stack topology is one-to-one where authored as such.**
   - Evidence: R1; `tests/test_pillbox_loader_contract.py::test_loader_rejects_multiple_pillboxes_for_one_stack`; `tests/test_logical_slot_topology.py::test_distinct_topologies_keep_distinct_stack_references`.
 
 - [x] **Non-daily presentation is truthful without adding recurrence semantics.**
   - Evidence: R1; `tests/test_non_daily_presentation.py::test_marked_daily_product_is_an_episodic_current_plan_placement`; `planner/engine/show.py`.
-
-- [x] **Grooming exposes canonical coverage work without becoming plan input.**
-  - Evidence: R1; `tests/test_grooming.py::test_receipt_catalog_closes_the_real_active_queue`; `tests/test_grooming.py::test_receipts_are_operational_and_not_a_plan_runtime_input`; `planner/engine/grooming.py`.
 
 - [x] **Form-specific evidence is bound to composition roles; universal evidence remains universal.**
   - Evidence: R1; `tests/test_canonical_inference.py::test_substance_applicability_reaches_each_exact_matching_role`; `tests/test_canonical_fact_catalog_integration.py::test_canonical_reference_validator_accepts_matching_composition_role_fact`.

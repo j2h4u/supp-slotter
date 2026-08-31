@@ -15,7 +15,7 @@ import pytest
 import yaml
 from planner.cards.dashboards import build_dashboard_review
 from planner.contracts import KnowledgeAssertion, Product, ProductComponent, Substance
-from planner.engine import grooming, review_model
+from planner.engine import review_model
 from planner.engine.review_model import _ConcernFilterContext
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.runtime_program import (
@@ -102,7 +102,7 @@ def test_authored_stack_partition_is_closed_and_reproduces_active_membership() -
         decode_runtime_program(payload)
 
 
-def test_second_excluded_partition_cannot_enter_current_review_grooming_or_relation_inputs(  # noqa: PLR0914
+def test_second_excluded_partition_cannot_enter_current_review_or_relation_inputs(  # noqa: PLR0914
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     """Only runtime-declared routable partitions contribute to active views."""
@@ -149,11 +149,6 @@ def test_second_excluded_partition_cannot_enter_current_review_grooming_or_relat
     rows = classify_relations((relation,), active_ids, runtime)
     assert rows[0]["source_matches"] == []
     assert rows[0]["target_matches"] == ["Active"]
-
-    monkeypatch.setattr(grooming, "load_yaml", lambda _path: stacks)
-    assert grooming._active_role_ids(Paths.from_root(tmp_path), products, test_bundle) == {  # type: ignore[arg-type]
-        active_product.components[0].id
-    }
 
     dashboard = tmp_path / "data" / "dashboards" / "archived.yaml"
     dashboard.parent.mkdir(parents=True)

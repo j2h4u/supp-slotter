@@ -4,13 +4,10 @@ from pathlib import Path
 
 from planner.engine.check import cmd_check
 from planner.engine.find import cmd_find
-from planner.engine.grooming import cmd_groom
 from planner.engine.plan import cmd_plan
 from planner.engine.results import (
     CheckResult,
     FindResult,
-    GroomResult,
-    GroomWorkItem,
     PlanResult,
     ReviewResult,
     ShowResult,
@@ -28,14 +25,11 @@ def cmd_review(data_root: Path | None = None) -> ReviewResult:
 __all__ = [
     "CheckResult",
     "FindResult",
-    "GroomResult",
-    "GroomWorkItem",
     "PlanResult",
     "ReviewResult",
     "ShowResult",
     "cmd_check",
     "cmd_find",
-    "cmd_groom",
     "cmd_plan",
     "cmd_review",
     "cmd_show",

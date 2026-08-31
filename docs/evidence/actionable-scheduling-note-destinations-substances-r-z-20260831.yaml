@@ -3,7 +3,6 @@ authority:
   recovery_plan: docs/plans/actionable-scheduling-knowledge-recovery-20260831.md
   substance_span_receipt: docs/evidence/actionable-scheduling-substance-note-spans-20260831.jsonl
   substance_atom_receipt: docs/evidence/actionable-scheduling-substance-note-atoms-r-z-20260831.jsonl
-  candidate_catalog: data/scheduling-candidates.yaml
   adjudication: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
 selection:
   basename_initials: r-z

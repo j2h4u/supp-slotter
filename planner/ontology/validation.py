@@ -14,7 +14,6 @@ from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import RDF
 from rdflib.term import Node
 
-from planner.ontology.candidate_catalog import CandidateCatalog, load_candidate_catalog
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.yaml_io import safe_load_yaml
 
@@ -297,12 +296,3 @@ def validate_graph(
     if not isinstance(report_graph, Graph):
         raise OntologyInfrastructureError("pySHACL returned a non-graph validation report")
     return cast(bool, conforms), report_graph, cast(str, report_text)
-
-
-def validate_candidate_catalog(path: Path | None = None) -> CandidateCatalog:
-    """Validate the closed source-indexed scheduling candidate catalog.
-
-    Kept at the ontology validation boundary so callers cannot accidentally
-    treat a malformed or stale catalog as an empty set of evidence.
-    """
-    return load_candidate_catalog(path)

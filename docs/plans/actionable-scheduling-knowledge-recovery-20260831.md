@@ -99,7 +99,7 @@ No lower cluster may be marked complete until its upper-left contract is written
 ### Wave 2 — deterministic coverage workflow (V-left levels 2 and 6)
 
 - [ ] Replace the one-outcome grooming receipt with a closed deterministic candidate/claim workflow that serves unassessed or invalid active role cards and claims in stable order and requires a typed disposition plus required fields before completion. A valid unresolved_without_direction record remains research-open but coverage-closed and is reported as status/follow-up rather than queued as incomplete coverage.
-  - Likely ownership: planner/engine/grooming.py, planner/__main__.py, data/grooming-receipts.yaml successor, runtime policy/schema loaders, docs/evidence-coverage-grooming.md, docs/agent-product-flow.md.
+  - Likely ownership: runtime policy/schema loaders and docs/agent-product-flow.md.
   - Evidence: CLI smoke shows the next unassessed or invalid card/claim and distinguishes valid research-open unresolved_without_direction records from incomplete coverage; schema fixtures reject prose-only completion, missing pressure provenance, and untyped closure.
 
 - [ ] Generate a deterministic active-shelf coverage manifest and certificate from canonical inputs and dispositions; fail planning when an active role, applicable dimension, candidate, or required adjudication remains unassessed.

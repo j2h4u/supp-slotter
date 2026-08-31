@@ -54,28 +54,6 @@ class ReviewResult:
     stderr: str = ""
 
 
-@dataclass(frozen=True, slots=True)
-class GroomWorkItem:
-    """One selected role/candidate needing canonical coverage work."""
-
-    composition_role_id: str
-    product_id: str
-    product_name: str
-    substance_id: str
-    substance_name: str
-    candidate_id: str | None = None
-    candidate_disposition: str | None = None
-
-
-@dataclass(frozen=True, slots=True)
-class GroomResult:
-    exit_code: int
-    work_item: GroomWorkItem | None
-    eligible_count: int
-    output: str = ""
-    stderr: str = ""
-
-
 @dataclass(frozen=True)
 class ShowResult:
     exit_code: int

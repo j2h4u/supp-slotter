@@ -36,23 +36,27 @@ def _assert_current_shelf_proof(schedule: dict[str, object], stacks: dict[str, l
         ("prd_cfce0b36b6", "exercise_anchor", "before"),
         ("prd_eb6337a6dc", "meal_context", "with_food"),
         ("prd_htuhz2s2gt", "meal_context", "with_food"),
+        ("prd_932319251f", "meal_context", "with_food"),
+        ("prd_e5cc3b4e7c", "meal_context", "with_food"),
+        ("prd_8mvv1w128a", "meal_context", "with_food"),
+        ("prd_w2s970gps4", "meal_context", "with_food"),
     }
     assert {
         (cast(str, match["item_id"]), cast(str, match["dimension"]), cast(str, match["value"]))
         for match in pressure_matches
     } == expected_pressures
-    assert len(pressure_matches) == 4
+    assert len(pressure_matches) == 8
     assert all(match["satisfied"] is True and match["slot_anchor"] == match["value"] for match in pressure_matches)
     assert all(
         bool(match["fact_ids"]) and bool(match["law_ids"]) and bool(match["applicability_role_ids"])
         for match in pressure_matches
     )
     objective = cast(dict[str, object], schedule["objective"])
-    assert objective["satisfied_pressures"] == 4
+    assert objective["satisfied_pressures"] == 8
     explanations = cast(dict[str, dict[str, object]], schedule["canonical_explanations"])
     assert (
         sum(explanation["placement_basis"] == "balance_and_tie_break_only" for explanation in explanations.values())
-        == 14
+        == 10
     )
     assert set(assignments) == {product_id for stack in ("daily", "training") for product_id in stacks[stack]}
 

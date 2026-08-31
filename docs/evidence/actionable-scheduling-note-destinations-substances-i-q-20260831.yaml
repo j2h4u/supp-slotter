@@ -3,7 +3,6 @@ authority:
   recovery_plan: docs/plans/actionable-scheduling-knowledge-recovery-20260831.md
   substance_span_receipt: docs/evidence/actionable-scheduling-substance-note-spans-20260831.jsonl
   substance_atom_receipt: docs/evidence/actionable-scheduling-substance-note-atoms-i-q-20260831.jsonl
-  candidate_catalog: data/scheduling-candidates.yaml
   adjudication: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
 selection:
   basename_initials: i-q
@@ -293,7 +292,7 @@ destinations:
     substance_id: sub_646e568f61
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_food_cmp_prd_w2s970gps4__sub_646e568f61
   disposition: typed_destination
   fact:
@@ -538,7 +537,7 @@ destinations:
     substance_id: sub_5bd641c116
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_exercise_lclt_cmp_prd_0e92bc1674__sub_5bd641c116
   disposition: typed_destination
 - atom_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255:004
@@ -657,7 +656,7 @@ destinations:
     substance_id: sub_3918fe347e
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_exercise_citrulline_cmp_prd_cfce0b36b6__sub_3918fe347e
   disposition: typed_destination
   fact:
@@ -1641,7 +1640,7 @@ destinations:
     substance_id: sub_fhl7c4skmf
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_exercise_electrolyte_magnesium_cmp_prd_20bf2df267__sub_fhl7c4skmf
   disposition: typed_destination
 - atom_id: 163b57427881dc63f343d4285d88d439e97bee49ee5796380ff401ec68aaf19c:003
@@ -3391,7 +3390,7 @@ destinations:
     substance_id: sub_f7780f899b
   destination:
     kind: candidate
-    path: data/scheduling-candidates.yaml
+    path: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
     candidate_id: cand_exercise_electrolyte_potassium_cmp_prd_20bf2df267__sub_f7780f899b
   disposition: typed_destination
 - atom_id: d1c5811b83f09bbb19002240c8a5ea3805a5fd10c320ab608ce51432ec208d6a:004
