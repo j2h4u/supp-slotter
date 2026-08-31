@@ -210,6 +210,7 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
         "tests/test_logical_slot_topology.py",
         "tests/test_maintenance.py",
         "tests/test_pillbox_loader_contract.py",
+        "tests/test_product_food_instruction.py",
         "tests/test_product_validation.py",
         "tests/test_read_model_relations.py",
         "tests/test_review_command.py",
@@ -239,7 +240,7 @@ def test_coverage_suite_selects_fast_modules_and_only_unique_smoke_nodes(
     assert run_unit_gate._coverage_inventory_items() == expected_inventory
     assert not set(expected_inventory) & {path.as_posix() for path in run_unit_gate.ONTOLOGY_CONTRACT_MODULES}
     output = capsys.readouterr().out
-    assert "Running coverage suite (23 targets)\n" in output
+    assert "Running coverage suite (24 targets)\n" in output
     assert output.count("elapsed=") == 2
 
 

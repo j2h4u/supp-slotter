@@ -46,6 +46,7 @@ FAST_UNIT_MODULES = frozenset({
     Path("tests/test_canonical_optimizer_plan_integration.py"),
     Path("tests/test_canonical_publication.py"),
     Path("tests/test_product_validation.py"),
+    Path("tests/test_product_food_instruction.py"),
     Path("tests/test_read_model_relations.py"),
     Path("tests/test_run_unit_gate.py"),
     Path("tests/test_scheduler_reviewer_authority.py"),
@@ -64,6 +65,7 @@ COVERAGE_ONLY_MODULES = (
     Path("tests/test_formal_uniqueness.py"),
 )
 RUNTIME_SCENARIOS_MODULES = (
+    Path("tests/test_actionable_scheduling_publication_trace.py"),
     Path("tests/test_canonical_inference_plan_integration.py"),
     Path("tests/test_canonical_optimizer.py"),
     Path("tests/test_canonical_optimizer_plan_integration.py"),
