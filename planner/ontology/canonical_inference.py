@@ -46,14 +46,6 @@ class CompositionApplicabilityPath:
     def role_id(self) -> str:
         return self.resolved_role
 
-    @property
-    def product_id(self) -> str:
-        return self.product
-
-    @property
-    def substance_id(self) -> str:
-        return self.substance
-
 
 @dataclass(frozen=True, slots=True)
 class PressureDerivation:
@@ -113,10 +105,6 @@ class SameDimensionPressureConflict:
     def identities(self) -> tuple[UnaryPressureIdentity, ...]:
         return tuple(UnaryPressureIdentity(self.item_id, self.dimension, value) for value in self.values)
 
-    @property
-    def pressure_identities(self) -> tuple[UnaryPressureIdentity, ...]:
-        return self.identities
-
 
 @dataclass(frozen=True, slots=True)
 class Success:
@@ -124,24 +112,12 @@ class Success:
 
     pressures: tuple[NormalizedUnaryPressure, ...]
 
-    @property
-    def normalized_pressures(self) -> tuple[NormalizedUnaryPressure, ...]:
-        return self.pressures
-
 
 @dataclass(frozen=True, slots=True)
 class Conflict:
     """Layout-free result when one item has opposing values on one axis."""
 
     conflicts: tuple[SameDimensionPressureConflict, ...]
-
-    @property
-    def diagnostics(self) -> tuple[SameDimensionPressureConflict, ...]:
-        return self.conflicts
-
-    @property
-    def pressure_conflicts(self) -> tuple[SameDimensionPressureConflict, ...]:
-        return self.conflicts
 
 
 InferenceResult = Success | Conflict
