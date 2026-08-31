@@ -2,13 +2,13 @@
 
 ## Outcome, pain point, and scope
 
-This recovery makes the active shelf materially schedule from formal world facts. The current canonical runtime is mechanism-correct and globally exact, but it has six scheduling facts and only four reach active products. Consequently 14 of 18 current placements are balance-only despite 34 passive relations and 191 structured knowledge memberships. Knowledge is captured but not accountable to the scheduler: this is a product failure.
+This recovery makes the active shelf materially schedule from formal world facts. The current baseline is 18 active products, six scheduling facts of which only four reach active products, and 14 balance-only placements despite 34 passive relations and 191 structured knowledge memberships. The runtime is mechanism-correct and globally exact, but knowledge is captured without being accountable to the scheduler: this is a product failure.
 
 The accepted direction is **closed actionable knowledge**. Every directed scheduling hypothesis, including anecdotal, mechanistic, or weak evidence, becomes one formal soft pressure through a typed fact and universal law. Evidence strength remains provenance, research state, and grooming/explanation metadata; it is never a numeric objective weight. The exact objective remains unique-pressure satisfaction, integer squared-load balance, then stable assignment tie-break. A direct same-item/same-dimension contradiction fails closed for adjudication.
 
 This covers active daily, episodic, and training shelf knowledge; typed unary food/empty/circadian/exercise claims; minimal pairwise world-fact mechanisms that genuinely entail co-location or separation; coverage/grooming workflow; proof-bearing explanations; and validation. Slots remain unbounded logical intake groups.
 
-Out of scope: dosage, diagnosis, treatment, clinical safety advice, capacity, tablet/capsule count, mass, volume, physical fit, a general rule engine, dose engine, UI framework, TypeDB, migrations, compatibility adapters, or a legacy museum. It does not blindly schedule every supports/balance relation. No stored prefer_same_slot, prefer_different_slot, placement, action, semantic UI prose, inferred result, numeric evidence weight, or weighted vote is canonical input.
+Out of scope: dosage, diagnosis, treatment, clinical safety advice, capacity, tablet/capsule count, mass, volume, physical fit, a general rule engine, dose engine, UI framework, TypeDB, migrations, compatibility adapters, or a legacy museum. It also excludes NLP, keyword/prose detection, heuristic linters, and an evidence warehouse. It does not blindly schedule every supports/balance relation. No stored prefer_same_slot, prefer_different_slot, placement, action, semantic UI prose, inferred result, numeric evidence weight, or weighted vote is canonical input.
 
 ## Why the prior V-model was insufficient
 
@@ -24,7 +24,7 @@ The cutover proved the *mechanism*: a closed fact catalog compiled, laws normali
 6. Balance-only is publishable only with a coverage certificate proving every active composition role and applicable scheduling dimension was assessed and no directed pressure exists. The simplest contract-consistent choice is incomplete coverage -> layout-free Indeterminate, rather than an incomplete balance layout. A mixed layout may include balance-only items only with individual complete certificates.
 7. Pairwise behavior is derived only from a minimal typed world-fact mechanism plus a universal law that entails co-location or separation. Supports, balance, and contextual relations remain passive and cannot affect the objective.
 8. Explanations show component pressures, provenance/research state, law/proof paths, satisfied/unsatisfied pressures, derived neutral outcomes, and every balance-only certificate. They never become authored placement knowledge.
-9. Generic authored notes cannot be a semantic sink. Useful existing notes are migrated into typed identity, composition, source, or typed evidence claims; generic notes are then removed or structurally unable to carry canonical scheduling knowledge.
+9. Generic authored notes are removed from canonical product, substance, and component card schema/source surface. A one-time stable source-span inventory migrates useful identity, composition, source, and scheduling material to typed destinations or records an explicit discard reason. After cutover, a notes key fails schema; only the closed typed candidate/disposition catalog may carry a scheduling candidate. No migration runtime, parser, heuristic, or museum remains.
 10. Evidence collection and semantic adjudication are distinct. Luna may collect evidence; high-reasoning agents decide semantics and ontology under the orchestration policy. Implementers are not alone in the checkout and must not revert concurrent work.
 
 ## V-level contract and paired acceptance matrix
@@ -34,7 +34,7 @@ No lower cluster may be marked complete until its upper-left contract is written
 | V level | V-left contract | Paired V-right acceptance evidence |
 | --- | --- | --- |
 | 1. Product invariant | Real active-shelf layout materially follows formal world facts. | A real-shelf trace proves every placement and every balance-only certificate. |
-| 2. Knowledge coverage boundary | Every active composition role and discovered scheduling candidate has exactly one formal disposition. | Deterministic coverage manifest has zero orphan/prose-only claims and zero unassessed active candidates. |
+| 2. Knowledge coverage boundary | Every active composition role and discovered scheduling candidate has exactly one formal disposition; generic notes no longer exist in canonical cards. | Deterministic coverage manifest has zero orphan/prose-only claims and zero unassessed active candidates; schema and corpus prove zero generic notes and the one-time source-span receipt proves no data loss. |
 | 3. Ontology boundary | Every directed hypothesis, including anecdotal, compiles to a typed pressure and law path. | Compiler/inference proofs establish typed fact/mechanism, applicability, provenance, dimension, value, and law. |
 | 4. Objective boundary | Every pressure outranks balance while exact global optimum and stable tie-break remain unchanged. | Metamorphic and exhaustive optimizer tests prove anecdotal pressure beats balance and exactness holds. |
 | 5. Publication boundary | Incomplete coverage cannot masquerade as neutral or balance-only. | Fail-closed/Indeterminate tests and explanations reject absent certificates and explain certified balance-only outcomes. |
@@ -55,17 +55,26 @@ No lower cluster may be marked complete until its upper-left contract is written
 - [ ] Record the product invariant, coverage boundary, candidate/disposition vocabulary, publication-certificate rule, and pairwise-admission rule in docs/domain-model.md and a governing dated decision; link the canonical-instance ADR without weakening its facts-only boundary.
   - Evidence: exact-head documentation diff plus reviewer acceptance that each invariant is a world fact or universal law, not a stored answer.
 
-- [ ] Inventory active daily, episodic, and training composition roles; the six current canonical facts; 34 relations; 191 structured memberships; and every scheduling-bearing phrase in active product/substance/component notes. Produce a deterministic source-indexed candidate ledger with no inference or schedule output.
-  - Evidence: committed generated-or-authored inventory with stable IDs, counts, source locations, and reproducible command output.
+- [ ] Freeze a recovery baseline witness set that records 18 active products, 14 balance-only placements, and each current placement trace. It must include named directed candidates for active nattokinase empty preference, active astaxanthin food preference, active krill-oil food preference, Only Trace Minerals product-with-food instruction, and LCLT exercise/recovery context, plus every other directed candidate discovered by the source-span inventory.
+  - Evidence: exact-head baseline manifest naming product and composition-role IDs, candidate source spans, current pressure set, placement, and balance-only status for all 18 products.
+
+- [ ] Send every named and discovered directed baseline candidate to high-reasoning semantic adjudication individually. Do not pre-adjudicate any candidate as pressure and do not permit a blanket neutral or outside_model closure for this witness set.
+  - Evidence: candidate-by-candidate adjudication record with rationale, provenance, and typed disposition; reviewer attests that no class-wide neutral/outside disposition was applied.
+
+- [ ] Inventory active daily, episodic, and training composition roles; the six current canonical facts; 34 relations; 191 structured memberships; and every legacy generic-note source span exactly once. Use stable file, entity, field, and byte/line-span identities for this one-time migration inventory only; it performs no NLP, keyword matching, prose interpretation, inference, or schedule output.
+  - Evidence: committed source-span receipt with stable IDs, counts, source locations, and reproducible deterministic output.
 
 - [ ] Give every ledger candidate exactly one typed disposition and reject duplicate, missing, or mutually inconsistent dispositions; permit outside_model only with an explicit closed reason.
   - Evidence: schema/loader rejection witnesses for zero and multiple dispositions, plus manifest output showing one disposition per candidate.
 
-- [ ] Preserve useful generic-note material by mechanically classifying it into identity, composition, source/provenance, typed evidence claim, or explicit out-of-model record; remove migrated scheduling semantics from generic notes and make validation reject scheduling candidate fields or directed scheduling prose in generic notes.
-  - Evidence: before/after note ledger, schema-negative fixtures, and a repository scan with documented allowlisted non-scheduling notes.
+- [ ] Migrate each one-time generic-note source span to a typed identity, composition, source/provenance, typed candidate/evidence claim, or explicit discard reason; then remove generic notes from the canonical card schema and every product, substance, and component source file. Do not retain a runtime migration receipt or backward-compatible notes field.
+  - Evidence: no-data-loss receipt maps every pre-cutover span to a typed destination or discard reason; schema-negative fixture rejects notes; corpus scan reports zero generic notes.
 
 - [ ] Establish the coverage-certificate shape: active role, applicable dimensions, evaluated candidate IDs, dispositions, absence of directed pressure where required, and exact input hashes; keep it derived verification metadata, never an optimizer input or stored placement answer.
   - Evidence: closed-schema acceptance fixture and proof that certificate mutation or staleness fails validation.
+
+- [ ] Add a recovery-difference witness that compares the frozen baseline to the completed active shelf, names every newly admitted fact reaching an active composition role, and reports the resulting balance-only count. It must fail the recovery acceptance if the count is not strictly below 14.
+  - Evidence: exact-head before/after trace with each new pressure's candidate, fact, applicability, law path, and placement effect; acceptance output reports balance-only count below 14.
 
 ### Wave 1 — closed ontology and admission paths (V-left level 3)
 
@@ -84,8 +93,8 @@ No lower cluster may be marked complete until its upper-left contract is written
 - [ ] Collect sources for all active unary food/empty/circadian/exercise candidates and preserve locators/quotations where available; route the collected record to high-reasoning semantic adjudication rather than admitting facts by collection alone.
   - Evidence: source ledger with candidate IDs, provenance, research state, and adjudication queue; no claimed schedule result.
 
-- [ ] Have a high-reasoning reviewer adjudicate each directed active candidate into an admitted typed fact/law path, a typed neutral/outside-model disposition, or an adjudication-blocking contradiction; do not add a fact family or law without that decision.
-  - Evidence: signed decision record linked to candidate IDs and a compiler proof for every admitted pressure.
+- [ ] Have a high-reasoning reviewer adjudicate each directed active candidate into an admitted typed fact/law path, an individually justified typed neutral/outside-model disposition, or an adjudication-blocking contradiction; do not add a fact family or law without that decision.
+  - Evidence: signed decision record linked to candidate IDs and a compiler proof for every admitted pressure; baseline witness record proves no blanket neutral/outside closure.
 
 ### Wave 2 — deterministic coverage workflow (V-left levels 2 and 6)
 
@@ -97,8 +106,8 @@ No lower cluster may be marked complete until its upper-left contract is written
   - Likely ownership: coverage module beside grooming and plan-input validation, without adding the manifest to the optimizer objective.
   - Evidence: reproducible manifest hash, zero-orphan/zero-unassessed real-shelf result, and an incomplete fixture returning Indeterminate.
 
-- [ ] Update agent-facing workflow documentation so collection, adjudication, formal authoring, verification, and evidence attachment are explicit commands and artifacts; prose, notes, and passive relations alone cannot close a card.
-  - Evidence: documentation review plus end-to-end workflow smoke from an unresolved card to a validated typed disposition.
+- [ ] Update agent-facing workflow documentation so collection, adjudication, formal authoring, verification, and evidence attachment are explicit commands and artifacts; prose, generic notes, and passive relations alone cannot close a card.
+  - Evidence: documentation review plus end-to-end workflow smoke from an unresolved card to a validated typed disposition, with notes rejected at schema boundary.
 
 ### Wave 3 — inference, exact optimization, and explanation (V-left levels 3–5)
 
@@ -137,8 +146,8 @@ No lower cluster may be marked complete until its upper-left contract is written
 - [ ] At the release-candidate boundary only, run just release once after targeted evidence is green; do not use the full release gate as a small-loop substitute.
   - Evidence: exact-head release receipt with status, stage results, coverage/quality outputs, corpus projection, and clean checkout.
 
-- [ ] Include focused tests for anecdotal pressure beats balance; prose cannot substitute for formal outcome; direct contradictions fail; pairwise behavior is derived while passive relations do not schedule; daily/episodic/training shelf; exact global optimum; certified balance-only; incomplete coverage Indeterminate; and disposable schedule behavior.
-  - Evidence: test inventory maps every named acceptance to a concrete test node and latest targeted/release receipt.
+- [ ] Include focused tests for anecdotal pressure beats balance; generic notes and prose cannot substitute for formal outcome; source-span migration has zero data loss and no remaining notes; direct contradictions fail; pairwise behavior is derived while passive relations do not schedule; daily/episodic/training shelf; exact global optimum; certified balance-only; incomplete coverage Indeterminate; disposable schedule behavior; and recovery balance-only count strictly below 14.
+  - Evidence: test inventory maps every named acceptance, including all five named baseline candidates, to a concrete test node and latest targeted/release receipt.
 
 ## Security and operational boundaries
 
@@ -161,28 +170,31 @@ No lower cluster may be marked complete until its upper-left contract is written
 
 ## Definition of done and stop line
 
-- [ ] Complete only when the V-level matrix has passing paired evidence at all six levels; every active role and discovered candidate has exactly one disposition; zero active candidates are unassessed or prose-only; active directed knowledge reaches formal pressures; pairwise effects are law-derived; contradictory and incomplete inputs are layout-free; and real daily/episodic/training traces explain every outcome.
-  - Evidence: exact-head coverage manifest, compiler/inference proofs, real-shelf traces, and release receipt.
+- [ ] Complete only when the V-level matrix has passing paired evidence at all six levels; every active role and discovered candidate has exactly one disposition; zero active candidates are unassessed or prose-only; the named recovery witnesses were individually adjudicated; generic notes are schema-rejected and absent from the corpus with a complete no-data-loss span receipt; active directed knowledge reaches formal pressures; pairwise effects are law-derived; contradictory and incomplete inputs are layout-free; real daily/episodic/training traces explain every outcome; and the recovery difference witness proves strictly fewer than 14 balance-only placements through newly admitted facts reaching active composition roles.
+  - Evidence: exact-head coverage manifest, no-data-loss receipt, compiler/inference proofs, baseline/recovery traces, and release receipt.
+
+- [ ] If high-reasoning adjudication cannot justify any newly admitted pressure reaching an active composition role, do not mark this recovery SHIP or check its product acceptance. Produce an explicit product-level STOP/decision that records the 14 balance-only baseline, rejected candidate rationale, and the next user decision required.
+  - Evidence: signed exact-head STOP decision linked to every candidate adjudication and no false completion or SHIP record.
 
 - [ ] Stop when the active shelf is covered and explained by the minimal closed vocabulary and justified laws. Do not add unrequested fact families, general interpretation, clinical/dose behavior, UI, storage engines, migrations, or compatibility work.
   - Evidence: final scope review records no out-of-scope artifact or unresolved required acceptance.
 
 ## Adversarial completion and convergence
 
-- [ ] Obtain an independent product reviewer verdict of SHIP with zero actionable Critical, High, or Medium findings against the real-shelf invariant and explanations.
-  - Evidence: exact-head reviewer record with verdict and finding disposition.
+- [ ] Obtain an independent product reviewer verdict of SHIP with zero actionable Critical, High, or Medium findings against the real-shelf invariant, the strict less-than-14 recovery witness, named candidate adjudications, and explanations.
+  - Evidence: exact-head reviewer record with verdict, baseline/recovery comparison, and finding disposition.
 
-- [ ] Obtain an independent ontology/V-model reviewer verdict of SHIP with zero actionable Critical, High, or Medium findings against all six V-level contracts, facts-only boundary, laws, and contradiction handling.
-  - Evidence: exact-head reviewer record with matrix-by-matrix findings.
+- [ ] Obtain an independent ontology/V-model reviewer verdict of SHIP with zero actionable Critical, High, or Medium findings against all six V-level contracts, facts-only boundary, laws, contradiction handling, no-blanket-disposition rule, and generic-notes removal closure.
+  - Evidence: exact-head reviewer record with matrix-by-matrix findings and notes/schema evidence.
 
 - [ ] Obtain an independent portability reviewer verdict of SHIP with zero actionable Critical, High, or Medium findings against the generated closed runtime program, no stored answers, and no compatibility surface.
   - Evidence: exact-head reviewer record with reproduction and boundary checks.
 
-- [ ] Obtain an independent QA/evidence reviewer verdict of SHIP with zero actionable Critical, High, or Medium findings against the manifest, certificates, CLI closure rules, targeted witnesses, and one release receipt.
+- [ ] Obtain an independent QA/evidence reviewer verdict of SHIP with zero actionable Critical, High, or Medium findings against the manifest, certificates, CLI closure rules, named baseline witnesses, source-span no-data-loss receipt, zero-notes corpus/schema proof, targeted witnesses, and one release receipt.
   - Evidence: exact-head reviewer record with test/evidence references.
 
-- [ ] Obtain an independent Kaizen/YAGNI reviewer verdict of SHIP with zero actionable Critical, High, or Medium findings; confirm the solution is the smallest closed addition and has no general engine or museum.
-  - Evidence: exact-head reviewer record identifying the stop-line check.
+- [ ] Obtain an independent Kaizen/YAGNI reviewer verdict of SHIP with zero actionable Critical, High, or Medium findings; confirm the solution is the smallest closed addition, removes notes rather than interpreting them, and has no general engine, parser/heuristic, or museum.
+  - Evidence: exact-head reviewer record identifying the stop-line and notes-removal checks.
 
 - [ ] If any convergence review finds an issue, append finite remediation checkboxes to this document, implement them as one coherent cluster, rerun just release only if executable state changed, then repeat the same five optics until all return SHIP with zero actionable Critical, High, or Medium findings.
   - Evidence: appended remediation records, commit map, and replacement exact-head review receipts.
