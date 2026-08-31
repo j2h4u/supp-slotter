@@ -1,0 +1,1583 @@
+format: supp-slotter.scheduling-candidates/v1
+authority:
+  adjudication: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+  queue: docs/evidence/actionable-scheduling-note-candidate-queue-20260831.jsonl
+  food: docs/decisions/actionable-scheduling-food-adjudication-20260831.md
+  exercise: docs/decisions/actionable-scheduling-exercise-adjudication-20260831.md
+  ordering: queue sequence 001-050, then named food sequence, then named exercise
+    sequence
+source_receipts:
+  - path: docs/evidence/actionable-scheduling-product-note-spans-20260831.jsonl
+    sha256: 53e38ad92a2d22624176ae4af0e6407782ff35d2922e5c666b9548df2b64a75d
+    record_count: 98
+  - path: docs/evidence/actionable-scheduling-substance-note-spans-20260831.jsonl
+    sha256: bb97e97be482b780cb5c5112ed824dd6fc2b85707d3adc59ca24957e3dd8df66
+    record_count: 256
+candidate_count: 64
+disposition_counts:
+  pressure: 8
+  neutral: 5
+  unresolved_without_direction: 14
+  outside_model: 37
+outside_model_reasons:
+- clinical_or_dose_scope
+- clinical_or_safety_scope
+- inactive_or_unreachable_scope
+- no_closed_fact_value
+- no_exact_form_or_role_scope
+- purpose_conditioned_claim
+- unmodeled_context
+- unmodeled_interval_or_context
+candidate_fields:
+  scope: typed subject and exact applicability; applicability is not a placement answer
+  provenance: adjudication decision plus source receipt/card/evidence references
+  pressure: present only for pressure dispositions; fact/law links and normalized
+    identity are evidence paths, not weighted optimizer records
+  outside_model_reason: required only for outside_model and closed to outside_model_reasons
+coverage_references:
+  relation_dispositions:
+    path: docs/decisions/actionable-scheduling-pairwise-adjudication-20260831.md
+    record_count: 34
+    optimizer_input: false
+  structured_membership_dispositions:
+    path: docs/evidence/actionable-scheduling-active-knowledge-dispositions-20260831.md
+    record_count: 191
+    optimizer_input: false
+candidates:
+- id: cand_note_atom_fd37f7f908d068d2b18962b3
+  sequence: 1
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_do96zy85ny
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/animal__animal_flex_comprehensive_joint_care__prd_do96zy85ny.yaml
+      field: notes
+      locator:
+        line_start: 71
+        line_end: 76
+        byte_start: 2956
+        byte_end: 3400
+      span_id: 3c8e3158609c906e949c9744eb964a7b6b2d66c3ddec135b15179620664d015c
+      span_sha256: 3c8e3158609c906e949c9744eb964a7b6b2d66c3ddec135b15179620664d015c
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_835810b98faf4445eff0cd31
+  sequence: 2
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_ecl277i8db
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/california_gold_nutrition__nicotinamide_riboside_tartrate_nrt_complex__prd_ecl277i8db.yaml
+      field: notes
+      locator:
+        line_start: 24
+        line_end: 27
+        byte_start: 878
+        byte_end: 1168
+      span_id: 9c068c0e0c9968733acdda591b92e3a6c5fc445e04e0672ef3ec2c334fcaac3a
+      span_sha256: 9c068c0e0c9968733acdda591b92e3a6c5fc445e04e0672ef3ec2c334fcaac3a
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_de0a8698539edb7185f5c85d
+  sequence: 3
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_coglohvmzn
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/country_life__core_daily_1_for_women__prd_coglohvmzn.yaml
+      field: notes
+      locator:
+        line_start: 125
+        line_end: 132
+        byte_start: 4759
+        byte_end: 5389
+      span_id: e2dd1099e80d68d3e435684f03b8dc71cb9a8a30b2de98f8cc6c3529f5ce0400
+      span_sha256: e2dd1099e80d68d3e435684f03b8dc71cb9a8a30b2de98f8cc6c3529f5ce0400
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_a7c7c4166e180b9b69c30696
+  sequence: 4
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_955ea0c9e6
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/doctors_best__nac_detox_regulators__prd_955ea0c9e6.yaml
+      field: notes
+      locator:
+        line_start: 21
+        line_end: 24
+        byte_start: 774
+        byte_end: 1076
+      span_id: 7a855e273dbcc8b36e22022c76bdefe74cda44eb7015683a71541b4b3964c538
+      span_sha256: 7a855e273dbcc8b36e22022c76bdefe74cda44eb7015683a71541b4b3964c538
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_4e19e8f62b675c92063a78df
+  sequence: 5
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_8jvb8ppsdq
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/doctors_best__stabilized_r_lipoic_acid__prd_8jvb8ppsdq.yaml
+      field: notes
+      locator:
+        line_start: 16
+        line_end: 19
+        byte_start: 541
+        byte_end: 886
+      span_id: 3de645b62f6d2ad187456863cff6fcf534a74cd0b2463fb6e3a28abbd39b308c
+      span_sha256: 3de645b62f6d2ad187456863cff6fcf534a74cd0b2463fb6e3a28abbd39b308c
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_c8bca12f5f4b1916f0ded21f
+  sequence: 6
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_eb6337a6dc
+    applicability:
+      active_shelf_reachable: true
+      product_ids:
+      - prd_eb6337a6dc
+      composition_role_ids: []
+  disposition: pressure
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/futurebiotics__vitamin_d3__prd_eb6337a6dc.yaml
+      field: notes
+      locator:
+        line_start: 11
+        line_end: 13
+        byte_start: 254
+        byte_end: 441
+      span_id: 9b86e3cc6cdf081a70d5fc897da9a431f71ed8d95d61a7c661c697ed3ff46abd
+      span_sha256: 9b86e3cc6cdf081a70d5fc897da9a431f71ed8d95d61a7c661c697ed3ff46abd
+  pressure:
+    fact_id: fact_food_prd_eb6337a6dc_sub_2476bf9d4b
+    law_id: law_food_bioavailability_increases
+    dimension: meal_context
+    value: with_food
+    normalized_item: prd_eb6337a6dc
+- id: cand_note_atom_d08ea852acc0fbcb332d33c3
+  sequence: 7
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_h9zp0td8gh
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/garden_of_life__super_seed_beyond_fiber__prd_h9zp0td8gh.yaml
+      field: notes
+      locator:
+        line_start: 17
+        line_end: 23
+        byte_start: 642
+        byte_end: 1169
+      span_id: 4975edef5b01b9d4aeab2f74b0fcbdbf8e33d435656e5e08c59e218a6b604c77
+      span_sha256: 4975edef5b01b9d4aeab2f74b0fcbdbf8e33d435656e5e08c59e218a6b604c77
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_a4ca5c059c8060afcbdaead7
+  sequence: 8
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_qdy601kwu0
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/jarrow_formulas__maculapf_macula_protective_factors__prd_qdy601kwu0.yaml
+      field: notes
+      locator:
+        line_start: 29
+        line_end: 33
+        byte_start: 1005
+        byte_end: 1345
+      span_id: 352d2ef762f48af26f7aaf791e8dbfcfeb5eb069c606188b1a3bbb6c77a730f0
+      span_sha256: 352d2ef762f48af26f7aaf791e8dbfcfeb5eb069c606188b1a3bbb6c77a730f0
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_2cda37dce342473de60904de
+  sequence: 9
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_9eoksvn2mt
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/jarrow_formulas__toco_sorb__prd_9eoksvn2mt.yaml
+      field: notes
+      locator:
+        line_start: 17
+        line_end: 20
+        byte_start: 556
+        byte_end: 831
+      span_id: b3613a903989698d56684e4f94eb5b411097c6e1f8215f378f48baf94304667d
+      span_sha256: b3613a903989698d56684e4f94eb5b411097c6e1f8215f378f48baf94304667d
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_b051cc6731178a9bc87fb665
+  sequence: 10
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_aq1hsm38gl
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/life_extension__melatonin__prd_aq1hsm38gl.yaml
+      field: notes
+      locator:
+        line_start: 12
+        line_end: 15
+        byte_start: 343
+        byte_end: 676
+      span_id: e0424ed32e11daceb7b6f1b4b5e7be3946d9cf02166884333a1ed47803ad3cbb
+      span_sha256: e0424ed32e11daceb7b6f1b4b5e7be3946d9cf02166884333a1ed47803ad3cbb
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_1c927da88dbdc33d0578c5e0
+  sequence: 11
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_932319251f
+    applicability:
+      active_shelf_reachable: true
+      product_ids:
+      - prd_932319251f
+      composition_role_ids: []
+  disposition: pressure
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/life_extension__only_trace_minerals__prd_932319251f.yaml
+      field: notes
+      locator:
+        line_start: 35
+        line_end: 40
+        byte_start: 1147
+        byte_end: 1599
+      span_id: 103c11b635ea91a34d1962cfdf0ba9de90f774e5be1b5377af62d0073213e64a
+      span_sha256: 103c11b635ea91a34d1962cfdf0ba9de90f774e5be1b5377af62d0073213e64a
+  pressure:
+    fact_id: fact_product_food_prd_932319251f
+    law_id: law_product_food_take_with_food
+    dimension: meal_context
+    value: with_food
+    normalized_item: prd_932319251f
+- id: cand_note_atom_8afee17053d97509c5f1cc86
+  sequence: 12
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_hf53zf8hvw
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/life_extension__vitamins_d_and_k_with_sea_iodine__prd_hf53zf8hvw.yaml
+      field: notes
+      locator:
+        line_start: 28
+        line_end: 30
+        byte_start: 940
+        byte_end: 1169
+      span_id: ce336ac2ae7e0f897b89a4ebf3fee0f69989859c80b3c9559cea2bcebd6d20ae
+      span_sha256: ce336ac2ae7e0f897b89a4ebf3fee0f69989859c80b3c9559cea2bcebd6d20ae
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_208ac8f9565ca312aa109a67
+  sequence: 13
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_2bdj9ejl1s
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/natural_balance__happy_sleeper__prd_2bdj9ejl1s.yaml
+      field: notes
+      locator:
+        line_start: 49
+        line_end: 51
+        byte_start: 1667
+        byte_end: 1902
+      span_id: 326fbdcc943d6e4658bd9669317e44be7bb64044b685884b1c6e400de87aab43
+      span_sha256: 326fbdcc943d6e4658bd9669317e44be7bb64044b685884b1c6e400de87aab43
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_3bdff61186e82bac54622515
+  sequence: 14
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_3at95d1ser
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/natures_way__alive_calcium_max_absorption__prd_3at95d1ser.yaml
+      field: notes
+      locator:
+        line_start: 37
+        line_end: 43
+        byte_start: 1272
+        byte_end: 1789
+      span_id: d366b930ef14da2797cdb35cae2fdc32d107e90e8288e95106aa46b266985d25
+      span_sha256: d366b930ef14da2797cdb35cae2fdc32d107e90e8288e95106aa46b266985d25
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_e177bb1e91075deed3bf9914
+  sequence: 15
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_3at95d1ser
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/natures_way__alive_calcium_max_absorption__prd_3at95d1ser.yaml
+      field: notes
+      locator:
+        line_start: 37
+        line_end: 43
+        byte_start: 1272
+        byte_end: 1789
+      span_id: d366b930ef14da2797cdb35cae2fdc32d107e90e8288e95106aa46b266985d25
+      span_sha256: d366b930ef14da2797cdb35cae2fdc32d107e90e8288e95106aa46b266985d25
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_ab93da362c70f41f2f497ebe
+  sequence: 16
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_q3wfbnfsd9
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/now_foods__magnesium_glycinate__prd_q3wfbnfsd9.yaml
+      field: notes
+      locator:
+        line_start: 12
+        line_end: 15
+        byte_start: 434
+        byte_end: 754
+      span_id: b8d7763a10610303694ad7dee4f1f09d9b47fe44d4b6b5e913ea6b41b364cecd
+      span_sha256: b8d7763a10610303694ad7dee4f1f09d9b47fe44d4b6b5e913ea6b41b364cecd
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_ded07c466df0813b2c7893bc
+  sequence: 17
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_97fc03c4c0
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/now_foods__potassium_citrate_99_mg__prd_97fc03c4c0.yaml
+      field: notes
+      locator:
+        line_start: 12
+        line_end: 14
+        byte_start: 430
+        byte_end: 672
+      span_id: 8bb35584714f57040fcc9214bbf7cfbf0bb4c612d2b20c0f59f942a4c4dab8c9
+      span_sha256: 8bb35584714f57040fcc9214bbf7cfbf0bb4c612d2b20c0f59f942a4c4dab8c9
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_d6bf51068f62436dc6cd70b7
+  sequence: 18
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_io1peb9syp
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/optimum_nutrition__opti_men_multivitamin_for_active_men__prd_io1peb9syp.yaml
+      field: notes
+      locator:
+        line_start: 177
+        line_end: 183
+        byte_start: 6681
+        byte_end: 7239
+      span_id: 77bc58d228bb4f9dd4fa3d67f1cf1c278bad73563f9809d89424826e6e63f9d2
+      span_sha256: 77bc58d228bb4f9dd4fa3d67f1cf1c278bad73563f9809d89424826e6e63f9d2
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_a18bb194433094d309383705
+  sequence: 19
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_ffmechrinq
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/paradise_herbs__african_mango__prd_ffmechrinq.yaml
+      field: notes
+      locator:
+        line_start: 13
+        line_end: 15
+        byte_start: 455
+        byte_end: 659
+      span_id: 175b7dd3d0f88d0f97c9a11469dc5082da0c768b528bea2f5e2288e66b031bd6
+      span_sha256: 175b7dd3d0f88d0f97c9a11469dc5082da0c768b528bea2f5e2288e66b031bd6
+  outside_model_reason: unmodeled_interval_or_context
+- id: cand_note_atom_68873823f036180733d28432
+  sequence: 20
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_wmgtl3kw7i
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/solaray__zinc_copper__prd_wmgtl3kw7i.yaml
+      field: notes
+      locator:
+        line_start: 21
+        line_end: 24
+        byte_start: 669
+        byte_end: 1012
+      span_id: 7dcba3c9a3159578ba543048cb60f49e214776d16c563179d07fd7266a016698
+      span_sha256: 7dcba3c9a3159578ba543048cb60f49e214776d16c563179d07fd7266a016698
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_d15b7b2add87da3299b2cc82
+  sequence: 21
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_nuicads5ns
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/solgar__skin_nails_and_hair_advanced_msm_formula__prd_nuicads5ns.yaml
+      field: notes
+      locator:
+        line_start: 36
+        line_end: 38
+        byte_start: 1149
+        byte_end: 1406
+      span_id: 27d8e1b796a660f14ab6f28a5daac6e6578f7f90de11b30e33f99e2745d97d5a
+      span_sha256: 27d8e1b796a660f14ab6f28a5daac6e6578f7f90de11b30e33f99e2745d97d5a
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_2f8951d77973833f8d1e06bc
+  sequence: 22
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_t6ml86bybn
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/source_naturals__ultra_mag__prd_t6ml86bybn.yaml
+      field: notes
+      locator:
+        line_start: 33
+        line_end: 36
+        byte_start: 1173
+        byte_end: 1486
+      span_id: 5d3079e354d28c76120421a0cbee624af577768e4b7dba223bc96b38412a9339
+      span_sha256: 5d3079e354d28c76120421a0cbee624af577768e4b7dba223bc96b38412a9339
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_73af4987a89dea44bbfeaf8f
+  sequence: 23
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_y57omgja5w
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/swanson__100_pure_krill_oil__prd_y57omgja5w.yaml
+      field: notes
+      locator:
+        line_start: 30
+        line_end: 34
+        byte_start: 1017
+        byte_end: 1389
+      span_id: 14ac58842f1478af2a62155df17eb87223ec789de3df5a188b6fc1c0fcb8ded3
+      span_sha256: 14ac58842f1478af2a62155df17eb87223ec789de3df5a188b6fc1c0fcb8ded3
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_71d8483b3d39fa56f7896489
+  sequence: 24
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_w1nkijjqxz
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/swanson__tocotrienols_double_strength__prd_w1nkijjqxz.yaml
+      field: notes
+      locator:
+        line_start: 13
+        line_end: 15
+        byte_start: 487
+        byte_end: 725
+      span_id: 69e6efe28c19ca7dbb34da6a3cfe8a32b66a7b7175d0861341470285e18017f4
+      span_sha256: 69e6efe28c19ca7dbb34da6a3cfe8a32b66a7b7175d0861341470285e18017f4
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_e30c5b6e15d7f580ee2f5e3b
+  sequence: 25
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_a6y3uidgfk
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/the_genius_brand__genius_pre__prd_a6y3uidgfk.yaml
+      field: notes
+      locator:
+        line_start: 51
+        line_end: 58
+        byte_start: 1486
+        byte_end: 2120
+      span_id: 966c537128dde0395f8dc7855be3199d93539fc460b189c65eba7fb5dafa162b
+      span_sha256: 966c537128dde0395f8dc7855be3199d93539fc460b189c65eba7fb5dafa162b
+  outside_model_reason: inactive_or_unreachable_scope
+- id: cand_note_atom_09c98117040ef16436a2e1b7
+  sequence: 26
+  candidate_type: note
+  scope:
+    subject:
+      product: prd_20bf2df267
+    applicability:
+      active_shelf_reachable: true
+      product_ids:
+      - prd_20bf2df267
+      composition_role_ids: []
+  disposition: neutral
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-product-note-atoms-20260831.jsonl
+      path: data/products/tim__electrolyte_caps__prd_20bf2df267.yaml
+      field: notes
+      locator:
+        line_start: 37
+        line_end: 45
+        byte_start: 1529
+        byte_end: 2231
+      span_id: c1276c3e74edccc0e7b2958354338578e784ec69c462a4274a905002ab96e84d
+      span_sha256: c1276c3e74edccc0e7b2958354338578e784ec69c462a4274a905002ab96e84d
+- id: cand_note_dcf05847619838d9f01423a0d95f63d71f50beb41348c2685f23c28537e310a7
+  sequence: 27
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_jmyif2xwft
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/african_mango_seed_extract_10_1__sub_jmyif2xwft.yaml
+      field: notes
+      locator:
+        line_start: 7
+        line_end: 8
+        byte_start: 123
+        byte_end: 375
+      span_id: fa72fc60a7d213458db198b0fd8665c0cb06ea5450508c85e9e5ac2a306d1ad6
+      span_sha256: 55158e7fb8e7c4a142e62c0a3ca01096a7757fe881b41f5feb009fab55b38755
+  outside_model_reason: unmodeled_interval_or_context
+- id: cand_note_1e935a7665f93fdc17c0925c677fadeb154a49cb6f2cc1905335523896738f49
+  sequence: 28
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_6zegokcu7e
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/alpha_amylase__sub_6zegokcu7e.yaml
+      field: notes
+      locator:
+        line_start: 6
+        line_end: 7
+        byte_start: 84
+        byte_end: 241
+      span_id: c73c56dcfba42d8c00f192f4d7e4df9fb08e017b15e35b408a14e4ff988d2096
+      span_sha256: e5ce709f13f4befe8a28b4d1545a1afa3667a0cfd8359dff549163ed4ac1727d
+  outside_model_reason: unmodeled_context
+- id: cand_note_733d87f39ad61bd3f7224f84a2af3040981e623da05c7198d45971a6dcfa8d4c
+  sequence: 29
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_j92h8kgjru
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/beetroot_extract__sub_j92h8kgjru.yaml
+      field: notes
+      locator:
+        line_start: 10
+        line_end: 13
+        byte_start: 174
+        byte_end: 605
+      span_id: 21c44708826a726be37311513658f46defd477957b081886c5050fef619e50a1
+      span_sha256: 179459e4a9c334b0d63952e23576f84266025631d02890627b2cad4ccf878745
+  outside_model_reason: no_exact_form_or_role_scope
+- id: cand_note_c4e6324eacce70c13c0a0ec9ab4592f069232d8032cd32b9cd3c155fdafcabf1
+  sequence: 30
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_abb9604e58
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/beta_alanine__sub_abb9604e58.yaml
+      field: notes
+      locator:
+        line_start: 3
+        line_end: 5
+        byte_start: 38
+        byte_end: 330
+      span_id: 8c04e88c836284c9a24f55733d4f541155df6a28e08c4a03c78ecd2c9aa9b304
+      span_sha256: a5658520b3b74b26e392e82cb7a2b103f286ca66be047e314560c4ff57e6a15f
+  outside_model_reason: no_closed_fact_value
+- id: cand_note_f61c436e56d7d766ac34ffd2a50c4a5a3b44a86ddfeeaa2d65fee172054abe3c
+  sequence: 31
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_abb9604e58
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/beta_alanine__sub_abb9604e58.yaml
+      field: notes
+      locator:
+        line_start: 3
+        line_end: 5
+        byte_start: 38
+        byte_end: 330
+      span_id: 8c04e88c836284c9a24f55733d4f541155df6a28e08c4a03c78ecd2c9aa9b304
+      span_sha256: a5658520b3b74b26e392e82cb7a2b103f286ca66be047e314560c4ff57e6a15f
+  outside_model_reason: clinical_or_dose_scope
+- id: cand_note_f3d58d83411d0e8c4fb99ffdab18c207487e58e37386fa1b1fbeb4977e567cca
+  sequence: 32
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_zhz9m31edv
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/beta_hydroxy_beta_methylbutyrate__sub_zhz9m31edv.yaml
+      field: notes
+      locator:
+        line_start: 6
+        line_end: 8
+        byte_start: 128
+        byte_end: 406
+      span_id: 569752387f548583cffccbcf869afc873fefcbf32cbb021af1656c2af3b2615a
+      span_sha256: 0266f2df9cb05093b490364a0d0604bf18b0a2681ad0a51b974e84a96d5ba8e3
+  outside_model_reason: no_closed_fact_value
+- id: cand_note_d81564e08e85ca68806eb8f3bffebb45f40e52a44a897f6250c13a85092a8baf
+  sequence: 33
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_fmuptat7pw
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/betaine_nitrate_no3_t__sub_fmuptat7pw.yaml
+      field: notes
+      locator:
+        line_start: 6
+        line_end: 7
+        byte_start: 72
+        byte_end: 241
+      span_id: 236baf28aecf2414b4d4242f38609b31a402f0c63f9bca2a0246cad14d240714
+      span_sha256: 00fd2864f9163298bf2370720615e53c32593f8f113abb7d01e0b0a424db5077
+  outside_model_reason: unmodeled_context
+- id: cand_note_0b6624033909105acf7b5e025f6b0aa37ff8bb185cbe62b3c9dd332f571d1b5b
+  sequence: 34
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_6tk5moz0wh
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/bromelain__sub_6tk5moz0wh.yaml
+      field: notes
+      locator:
+        line_start: 6
+        line_end: 8
+        byte_start: 89
+        byte_end: 406
+      span_id: 6d0e2b786757a30bc4cd4487841537fe3fc7c15cfdcf89476b6da59b5ca719d8
+      span_sha256: 40f17218837770ca458c4d1138aa089db99838ffdb65673ff2c3528d138d87ba
+  outside_model_reason: clinical_or_safety_scope
+- id: cand_note_2820c8320c617329ee64f9c9eb33f3e4ca2dc26a19f4d0f51d70b0395df27968
+  sequence: 35
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_6tk5moz0wh
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/bromelain__sub_6tk5moz0wh.yaml
+      field: notes
+      locator:
+        line_start: 6
+        line_end: 8
+        byte_start: 89
+        byte_end: 406
+      span_id: 6d0e2b786757a30bc4cd4487841537fe3fc7c15cfdcf89476b6da59b5ca719d8
+      span_sha256: 40f17218837770ca458c4d1138aa089db99838ffdb65673ff2c3528d138d87ba
+  outside_model_reason: purpose_conditioned_claim
+- id: cand_note_3cdab89e570d5a766392a5b2d2c71ec62ed1d88b88c0bef8d11a11661cf0eb96
+  sequence: 36
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_6tk5moz0wh
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/bromelain__sub_6tk5moz0wh.yaml
+      field: notes
+      locator:
+        line_start: 6
+        line_end: 8
+        byte_start: 89
+        byte_end: 406
+      span_id: 6d0e2b786757a30bc4cd4487841537fe3fc7c15cfdcf89476b6da59b5ca719d8
+      span_sha256: 40f17218837770ca458c4d1138aa089db99838ffdb65673ff2c3528d138d87ba
+  outside_model_reason: purpose_conditioned_claim
+- id: cand_note_0c26f105bf8fb918c3469fd5d5fbab23a83e011ae3f200051b807f192e42a1c0
+  sequence: 37
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_iqjdo9gvbv
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: neutral
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/calcium_dicalcium_phosphate__sub_iqjdo9gvbv.yaml
+      field: notes
+      locator:
+        line_start: 4
+        line_end: 11
+        byte_start: 59
+        byte_end: 565
+      span_id: 3df08ef1f0e850eefbfac967d933f26f8e2a3757a063b7d5e7fe4556dfb03c88
+      span_sha256: 389079988b46263fa217b1ec81e25f133d0f7c2a641e2d936b30515b8c75cab5
+- id: cand_note_bcde71885c1365835992e502661b88f1795e4626f658dba108d89f89d388d97b
+  sequence: 38
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_kwudyhex2o
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/choline_bitartrate__sub_kwudyhex2o.yaml
+      field: notes
+      locator:
+        line_start: 3
+        line_end: 12
+        byte_start: 31
+        byte_end: 701
+      span_id: 72349237ad2978b2f466a45589b5dc7187b866caddf01e82fb70369f0d1e51d9
+      span_sha256: d676e7b7ccb5ec26cad460b583127c99e374ac729b302bee2287cda6f025d033
+  outside_model_reason: clinical_or_safety_scope
+- id: cand_note_21c3336cc1d29cc3bec40c093036a7035f31d33a96cfd3e1e80cc1b66bd6fe6d
+  sequence: 39
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_844a0cc551
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: neutral
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/copper_bisglycinate__sub_844a0cc551.yaml
+      field: notes
+      locator:
+        line_start: 6
+        line_end: 10
+        byte_start: 87
+        byte_end: 650
+      span_id: df61194942183e673ca05f1a97fa63c97dd8236349e0387bcd631dbd87b62ccb
+      span_sha256: b050c59d00286595b3387ca58952b056d66b23b129bd019e00b6c48276b5c694
+- id: cand_note_a4c29445b00bf66d3b403d617dadfc78f495f88561d5008409b100f3c38ac9bd
+  sequence: 40
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_9c0908e7f7
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: neutral
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/creatine_monohydrate__sub_9c0908e7f7.yaml
+      field: notes
+      locator:
+        line_start: 4
+        line_end: 4
+        byte_start: 52
+        byte_end: 334
+      span_id: 198ec784890ad1412495e9cb55213b7a4455fc30db2ef5ec4124a097fdfc0ac2
+      span_sha256: 009251640a1f326fcb348edf9a0f21af5e3db142388d4eef4b0f2871ebdedeed
+- id: cand_note_3da0895bedf599a13744fbb6550616fe1d6a117f12bd77fe94eb3b8e2221f121
+  sequence: 41
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_jwqo8ptntd
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: unresolved_without_direction
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/d_ribose__sub_jwqo8ptntd.yaml
+      field: notes
+      locator:
+        line_start: 4
+        line_end: 6
+        byte_start: 33
+        byte_end: 319
+      span_id: 53547e371a5e229fcaad081d2ccc668ede3ad1a36744cb6822515490bd09d487
+      span_sha256: 06ea982eb88c36edd92818ac3a008b0dc127da5c3a9290f9f545ae0fcb9f0f4b
+- id: cand_note_bd11a039cd10fc0d14e0c4547b0a117fcfe8ec6a27441606a6ff9aac2c232622
+  sequence: 42
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_jwqo8ptntd
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: unresolved_without_direction
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/d_ribose__sub_jwqo8ptntd.yaml
+      field: notes
+      locator:
+        line_start: 4
+        line_end: 6
+        byte_start: 33
+        byte_end: 319
+      span_id: 53547e371a5e229fcaad081d2ccc668ede3ad1a36744cb6822515490bd09d487
+      span_sha256: 06ea982eb88c36edd92818ac3a008b0dc127da5c3a9290f9f545ae0fcb9f0f4b
+- id: cand_note_a6542984ac42867f48fad53cfa98fdb6e774e2b83ef1de0f79c60467489074d4
+  sequence: 43
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_rt2lr29xqs
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/dehydroepiandrosterone__sub_rt2lr29xqs.yaml
+      field: notes
+      locator:
+        line_start: 5
+        line_end: 7
+        byte_start: 58
+        byte_end: 428
+      span_id: 0a4d0c0760c23915ba9534483b9677e476faa0947355c859304111357347f93d
+      span_sha256: f3556539c2e5a8384d4a817d8fffed7c5620be087555ff9febf85e219a8e4fdb
+  outside_model_reason: clinical_or_safety_scope
+- id: cand_note_437a35c9b59607d8c3e89eec7a66e8f4070d6f41e7b4174725a874787aeeb43e
+  sequence: 44
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_xsqvv2fop0
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: unresolved_without_direction
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/docosahexaenoic_acid__sub_xsqvv2fop0.yaml
+      field: notes
+      locator:
+        line_start: 5
+        line_end: 5
+        byte_start: 61
+        byte_end: 375
+      span_id: 9b44226343491de02fd63ac95ca320f16b6de68dc448833938a74c1d3284515b
+      span_sha256: e523f287c13444bf46b92b38cb1e99ca912d7d274902c593c6b0247bcf48280a
+- id: cand_note_d9bb7a793eab2aecf9efb718abb60717a0a44b53c1e3f6e7d7163b7e1f26a3a1
+  sequence: 45
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_xsqvv2fop0
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: unresolved_without_direction
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/docosahexaenoic_acid__sub_xsqvv2fop0.yaml
+      field: notes
+      locator:
+        line_start: 5
+        line_end: 5
+        byte_start: 61
+        byte_end: 375
+      span_id: 9b44226343491de02fd63ac95ca320f16b6de68dc448833938a74c1d3284515b
+      span_sha256: e523f287c13444bf46b92b38cb1e99ca912d7d274902c593c6b0247bcf48280a
+- id: cand_note_013c76f349b740764c1fb456e9032d9fb6852e5f24e7fed29224f4e15a11430b
+  sequence: 46
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_66b783576c
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: unresolved_without_direction
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/eicosapentaenoic_acid__sub_66b783576c.yaml
+      field: notes
+      locator:
+        line_start: 5
+        line_end: 5
+        byte_start: 62
+        byte_end: 376
+      span_id: 3e62f9e674ebb3efc858ac8ae3aa1389ae4c791c13f7460d536bff73473e43a9
+      span_sha256: 8b1d16ba76908d3573acfc4bb558e76af9624391a904da1c894590ccc701486f
+- id: cand_note_766ea2ca981fb200e036aa8c57acb701f6c4e854190d56c102e90e174a840081
+  sequence: 47
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_sunkcr05vl
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: unresolved_without_direction
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/fish_oil_concentrate_epa_dha_ethyl_esters__sub_sunkcr05vl.yaml
+      field: notes
+      locator:
+        line_start: 5
+        line_end: 14
+        byte_start: 86
+        byte_end: 856
+      span_id: 2c6ce739774ff7560cdeb5cff57df648f24cff342564d6f625558e5ca2e54416
+      span_sha256: 58e9217e1565b39e081e87f671f1db958020230ad161baa7e192bee3687780d0
+- id: cand_note_551e84493e65009c8c07a399c6db54f8e323504844271387981c8648ce9062e0
+  sequence: 48
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_be55xf4yb7
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/garlic__sub_be55xf4yb7.yaml
+      field: notes
+      locator:
+        line_start: 7
+        line_end: 8
+        byte_start: 96
+        byte_end: 328
+      span_id: 87cb7bf3835898357df4720ed134cf036fdf242127120079fcbb024a68ccdec0
+      span_sha256: 2f04b90233cabd42244ab8a53aee0964b14621668edb62b52b792c9f11d50781
+  outside_model_reason: clinical_or_safety_scope
+- id: cand_note_3b55992a050a8cd6391c4d5df723b2bd0dda2224c07e948f3306ab5e672f8805
+  sequence: 49
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_f3vgw907ew
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: outside_model
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/ginger__sub_f3vgw907ew.yaml
+      field: notes
+      locator:
+        line_start: 6
+        line_end: 7
+        byte_start: 77
+        byte_end: 296
+      span_id: 63e70e546aae0ead1c6ce6ccae42ad3037d88b7cdf4bfe03437a5387eea14d07
+      span_sha256: 327909f5d0b5de79b92b8d814b943623f47f73a3f7bfa3950c87f97b770eb44a
+  outside_model_reason: clinical_or_safety_scope
+- id: cand_note_103ad5d1c1cac1632aeea36e647d08f6b249e763047af929aa6d67b19dd87162
+  sequence: 50
+  candidate_type: note
+  scope:
+    subject:
+      substance: sub_c9720c7240
+    applicability:
+      active_shelf_reachable: false
+      product_ids: []
+      composition_role_ids: []
+  disposition: unresolved_without_direction
+  provenance:
+    decision: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+    source:
+      receipt: docs/evidence/actionable-scheduling-substance-note-atoms-a-h-20260831.jsonl
+      path: data/substances/glycine__sub_c9720c7240.yaml
+      field: notes
+      locator:
+        line_start: 3
+        line_end: 6
+        byte_start: 33
+        byte_end: 439
+      span_id: a658b90b4b045a213ef982423c309d0642dddf20b0e0d8018e2a0cafea592af9
+      span_sha256: fe0604b2797ede9cbe4c47b3afb47532a8d0750bdeb7b44953749b1d5ec65f1e
+- id: cand_food_cmp_prd_175251bd63__sub_877c24aad4_empty
+  sequence: 51
+  candidate_type: food
+  scope:
+    subject:
+      composition_role: cmp_prd_175251bd63__sub_877c24aad4
+    applicability:
+      composition_role: cmp_prd_175251bd63__sub_877c24aad4
+    active_shelf_reachable: true
+  disposition: unresolved_without_direction
+  provenance:
+    decision: docs/decisions/actionable-scheduling-food-adjudication-20260831.md
+    sources:
+    - path: data/substances/nattokinase__sub_877c24aad4.yaml
+      locator: '#L3'
+    - source: PMID 17520440
+    - source: PMID 23709455
+    - source: PMID 26109079
+    - source: PMID 19358933
+    - source: NIH DSLD label 82020
+- id: cand_food_cmp_prd_e5cc3b4e7c__sub_249199f726
+  sequence: 52
+  candidate_type: food
+  scope:
+    subject:
+      composition_role: cmp_prd_e5cc3b4e7c__sub_249199f726
+    applicability:
+      composition_role: cmp_prd_e5cc3b4e7c__sub_249199f726
+    active_shelf_reachable: true
+  disposition: pressure
+  provenance:
+    decision: docs/decisions/actionable-scheduling-food-adjudication-20260831.md
+    sources:
+    - path: data/substances/astaxanthin__sub_249199f726.yaml
+      locator: '#L3'
+    - path: data/products/harmony_aqua__astaxanthin__prd_e5cc3b4e7c.yaml
+    - source: PMID 19734684
+    - source: PMID 12885395
+  pressure:
+    fact_id: fact_food_prd_e5cc3b4e7c_sub_249199f726
+    law_id: law_food_bioavailability_increases
+    dimension: meal_context
+    value: with_food
+    normalized_item: prd_e5cc3b4e7c
+- id: cand_food_cmp_prd_8mvv1w128a__sub_249199f726
+  sequence: 53
+  candidate_type: food
+  scope:
+    subject:
+      composition_role: cmp_prd_8mvv1w128a__sub_249199f726
+    applicability:
+      composition_role: cmp_prd_8mvv1w128a__sub_249199f726
+    active_shelf_reachable: true
+  disposition: pressure
+  provenance:
+    decision: docs/decisions/actionable-scheduling-food-adjudication-20260831.md
+    sources:
+    - path: data/substances/astaxanthin__sub_249199f726.yaml
+      locator: '#L3'
+    - path: data/products/psalae__astaxanthin__prd_8mvv1w128a.yaml
+    - source: PMID 19734684
+    - source: PMID 12885395
+  pressure:
+    fact_id: fact_food_prd_8mvv1w128a_sub_249199f726
+    law_id: law_food_bioavailability_increases
+    dimension: meal_context
+    value: with_food
+    normalized_item: prd_8mvv1w128a
+- id: cand_food_cmp_prd_w2s970gps4__sub_249199f726
+  sequence: 54
+  candidate_type: food
+  scope:
+    subject:
+      composition_role: cmp_prd_w2s970gps4__sub_249199f726
+    applicability:
+      composition_role: cmp_prd_w2s970gps4__sub_249199f726
+    active_shelf_reachable: true
+  disposition: pressure
+  provenance:
+    decision: docs/decisions/actionable-scheduling-food-adjudication-20260831.md
+    sources:
+    - path: data/substances/astaxanthin__sub_249199f726.yaml
+      locator: '#L3'
+    - path: data/products/psalae__antarctiv_krill_oil__prd_w2s970gps4.yaml
+    - source: PMID 19734684
+    - source: PMID 12885395
+  pressure:
+    fact_id: fact_food_prd_w2s970gps4_sub_249199f726
+    law_id: law_food_bioavailability_increases
+    dimension: meal_context
+    value: with_food
+    normalized_item: prd_w2s970gps4
+- id: cand_food_cmp_prd_w2s970gps4__sub_646e568f61
+  sequence: 55
+  candidate_type: food
+  scope:
+    subject:
+      composition_role: cmp_prd_w2s970gps4__sub_646e568f61
+    applicability:
+      composition_role: cmp_prd_w2s970gps4__sub_646e568f61
+    active_shelf_reachable: true
+  disposition: pressure
+  provenance:
+    decision: docs/decisions/actionable-scheduling-food-adjudication-20260831.md
+    sources:
+    - path: data/substances/krill_oil__sub_646e568f61.yaml
+      locator: '#L3'
+    - source: PMID 30799231
+    - source: PMID 25884846
+    - source: PMID 26328782
+    - source: NIH ODS Omega-3 fact sheet
+    - source: NCCIH Omega-3 page
+  pressure:
+    fact_id: fact_food_prd_w2s970gps4_sub_646e568f61
+    law_id: law_food_bioavailability_increases
+    dimension: meal_context
+    value: with_food
+    normalized_item: prd_w2s970gps4
+- id: cand_product_food_prd_932319251f_with_food
+  sequence: 56
+  candidate_type: food
+  scope:
+    subject:
+      product: prd_932319251f
+    applicability:
+      product: prd_932319251f
+    active_shelf_reachable: true
+  disposition: pressure
+  provenance:
+    decision: docs/decisions/actionable-scheduling-food-adjudication-20260831.md
+    sources:
+    - path: data/products/life_extension__only_trace_minerals__prd_932319251f.yaml
+      locator: '#L38-L40'
+    - source: src_life_extension_only_trace_minerals
+      locator: https://www.lifeextension.com/vitamins-supplements/item01328/only-trace-minerals
+  pressure:
+    fact_id: fact_product_food_prd_932319251f
+    law_id: law_product_food_take_with_food
+    dimension: meal_context
+    value: with_food
+    normalized_item: prd_932319251f
+- id: cand_exercise_lclt_cmp_prd_0e92bc1674__sub_5bd641c116
+  sequence: 57
+  candidate_type: exercise
+  scope:
+    subject:
+      composition_role: cmp_prd_0e92bc1674__sub_5bd641c116
+    applicability:
+      composition_role: cmp_prd_0e92bc1674__sub_5bd641c116
+    active_shelf_reachable: true
+  disposition: unresolved_without_direction
+  provenance:
+    decision: docs/decisions/actionable-scheduling-exercise-adjudication-20260831.md
+    sources:
+    - path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+      locator: '#L6-L24'
+    - source: PMID 17313301
+    - source: PMID 34684429
+- id: cand_exercise_creatine_cmp_prd_2ca842627a__sub_9c0908e7f7
+  sequence: 58
+  candidate_type: exercise
+  scope:
+    subject:
+      composition_role: cmp_prd_2ca842627a__sub_9c0908e7f7
+    applicability:
+      composition_role: cmp_prd_2ca842627a__sub_9c0908e7f7
+    active_shelf_reachable: true
+  disposition: neutral
+  provenance:
+    decision: docs/decisions/actionable-scheduling-exercise-adjudication-20260831.md
+    sources:
+    - path: data/substances/creatine_monohydrate__sub_9c0908e7f7.yaml
+      locator: '#L12'
+- id: cand_exercise_citrulline_cmp_prd_cfce0b36b6__sub_3918fe347e
+  sequence: 59
+  candidate_type: exercise
+  scope:
+    subject:
+      composition_role: cmp_prd_cfce0b36b6__sub_3918fe347e
+    applicability:
+      composition_role: cmp_prd_cfce0b36b6__sub_3918fe347e
+    active_shelf_reachable: true
+  disposition: pressure
+  provenance:
+    decision: docs/decisions/actionable-scheduling-exercise-adjudication-20260831.md
+    sources:
+    - path: data/substances/l_citrulline_malate__sub_3918fe347e.yaml
+      locator: '#L4-L13'
+    - source: src_pubmed_17953788
+      locator: https://pubmed.ncbi.nlm.nih.gov/17953788/
+    - source: src_pubmed_39662304
+      locator: https://pubmed.ncbi.nlm.nih.gov/39662304/
+    - source: src_pmc_13304508
+      locator: https://pmc.ncbi.nlm.nih.gov/articles/PMC13304508/
+  pressure:
+    fact_id: fact_pre_exercise_performance_prd_cfce0b36b6_sub_3918fe347e
+    law_id: law_pre_exercise_performance_improves
+    dimension: exercise_anchor
+    value: before
+    normalized_item: prd_cfce0b36b6
+- id: cand_exercise_electrolyte_sodium_cmp_prd_20bf2df267__sub_4j9fttkil9
+  sequence: 60
+  candidate_type: exercise
+  scope:
+    subject:
+      composition_role: cmp_prd_20bf2df267__sub_4j9fttkil9
+    applicability:
+      composition_role: cmp_prd_20bf2df267__sub_4j9fttkil9
+    active_shelf_reachable: true
+  disposition: unresolved_without_direction
+  provenance:
+    decision: docs/decisions/actionable-scheduling-exercise-adjudication-20260831.md
+    sources:
+    - path: data/products/tim__electrolyte_caps__prd_20bf2df267.yaml
+      locator: '#L37-L45'
+    - path: data/substances/sodium__sub_4j9fttkil9.yaml
+      locator: '#L11'
+- id: cand_exercise_electrolyte_potassium_cmp_prd_20bf2df267__sub_f7780f899b
+  sequence: 61
+  candidate_type: exercise
+  scope:
+    subject:
+      composition_role: cmp_prd_20bf2df267__sub_f7780f899b
+    applicability:
+      composition_role: cmp_prd_20bf2df267__sub_f7780f899b
+    active_shelf_reachable: true
+  disposition: unresolved_without_direction
+  provenance:
+    decision: docs/decisions/actionable-scheduling-exercise-adjudication-20260831.md
+    sources:
+    - path: data/products/tim__electrolyte_caps__prd_20bf2df267.yaml
+      locator: '#L37-L45'
+    - path: data/substances/potassium_citrate__sub_f7780f899b.yaml
+      locator: '#L4-L7'
+- id: cand_exercise_electrolyte_magnesium_cmp_prd_20bf2df267__sub_fhl7c4skmf
+  sequence: 62
+  candidate_type: exercise
+  scope:
+    subject:
+      composition_role: cmp_prd_20bf2df267__sub_fhl7c4skmf
+    applicability:
+      composition_role: cmp_prd_20bf2df267__sub_fhl7c4skmf
+    active_shelf_reachable: true
+  disposition: unresolved_without_direction
+  provenance:
+    decision: docs/decisions/actionable-scheduling-exercise-adjudication-20260831.md
+    sources:
+    - path: data/products/tim__electrolyte_caps__prd_20bf2df267.yaml
+      locator: '#L37-L45'
+    - path: data/substances/magnesium_citrate__sub_fhl7c4skmf.yaml
+      locator: '#L4-L9'
+- id: cand_exercise_electrolyte_calcium_dcp_cmp_prd_20bf2df267__sub_iqjdo9gvbv
+  sequence: 63
+  candidate_type: exercise
+  scope:
+    subject:
+      composition_role: cmp_prd_20bf2df267__sub_iqjdo9gvbv
+    applicability:
+      composition_role: cmp_prd_20bf2df267__sub_iqjdo9gvbv
+    active_shelf_reachable: true
+  disposition: unresolved_without_direction
+  provenance:
+    decision: docs/decisions/actionable-scheduling-exercise-adjudication-20260831.md
+    sources:
+    - path: data/products/tim__electrolyte_caps__prd_20bf2df267.yaml
+      locator: '#L37-L45'
+    - path: data/substances/calcium_dicalcium_phosphate__sub_iqjdo9gvbv.yaml
+      locator: '#L14'
+- id: cand_exercise_electrolyte_calcium_lactate_cmp_prd_20bf2df267__sub_p5qxdnxu9e
+  sequence: 64
+  candidate_type: exercise
+  scope:
+    subject:
+      composition_role: cmp_prd_20bf2df267__sub_p5qxdnxu9e
+    applicability:
+      composition_role: cmp_prd_20bf2df267__sub_p5qxdnxu9e
+    active_shelf_reachable: true
+  disposition: unresolved_without_direction
+  provenance:
+    decision: docs/decisions/actionable-scheduling-exercise-adjudication-20260831.md
+    sources:
+    - path: data/products/tim__electrolyte_caps__prd_20bf2df267.yaml
+      locator: '#L37-L45'
+    - path: data/substances/calcium_lactate__sub_p5qxdnxu9e.yaml
+      locator: '#L10'
