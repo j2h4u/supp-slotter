@@ -188,7 +188,6 @@ IMPLEMENTED_PRESSURE_IDENTITY = ("item_id", "dimension", "value")
 IMPLEMENTED_DOMAIN_FEASIBILITY = "unbounded_logical_domain"
 IMPLEMENTED_PRIMARY_OBJECTIVE = "maximize_unique_pressure_satisfaction"
 IMPLEMENTED_SECONDARY_OBJECTIVE = "minimize_integer_squared_load_per_domain"
-IMPLEMENTED_ENGINE_TIE_BREAK = IMPLEMENTED_TIE_BREAK
 IMPLEMENTED_PUBLICATION_STATUSES = ("Optimal", "Indeterminate")
 
 
@@ -1009,7 +1008,7 @@ def _decode_engine_contract(projection: Mapping[str, object]) -> RuntimeEngineCo
         raise _error("engine_contract.primary_objective", "must maximize unique pressure satisfaction")
     if engine_contract.secondary_objective != IMPLEMENTED_SECONDARY_OBJECTIVE:
         raise _error("engine_contract.secondary_objective", "must minimize integer squared load per domain")
-    if engine_contract.tie_break != IMPLEMENTED_ENGINE_TIE_BREAK:
+    if engine_contract.tie_break != IMPLEMENTED_TIE_BREAK:
         raise _error("engine_contract.tie_break", "must use stable item ID and slot order")
     if engine_contract.publication_statuses != IMPLEMENTED_PUBLICATION_STATUSES:
         raise _error(

@@ -64,10 +64,6 @@ class GroomWorkItem:
     substance_id: str
     substance_name: str
 
-    @property
-    def id(self) -> str:
-        return self.composition_role_id
-
 
 @dataclass(frozen=True, slots=True)
 class GroomResult:

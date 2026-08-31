@@ -11,7 +11,8 @@ from datetime import date
 from pathlib import Path
 from typing import cast
 
-from planner.cards.product import composition_role_id, load_product_registry
+from planner.card_ids import composition_role_id
+from planner.cards.product import load_product_registry
 from planner.cards.substance import load_substance_registry
 from planner.contracts import CardLoadError, Product, Substance
 from planner.engine.results import GroomResult, GroomWorkItem

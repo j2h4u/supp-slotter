@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from planner.cards.product import _product_components, composition_role_id
+from planner.card_ids import composition_role_id
+from planner.cards.product import _product_components
 from planner.cards.product_validation import check_product_formulas
 from planner.ontology.projection import ProjectionResult, _project_repository_with_projection
 from rdflib import URIRef
@@ -14,6 +15,7 @@ BASE = "https://example.test/ontology/"
 
 def _product_projection() -> dict[str, object]:
     return {
+        "catalogs": [],
         "repository_projection": {
             "format_version": "repository-projection-v1",
             "base_iri": BASE,
@@ -56,7 +58,7 @@ def _product_projection() -> dict[str, object]:
                     },
                 }
             ],
-        }
+        },
     }
 
 

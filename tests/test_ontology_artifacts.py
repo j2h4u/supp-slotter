@@ -9,7 +9,7 @@ from typing import cast
 
 import pytest
 import yaml
-from planner.ontology.artifacts import load_runtime_program
+from planner.ontology.artifacts import load_ontology
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.glue_capabilities import (
     IMPLEMENTED_GLUE_CONTRACT_CAPABILITY_SETS,
@@ -82,14 +82,14 @@ def _copy_repository_shape(tmp_path: Path) -> Path:  # noqa: PLR0912, PLR0914
 
 
 def test_committed_runtime_program_decodes() -> None:
-    runtime = load_runtime_program(ONTOLOGY)
+    runtime = load_ontology(ONTOLOGY).runtime_program
     assert runtime.engine_contract.protocol_version == "supp-slotter.engine-contract/v2"
     assert runtime.engine_contract.pressure_identity == ("item_id", "dimension", "value")
     assert runtime.engine_contract.publication_statuses == ("Optimal", "Indeterminate")
 
 
 def test_dashboard_state_rows_are_role_free_and_truth_table_driven() -> None:
-    runtime = load_runtime_program(ONTOLOGY)
+    runtime = load_ontology(ONTOLOGY).runtime_program
     payload = _runtime_payload()
     projection = cast(dict[str, object], payload["projection"])
     catalog = cast(dict[str, object], projection["dashboard_state_catalog"])

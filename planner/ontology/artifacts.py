@@ -188,12 +188,6 @@ class OntologyBundle:
         return cast(Mapping[str, object], load_ontoclean_profiles(self))
 
     @property
-    def artifact_bytes(self) -> Mapping[str, bytes]:
-        """Alias documenting that values are the original verified bytes."""
-
-        return self.artifacts
-
-    @property
     def projection_map(self) -> Mapping[str, object]:
         """Compiled repository projection consumed by generic projectors."""
 
@@ -204,12 +198,6 @@ class OntologyBundle:
                 code=UNSUPPORTED,
             )
         return cast(Mapping[str, object], value)
-
-    @property
-    def projection(self) -> Mapping[str, object]:
-        """Short alias for the verified compiled runtime payload."""
-
-        return self.projection_map
 
 
 def _register_verified_bundle(bundle: OntologyBundle) -> OntologyBundle:
@@ -227,7 +215,7 @@ def load_ontology(root: Path) -> OntologyBundle:
     ontology_root = root if isinstance(root, Path) else Path(root)
     runtime_lock, _ = _read_mapping(ontology_root / "generated" / "runtime-lock.json", yaml_format=False)
     outputs = _validate_runtime_lock(runtime_lock)
-    artifact_bytes, decoded = _load_outputs(
+    artifacts, decoded = _load_outputs(
         ontology_root / "generated",
         outputs,
         decoded_outputs=_RUNTIME_OUTPUTS,
@@ -236,7 +224,7 @@ def load_ontology(root: Path) -> OntologyBundle:
     bundle = OntologyBundle(
         ontology_root,
         cast(Mapping[str, object], _freeze(runtime_lock)),
-        _FrozenDict(artifact_bytes),
+        _FrozenDict(artifacts),
         _FrozenDict({key: _freeze(value) for key, value in decoded.items()}),
     )
     # Validate the complete generated term/category registries before the
@@ -333,7 +321,7 @@ def _load_outputs(
     *,
     decoded_outputs: frozenset[str],
 ) -> tuple[dict[str, bytes], dict[str, object]]:
-    artifact_bytes: dict[str, bytes] = {}
+    artifacts: dict[str, bytes] = {}
     decoded: dict[str, object] = {}
     for record in outputs:
         relative = _safe_relative(record["path"], "output")
@@ -341,10 +329,10 @@ def _load_outputs(
         content = _read_once(path, code=MISSING)
         _check_hash(content, record["sha256"], relative, source=False)
         if relative in decoded_outputs:
-            artifact_bytes[relative] = content
+            artifacts[relative] = content
             decoded[relative] = _decode_artifact(relative, content, path=path)
             _validate_declared_format(relative, decoded[relative])
-    return artifact_bytes, decoded
+    return artifacts, decoded
 
 
 def _validate_runtime_program(runtime_lock: Mapping[str, object], decoded: Mapping[str, object]) -> None:
@@ -410,18 +398,6 @@ def _source_set_hash(manifest: Mapping[str, object], source_bytes: Mapping[str, 
 
 def _is_verified_bundle(value: object) -> bool:
     return type(value) is OntologyBundle and is_registered_bundle(value)
-
-
-def load_runtime_vocabulary(ontology_root: Path) -> Mapping[str, object]:
-    """Load the canonical runtime vocabulary from a verified ontology bundle."""
-
-    return load_ontology(ontology_root).runtime_vocabulary
-
-
-def load_runtime_program(ontology_root: Path) -> RuntimeProgram:
-    """Load the typed runtime program from a hash-verified ontology bundle."""
-
-    return load_ontology(ontology_root).runtime_program
 
 
 def _read_mapping(path: Path, *, yaml_format: bool) -> tuple[dict[str, object], bytes]:

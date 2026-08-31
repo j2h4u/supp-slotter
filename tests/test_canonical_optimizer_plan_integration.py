@@ -9,7 +9,7 @@ import planner.engine.plan as plan_module
 from planner.canonical_optimizer_result import CanonicalObjective, Optimal
 from planner.contracts import Product, Slot
 from planner.engine._plan_types import ActiveIndex
-from planner.ontology.artifacts import load_runtime_program
+from planner.ontology.artifacts import load_ontology
 from planner.ontology.canonical_inference import Success
 from planner.paths import Paths
 from planner.schedule_types import CanonicalPublicationSource, PublishedSchedule
@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def _runtime() -> plan_module._PlanRuntime:
     slot = Slot("slot", "Slot", 1, "daily", "Daily", "daily", {"meal": None})
-    runtime_program = load_runtime_program(ROOT / "ontology")
+    runtime_program = load_ontology(ROOT / "ontology").runtime_program
     inputs = SimpleNamespace(
         slots={"slot": slot},
         products={"prd": Product("prd", "Product", ())},

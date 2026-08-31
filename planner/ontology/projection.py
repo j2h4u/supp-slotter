@@ -40,7 +40,7 @@ class ProvenanceRecord:
 
 @dataclass(frozen=True)
 class ProjectionResult:
-    """RDF graph plus stable serializable and source-provenance views."""
+    """RDF graph plus stable serializable and provenance views."""
 
     graph: Graph
     triples: tuple[tuple[str, str, str], ...]
@@ -49,10 +49,6 @@ class ProjectionResult:
     @property
     def canonical_ntriples(self) -> bytes:
         return ("".join(f"{subject} {predicate} {obj} .\n" for subject, predicate, obj in self.triples)).encode("utf-8")
-
-    @property
-    def source_provenance(self) -> tuple[ProvenanceRecord, ...]:
-        return self.provenance
 
 
 @dataclass

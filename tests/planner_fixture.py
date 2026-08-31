@@ -9,7 +9,7 @@ from shutil import copy2
 from typing import cast
 
 import yaml
-from planner.cards.product import composition_role_id
+from planner.card_ids import composition_role_id
 from planner.engine import CheckResult, cmd_check, cmd_plan
 from planner.ontology.glue_capabilities import ONTOLOGY_COMPOSITE_KEY_SEPARATOR
 

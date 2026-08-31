@@ -11,7 +11,7 @@ from typing import cast
 import planner.ontology.artifacts as artifacts
 import pytest
 import yaml
-from planner.ontology.artifacts import OntologyBundle, load_formal_ontology, load_ontology, load_runtime_vocabulary
+from planner.ontology.artifacts import OntologyBundle, load_formal_ontology, load_ontology
 from planner.ontology.errors import (
     MALFORMED,
     MISSING,
@@ -42,12 +42,11 @@ def _raises(root: Path, code: str, *, formal: bool = False) -> None:
     assert raised.value.code == code
 
 
-def test_success_and_runtime_vocabulary_delegate_to_one_bundle(tmp_path: Path) -> None:
+def test_runtime_bundle_exposes_vocabulary_and_profiles(tmp_path: Path) -> None:
     root = _fixture(tmp_path)
     bundle = load_ontology(root)
     assert isinstance(bundle, OntologyBundle)
     assert bundle.runtime_vocabulary["format"] == "supp-slotter.runtime-vocabulary/v2"
-    assert load_runtime_vocabulary(root) == bundle.runtime_vocabulary
     profiles = bundle.ontoclean_profiles
     assert set(profiles) == {"rigid_identity", "anti_rigid_dependent", "dependent_assertion"}
     categories = cast(dict[str, dict[str, object]], bundle.runtime_vocabulary["categories"])

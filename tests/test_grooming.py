@@ -143,7 +143,7 @@ def test_removing_then_restoring_an_active_receipt_reopens_then_closes_its_role(
 
     _write_receipts(paths.data / "grooming-receipts.yaml", [])
     selected, eligible = grooming._select_work_items(paths, bundle)
-    assert selected[0].id == role_b and eligible == 1
+    assert selected[0].composition_role_id == role_b and eligible == 1
 
     _write_receipts(paths.data / "grooming-receipts.yaml", [(role_b, "no_supported_fact")])
     selected, eligible = grooming._select_work_items(paths, bundle)
@@ -161,7 +161,7 @@ def test_inactive_receipt_does_not_queue_until_the_role_is_activated(
 
     monkeypatch.setattr(grooming, "_active_role_ids", lambda _paths, _products, _bundle: {role_a, role_b})
     selected, eligible = grooming._select_work_items(paths, bundle)
-    assert selected[0].id == role_b and eligible == 1
+    assert selected[0].composition_role_id == role_b and eligible == 1
 
     _write_receipts(paths.data / "grooming-receipts.yaml", [(role_b, "no_supported_fact")])
     selected, eligible = grooming._select_work_items(paths, bundle)

@@ -67,10 +67,6 @@ class PressureDerivation:
     def fact_id(self) -> str:
         return self.fact.id
 
-    @property
-    def fact_value(self) -> str:
-        return self.value
-
 
 @dataclass(frozen=True, slots=True)
 class NormalizedUnaryPressure:
@@ -100,10 +96,6 @@ class SameDimensionPressureConflict:
     dimension: str
     values: tuple[str, ...]
     derivations: tuple[PressureDerivation, ...]
-
-    @property
-    def identities(self) -> tuple[UnaryPressureIdentity, ...]:
-        return tuple(UnaryPressureIdentity(self.item_id, self.dimension, value) for value in self.values)
 
 
 @dataclass(frozen=True, slots=True)

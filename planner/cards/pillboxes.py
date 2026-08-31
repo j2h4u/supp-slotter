@@ -15,7 +15,6 @@ from planner.contracts import (
     Slot,
 )
 from planner.ontology.artifacts import OntologyBundle
-from planner.ontology.runtime_program import RuntimeProgram
 from planner.schema_validation import schema_errors
 
 _TECHNICAL_FIELDS = frozenset({"label", "order"})
@@ -29,22 +28,19 @@ class _SlotLoadContext:
     stack: str
 
 
-def load_pillboxes(path: Path, bundle: OntologyBundle | RuntimeProgram) -> dict[str, Pillbox]:
+def load_pillboxes(path: Path, bundle: OntologyBundle) -> dict[str, Pillbox]:
     """Load the closed logical slot topology.
 
-    ``bundle`` remains part of the loader boundary for callers during the
-    runtime cutover, but topology validation is intentionally independent of
-    the generated legacy ``near``/``food`` card schema.
+    Topology validation is intentionally independent of the generated legacy
+    ``near``/``food`` card schema.
     """
     data = load_card_mapping(path, "pillboxes")
     if not data:
         raise CardLoadError(path, f"{path}: pillboxes must contain at least one pillbox")
-    if isinstance(bundle, OntologyBundle):
-        errors = schema_errors(data, "pillboxes", path, bundle)
-        if errors:
-            raise CardLoadError(path, errors[0])
-    runtime = bundle.runtime_program if isinstance(bundle, OntologyBundle) else bundle
-    dimensions = runtime.canonical_scheduling.pressure_values_by_dimension
+    errors = schema_errors(data, "pillboxes", path, bundle)
+    if errors:
+        raise CardLoadError(path, errors[0])
+    dimensions = bundle.runtime_program.canonical_scheduling.pressure_values_by_dimension
     loaded = {
         pillbox_name: _load_pillbox(path, pillbox_name, pillbox, dimensions)
         for pillbox_name, pillbox in sorted(data.items(), key=lambda item: str(item[0]))
@@ -163,12 +159,11 @@ def flatten_pillbox_slots(pillboxes: dict[str, Pillbox]) -> dict[str, Slot]:
 def check_pillbox_slot_anchors(
     pillboxes: dict[str, Pillbox],
     slots_path: Path,
-    bundle: OntologyBundle | RuntimeProgram,
+    bundle: OntologyBundle,
 ) -> list[str]:
     """Validate generic immutable topology anchors against runtime metadata."""
     errors: list[str] = []
-    runtime = bundle.runtime_program if isinstance(bundle, OntologyBundle) else bundle
-    dimensions = runtime.canonical_scheduling.pressure_values_by_dimension
+    dimensions = bundle.runtime_program.canonical_scheduling.pressure_values_by_dimension
     for pillbox_name, pillbox in pillboxes.items():
         for slot_id, slot in pillbox.slots.items():
             if set(slot.anchors) != set(dimensions) or any(

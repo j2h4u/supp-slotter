@@ -5,8 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
+from planner.card_ids import composition_role_id
 from planner.cards._common import load_card_mapping
-from planner.cards.product import canonical_product_filename, composition_role_id
+from planner.cards.product import canonical_product_filename
 from planner.contracts import CardLoadError, Product
 from planner.ontology.artifacts import OntologyBundle
 from planner.schema_validation import schema_errors

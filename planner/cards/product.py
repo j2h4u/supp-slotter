@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
-from planner.card_ids import composition_role_id as composition_role_id
 from planner.cards._common import load_card_mapping, normalize_filename_part
 from planner.cards.search import collect_search_strings, combined_search_score
 from planner.contracts import (
