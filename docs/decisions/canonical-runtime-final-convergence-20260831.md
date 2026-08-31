@@ -15,8 +15,7 @@ fresh-context final auditor.
   at threshold 30 with maximum 29.40 and zero violations, a conforming corpus
   projection, 73 import files/310 dependencies, and 10 kept/0 broken
   contracts. The checkout stayed clean with no repository processes.
-- Governing evidence: the [cutover checklist](../plans/canonical-runtime-cutover-checklist-20260830.md),
-  [domain model](../domain-model.md), and
+- Governing contract: the [domain model](../domain-model.md) and
   [canonical-instance boundary](canonical-instance-inference-boundary-20260822.md).
 
 ## Independent same-optics verdicts

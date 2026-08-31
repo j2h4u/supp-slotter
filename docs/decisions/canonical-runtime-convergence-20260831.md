@@ -40,4 +40,4 @@ accepted contract and evidence.
 
 The historical panel and same-optics convergence completed for the reviewed
 heads only. This record does not close any final-review hold for the remediated
-candidate; see the current [cutover checklist](../plans/canonical-runtime-cutover-checklist-20260830.md).
+candidate; see the current [domain model](../domain-model.md).

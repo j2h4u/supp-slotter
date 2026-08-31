@@ -11,9 +11,8 @@ checklist records with zero actionable Critical, High, or Medium findings.
   `3ac1ab3271baa4ecd6171e6a8e98421fe5a12eb7`.
 - Runtime parent and release receipt:
   `eeb0663b5bbdea5e475f11d1f10aace2b95432f9`.
-- Governing records: the [cutover checklist](../plans/canonical-runtime-cutover-checklist-20260830.md),
-  [final independent convergence](canonical-runtime-final-convergence-20260831.md),
-  [domain model](../domain-model.md), and
+- Governing records: the [domain model](../domain-model.md),
+  [final independent convergence](canonical-runtime-final-convergence-20260831.md), and
   [canonical-instance boundary](canonical-instance-inference-boundary-20260822.md).
 
 ## Audit result

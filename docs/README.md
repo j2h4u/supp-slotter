@@ -19,6 +19,7 @@ Use this page as the map. The README is the product front door; these docs are t
 
 - [Canonical Instance and Inference Boundary](decisions/canonical-instance-inference-boundary-20260822.md) — governing decision for canonical scheduler inputs, inference, optimization, and publication.
 - [Ontology Facts](ontology-facts.md) — current unresolved ontology pressure points only.
+- [Actionable Scheduling Status](actionable-scheduling-status.md) — current architecture, state, and readiness boundary.
 - [MCP Position](mcp-position.md) — why an MCP server is deferred until the product surface is clearer.
 - [planner/](../planner/) — CLI/runtime package.
 - [tests/](../tests/) — regression tests for validation, review, scheduling, and maintenance behavior.

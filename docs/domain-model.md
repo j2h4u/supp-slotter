@@ -10,9 +10,7 @@ The canonical result is determined by typed world facts and universal laws.
 Absence of a fact means absence of a derived pressure, not a runtime
 completeness failure. A balance-and-tie-break-only placement is therefore valid
 when no admitted pressure applies. This contract is governed by the
-[canonical instance and inference boundary](decisions/canonical-instance-inference-boundary-20260822.md)
-and the accepted
-[runtime simplification decision](decisions/actionable-scheduling-runtime-simplification-20260831.md).
+[canonical instance and inference boundary](decisions/canonical-instance-inference-boundary-20260822.md).
 
 ## Canonical inputs
 
