@@ -109,13 +109,14 @@ review and do not silently satisfy an unchecked item below.
 
 ## Remaining finite release steps
 
-- [ ] Run the targeted `just` witnesses for the simplified boundary in one
+- [x] Run the targeted `just` witnesses for the simplified boundary in one
   bounded gate at a time: formal fact-to-pressure derivation; an admitted weak
   pressure beating balance; contradiction-to-`Indeterminate`; notes rejection;
   exact global optimum; and the 18-product trace with ten balance-only
   placements. Confirm removed catalog, coverage, and grooming modules/CLI
   surfaces are absent rather than testing their former behavior.
   - Evidence required: exact commands, exit statuses, HEAD, and bounded output.
+  - Evidence: [targeted witness receipt](../evidence/actionable-scheduling-targeted-witnesses-20260831.yaml)
 
 - [ ] Perform an exact-head data and architecture audit: every currently
   admitted directed input is a typed fact/law path; no stored preference,
