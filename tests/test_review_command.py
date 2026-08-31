@@ -6,6 +6,7 @@ from pathlib import Path
 
 import yaml
 from planner.engine import cmd_review
+from planner.ontology.artifacts import load_ontology
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -52,8 +53,20 @@ def _write_minimal_data_root(tmp: Path) -> None:
         "  substance: sub_aabbccdd09\n"
     )
 
-    # Minimal stacks.yaml — product in daily stack (plain string format)
-    (tmp / "data" / "stacks.yaml").write_text("daily:\n- prd_aabbccdd02\ntraining: []\ninactive: []\n")
+    # Minimal stacks.yaml — product in the first canonical routable stack
+    # (plain string format), with every policy-declared partition represented.
+    partition = load_ontology(ROOT / "ontology").runtime_program.glue_contract.stack_partition
+    routable_stack = partition.routable_stack_names[0]
+    stack_data: dict[str, object] = {
+        stack_name: []
+        for stack_name in (
+            *partition.routable_stack_names,
+            *partition.excluded_stack_names,
+            partition.tracked_unassigned_partition_name,
+        )
+    }
+    stack_data[routable_stack] = ["prd_aabbccdd02"]
+    (tmp / "data" / "stacks.yaml").write_text(yaml.safe_dump(stack_data, sort_keys=False))
 
     # Minimal pillboxes.yaml — one slot in daily pillbox
     (tmp / "data" / "pillboxes.yaml").write_text(
