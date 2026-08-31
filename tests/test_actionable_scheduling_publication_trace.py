@@ -61,10 +61,10 @@ def test_real_shelf_recovery_objective_and_balance_only_count(tmp_path: Path) ->
     assert schedule["status"] == "Optimal"
     assert objective["satisfied_pressures"] == 8
     assert objective["squared_load"] == 58
-    assert sum(
-        explanation["placement_basis"] == "balance_and_tie_break_only"
-        for explanation in explanations.values()
-    ) == 10
+    assert (
+        sum(explanation["placement_basis"] == "balance_and_tie_break_only" for explanation in explanations.values())
+        == 10
+    )
 
 
 def test_recovery_has_only_pressure_explained_placement_changes(tmp_path: Path) -> None:
@@ -86,9 +86,7 @@ def test_recovery_difference_witness_is_strict_and_complete() -> None:
     witness = cast(
         dict[str, object],
         yaml.safe_load(
-            (ROOT / "docs/evidence/actionable-scheduling-recovery-difference-20260831.yaml").read_text(
-                encoding="utf-8"
-            )
+            (ROOT / "docs/evidence/actionable-scheduling-recovery-difference-20260831.yaml").read_text(encoding="utf-8")
         ),
     )
     current = cast(dict[str, object], witness["current"])

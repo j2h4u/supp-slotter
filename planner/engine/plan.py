@@ -85,7 +85,7 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
                 substances=inputs.substances,
             ),
         )
-    except (KeyboardInterrupt, MemoryError):
+    except KeyboardInterrupt, MemoryError:
         raise
     except Exception as error:  # noqa: BLE001
         message = f"plan: canonical input failed closed: {error}"
@@ -155,7 +155,7 @@ def _publish_plan(
             slot_loads=slot_loads,
             schedule=published.document,
         )
-    except (KeyboardInterrupt, MemoryError):
+    except KeyboardInterrupt, MemoryError:
         raise
     except Exception as error:  # noqa: BLE001
         message = f"plan: canonical publication failed closed: {error}"

@@ -27,9 +27,7 @@ def _runtime():
 def test_product_food_instruction_targets_intake_item_without_component_fanout() -> None:
     runtime = _runtime()
     product = "prd_932319251f"
-    instruction = next(
-        fact for fact in runtime.canonical_scheduling.facts if fact.family == "ProductFoodInstruction"
-    )
+    instruction = next(fact for fact in runtime.canonical_scheduling.facts if fact.family == "ProductFoodInstruction")
     assert instruction.applicability.target_kind == "product"
     roles = (RuntimeCompositionRole("cmp_component", product, "sub_component"),)
 
@@ -68,11 +66,7 @@ def test_psalae_role_facts_normalize_to_one_pressure_with_both_proofs() -> None:
     assert isinstance(result, Success)
     pressures = [row for row in result.pressures if row.item_id == "intake" and row.value == "with_food"]
     assert len(pressures) == 1
-    assert {
-        proof.fact.id
-        for proof in pressures[0].derivations
-        if proof.family == "FoodEffect"
-    } == {
+    assert {proof.fact.id for proof in pressures[0].derivations if proof.family == "FoodEffect"} == {
         "fact_food_prd_w2s970gps4_sub_249199f726",
         "fact_food_prd_w2s970gps4_sub_646e568f61",
     }

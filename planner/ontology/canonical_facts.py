@@ -67,9 +67,7 @@ def _subject_errors(
     subject = fact.subject
     if subject.product is not None:
         return (
-            []
-            if subject.product in products
-            else [f"{label} references unknown subject product {subject.product!r}"]
+            [] if subject.product in products else [f"{label} references unknown subject product {subject.product!r}"]
         )
     if subject.substance is not None:
         return (
@@ -128,9 +126,7 @@ def validate_canonical_scheduling(
         if family is not None:
             product_target = fact.applicability.product is not None
             if (family.target_kind == "product") != product_target:
-                errors.append(
-                    f"{fact.family}.{fact.id} target kind does not match its canonical fact family"
-                )
+                errors.append(f"{fact.family}.{fact.id} target kind does not match its canonical fact family")
         errors.extend(_fact_reference_errors(fact, f"{fact.family}.{fact.id}", roles, substances, products, sources))
 
     if errors:

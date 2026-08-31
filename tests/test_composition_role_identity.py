@@ -74,15 +74,13 @@ def test_authored_component_identity_survives_reorder(tmp_path: Path) -> None:
     product_path = products / "demo.yaml"
     _write_product(
         product_path,
-        "  - id: cmp_prd_demo__sub_a\n    substance: sub_a\n"
-        "  - id: cmp_prd_demo__sub_b\n    substance: sub_b\n",
+        "  - id: cmp_prd_demo__sub_a\n    substance: sub_a\n  - id: cmp_prd_demo__sub_b\n    substance: sub_b\n",
     )
     before = _component_nodes(_project_repository_with_projection(tmp_path, _product_projection()))
 
     _write_product(
         product_path,
-        "  - id: cmp_prd_demo__sub_b\n    substance: sub_b\n"
-        "  - id: cmp_prd_demo__sub_a\n    substance: sub_a\n",
+        "  - id: cmp_prd_demo__sub_b\n    substance: sub_b\n  - id: cmp_prd_demo__sub_a\n    substance: sub_a\n",
     )
     after = _component_nodes(_project_repository_with_projection(tmp_path, _product_projection()))
 
