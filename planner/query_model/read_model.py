@@ -27,7 +27,10 @@ class StackReadModel:
         return self._ontology_bundle
 
     def active_substance_ids(self) -> set[str]:
-        return active_substance_ids(self._data, self._ontology_bundle.runtime_program.glue_contract.inactive_stack_name)
+        routable_stack_names = set(
+            self._ontology_bundle.runtime_program.glue_contract.stack_partition.routable_stack_names
+        )
+        return active_substance_ids(self._data, routable_stack_names)
 
     def classify_relations(
         self,

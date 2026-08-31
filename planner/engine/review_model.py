@@ -87,9 +87,9 @@ def build_review_model(  # noqa: PLR0914
     except ValueError as error:
         return None, [f"review: {error}"]
     active_substances = read_model.active_substance_ids()
-    inactive_stack_name = bundle.runtime_program.glue_contract.inactive_stack_name
+    routable_stack_names = set(bundle.runtime_program.glue_contract.stack_partition.routable_stack_names)
     active_products = {
-        product_id for product_id, entry in stack_entries.items() if entry["stack"] != inactive_stack_name
+        product_id for product_id, entry in stack_entries.items() if entry["stack"] in routable_stack_names
     }
     try:
         dashboard_summary = _dashboard_summary(

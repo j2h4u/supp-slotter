@@ -5,11 +5,16 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from copy import deepcopy
+from dataclasses import replace
 from functools import cache
 from pathlib import Path
+from types import SimpleNamespace
 from typing import cast
 
 import pytest
+from planner.contracts import Product, ProductComponent, Substance
+from planner.engine import grooming, review_model
+from planner.engine.review_model import _ConcernFilterContext
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.runtime_program import (
     IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY,
@@ -23,7 +28,13 @@ from planner.ontology.runtime_program import (
     IMPLEMENTED_TIE_BREAK,
     decode_runtime_program,
 )
+from planner.paths import Paths
+from planner.query_model.data import ReadModelData, RelationEndpoint, RelationQuery
+from planner.query_model.read_model import StackReadModel
+from planner.query_model.relations import classify_relations
 from scripts.ontology_compiler import compile_ontology
+
+from tests.helpers import ontology_bundle
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -87,6 +98,80 @@ def test_authored_stack_partition_is_closed_and_reproduces_active_membership() -
     partition_payload["excluded_stack_names"] = ["daily"]
     with pytest.raises(OntologyInfrastructureError, match="disjoint"):
         decode_runtime_program(payload)
+
+
+def test_second_excluded_partition_cannot_enter_current_review_grooming_or_relation_inputs(  # noqa: PLR0914
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Only runtime-declared routable partitions contribute to active views."""
+    bundle = ontology_bundle()
+    runtime = bundle.runtime_program
+    partition = replace(
+        runtime.glue_contract.stack_partition,
+        excluded_stack_names=(*runtime.glue_contract.stack_partition.excluded_stack_names, "archived"),
+    )
+    runtime = replace(runtime, glue_contract=replace(runtime.glue_contract, stack_partition=partition))
+    test_bundle = SimpleNamespace(runtime_program=runtime)
+
+    active = Substance("sub_aaaaaaaaaa", "Active")
+    excluded = Substance("sub_bbbbbbbbbb", "Archived")
+    active_product = Product(
+        "prd_aaaaaaaaaa", "Active product", (ProductComponent(active.id, "cmp_prd_aaaaaaaaaa__sub_aaaaaaaaaa"),)
+    )
+    excluded_product = Product(
+        "prd_bbbbbbbbbb", "Archived product", (ProductComponent(excluded.id, "cmp_prd_bbbbbbbbbb__sub_bbbbbbbbbb"),)
+    )
+    products = {active_product.id: active_product, excluded_product.id: excluded_product}
+    substances = {active.id: active, excluded.id: excluded}
+    stacks = {"daily": [active_product.id], "inactive": [], "archived": [excluded_product.id], "training": []}
+
+    query_model = StackReadModel(
+        ReadModelData(substances=substances, products=products, stacks=stacks, relations=()),
+        test_bundle,  # type: ignore[arg-type]
+    )
+    active_ids = query_model.active_substance_ids()
+    assert active_ids == {active.id}
+
+    relation = RelationQuery(
+        relation_type="co_use_context",
+        source=RelationEndpoint("excluded", "Archived", (excluded.id,), ("Archived",), "entity_id"),
+        target=RelationEndpoint("active", "Active", (active.id,), ("Active",), "entity_id"),
+        reason="excluded membership must not become active relation evidence",
+        research_state="unassessed",
+        sources=(),
+    )
+    rows = classify_relations((relation,), active_ids, runtime)
+    assert rows[0]["source_matches"] == []
+    assert rows[0]["target_matches"] == ["Active"]
+
+    monkeypatch.setattr(grooming, "load_yaml", lambda _path: stacks)
+    assert grooming._active_role_ids(Paths.from_root(tmp_path), products, test_bundle) == {  # type: ignore[arg-type]
+        active_product.components[0].id
+    }
+
+    captured: dict[str, _ConcernFilterContext] = {}
+    monkeypatch.setattr(review_model, "load_substance_registry", lambda *_args: substances)
+    monkeypatch.setattr(review_model, "load_product_registry", lambda *_args: products)
+    monkeypatch.setattr(review_model, "load_yaml", lambda _path: {})
+    monkeypatch.setattr(review_model, "check_global_relations", lambda *_args: [])
+    monkeypatch.setattr(review_model, "load_global_relations", lambda *_args: [])
+    monkeypatch.setattr(review_model, "stacks_for_read_model", lambda *_args: stacks)
+    monkeypatch.setattr(review_model, "build_stack_read_model", lambda *_args, **_kwargs: query_model)
+    monkeypatch.setattr(review_model, "_dashboard_summary", lambda *_args: {})
+
+    def capture_concerns(
+        context: _ConcernFilterContext, _order: tuple[str, ...]
+    ) -> dict[str, list[review_model.ConcernEntry]]:
+        captured["context"] = context
+        return {}
+
+    monkeypatch.setattr(review_model, "_concerns_by_kind", capture_concerns)
+    model, errors = review_model.build_review_model(Paths.from_root(tmp_path), test_bundle)  # type: ignore[arg-type]
+
+    assert errors == []
+    assert model is not None
+    assert set(captured["context"].substances) == {active.id}
+    assert set(captured["context"].products) == {active_product.id}
 
 
 def test_v1_contract_is_rejected_without_compatibility_fallback() -> None:

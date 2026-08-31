@@ -5,11 +5,11 @@ from __future__ import annotations
 from planner.query_model.data import ReadModelData
 
 
-def active_substance_ids(data: ReadModelData, inactive_stack_name: str) -> set[str]:
-    """Substance IDs referenced by any product in a non-inactive stack."""
+def active_substance_ids(data: ReadModelData, routable_stack_names: set[str]) -> set[str]:
+    """Substance IDs referenced by any product in a routable stack."""
     target_product_ids: set[str] = set()
     for name, product_ids in data.stacks.items():
-        if name != inactive_stack_name:
+        if name in routable_stack_names:
             target_product_ids.update(product_ids)
 
     result: set[str] = set()

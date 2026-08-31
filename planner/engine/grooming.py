@@ -87,10 +87,11 @@ def _active_role_ids(paths: Paths, products: Mapping[str, Product], bundle: Onto
     raw = load_yaml(paths.stacks_file)
     if not isinstance(raw, Mapping):
         raise CardLoadError(paths.stacks_file, "stacks must be a mapping")
+    routable_stack_names = set(bundle.runtime_program.glue_contract.stack_partition.routable_stack_names)
     active_product_ids = {
         product_id
         for stack_name, product_ids in raw.items()
-        if stack_name != bundle.runtime_program.glue_contract.inactive_stack_name and isinstance(product_ids, list)
+        if stack_name in routable_stack_names and isinstance(product_ids, list)
         for product_id in product_ids
         if isinstance(product_id, str)
     }

@@ -199,12 +199,12 @@ def _product_presence_by_substance(
 
 def _usage_for_product_presence(
     product_presence: DashboardProductPresence | None,
-    inactive_stack_name: str,
+    routable_stack_names: set[str],
     state_catalog: RuntimeDashboardStateCatalog,
 ) -> DashboardUsage:
     stacks = product_presence["stacks"] if product_presence is not None else []
-    active_stacks = [stack for stack in stacks if stack != inactive_stack_name]
-    inactive_stacks = [stack for stack in stacks if stack == inactive_stack_name]
+    active_stacks = [stack for stack in stacks if stack in routable_stack_names]
+    inactive_stacks = [stack for stack in stacks if stack not in routable_stack_names]
     state = state_catalog.usage_state_for(
         active_stack_membership=bool(active_stacks),
         inactive_stack_membership=bool(inactive_stacks),
@@ -223,7 +223,7 @@ def _build_member(  # noqa: PLR0913, PLR0917
     substance_id: str,
     substance: Substance,
     product_presence: DashboardProductPresence | None,
-    inactive_stack_name: str,
+    routable_stack_names: set[str],
     state_catalog: RuntimeDashboardStateCatalog,
     matched_traits_for_substance: list[DashboardMatchedTrait],
 ) -> DashboardMember:
@@ -241,7 +241,7 @@ def _build_member(  # noqa: PLR0913, PLR0917
             "state": cast(ProductTrackingState, tracking_state.state),
             "product_count": product_count,
         },
-        "usage": _usage_for_product_presence(product_presence, inactive_stack_name, state_catalog),
+        "usage": _usage_for_product_presence(product_presence, routable_stack_names, state_catalog),
     }
 
 
@@ -261,7 +261,7 @@ def build_dashboard_review(
     risks: list[dict[str, object]] = []
     warnings: list[dict[str, object]] = []
     product_presence_by_substance = _product_presence_by_substance(products, stack_entries)
-    inactive_stack_name = bundle.runtime_program.glue_contract.inactive_stack_name
+    routable_stack_names = set(bundle.runtime_program.glue_contract.stack_partition.routable_stack_names)
     state_catalog = bundle.runtime_program.dashboard_state_catalog
     loaded_dashboard_ids: dict[str, Path] = {}
 
@@ -287,7 +287,7 @@ def build_dashboard_review(
                     substance_id=substance_id,
                     substance=substance,
                     product_presence=product_presence,
-                    inactive_stack_name=inactive_stack_name,
+                    routable_stack_names=routable_stack_names,
                     state_catalog=state_catalog,
                     matched_traits_for_substance=matched,
                 )
