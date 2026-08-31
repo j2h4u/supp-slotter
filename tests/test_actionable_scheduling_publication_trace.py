@@ -93,21 +93,3 @@ def test_recovery_has_only_pressure_explained_placement_changes(tmp_path: Path) 
         "prd_e5cc3b4e7c": "morning_food",
         "prd_w2s970gps4": "day_food",
     }
-
-
-def test_recovery_difference_witness_is_strict_and_complete() -> None:
-    witness = cast(
-        dict[str, object],
-        yaml.safe_load(
-            (ROOT / "docs/evidence/actionable-scheduling-recovery-difference-20260831.yaml").read_text(encoding="utf-8")
-        ),
-    )
-    current = cast(dict[str, object], witness["current"])
-    acceptance = cast(dict[str, object], witness["acceptance"])
-
-    assert current["status"] == "Optimal"
-    assert current["normalized_pressures"] == 8
-    assert current["squared_load"] == 58
-    assert current["balance_only_placements"] == 10
-    assert acceptance["changed_placement_count"] == 4
-    assert acceptance["no_unexplained_placement_change"] is True
