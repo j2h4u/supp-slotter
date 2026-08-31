@@ -173,12 +173,12 @@ answer.
 
 ## Final review holds
 
-- [ ] **Independent Sol panel.** Re-run the independent panel against the
-  remediated runtime candidate and return `SHIP` without actionable Critical,
-  High, or Medium reservations.
-  - Pending on `eeb0663b5bbdea5e475f11d1f10aace2b95432f9`: the prior
-    [convergence record](../decisions/canonical-runtime-convergence-20260831.md)
-    is superseded and cannot close this remediated head.
+- [x] **Independent Sol panel.** The independent panel reviewed the remediated
+  runtime candidate and returned `SHIP` without actionable Critical, High, or
+  Medium reservations.
+  - Evidence: [final independent convergence](../decisions/canonical-runtime-final-convergence-20260831.md);
+    documentation head `3a940d87d4028c5e251fa4436ac6dc2231114b10`; runtime
+    parent and R1 `eeb0663b5bbdea5e475f11d1f10aace2b95432f9`.
 
 - [ ] **Fresh-context final auditor.** Inspect this exact runtime candidate,
   validate every checked record and R1, then save per-item verdicts and a final
@@ -186,12 +186,13 @@ answer.
   - Pending on `eeb0663b5bbdea5e475f11d1f10aace2b95432f9`: remediation is
     present, but no fresh-context final-auditor report with `COMPLETE` exists.
 
-- [ ] **Repeated same-optics convergence.** Repeat the product, ontology,
-  portability, and QA optics after the fresh-context audit; compare the
-  remediated head with the historical review and return `SHIP` only with no
-  actionable reservation.
-  - Pending on `eeb0663b5bbdea5e475f11d1f10aace2b95432f9`: the prior
-    [convergence record](../decisions/canonical-runtime-convergence-20260831.md)
-    is superseded and non-final.
+- [x] **Repeated same-optics convergence.** The product, ontology,
+  portability, and QA optics repeated on the remediated heads and each returned
+  `SHIP` without an actionable reservation.
+  - Evidence: [final independent convergence](../decisions/canonical-runtime-final-convergence-20260831.md);
+    historical [superseded convergence](../decisions/canonical-runtime-convergence-20260831.md);
+    documentation head `3a940d87d4028c5e251fa4436ac6dc2231114b10`; runtime
+    parent and R1 `eeb0663b5bbdea5e475f11d1f10aace2b95432f9`.
 
-The cutover remains open until all three holds are independently closed.
+The cutover remains open until the fresh-context final auditor independently
+closes the remaining hold.
