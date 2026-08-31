@@ -1,7 +1,6 @@
 id: sub_230c5c820e
 name: Vitamin B1
 form: thiamine
-notes: 'Country Life Coenzyme B-Complex supplies thiamine hydrochloride plus thiamine cocarboxylase chloride, 50 mg total per 2 capsules; the split between forms is not disclosed, and no superiority of the coenzyme form over thiamine hydrochloride is established. Thiamin is a core cofactor for cellular energy metabolism and normal cell growth/function.'
 knowledge:
   context:
   - value: mitochondrial_health

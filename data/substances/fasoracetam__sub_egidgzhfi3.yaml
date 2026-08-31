@@ -2,9 +2,6 @@ name: Fasoracetam
 aliases:
 - NS-105
 - AEVI-001
-notes: 'Knowledge-only racetam-family nootropic reference card. Added as an experimental racetam-adjacent comparator; current
-  ontology intentionally keeps glutamatergic/mGluR nuance in notes rather than adding a new trait from this batch. Source
-  checked: PubChem CID 198695.'
 concerns:
 - kind: model_gap
   text: Mechanistic discussion often mentions glutamatergic or mGluR context, but the current ontology has no dedicated glutamatergic

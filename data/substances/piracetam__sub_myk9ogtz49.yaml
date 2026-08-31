@@ -2,9 +2,6 @@ name: Piracetam
 aliases:
 - Nootropil
 - 2-oxo-1-pyrrolidine acetamide
-notes: 'Knowledge-only racetam anchor. PubChem lists piracetam as the prototype racetam nootropic; FDA and evidence reviews
-  should be checked before treating it as a supplement or clinical recommendation. Sources checked: PubChem CID 4843; Cochrane
-  piracetam dementia/cognitive impairment review; FDA dietary-supplement status references.'
 knowledge:
   effect:
   - value: cognitive_performance_context

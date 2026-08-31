@@ -3,8 +3,6 @@ aliases:
 - SAMe
 - S-adenosyl-L-methionine
 - Ademetionine
-notes: 'Knowledge-only popular methyl-donor and mood-adjacent supplement reference card. Added as a common missing substance,
-  not as an active-stack recommendation. Source checked: NCCIH SAMe in-depth safety and evidence page.'
 knowledge:
   effect:
   - value: homocysteine_metabolism_support

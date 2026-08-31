@@ -3,9 +3,6 @@ name: Psyllium husk
 aliases:
 - Plantago ovata husk
 - ispaghula husk
-notes: Viscous soluble fiber used as a high-signal LDL-C / ApoB dietary adjunct. FDA cholesterol/CHD health-claim regulation
-  identifies 7 g/day or more soluble fiber from psyllium seed husk as the associated daily intake level. Review as a bile-acid-binding
-  soluble-fiber intervention, not a stimulant laxative.
 knowledge:
   effect:
   - value: lipid_metabolism_support

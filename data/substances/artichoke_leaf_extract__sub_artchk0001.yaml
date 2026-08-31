@@ -3,8 +3,6 @@ name: Artichoke leaf extract
 aliases:
 - Cynara scolymus
 - artichoke extract
-notes: Botanical extract sometimes used for lipid and bile-flow support. Meta-analyses of randomized trials suggest modest
-  reductions in total cholesterol, LDL-C, and triglycerides, but evidence quality and product standardization vary.
 knowledge:
   effect:
   - value: lipid_metabolism_support

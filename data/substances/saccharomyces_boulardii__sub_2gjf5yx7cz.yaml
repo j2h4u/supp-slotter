@@ -2,9 +2,6 @@ name: Saccharomyces boulardii
 aliases:
 - S. boulardii
 - Saccharomyces cerevisiae var. boulardii
-notes: 'Knowledge-only probiotic yeast reference card. Added because S. boulardii is a common standalone probiotic category
-  distinct from generic Lactobacillus/Bifidobacterium blends. Sources checked: NCCIH probiotics safety page; NIH ODS probiotics
-  fact sheet.'
 knowledge:
   effect:
   - value: gut_microbiome_context

@@ -4,11 +4,6 @@ form: acetyl
 aliases:
 - Acetyl L-Carnitine
 - ALCAR
-notes: 'Acetylated form of L-carnitine; crosses the blood-brain barrier unlike plain L-carnitine. Dual action: mitochondrial
-  support (shuttles acetyl groups into the TCA cycle) and cholinergic modulation (donates acetyl group for ACh synthesis).
-  Typical dose 500–2000 mg/day; current evidence does not support a universal morning, empty-stomach, or bedtime-avoidance
-  scheduling rule. TMAO production via gut microbiome warrants caution
-  in cardiovascular risk profiles. Sources: examine.com (Acetyl-L-Carnitine), Malaguarnera et al. 2007 (Am J Clin Nutr).'
 knowledge:
   context:
   - value: mitochondrial_health

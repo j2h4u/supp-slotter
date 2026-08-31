@@ -3,9 +3,6 @@ aliases:
 - Zinc carnosine
 - Polaprezinc
 - PepZin GI
-notes: Knowledge-only gastric-mucosal zinc complex reference card. Added because zinc L-carnosine is a common upper-GI/gastric-lining
-  supplement category and is product-distinct from generic zinc plus generic L-carnosine. Source checked - PubMed review on
-  zinc L-carnosine in gastrointestinal mucosal disease.
 concerns:
 - kind: data_quality
   text: Product cards should record elemental zinc amount, zinc L-carnosine complex amount, brand/trademark, dose timing,

@@ -3,9 +3,6 @@ aliases:
 - Ozempic
 - Wegovy
 - Rybelsus
-notes: Knowledge-only prescription GLP-1 receptor agonist card. Approved product labels differ by brand and route, including
-  weekly injection and oral tablet presentations; keep product/route explicit before making practical claims. Sources checked
-  - DailyMed Ozempic, Wegovy, and Rybelsus labels; FDA unapproved GLP-1 drugs page.
 knowledge:
   context:
   - value: incretin_drug_context

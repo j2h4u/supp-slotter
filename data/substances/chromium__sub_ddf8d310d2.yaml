@@ -1,11 +1,5 @@
 id: sub_ddf8d310d2
 name: Chromium
-notes: Generic elemental chromium contribution. Product cards keep the concrete source form in component labels and notes.
-  This card represents supplemental trivalent chromium (Cr(III)), not toxic industrial hexavalent chromium (Cr(VI)); concrete
-  source forms remain on product cards. FNB 2001 treated chromium as essential, whereas EFSA 2014 did not substantiate
-  essentiality or set dietary reference values. The mineral kind classification is elemental, not an essentiality claim.
-  NIH ODS describes chromium in an insulin-action / glucose-metabolism context, but routine glycemic benefit is mixed and any
-  body-composition effect is trivial. EFSA 2008 is used here for source safety, not efficacy or scheduling.
 concerns:
 - kind: model_gap
   text: This generic elemental card spans multiple supplemental chromium forms; the chromium picolinate/levothyroxine signal (PMID 17499152) cannot become a generic chromium relation or fixed interval.

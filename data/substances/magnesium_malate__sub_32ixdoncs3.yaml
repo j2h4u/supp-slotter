@@ -1,8 +1,6 @@
 id: sub_32ixdoncs3
 name: Magnesium
 form: malate
-notes: Magnesium source in malate form. Review context - treat as a magnesium source for enzyme/energy, glucose, blood-pressure,
-  nerve/muscle, bone-mineral, and vitamin-D/calcium-axis review while preserving the malate form.
 knowledge:
   effect:
   - value: bone_mineral_metabolism_support

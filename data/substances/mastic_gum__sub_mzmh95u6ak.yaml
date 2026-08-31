@@ -3,9 +3,6 @@ aliases:
 - Chios mastic
 - Pistacia lentiscus resin
 - Pistacia lentiscus var. chia
-notes: Knowledge-only resin/botanical digestive reference card. Added because mastic gum is a common upper-GI and H. pylori-adjacent
-  supplement category, but it should not be treated as eradication therapy or a substitute for diagnostic care. Sources checked
-  - PubMed reviews on Chios mastic gum and Pistacia lentiscus.
 concerns:
 - kind: data_quality
   text: Product cards should distinguish true Chios/Pistacia lentiscus resin from flavored chewing gum, record resin amount,

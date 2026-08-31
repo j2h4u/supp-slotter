@@ -22,10 +22,6 @@ components:
   id: cmp_prd_py5nr1nl9r__sub_vtbzgqylmd
   label: Phosphorus from microcrystalline calcium hydroxyapatite
   amount: 245 mg
-notes: 'Serving size: 3 capsules. Package: 120 capsules. Label also lists protein
-  1 g and microcrystalline calcium hydroxyapatite 2.7 g. Suggested use: 3 capsules
-  twice daily. Sources: iHerb listing, Source Naturals official product page, and
-  secondary Supplement Facts source.'
 concerns:
 - kind: data_quality
   text: Secondary listings differ slightly on calcium and vitamin D amounts; verify

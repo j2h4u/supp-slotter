@@ -1,8 +1,5 @@
 id: sub_c36e075c09
 name: Red yeast rice
-notes: Red yeast rice component listed on the Minami Healthy Foods nattokinase label. NCCIH notes that products with meaningful
-  monacolin K can have lovastatin-like cholesterol-lowering effects, side effects, and drug interactions, while actual monacolin
-  content varies by product.
 concerns:
 - kind: data_quality
   text: Minami Nattokinase lists red yeast rice but does not disclose red-yeast-rice dose or monacolin/statin-like content.

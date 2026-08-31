@@ -1,12 +1,5 @@
 id: sub_c55378389c
 name: Molybdenum
-notes: Generic elemental molybdenum contribution. Product cards keep the concrete source form in component labels and notes.
-  NIH ODS describes molybdenum as a structural constituent of molybdopterin, required for sulfite oxidase, xanthine oxidase,
-  aldehyde oxidase, and mitochondrial amidoxime reducing component; these enzymes metabolize sulfur-containing amino acids,
-  purines/pyrimidines, drugs, and toxins. ODS/NASEM establish essentiality and a sulfur-amino-acid metabolism context,
-  not enhancement, NAC support, or outcome claims in adequately nourished adults. Human absorption varies by source and
-  matrix, and no comparative registered-form study establishes superiority. Ruminant copper interactions do not establish
-  a human spacing interval.
 knowledge:
   effect:
   - value: sulfur_amino_acid_metabolism

@@ -5,9 +5,6 @@ aliases:
 - Cinnamomum verum
 - Ceylon cinnamon
 - Cassia cinnamon
-notes: 'Knowledge-only popular glucose-metabolism botanical reference card. Added because cinnamon is one of the most common
-  blood-sugar supplement categories and was missing from the knowledge base. Source checked: NCCIH diabetes and dietary supplements
-  page.'
 knowledge:
   effect:
   - value: insulin_signaling_context

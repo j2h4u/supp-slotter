@@ -3,8 +3,6 @@ name: L-Valine
 aliases:
 - valine
 - BCAA
-notes: Branched-chain essential amino acid; component of BCAA blends and multivitamin amino-acid blends. Review context -
-  BCAA/protein synthesis context; blend presence does not imply ergogenic dose.
 knowledge:
   effect:
   - value: protein_synthesis_support

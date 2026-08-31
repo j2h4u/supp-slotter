@@ -3,8 +3,6 @@ name: L-Cystine
 aliases:
 - cystine
 - dimer of L-cysteine
-notes: Disulfide dimer of L-cysteine; sulfur-containing amino acid found in multivitamin amino-acid blends. Review context
-  - sulfur-amino-acid and protein/keratin matrix context, without treating low blend doses as therapeutic cysteine repletion.
 knowledge:
   effect:
   - value: protein_synthesis_support

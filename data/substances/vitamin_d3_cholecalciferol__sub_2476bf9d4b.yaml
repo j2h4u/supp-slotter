@@ -1,7 +1,6 @@
 id: sub_2476bf9d4b
 name: Vitamin D3
 form: cholecalciferol
-notes: 'Vitamin D3 is the fat-soluble cholecalciferol form of vitamin D. NIH ODS supports vitamin identity, calcium absorption, and bone physiology. Human meal studies support a bounded food preference, especially with dietary fat, while absorption also occurs without fat; fat_meal_required is not established. No clock-time or activity-linked rule is established. Sources: NIH ODS Vitamin D; PMID 25441954; PMID 20200983.'
 knowledge:
   effect:
   - value: calcium_absorption_support

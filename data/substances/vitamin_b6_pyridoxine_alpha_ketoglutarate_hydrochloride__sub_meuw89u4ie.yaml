@@ -1,7 +1,6 @@
 id: sub_meuw89u4ie
 name: Vitamin B6
 form: pyridoxine alpha-ketoglutarate hydrochloride
-notes: 'Country Life lists 50 mg total vitamin B6 per 2 capsules across pyridoxine HCl, pyridoxal-5-phosphate (P5P), and pyridoxine alpha-ketoglutarate hydrochloride; the split between forms is not disclosed. This card captures the labelled B6 form without projecting P5P-specific clinical or medication-interaction claims onto it.'
 knowledge:
   effect:
   - value: amino_acid_metabolism_support

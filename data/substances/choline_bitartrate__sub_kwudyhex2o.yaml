@@ -1,15 +1,5 @@
 name: Choline
 form: bitartrate
-notes: >-
-  Choline bitartrate form disclosed on the GLS Ежовик гребенчатый с холином label;
-  the physical label amount is 160 mg choline bitartrate per capsule and is not
-  reinterpreted as elemental choline. Choline is an essential nutrient with
-  intrinsic roles in acetylcholine synthesis, methyl-group metabolism, and
-  phospholipid membrane structure; these physiological roles do not establish
-  cognitive enhancement. Human TMAO formation is dependent on choline form,
-  exposure, and gut-microbiome context; biomarker findings do not establish
-  clinical harm, a clinical risk threshold, or a schedule. The planner is
-  dose-agnostic.
 id: sub_kwudyhex2o
 knowledge:
   effect:

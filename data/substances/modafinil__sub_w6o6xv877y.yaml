@@ -1,9 +1,6 @@
 name: Modafinil
 aliases:
 - Provigil
-notes: 'Knowledge-only pharmaceutical wakefulness comparator card. Added because modafinil is the best-known wakefulness/nootropic
-  reference point, but it is not a supplement and should not be treated as routine stack coverage. Sources checked: MedlinePlus
-  modafinil drug information; DailyMed modafinil prescribing information; LiverTox modafinil monograph.'
 knowledge:
   effect:
   - value: stimulant_context

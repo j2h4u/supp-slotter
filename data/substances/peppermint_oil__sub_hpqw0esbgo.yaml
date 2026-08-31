@@ -2,8 +2,6 @@ name: Peppermint oil
 aliases:
 - Mentha x piperita oil
 - enteric-coated peppermint oil
-notes: Knowledge-only digestive-comfort reference card. Added because peppermint oil is one of the best-known non-probiotic
-  IBS/digestive-comfort supplements. Source checked - NCCIH peppermint oil usefulness and safety page.
 knowledge:
   effect:
   - value: digestive_comfort_context

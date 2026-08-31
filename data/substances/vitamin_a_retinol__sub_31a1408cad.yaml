@@ -1,8 +1,6 @@
 id: sub_31a1408cad
 name: Vitamin A
 form: retinol
-notes: 'Fat-soluble retinol. Fat-soluble components A and E are the scheduling bottleneck in this formula. Vitamin E can support
-  vitamin A bioavailability. Source: WHO vitamin A supplement technical note; AJCN vitamin E/vitamin A absorption study.'
 knowledge:
   effect:
   - value: epithelial_immune_context

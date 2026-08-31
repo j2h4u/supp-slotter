@@ -4,7 +4,6 @@ form: glycinate
 aliases:
 - Magnesium bisglycinate
 - Albion magnesium bisglycinate
-notes: 'Magnesium glycinate component. Formulation and tolerability are product- and dose-dependent; the bounded evidence does not establish categorical high bioavailability, low-laxative, glycine-synergy, or evening-timing claims. Sleep-recovery context is bounded to self-reported poor sleepers in the cited trial and is not a bedtime rule. The active Vitamir product identity, source, and amount remain unresolved pending label verification. NIH ODS describes magnesium as a cofactor for energy production, glucose and blood-pressure regulation, muscle/nerve function, calcium/potassium ion transport, normal heart rhythm, and bone structure.'
 knowledge:
   context:
   - value: sleep_recovery

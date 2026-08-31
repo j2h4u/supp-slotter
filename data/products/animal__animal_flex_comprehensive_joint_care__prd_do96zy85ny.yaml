@@ -27,9 +27,6 @@ components:
 - substance: sub_6tb5m1zwx2
   id: cmp_prd_do96zy85ny__sub_6tb5m1zwx2
   label: Joint Construction Complex — Glucosamine HCl
-  notes: Per-component amount not disclosed; Joint Construction Complex totals 3,000
-    mg per pack (glucosamine HCl + glucosamine sulfate 2KCl + MSM + chondroitin sulfate
-    A + chondroitin sulfate C combined).
 - substance: sub_cj87ulhyh9
   id: cmp_prd_do96zy85ny__sub_cj87ulhyh9
   label: Joint Construction Complex — Glucosamine sulfate 2KCl
@@ -42,9 +39,6 @@ components:
 - substance: sub_5asgs25wbz
   id: cmp_prd_do96zy85ny__sub_5asgs25wbz
   label: Joint Lubrication Complex — Flaxseed oil with 50% alpha-linolenic acid
-  notes: Per-component amount not disclosed; Joint Lubrication Complex totals 1,000
-    mg per pack (flaxseed oil + cetyl myristoleate proprietary blend + hyaluronic
-    acid combined).
 - substance: sub_30l4y882rd
   id: cmp_prd_do96zy85ny__sub_30l4y882rd
   label: Joint Lubrication Complex — Cetyl myristoleate proprietary blend
@@ -54,8 +48,6 @@ components:
 - substance: sub_f3vgw907ew
   id: cmp_prd_do96zy85ny__sub_f3vgw907ew
   label: Joint Support Complex — Ginger root
-  notes: Per-component amount not disclosed; Joint Support Complex totals 1,000 mg
-    per pack (ginger + turmeric + boswellia + quercetin + bromelain combined).
 - substance: sub_l9assl1a83
   id: cmp_prd_do96zy85ny__sub_l9assl1a83
   label: Joint Support Complex — Turmeric root
@@ -68,10 +60,4 @@ components:
 - substance: sub_6tk5moz0wh
   id: cmp_prd_do96zy85ny__sub_6tk5moz0wh
   label: Joint Support Complex — Bromelain
-notes: 'Serving size: 1 pack. Package: 44 pill packs. Suggested use: 1 pack with any
-  meal during the day. Calories 10, total fat 1 g per pack. Contains shellfish and
-  soy; made on equipment that processes common allergens. Other ingredients: dicalcium
-  phosphate, maltodextrin, bovine gelatin, glycerin, stearic acid, magnesium stearate,
-  microcrystalline cellulose, carob extract, purified water, silicon dioxide, pharmaceutical
-  glaze.'
 id: prd_do96zy85ny

@@ -3,9 +3,6 @@ name: Lavender
 form: flower
 aliases:
 - English lavender
-notes: 'English lavender flower listed in the Natural Balance Happy Sleeper proprietary blend. Review context: oral lavender
-  is promoted for calming anxiety/stress; NCCIH treats sleep-quality evidence as unclear, so keep as calming/sleep context
-  rather than a strong sleep-efficacy claim.'
 knowledge:
   context:
   - value: sleep_recovery

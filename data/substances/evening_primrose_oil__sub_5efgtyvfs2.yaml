@@ -4,9 +4,6 @@ aliases:
 - Oenothera biennis oil
 - gamma-linolenic acid source
 - GLA source
-notes: Knowledge-only omega-6/GLA seed-oil reference card. Added because evening primrose oil is a common PMS, breast-pain,
-  menopause, and skin-support supplement category, but NCCIH summarizes evidence as insufficient for supported condition claims.
-  Source checked - NCCIH evening primrose oil usefulness and safety page.
 concerns:
 - kind: data_quality
   text: Product cards should record total oil grams, GLA percentage or milligrams, capsule count per serving, and whether

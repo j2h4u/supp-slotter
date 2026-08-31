@@ -100,10 +100,6 @@ components:
 - substance: sub_9udzxhaaoe
   id: cmp_prd_coglohvmzn__sub_9udzxhaaoe
   label: Women's Health Blend — Cranberry
-  notes: Per-component amount not disclosed; Women's Health Blend totals 207.5 mg
-    per tablet and additionally contains generic fruit powders (blueberry, tart cherry,
-    strawberry, raspberry seed, prune) which are not encoded as separate substance
-    cards per intake policy.
 - substance: sub_kv83vycgfy
   id: cmp_prd_coglohvmzn__sub_kv83vycgfy
   label: Women's Health Blend — Grape seed extract
@@ -122,12 +118,4 @@ components:
 - substance: sub_f3vgw907ew
   id: cmp_prd_coglohvmzn__sub_f3vgw907ew
   label: Women's Health Blend — Ginger extract
-notes: 'Serving size: 1 tablet. Package: 60 tablets. Suggested use: adult females
-  take 1 tablet daily with food. Women''s Health Blend (207.5 mg per tablet) lists
-  cranberry, grape seed, pomegranate, quercetin, blueberry, resveratrol, tart cherry,
-  strawberry, raspberry seed, bilberry, prune, calcium fructoborate, and ginger extract;
-  generic fruit powders not encoded per intake policy. Phosphorus and sodium content
-  on the label are reported as nutrient line items but not encoded as separate substance
-  components. Manganese and Molybdenum forms are not specified by the label; generic
-  cards are used as fallbacks.'
 id: prd_coglohvmzn

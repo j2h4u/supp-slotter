@@ -1,7 +1,6 @@
 id: sub_d0034bd130
 name: Vitamin B9
 form: methylfolate
-notes: 'Coenzyme B-Complex component: methylfolate active B9 form. The active Country Life product lists 667 mcg DFE per 2 capsules as L-5-methyltetrahydrofolate calcium salt; other registered products use a (6S)-5-methyltetrahydrofolate glucosamine salt. Calcium L-5-MTHF and (6S)-5-MTHF salts are folate forms, and folate physiology is supported; no MTHFR-specific benefit or superiority claim is established. Form and product applicability remain product-specific, and no schedule is established. Sources: Linus Pauling Institute Folate; NIH ODS Folate; EFSA 10.2903/j.efsa.2013.3358.'
 knowledge:
   context:
   - value: neurocognitive_support

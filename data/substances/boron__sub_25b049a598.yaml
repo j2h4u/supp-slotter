@@ -1,6 +1,5 @@
 id: sub_25b049a598
 name: Boron
-notes: Generic elemental boron contribution. The active Life Extension product supplies 3 mg from a citrate/aspartate/glycinate complex; calcium fructoborate is a distinct inactive source and its evidence does not transfer to generic boron. NIH ODS does not classify boron as an essential human nutrient and does not establish a clear human function. Limited and inconsistent human evidence concerns bone/mineral, hormone, cognition, vitamin-D/calcium, and metabolic outcomes; no form has an established advantage. Keep intake within bounded upper-intake context; no known clinical medication interaction is established.
 knowledge:
   effect:
   - value: bone_mineral_metabolism_support

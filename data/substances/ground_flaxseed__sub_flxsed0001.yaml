@@ -4,8 +4,6 @@ aliases:
 - flaxseed meal
 - Linum usitatissimum seed
 - flax lignans
-notes: Whole or ground flaxseed/lignan context for lipid review. NCCIH summarizes possible cholesterol benefit for some flaxseed
-  preparations, especially whole flaxseed and flaxseed lignans, while flaxseed oil should not inherit this LDL-C role automatically.
 knowledge:
   effect:
   - value: lipid_metabolism_support

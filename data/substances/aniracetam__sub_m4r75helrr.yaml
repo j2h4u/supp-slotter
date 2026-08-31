@@ -4,9 +4,6 @@ aliases:
 - Draganon
 - Sarpul
 - Ampamet
-notes: 'Knowledge-only racetam-family nootropic reference card. Added so cognitive expert reviews can see a representative
-  fat-soluble racetam without inferring that it belongs in the active stack. Sources checked: PubChem CID 2196 and FDA/piracetam
-  regulatory context.'
 knowledge:
   effect:
   - value: cognitive_performance_context

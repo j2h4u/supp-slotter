@@ -3,8 +3,6 @@ aliases:
 - Omberacetam
 - GVS-111
 - N-phenylacetyl-L-prolylglycine ethyl ester
-notes: 'Knowledge-only racetam-adjacent Russian nootropic reference card. It is not a racetam structurally, but it belongs
-  near the racetam/nootropic review family for expert-panel completeness. Source checked: PubChem CID 180496.'
 knowledge:
   effect:
   - value: neurotrophic_support

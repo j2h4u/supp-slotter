@@ -1,0 +1,25 @@
+format: supp-slotter.actionable-scheduling-note-destinations/v1
+authority:
+  recovery_plan: docs/plans/actionable-scheduling-knowledge-recovery-20260831.md
+  substance_span_receipt: docs/evidence/actionable-scheduling-substance-note-spans-20260831.jsonl
+  substance_atom_receipt: docs/evidence/actionable-scheduling-substance-note-atoms-0-9-20260831.jsonl
+  candidate_catalog: data/scheduling-candidates.yaml
+selection:
+  basename_initials: 0-9
+  source_span_count: 1
+  atom_count: 1
+  destination_count: 1
+destinations:
+  - atom_id: 34aff3fb0a67052143d5a6fa9e17621c122700c87bcb5387c06b04d3bad3915c
+    span_id: 793f936a0b3113328c45f1e4e5d0aa65a07f57ba57e188654e705525df3e22f8
+    source:
+      path: data/substances/5_htp_griffonia_simplicifolia_seed_extract__sub_6svt59zncl.yaml
+      field: notes
+      substance_id: sub_6svt59zncl
+    destination:
+      kind: composition
+      path: data/products/natural_balance__happy_sleeper__prd_2bdj9ejl1s.yaml
+      component_id: cmp_prd_2bdj9ejl1s__sub_6svt59zncl
+      product_id: prd_2bdj9ejl1s
+      substance_id: sub_6svt59zncl
+    disposition: typed_destination

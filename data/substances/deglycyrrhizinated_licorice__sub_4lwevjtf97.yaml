@@ -3,9 +3,6 @@ aliases:
 - DGL
 - DGL licorice
 - deglycyrrhizinated licorice root
-notes: Knowledge-only digestive-comfort botanical reference card. Added because DGL is a common stomach/upper-GI support category
-  and should be separated from ordinary licorice root safety assumptions. Source checked - NCCIH licorice root usefulness
-  and safety page.
 concerns:
 - kind: data_quality
   text: Product cards should distinguish DGL, ordinary licorice root, glycyrrhizin content, chewable versus capsule form,

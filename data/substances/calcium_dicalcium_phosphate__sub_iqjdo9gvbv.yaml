@@ -1,14 +1,6 @@
 id: sub_iqjdo9gvbv
 name: Calcium
 form: dicalcium phosphate
-notes: >-
-  Dicalcium phosphate component from the TiM Electrolyte Caps label. TiM reports
-  24 mg total calcium split across dicalcium phosphate and calcium lactate, with
-  the per-source contribution unresolved. Calcium supports bone/tooth mineral
-  structure and mediates muscle function, blood clotting, nerve transmission,
-  vascular contraction/dilation, and hormone secretion; vitamin D supports active
-  calcium absorption. No dicalcium-phosphate-specific superiority or schedule is
-  established.
 knowledge:
   context:
   - value: workout_performance

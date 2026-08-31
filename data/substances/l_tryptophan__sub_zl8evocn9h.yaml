@@ -1,9 +1,6 @@
 name: L-Tryptophan
 aliases:
 - Tryptophan
-notes: 'Knowledge-only popular sleep/mood amino-acid reference card. Added because 5-HTP exists in the repository but its
-  upstream dietary amino-acid precursor was missing. Sources checked: NIH ODS Dietary Supplement Label Database ingredient
-  page and WebMD L-tryptophan safety overview.'
 knowledge:
   context:
   - value: sleep_recovery

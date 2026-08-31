@@ -2,9 +2,6 @@ name: Mucuna pruriens
 aliases:
 - Velvet bean
 - Kapikacchu
-notes: 'Knowledge-only botanical L-DOPA source reference card. Added because cognitive, mood, and performance panels should
-  see the botanical levodopa exposure separately from the existing pharmaceutical levodopa card. Source checked: RIVM warning
-  on Mucuna pruriens supplement levodopa exposure.'
 concerns:
 - kind: model_gap
   text: The ontology has no dedicated dopaminergic-load or levodopa-exposure dashboard; use catecholamine precursor context

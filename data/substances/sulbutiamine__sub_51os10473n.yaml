@@ -1,8 +1,6 @@
 name: Sulbutiamine
 aliases:
 - Isobutyryl thiamine disulfide
-notes: 'Knowledge-only synthetic thiamine-derivative nootropic/fatigue reference card. Added as a distinct B1-adjacent comparator
-  rather than merging into ordinary thiamine or benfotiamine cards. Source checked: PubChem CID 3002120.'
 knowledge:
   effect:
   - value: cognitive_performance_context

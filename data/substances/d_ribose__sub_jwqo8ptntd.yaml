@@ -1,9 +1,6 @@
 name: D-Ribose
 aliases:
 - ribose
-notes: Knowledge-only cellular-energy reference card. Added because D-ribose is a common ATP/energy supplement topic, but
-  exercise-performance evidence should stay review-level rather than be treated as established benefit. Source checked - NIH
-  ODS exercise/performance fact sheet.
 knowledge:
   effect:
   - value: exercise_recovery_support

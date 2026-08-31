@@ -1,8 +1,6 @@
 name: Dulaglutide
 aliases:
 - Trulicity
-notes: Knowledge-only prescription GLP-1 receptor agonist card for diabetes and cardiometabolic interaction review. Sources
-  checked - DailyMed Trulicity label; FDA unapproved GLP-1 drugs page.
 knowledge:
   context:
   - value: incretin_drug_context

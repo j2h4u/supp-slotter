@@ -3,8 +3,6 @@ name: Iodine
 form: potassium iodide
 aliases:
 - KI
-notes: Standardized inorganic iodine source common in multivitamins. Kept separate from kelp/Sea-Iodine because source variability
-  and thyroid review context differ; NIH ODS lists kelp and multivitamin iodine supplements as iodine sources.
 knowledge:
   kind:
   - value: mineral

@@ -2,8 +2,6 @@ name: Liraglutide
 aliases:
 - Victoza
 - Saxenda
-notes: Knowledge-only prescription GLP-1 receptor agonist card for diabetes, obesity, and GLP-interaction review. Sources
-  checked - DailyMed Saxenda and Victoza labels; FDA unapproved GLP-1 drugs page.
 knowledge:
   context:
   - value: incretin_drug_context

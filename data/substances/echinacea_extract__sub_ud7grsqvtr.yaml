@@ -4,8 +4,6 @@ aliases:
 - Echinacea purpurea
 - Echinacea angustifolia
 - Purple coneflower
-notes: 'Knowledge-only popular immune botanical reference card. Added because echinacea is one of the best-known cold/immune
-  supplement categories and was missing from the knowledge base. Source checked: NCCIH echinacea usefulness and safety page.'
 knowledge:
   effect:
   - value: immune_modulation_context

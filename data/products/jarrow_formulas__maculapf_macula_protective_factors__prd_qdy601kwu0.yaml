@@ -26,11 +26,6 @@ components:
   id: cmp_prd_qdy601kwu0__sub_249199f726
   label: Astaxanthin from Haematococcus pluvialis
   amount: 4 mg
-notes: 'Serving size: 1 softgel. Package: 60 softgels. Suggested use: 1 softgel
-  per day with food. User-provided Supplement Facts text is the strongest source;
-  discontinued product pages are secondary. Other ingredients include sunflower
-  lecithin, bovine gelatin softgel, avocado oil, sunflower oil, and caramel as a
-  light barrier.'
 concerns:
 - kind: data_quality
   text: Product description text said 10 mg meso-zeaxanthin, while the Supplement

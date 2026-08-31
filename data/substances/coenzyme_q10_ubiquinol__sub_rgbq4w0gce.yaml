@@ -3,9 +3,6 @@ name: Coenzyme Q10
 form: ubiquinol
 aliases:
 - CoQ10
-notes: Ubiquinol (reduced) form — more bioavailable than ubiquinone, especially in older adults; electron-transport-chain
-  support context for mitochondrial review. Review context - CoQ10 transfers electrons in the mitochondrial respiratory chain
-  and also functions as an antioxidant; this does not imply proven statin-myalgia benefit.
 knowledge:
   context:
   - value: mitochondrial_health

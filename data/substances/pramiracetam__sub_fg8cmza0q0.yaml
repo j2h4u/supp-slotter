@@ -1,8 +1,6 @@
 name: Pramiracetam
 aliases:
 - CI-879
-notes: 'Knowledge-only racetam-family nootropic reference card. Added as a high-potency racetam comparator for cholinergic/cognitive
-  review, not as an active-stack recommendation. Source checked: PubChem CID 51712.'
 knowledge:
   effect:
   - value: cholinergic_support

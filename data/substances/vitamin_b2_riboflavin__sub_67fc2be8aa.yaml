@@ -1,7 +1,6 @@
 id: sub_67fc2be8aa
 name: Vitamin B2
 form: riboflavin
-notes: "This card represents free riboflavin, distinct from the separate riboflavin 5'-phosphate (R5P) card; Country Life's mixed active label lists both forms. Human meal-absorption evidence supports a soft food preference, not a required meal or fat meal. No clinical efficacy claim is made."
 knowledge:
   context:
   - value: mitochondrial_health

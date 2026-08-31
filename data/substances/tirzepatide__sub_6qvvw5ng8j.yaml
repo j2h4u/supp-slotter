@@ -2,9 +2,6 @@ name: Tirzepatide
 aliases:
 - Mounjaro
 - Zepbound
-notes: Knowledge-only prescription dual GIP/GLP-1 receptor agonist card. Approved product labels differ by indication and
-  brand; keep product/indication explicit before making practical claims. Sources checked - DailyMed Mounjaro and Zepbound
-  labels; FDA unapproved GLP-1 drugs page.
 knowledge:
   context:
   - value: incretin_drug_context

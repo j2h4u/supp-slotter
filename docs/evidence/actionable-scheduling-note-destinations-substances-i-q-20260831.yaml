@@ -1,0 +1,3629 @@
+format: supp-slotter.actionable-scheduling-note-destinations/v1
+authority:
+  recovery_plan: docs/plans/actionable-scheduling-knowledge-recovery-20260831.md
+  substance_span_receipt: docs/evidence/actionable-scheduling-substance-note-spans-20260831.jsonl
+  substance_atom_receipt: docs/evidence/actionable-scheduling-substance-note-atoms-i-q-20260831.jsonl
+  candidate_catalog: data/scheduling-candidates.yaml
+  adjudication: docs/decisions/actionable-scheduling-adjudication-consolidated-20260831.md
+selection:
+  basename_initials: i-q
+  case_insensitive: true
+  source_span_count: 89
+  atom_count: 348
+  destination_count: 348
+  typed_destination_count: 182
+  discard_counts:
+    clinical_or_safety_scope: 18
+    no_exact_scheduling_direction: 21
+    receipt_only_metadata: 127
+destinations:
+- atom_id: 5c29834bdb8b4d05ccbcce4c24eb76c24fc68f51164f1f32792edf2f318fa1ac:001
+  span_id: 5c29834bdb8b4d05ccbcce4c24eb76c24fc68f51164f1f32792edf2f318fa1ac
+  source:
+    path: data/substances/inositol__sub_sa87d9ycbd.yaml
+    field: notes
+    substance_id: sub_sa87d9ycbd
+  destination:
+    kind: identity
+    path: data/substances/inositol__sub_sa87d9ycbd.yaml
+    substance_id: sub_sa87d9ycbd
+    field: name
+  disposition: typed_destination
+- atom_id: 5c29834bdb8b4d05ccbcce4c24eb76c24fc68f51164f1f32792edf2f318fa1ac:002
+  span_id: 5c29834bdb8b4d05ccbcce4c24eb76c24fc68f51164f1f32792edf2f318fa1ac
+  source:
+    path: data/substances/inositol__sub_sa87d9ycbd.yaml
+    field: notes
+    substance_id: sub_sa87d9ycbd
+  destination:
+    kind: composition
+    path: data/products/natural_factors__biocoenzymated_active_b_complex__prd_qmgu4q8ipo.yaml
+    component_id: cmp_prd_qmgu4q8ipo__sub_sa87d9ycbd
+    product_id: prd_qmgu4q8ipo
+    substance_id: sub_sa87d9ycbd
+  disposition: typed_destination
+- atom_id: 5c29834bdb8b4d05ccbcce4c24eb76c24fc68f51164f1f32792edf2f318fa1ac:003
+  span_id: 5c29834bdb8b4d05ccbcce4c24eb76c24fc68f51164f1f32792edf2f318fa1ac
+  source:
+    path: data/substances/inositol__sub_sa87d9ycbd.yaml
+    field: notes
+    substance_id: sub_sa87d9ycbd
+  destination:
+    kind: knowledge
+    path: data/substances/inositol__sub_sa87d9ycbd.yaml
+    substance_id: sub_sa87d9ycbd
+    field: knowledge.effect[0]
+    value: insulin_signaling_context
+  disposition: typed_destination
+- atom_id: 5c29834bdb8b4d05ccbcce4c24eb76c24fc68f51164f1f32792edf2f318fa1ac:004
+  span_id: 5c29834bdb8b4d05ccbcce4c24eb76c24fc68f51164f1f32792edf2f318fa1ac
+  source:
+    path: data/substances/inositol__sub_sa87d9ycbd.yaml
+    field: notes
+    substance_id: sub_sa87d9ycbd
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: c9849b037f736f50078e4430219e63251ed280de291f1243399f6af5fe9bee4e:001
+  span_id: c9849b037f736f50078e4430219e63251ed280de291f1243399f6af5fe9bee4e
+  source:
+    path: data/substances/inulin__sub_26s1uncypx.yaml
+    field: notes
+    substance_id: sub_26s1uncypx
+  destination:
+    kind: identity
+    path: data/substances/inulin__sub_26s1uncypx.yaml
+    substance_id: sub_26s1uncypx
+    field: name
+  disposition: typed_destination
+- atom_id: c9849b037f736f50078e4430219e63251ed280de291f1243399f6af5fe9bee4e:002
+  span_id: c9849b037f736f50078e4430219e63251ed280de291f1243399f6af5fe9bee4e
+  source:
+    path: data/substances/inulin__sub_26s1uncypx.yaml
+    field: notes
+    substance_id: sub_26s1uncypx
+  destination:
+    kind: identity
+    path: data/substances/inulin__sub_26s1uncypx.yaml
+    substance_id: sub_26s1uncypx
+    field: name
+  disposition: typed_destination
+- atom_id: c9849b037f736f50078e4430219e63251ed280de291f1243399f6af5fe9bee4e:003
+  span_id: c9849b037f736f50078e4430219e63251ed280de291f1243399f6af5fe9bee4e
+  source:
+    path: data/substances/inulin__sub_26s1uncypx.yaml
+    field: notes
+    substance_id: sub_26s1uncypx
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: c9849b037f736f50078e4430219e63251ed280de291f1243399f6af5fe9bee4e:004
+  span_id: c9849b037f736f50078e4430219e63251ed280de291f1243399f6af5fe9bee4e
+  source:
+    path: data/substances/inulin__sub_26s1uncypx.yaml
+    field: notes
+    substance_id: sub_26s1uncypx
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: c9849b037f736f50078e4430219e63251ed280de291f1243399f6af5fe9bee4e:005
+  span_id: c9849b037f736f50078e4430219e63251ed280de291f1243399f6af5fe9bee4e
+  source:
+    path: data/substances/inulin__sub_26s1uncypx.yaml
+    field: notes
+    substance_id: sub_26s1uncypx
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: bc8ffe805d377c06faed3e76ed25d18e729d01b24a50d573b9128c4192b03c3d:001
+  span_id: bc8ffe805d377c06faed3e76ed25d18e729d01b24a50d573b9128c4192b03c3d
+  source:
+    path: data/substances/iodine_kelp__sub_odrlz59f4e.yaml
+    field: notes
+    substance_id: sub_odrlz59f4e
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: bc8ffe805d377c06faed3e76ed25d18e729d01b24a50d573b9128c4192b03c3d:002
+  span_id: bc8ffe805d377c06faed3e76ed25d18e729d01b24a50d573b9128c4192b03c3d
+  source:
+    path: data/substances/iodine_kelp__sub_odrlz59f4e.yaml
+    field: notes
+    substance_id: sub_odrlz59f4e
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: bc8ffe805d377c06faed3e76ed25d18e729d01b24a50d573b9128c4192b03c3d:003
+  span_id: bc8ffe805d377c06faed3e76ed25d18e729d01b24a50d573b9128c4192b03c3d
+  source:
+    path: data/substances/iodine_kelp__sub_odrlz59f4e.yaml
+    field: notes
+    substance_id: sub_odrlz59f4e
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: c0a75d60059119a6f8043c96d2fbeb617a1b1e940bdee41191adf4d0a25f1422:001
+  span_id: c0a75d60059119a6f8043c96d2fbeb617a1b1e940bdee41191adf4d0a25f1422
+  source:
+    path: data/substances/iodine_potassium_iodide__sub_xwl4xhn8bv.yaml
+    field: notes
+    substance_id: sub_xwl4xhn8bv
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: c0a75d60059119a6f8043c96d2fbeb617a1b1e940bdee41191adf4d0a25f1422:002
+  span_id: c0a75d60059119a6f8043c96d2fbeb617a1b1e940bdee41191adf4d0a25f1422
+  source:
+    path: data/substances/iodine_potassium_iodide__sub_xwl4xhn8bv.yaml
+    field: notes
+    substance_id: sub_xwl4xhn8bv
+  destination:
+    kind: knowledge
+    path: data/substances/iodine_potassium_iodide__sub_xwl4xhn8bv.yaml
+    substance_id: sub_xwl4xhn8bv
+    field: knowledge.pathway[0]
+    value: thyroid_hormone_axis
+  disposition: typed_destination
+- atom_id: c0a75d60059119a6f8043c96d2fbeb617a1b1e940bdee41191adf4d0a25f1422:003
+  span_id: c0a75d60059119a6f8043c96d2fbeb617a1b1e940bdee41191adf4d0a25f1422
+  source:
+    path: data/substances/iodine_potassium_iodide__sub_xwl4xhn8bv.yaml
+    field: notes
+    substance_id: sub_xwl4xhn8bv
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 1b0851ce8fa6265f0fab93cb7f31016720ab00d6adb2f26429789b22a358f22a:001
+  span_id: 1b0851ce8fa6265f0fab93cb7f31016720ab00d6adb2f26429789b22a358f22a
+  source:
+    path: data/substances/iodine_sea_iodine_complex__sub_k2m2utd8s5.yaml
+    field: notes
+    substance_id: sub_k2m2utd8s5
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 1b0851ce8fa6265f0fab93cb7f31016720ab00d6adb2f26429789b22a358f22a:002
+  span_id: 1b0851ce8fa6265f0fab93cb7f31016720ab00d6adb2f26429789b22a358f22a
+  source:
+    path: data/substances/iodine_sea_iodine_complex__sub_k2m2utd8s5.yaml
+    field: notes
+    substance_id: sub_k2m2utd8s5
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: f8847e721de08c40a3ad72bbdae0c9339cc07047e94fcf60b93b5f22f47d537d:001
+  span_id: f8847e721de08c40a3ad72bbdae0c9339cc07047e94fcf60b93b5f22f47d537d
+  source:
+    path: data/substances/iron_ferrochel_ferrous_bisglycinate_chelate__sub_ses5czfzi1.yaml
+    field: notes
+    substance_id: sub_ses5czfzi1
+  destination:
+    kind: composition
+    path: data/products/source_naturals__advanced_ferrochel__prd_h9obp71966.yaml
+    component_id: cmp_prd_h9obp71966__sub_ses5czfzi1
+    product_id: prd_h9obp71966
+    substance_id: sub_ses5czfzi1
+  disposition: typed_destination
+- atom_id: f8847e721de08c40a3ad72bbdae0c9339cc07047e94fcf60b93b5f22f47d537d:002
+  span_id: f8847e721de08c40a3ad72bbdae0c9339cc07047e94fcf60b93b5f22f47d537d
+  source:
+    path: data/substances/iron_ferrochel_ferrous_bisglycinate_chelate__sub_ses5czfzi1.yaml
+    field: notes
+    substance_id: sub_ses5czfzi1
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: f8847e721de08c40a3ad72bbdae0c9339cc07047e94fcf60b93b5f22f47d537d:003
+  span_id: f8847e721de08c40a3ad72bbdae0c9339cc07047e94fcf60b93b5f22f47d537d
+  source:
+    path: data/substances/iron_ferrochel_ferrous_bisglycinate_chelate__sub_ses5czfzi1.yaml
+    field: notes
+    substance_id: sub_ses5czfzi1
+  destination:
+    kind: knowledge
+    path: data/substances/iron_ferrochel_ferrous_bisglycinate_chelate__sub_ses5czfzi1.yaml
+    substance_id: sub_ses5czfzi1
+    field: knowledge.risk[0]
+    value: iron_overdose_review
+  disposition: typed_destination
+- atom_id: 69ca752fe79adb30fe0a495f1530ebda0b1b016f79ceaf5219bebb276a3dbf42:001
+  span_id: 69ca752fe79adb30fe0a495f1530ebda0b1b016f79ceaf5219bebb276a3dbf42
+  source:
+    path: data/substances/iron_ferrous_gluconate__sub_d5p99yk0hh.yaml
+    field: notes
+    substance_id: sub_d5p99yk0hh
+  destination:
+    kind: composition
+    path: data/products/country_life__core_daily_1_for_women__prd_coglohvmzn.yaml
+    component_id: cmp_prd_coglohvmzn__sub_d5p99yk0hh
+    product_id: prd_coglohvmzn
+    substance_id: sub_d5p99yk0hh
+  disposition: typed_destination
+- atom_id: 69ca752fe79adb30fe0a495f1530ebda0b1b016f79ceaf5219bebb276a3dbf42:002
+  span_id: 69ca752fe79adb30fe0a495f1530ebda0b1b016f79ceaf5219bebb276a3dbf42
+  source:
+    path: data/substances/iron_ferrous_gluconate__sub_d5p99yk0hh.yaml
+    field: notes
+    substance_id: sub_d5p99yk0hh
+  destination:
+    kind: identity
+    path: data/substances/iron_ferrous_gluconate__sub_d5p99yk0hh.yaml
+    substance_id: sub_d5p99yk0hh
+    field: name
+  disposition: typed_destination
+- atom_id: 69ca752fe79adb30fe0a495f1530ebda0b1b016f79ceaf5219bebb276a3dbf42:003
+  span_id: 69ca752fe79adb30fe0a495f1530ebda0b1b016f79ceaf5219bebb276a3dbf42
+  source:
+    path: data/substances/iron_ferrous_gluconate__sub_d5p99yk0hh.yaml
+    field: notes
+    substance_id: sub_d5p99yk0hh
+  destination:
+    kind: knowledge
+    path: data/substances/iron_ferrous_gluconate__sub_d5p99yk0hh.yaml
+    substance_id: sub_d5p99yk0hh
+    field: knowledge.risk[0]
+    value: iron_overdose_review
+  disposition: typed_destination
+- atom_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87:001
+  span_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87
+  source:
+    path: data/substances/krill_oil__sub_646e568f61.yaml
+    field: notes
+    substance_id: sub_646e568f61
+  destination:
+    kind: identity
+    path: data/substances/krill_oil__sub_646e568f61.yaml
+    substance_id: sub_646e568f61
+    field: name
+  disposition: typed_destination
+- atom_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87:002
+  span_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87
+  source:
+    path: data/substances/krill_oil__sub_646e568f61.yaml
+    field: notes
+    substance_id: sub_646e568f61
+  destination:
+    kind: composition
+    path: data/products/psalae__antarctiv_krill_oil__prd_w2s970gps4.yaml
+    component_id: cmp_prd_w2s970gps4__sub_646e568f61
+    product_id: prd_w2s970gps4
+    substance_id: sub_646e568f61
+  disposition: typed_destination
+- atom_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87:003
+  span_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87
+  source:
+    path: data/substances/krill_oil__sub_646e568f61.yaml
+    field: notes
+    substance_id: sub_646e568f61
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87:004
+  span_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87
+  source:
+    path: data/substances/krill_oil__sub_646e568f61.yaml
+    field: notes
+    substance_id: sub_646e568f61
+  destination:
+    kind: candidate
+    path: data/scheduling-candidates.yaml
+    candidate_id: cand_food_cmp_prd_w2s970gps4__sub_646e568f61
+  disposition: typed_destination
+  fact:
+    kind: fact
+    path: ontology/canonical-facts.yaml
+    fact_id: fact_food_prd_w2s970gps4_sub_646e568f61
+- atom_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87:005
+  span_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87
+  source:
+    path: data/substances/krill_oil__sub_646e568f61.yaml
+    field: notes
+    substance_id: sub_646e568f61
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87:006
+  span_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87
+  source:
+    path: data/substances/krill_oil__sub_646e568f61.yaml
+    field: notes
+    substance_id: sub_646e568f61
+  destination:
+    kind: knowledge
+    path: data/substances/krill_oil__sub_646e568f61.yaml
+    substance_id: sub_646e568f61
+    field: knowledge.risk[0]
+    value: bleeding_med_interaction
+  disposition: typed_destination
+- atom_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87:007
+  span_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87
+  source:
+    path: data/substances/krill_oil__sub_646e568f61.yaml
+    field: notes
+    substance_id: sub_646e568f61
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87:008
+  span_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87
+  source:
+    path: data/substances/krill_oil__sub_646e568f61.yaml
+    field: notes
+    substance_id: sub_646e568f61
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87:009
+  span_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87
+  source:
+    path: data/substances/krill_oil__sub_646e568f61.yaml
+    field: notes
+    substance_id: sub_646e568f61
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87:010
+  span_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87
+  source:
+    path: data/substances/krill_oil__sub_646e568f61.yaml
+    field: notes
+    substance_id: sub_646e568f61
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87:011
+  span_id: 604536baa932941c9a59d053f9ce8ae0423b5660d872d0a48d0fbdfad863ca87
+  source:
+    path: data/substances/krill_oil__sub_646e568f61.yaml
+    field: notes
+    substance_id: sub_646e568f61
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 9d5318f8ae9a39110a5ab4cdb8cc9fdaaa4b24c3d674ea7dff1eedc75f3a5390:001
+  span_id: 9d5318f8ae9a39110a5ab4cdb8cc9fdaaa4b24c3d674ea7dff1eedc75f3a5390
+  source:
+    path: data/substances/l_arginine__sub_699a985e61.yaml
+    field: notes
+    substance_id: sub_699a985e61
+  destination:
+    kind: identity
+    path: data/substances/l_arginine__sub_699a985e61.yaml
+    substance_id: sub_699a985e61
+    field: name
+  disposition: typed_destination
+- atom_id: 9d5318f8ae9a39110a5ab4cdb8cc9fdaaa4b24c3d674ea7dff1eedc75f3a5390:002
+  span_id: 9d5318f8ae9a39110a5ab4cdb8cc9fdaaa4b24c3d674ea7dff1eedc75f3a5390
+  source:
+    path: data/substances/l_arginine__sub_699a985e61.yaml
+    field: notes
+    substance_id: sub_699a985e61
+  destination:
+    kind: knowledge
+    path: data/substances/l_arginine__sub_699a985e61.yaml
+    substance_id: sub_699a985e61
+    field: knowledge.effect[0]
+    value: nitric_oxide_support
+  disposition: typed_destination
+- atom_id: bfd5e28f66c121c47d2dcc6be4b3375a2d3bf2dd786f33c9ae4bb5aeb0739dd3:001
+  span_id: bfd5e28f66c121c47d2dcc6be4b3375a2d3bf2dd786f33c9ae4bb5aeb0739dd3
+  source:
+    path: data/substances/l_arginine_alpha_ketoglutarate__sub_sxc3zqhfsy.yaml
+    field: notes
+    substance_id: sub_sxc3zqhfsy
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: bfd5e28f66c121c47d2dcc6be4b3375a2d3bf2dd786f33c9ae4bb5aeb0739dd3:002
+  span_id: bfd5e28f66c121c47d2dcc6be4b3375a2d3bf2dd786f33c9ae4bb5aeb0739dd3
+  source:
+    path: data/substances/l_arginine_alpha_ketoglutarate__sub_sxc3zqhfsy.yaml
+    field: notes
+    substance_id: sub_sxc3zqhfsy
+  destination:
+    kind: identity
+    path: data/substances/l_arginine_alpha_ketoglutarate__sub_sxc3zqhfsy.yaml
+    substance_id: sub_sxc3zqhfsy
+    field: name
+  disposition: typed_destination
+- atom_id: bfd5e28f66c121c47d2dcc6be4b3375a2d3bf2dd786f33c9ae4bb5aeb0739dd3:003
+  span_id: bfd5e28f66c121c47d2dcc6be4b3375a2d3bf2dd786f33c9ae4bb5aeb0739dd3
+  source:
+    path: data/substances/l_arginine_alpha_ketoglutarate__sub_sxc3zqhfsy.yaml
+    field: notes
+    substance_id: sub_sxc3zqhfsy
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: bfd5e28f66c121c47d2dcc6be4b3375a2d3bf2dd786f33c9ae4bb5aeb0739dd3:004
+  span_id: bfd5e28f66c121c47d2dcc6be4b3375a2d3bf2dd786f33c9ae4bb5aeb0739dd3
+  source:
+    path: data/substances/l_arginine_alpha_ketoglutarate__sub_sxc3zqhfsy.yaml
+    field: notes
+    substance_id: sub_sxc3zqhfsy
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: f504a8dbd3e3b42fc7180a73f651eec13ffc04b7dba5bc54ba0c2831347e8dce:001
+  span_id: f504a8dbd3e3b42fc7180a73f651eec13ffc04b7dba5bc54ba0c2831347e8dce
+  source:
+    path: data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml
+    field: notes
+    substance_id: sub_97b0ff246a
+  destination:
+    kind: identity
+    path: data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml
+    substance_id: sub_97b0ff246a
+    field: name
+  disposition: typed_destination
+- atom_id: f504a8dbd3e3b42fc7180a73f651eec13ffc04b7dba5bc54ba0c2831347e8dce:002
+  span_id: f504a8dbd3e3b42fc7180a73f651eec13ffc04b7dba5bc54ba0c2831347e8dce
+  source:
+    path: data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml
+    field: notes
+    substance_id: sub_97b0ff246a
+  destination:
+    kind: knowledge
+    path: data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml
+    substance_id: sub_97b0ff246a
+    field: knowledge.pathway[0]
+    value: carnitine_shuttle
+  disposition: typed_destination
+- atom_id: f504a8dbd3e3b42fc7180a73f651eec13ffc04b7dba5bc54ba0c2831347e8dce:003
+  span_id: f504a8dbd3e3b42fc7180a73f651eec13ffc04b7dba5bc54ba0c2831347e8dce
+  source:
+    path: data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml
+    field: notes
+    substance_id: sub_97b0ff246a
+  destination:
+    kind: knowledge
+    path: data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml
+    substance_id: sub_97b0ff246a
+    field: knowledge.context[0]
+    value: mitochondrial_health
+  disposition: typed_destination
+- atom_id: f504a8dbd3e3b42fc7180a73f651eec13ffc04b7dba5bc54ba0c2831347e8dce:004
+  span_id: f504a8dbd3e3b42fc7180a73f651eec13ffc04b7dba5bc54ba0c2831347e8dce
+  source:
+    path: data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml
+    field: notes
+    substance_id: sub_97b0ff246a
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: f504a8dbd3e3b42fc7180a73f651eec13ffc04b7dba5bc54ba0c2831347e8dce:005
+  span_id: f504a8dbd3e3b42fc7180a73f651eec13ffc04b7dba5bc54ba0c2831347e8dce
+  source:
+    path: data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml
+    field: notes
+    substance_id: sub_97b0ff246a
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: f504a8dbd3e3b42fc7180a73f651eec13ffc04b7dba5bc54ba0c2831347e8dce:006
+  span_id: f504a8dbd3e3b42fc7180a73f651eec13ffc04b7dba5bc54ba0c2831347e8dce
+  source:
+    path: data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml
+    field: notes
+    substance_id: sub_97b0ff246a
+  destination:
+    kind: knowledge
+    path: data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml
+    substance_id: sub_97b0ff246a
+    field: knowledge.pathway[1]
+    value: tmao_precursor
+  disposition: typed_destination
+- atom_id: f504a8dbd3e3b42fc7180a73f651eec13ffc04b7dba5bc54ba0c2831347e8dce:007
+  span_id: f504a8dbd3e3b42fc7180a73f651eec13ffc04b7dba5bc54ba0c2831347e8dce
+  source:
+    path: data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml
+    field: notes
+    substance_id: sub_97b0ff246a
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: f504a8dbd3e3b42fc7180a73f651eec13ffc04b7dba5bc54ba0c2831347e8dce:008
+  span_id: f504a8dbd3e3b42fc7180a73f651eec13ffc04b7dba5bc54ba0c2831347e8dce
+  source:
+    path: data/substances/l_carnitine_acetyl__sub_97b0ff246a.yaml
+    field: notes
+    substance_id: sub_97b0ff246a
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255:001
+  span_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255
+  source:
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    field: notes
+    substance_id: sub_5bd641c116
+  destination:
+    kind: identity
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    substance_id: sub_5bd641c116
+    field: name
+  disposition: typed_destination
+- atom_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255:002
+  span_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255
+  source:
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    field: notes
+    substance_id: sub_5bd641c116
+  destination:
+    kind: composition
+    path: data/products/primecraft__l_carnitine_l_tartrate_lclt__prd_0e92bc1674.yaml
+    component_id: cmp_prd_0e92bc1674__sub_5bd641c116
+    product_id: prd_0e92bc1674
+    substance_id: sub_5bd641c116
+  disposition: typed_destination
+- atom_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255:003
+  span_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255
+  source:
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    field: notes
+    substance_id: sub_5bd641c116
+  destination:
+    kind: candidate
+    path: data/scheduling-candidates.yaml
+    candidate_id: cand_exercise_lclt_cmp_prd_0e92bc1674__sub_5bd641c116
+  disposition: typed_destination
+- atom_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255:004
+  span_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255
+  source:
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    field: notes
+    substance_id: sub_5bd641c116
+  destination:
+    kind: knowledge
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    substance_id: sub_5bd641c116
+    field: knowledge.context[0]
+    value: mitochondrial_health
+  disposition: typed_destination
+- atom_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255:005
+  span_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255
+  source:
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    field: notes
+    substance_id: sub_5bd641c116
+  destination:
+    kind: knowledge
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    substance_id: sub_5bd641c116
+    field: knowledge.effect[1]
+    value: exercise_recovery_support
+  disposition: typed_destination
+- atom_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255:006
+  span_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255
+  source:
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    field: notes
+    substance_id: sub_5bd641c116
+  destination:
+    kind: knowledge
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    substance_id: sub_5bd641c116
+    field: knowledge.pathway[0]
+    value: carnitine_shuttle
+  disposition: typed_destination
+- atom_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255:007
+  span_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255
+  source:
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    field: notes
+    substance_id: sub_5bd641c116
+  destination:
+    kind: knowledge
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    substance_id: sub_5bd641c116
+    field: knowledge.pathway[0]
+    value: carnitine_shuttle
+  disposition: typed_destination
+- atom_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255:008
+  span_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255
+  source:
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    field: notes
+    substance_id: sub_5bd641c116
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255:009
+  span_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255
+  source:
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    field: notes
+    substance_id: sub_5bd641c116
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255:010
+  span_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255
+  source:
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    field: notes
+    substance_id: sub_5bd641c116
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255:011
+  span_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255
+  source:
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    field: notes
+    substance_id: sub_5bd641c116
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255:012
+  span_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255
+  source:
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    field: notes
+    substance_id: sub_5bd641c116
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255:013
+  span_id: 05cb039492f2dbaea5f759c8b66db2c69be323876a1b9707826db6ce85ee6255
+  source:
+    path: data/substances/l_carnitine_l_tartrate__sub_5bd641c116.yaml
+    field: notes
+    substance_id: sub_5bd641c116
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 7ee841cc0622ea25d70295c3d16d52c69625601c1211651f6603c47e76871093:001
+  span_id: 7ee841cc0622ea25d70295c3d16d52c69625601c1211651f6603c47e76871093
+  source:
+    path: data/substances/l_citrulline_malate__sub_3918fe347e.yaml
+    field: notes
+    substance_id: sub_3918fe347e
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 7ee841cc0622ea25d70295c3d16d52c69625601c1211651f6603c47e76871093:002
+  span_id: 7ee841cc0622ea25d70295c3d16d52c69625601c1211651f6603c47e76871093
+  source:
+    path: data/substances/l_citrulline_malate__sub_3918fe347e.yaml
+    field: notes
+    substance_id: sub_3918fe347e
+  destination:
+    kind: candidate
+    path: data/scheduling-candidates.yaml
+    candidate_id: cand_exercise_citrulline_cmp_prd_cfce0b36b6__sub_3918fe347e
+  disposition: typed_destination
+  fact:
+    kind: fact
+    path: ontology/canonical-facts.yaml
+    fact_id: fact_pre_exercise_performance_prd_cfce0b36b6_sub_3918fe347e
+- atom_id: 4ec1058b8495dd2a8aca98b93f0d5f0e193b045e4ccca3c1754b5b1cc3c98552:001
+  span_id: 4ec1058b8495dd2a8aca98b93f0d5f0e193b045e4ccca3c1754b5b1cc3c98552
+  source:
+    path: data/substances/l_cystine__sub_4uegm50u2f.yaml
+    field: notes
+    substance_id: sub_4uegm50u2f
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 4ec1058b8495dd2a8aca98b93f0d5f0e193b045e4ccca3c1754b5b1cc3c98552:002
+  span_id: 4ec1058b8495dd2a8aca98b93f0d5f0e193b045e4ccca3c1754b5b1cc3c98552
+  source:
+    path: data/substances/l_cystine__sub_4uegm50u2f.yaml
+    field: notes
+    substance_id: sub_4uegm50u2f
+  destination:
+    kind: identity
+    path: data/substances/l_cystine__sub_4uegm50u2f.yaml
+    substance_id: sub_4uegm50u2f
+    field: name
+  disposition: typed_destination
+- atom_id: 4ec1058b8495dd2a8aca98b93f0d5f0e193b045e4ccca3c1754b5b1cc3c98552:003
+  span_id: 4ec1058b8495dd2a8aca98b93f0d5f0e193b045e4ccca3c1754b5b1cc3c98552
+  source:
+    path: data/substances/l_cystine__sub_4uegm50u2f.yaml
+    field: notes
+    substance_id: sub_4uegm50u2f
+  destination:
+    kind: knowledge
+    path: data/substances/l_cystine__sub_4uegm50u2f.yaml
+    substance_id: sub_4uegm50u2f
+    field: knowledge.effect[0]
+    value: protein_synthesis_support
+  disposition: typed_destination
+- atom_id: 86a186753597d7e73d251e56d2b78a736bf08db0a41d618fbc5484fb0cd272ad:001
+  span_id: 86a186753597d7e73d251e56d2b78a736bf08db0a41d618fbc5484fb0cd272ad
+  source:
+    path: data/substances/l_ergothioneine__sub_wy6kzeu4f7.yaml
+    field: notes
+    substance_id: sub_wy6kzeu4f7
+  destination:
+    kind: composition
+    path: data/products/california_gold_nutrition__nicotinamide_riboside_tartrate_nrt_complex__prd_ecl277i8db.yaml
+    component_id: cmp_prd_ecl277i8db__sub_wy6kzeu4f7
+    product_id: prd_ecl277i8db
+    substance_id: sub_wy6kzeu4f7
+  disposition: typed_destination
+- atom_id: 86a186753597d7e73d251e56d2b78a736bf08db0a41d618fbc5484fb0cd272ad:002
+  span_id: 86a186753597d7e73d251e56d2b78a736bf08db0a41d618fbc5484fb0cd272ad
+  source:
+    path: data/substances/l_ergothioneine__sub_wy6kzeu4f7.yaml
+    field: notes
+    substance_id: sub_wy6kzeu4f7
+  destination:
+    kind: knowledge
+    path: data/substances/l_ergothioneine__sub_wy6kzeu4f7.yaml
+    substance_id: sub_wy6kzeu4f7
+    field: knowledge.context[0]
+    value: antioxidant_protection
+  disposition: typed_destination
+- atom_id: 86a186753597d7e73d251e56d2b78a736bf08db0a41d618fbc5484fb0cd272ad:003
+  span_id: 86a186753597d7e73d251e56d2b78a736bf08db0a41d618fbc5484fb0cd272ad
+  source:
+    path: data/substances/l_ergothioneine__sub_wy6kzeu4f7.yaml
+    field: notes
+    substance_id: sub_wy6kzeu4f7
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 0817acf0b7d47a5ac400eb72f57696ad69a3586c960703cc6b34d959f4a135d2:001
+  span_id: 0817acf0b7d47a5ac400eb72f57696ad69a3586c960703cc6b34d959f4a135d2
+  source:
+    path: data/substances/l_glutamine__sub_85w45nbob4.yaml
+    field: notes
+    substance_id: sub_85w45nbob4
+  destination:
+    kind: identity
+    path: data/substances/l_glutamine__sub_85w45nbob4.yaml
+    substance_id: sub_85w45nbob4
+    field: name
+  disposition: typed_destination
+- atom_id: 0817acf0b7d47a5ac400eb72f57696ad69a3586c960703cc6b34d959f4a135d2:002
+  span_id: 0817acf0b7d47a5ac400eb72f57696ad69a3586c960703cc6b34d959f4a135d2
+  source:
+    path: data/substances/l_glutamine__sub_85w45nbob4.yaml
+    field: notes
+    substance_id: sub_85w45nbob4
+  destination:
+    kind: knowledge
+    path: data/substances/l_glutamine__sub_85w45nbob4.yaml
+    substance_id: sub_85w45nbob4
+    field: knowledge.kind[0]
+    value: amino
+  disposition: typed_destination
+- atom_id: 0817acf0b7d47a5ac400eb72f57696ad69a3586c960703cc6b34d959f4a135d2:003
+  span_id: 0817acf0b7d47a5ac400eb72f57696ad69a3586c960703cc6b34d959f4a135d2
+  source:
+    path: data/substances/l_glutamine__sub_85w45nbob4.yaml
+    field: notes
+    substance_id: sub_85w45nbob4
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: 0817acf0b7d47a5ac400eb72f57696ad69a3586c960703cc6b34d959f4a135d2:004
+  span_id: 0817acf0b7d47a5ac400eb72f57696ad69a3586c960703cc6b34d959f4a135d2
+  source:
+    path: data/substances/l_glutamine__sub_85w45nbob4.yaml
+    field: notes
+    substance_id: sub_85w45nbob4
+  destination:
+    kind: knowledge
+    path: data/substances/l_glutamine__sub_85w45nbob4.yaml
+    substance_id: sub_85w45nbob4
+    field: knowledge.effect[0]
+    value: gut_barrier_context
+  disposition: typed_destination
+- atom_id: 0817acf0b7d47a5ac400eb72f57696ad69a3586c960703cc6b34d959f4a135d2:005
+  span_id: 0817acf0b7d47a5ac400eb72f57696ad69a3586c960703cc6b34d959f4a135d2
+  source:
+    path: data/substances/l_glutamine__sub_85w45nbob4.yaml
+    field: notes
+    substance_id: sub_85w45nbob4
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: 2aa10285fd3d7ff6a1aaa60b2f0f8aeb7883c132cf66f4bf38b22a0bb47fe24b:001
+  span_id: 2aa10285fd3d7ff6a1aaa60b2f0f8aeb7883c132cf66f4bf38b22a0bb47fe24b
+  source:
+    path: data/substances/l_isoleucine__sub_q8ig3ioki2.yaml
+    field: notes
+    substance_id: sub_q8ig3ioki2
+  destination:
+    kind: identity
+    path: data/substances/l_isoleucine__sub_q8ig3ioki2.yaml
+    substance_id: sub_q8ig3ioki2
+    field: name
+  disposition: typed_destination
+- atom_id: 2aa10285fd3d7ff6a1aaa60b2f0f8aeb7883c132cf66f4bf38b22a0bb47fe24b:002
+  span_id: 2aa10285fd3d7ff6a1aaa60b2f0f8aeb7883c132cf66f4bf38b22a0bb47fe24b
+  source:
+    path: data/substances/l_isoleucine__sub_q8ig3ioki2.yaml
+    field: notes
+    substance_id: sub_q8ig3ioki2
+  destination:
+    kind: knowledge
+    path: data/substances/l_isoleucine__sub_q8ig3ioki2.yaml
+    substance_id: sub_q8ig3ioki2
+    field: knowledge.kind[0]
+    value: amino
+  disposition: typed_destination
+- atom_id: 2aa10285fd3d7ff6a1aaa60b2f0f8aeb7883c132cf66f4bf38b22a0bb47fe24b:003
+  span_id: 2aa10285fd3d7ff6a1aaa60b2f0f8aeb7883c132cf66f4bf38b22a0bb47fe24b
+  source:
+    path: data/substances/l_isoleucine__sub_q8ig3ioki2.yaml
+    field: notes
+    substance_id: sub_q8ig3ioki2
+  destination:
+    kind: knowledge
+    path: data/substances/l_isoleucine__sub_q8ig3ioki2.yaml
+    substance_id: sub_q8ig3ioki2
+    field: knowledge.effect[0]
+    value: protein_synthesis_support
+  disposition: typed_destination
+- atom_id: 2aa10285fd3d7ff6a1aaa60b2f0f8aeb7883c132cf66f4bf38b22a0bb47fe24b:004
+  span_id: 2aa10285fd3d7ff6a1aaa60b2f0f8aeb7883c132cf66f4bf38b22a0bb47fe24b
+  source:
+    path: data/substances/l_isoleucine__sub_q8ig3ioki2.yaml
+    field: notes
+    substance_id: sub_q8ig3ioki2
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: cb0799edc37fad74a3c9d7061a7c5f291c4862516004f6791082db858afde7f2:001
+  span_id: cb0799edc37fad74a3c9d7061a7c5f291c4862516004f6791082db858afde7f2
+  source:
+    path: data/substances/l_leucine__sub_j9m8ex93zb.yaml
+    field: notes
+    substance_id: sub_j9m8ex93zb
+  destination:
+    kind: identity
+    path: data/substances/l_leucine__sub_j9m8ex93zb.yaml
+    substance_id: sub_j9m8ex93zb
+    field: name
+  disposition: typed_destination
+- atom_id: cb0799edc37fad74a3c9d7061a7c5f291c4862516004f6791082db858afde7f2:002
+  span_id: cb0799edc37fad74a3c9d7061a7c5f291c4862516004f6791082db858afde7f2
+  source:
+    path: data/substances/l_leucine__sub_j9m8ex93zb.yaml
+    field: notes
+    substance_id: sub_j9m8ex93zb
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: cb0799edc37fad74a3c9d7061a7c5f291c4862516004f6791082db858afde7f2:003
+  span_id: cb0799edc37fad74a3c9d7061a7c5f291c4862516004f6791082db858afde7f2
+  source:
+    path: data/substances/l_leucine__sub_j9m8ex93zb.yaml
+    field: notes
+    substance_id: sub_j9m8ex93zb
+  destination:
+    kind: identity
+    path: data/substances/l_leucine__sub_j9m8ex93zb.yaml
+    substance_id: sub_j9m8ex93zb
+    field: name
+  disposition: typed_destination
+- atom_id: cb0799edc37fad74a3c9d7061a7c5f291c4862516004f6791082db858afde7f2:004
+  span_id: cb0799edc37fad74a3c9d7061a7c5f291c4862516004f6791082db858afde7f2
+  source:
+    path: data/substances/l_leucine__sub_j9m8ex93zb.yaml
+    field: notes
+    substance_id: sub_j9m8ex93zb
+  destination:
+    kind: knowledge
+    path: data/substances/l_leucine__sub_j9m8ex93zb.yaml
+    substance_id: sub_j9m8ex93zb
+    field: knowledge.effect[0]
+    value: muscle_protein_synthesis_context
+  disposition: typed_destination
+- atom_id: cb0799edc37fad74a3c9d7061a7c5f291c4862516004f6791082db858afde7f2:005
+  span_id: cb0799edc37fad74a3c9d7061a7c5f291c4862516004f6791082db858afde7f2
+  source:
+    path: data/substances/l_leucine__sub_j9m8ex93zb.yaml
+    field: notes
+    substance_id: sub_j9m8ex93zb
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 548ba3b4be5c3d1d90e6bba6d182fdf49a48380bde9f39d1a6e29cd9d13e3d23:001
+  span_id: 548ba3b4be5c3d1d90e6bba6d182fdf49a48380bde9f39d1a6e29cd9d13e3d23
+  source:
+    path: data/substances/l_lysine__sub_60e4d06f8c.yaml
+    field: notes
+    substance_id: sub_60e4d06f8c
+  destination:
+    kind: identity
+    path: data/substances/l_lysine__sub_60e4d06f8c.yaml
+    substance_id: sub_60e4d06f8c
+    field: name
+  disposition: typed_destination
+- atom_id: 548ba3b4be5c3d1d90e6bba6d182fdf49a48380bde9f39d1a6e29cd9d13e3d23:002
+  span_id: 548ba3b4be5c3d1d90e6bba6d182fdf49a48380bde9f39d1a6e29cd9d13e3d23
+  source:
+    path: data/substances/l_lysine__sub_60e4d06f8c.yaml
+    field: notes
+    substance_id: sub_60e4d06f8c
+  destination:
+    kind: identity
+    path: data/substances/l_lysine__sub_60e4d06f8c.yaml
+    substance_id: sub_60e4d06f8c
+    field: name
+  disposition: typed_destination
+- atom_id: 548ba3b4be5c3d1d90e6bba6d182fdf49a48380bde9f39d1a6e29cd9d13e3d23:003
+  span_id: 548ba3b4be5c3d1d90e6bba6d182fdf49a48380bde9f39d1a6e29cd9d13e3d23
+  source:
+    path: data/substances/l_lysine__sub_60e4d06f8c.yaml
+    field: notes
+    substance_id: sub_60e4d06f8c
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 4fd3bd108587bbf5e23b36c08fe0339ac40899e992ad1d265f47322aa689f79c:001
+  span_id: 4fd3bd108587bbf5e23b36c08fe0339ac40899e992ad1d265f47322aa689f79c
+  source:
+    path: data/substances/l_lysine_hcl__sub_pdmkcn3fd7.yaml
+    field: notes
+    substance_id: sub_pdmkcn3fd7
+  destination:
+    kind: composition
+    path: data/products/solgar__skin_nails_and_hair_advanced_msm_formula__prd_nuicads5ns.yaml
+    component_id: cmp_prd_nuicads5ns__sub_pdmkcn3fd7
+    product_id: prd_nuicads5ns
+    substance_id: sub_pdmkcn3fd7
+  disposition: typed_destination
+- atom_id: 4fd3bd108587bbf5e23b36c08fe0339ac40899e992ad1d265f47322aa689f79c:002
+  span_id: 4fd3bd108587bbf5e23b36c08fe0339ac40899e992ad1d265f47322aa689f79c
+  source:
+    path: data/substances/l_lysine_hcl__sub_pdmkcn3fd7.yaml
+    field: notes
+    substance_id: sub_pdmkcn3fd7
+  destination:
+    kind: identity
+    path: data/substances/l_lysine_hcl__sub_pdmkcn3fd7.yaml
+    substance_id: sub_pdmkcn3fd7
+    field: name
+  disposition: typed_destination
+- atom_id: 4fd3bd108587bbf5e23b36c08fe0339ac40899e992ad1d265f47322aa689f79c:003
+  span_id: 4fd3bd108587bbf5e23b36c08fe0339ac40899e992ad1d265f47322aa689f79c
+  source:
+    path: data/substances/l_lysine_hcl__sub_pdmkcn3fd7.yaml
+    field: notes
+    substance_id: sub_pdmkcn3fd7
+  destination:
+    kind: identity
+    path: data/substances/l_lysine_hcl__sub_pdmkcn3fd7.yaml
+    substance_id: sub_pdmkcn3fd7
+    field: name
+  disposition: typed_destination
+- atom_id: 1b9c5b0d4c265493e3d675aa612ba8fd2baf16a1ff315e4ec9d2369cd5c1511a:001
+  span_id: 1b9c5b0d4c265493e3d675aa612ba8fd2baf16a1ff315e4ec9d2369cd5c1511a
+  source:
+    path: data/substances/l_ornithine__sub_8f61be4a26.yaml
+    field: notes
+    substance_id: sub_8f61be4a26
+  destination:
+    kind: identity
+    path: data/substances/l_ornithine__sub_8f61be4a26.yaml
+    substance_id: sub_8f61be4a26
+    field: name
+  disposition: typed_destination
+- atom_id: 1b9c5b0d4c265493e3d675aa612ba8fd2baf16a1ff315e4ec9d2369cd5c1511a:002
+  span_id: 1b9c5b0d4c265493e3d675aa612ba8fd2baf16a1ff315e4ec9d2369cd5c1511a
+  source:
+    path: data/substances/l_ornithine__sub_8f61be4a26.yaml
+    field: notes
+    substance_id: sub_8f61be4a26
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: 1b9c5b0d4c265493e3d675aa612ba8fd2baf16a1ff315e4ec9d2369cd5c1511a:003
+  span_id: 1b9c5b0d4c265493e3d675aa612ba8fd2baf16a1ff315e4ec9d2369cd5c1511a
+  source:
+    path: data/substances/l_ornithine__sub_8f61be4a26.yaml
+    field: notes
+    substance_id: sub_8f61be4a26
+  destination:
+    kind: knowledge
+    path: data/substances/l_ornithine__sub_8f61be4a26.yaml
+    substance_id: sub_8f61be4a26
+    field: knowledge.role[0]
+    value: ergogenic
+  disposition: typed_destination
+- atom_id: 45051c772d534610b50b937d9404cefe26fff6c139c5d6fc5b66c43da8b51913:001
+  span_id: 45051c772d534610b50b937d9404cefe26fff6c139c5d6fc5b66c43da8b51913
+  source:
+    path: data/substances/l_proline__sub_22bf1dfae0.yaml
+    field: notes
+    substance_id: sub_22bf1dfae0
+  destination:
+    kind: identity
+    path: data/substances/l_proline__sub_22bf1dfae0.yaml
+    substance_id: sub_22bf1dfae0
+    field: name
+  disposition: typed_destination
+- atom_id: 45051c772d534610b50b937d9404cefe26fff6c139c5d6fc5b66c43da8b51913:002
+  span_id: 45051c772d534610b50b937d9404cefe26fff6c139c5d6fc5b66c43da8b51913
+  source:
+    path: data/substances/l_proline__sub_22bf1dfae0.yaml
+    field: notes
+    substance_id: sub_22bf1dfae0
+  destination:
+    kind: composition
+    path: data/products/solgar__skin_nails_and_hair_advanced_msm_formula__prd_nuicads5ns.yaml
+    component_id: cmp_prd_nuicads5ns__sub_22bf1dfae0
+    product_id: prd_nuicads5ns
+    substance_id: sub_22bf1dfae0
+  disposition: typed_destination
+- atom_id: 45051c772d534610b50b937d9404cefe26fff6c139c5d6fc5b66c43da8b51913:003
+  span_id: 45051c772d534610b50b937d9404cefe26fff6c139c5d6fc5b66c43da8b51913
+  source:
+    path: data/substances/l_proline__sub_22bf1dfae0.yaml
+    field: notes
+    substance_id: sub_22bf1dfae0
+  destination:
+    kind: knowledge
+    path: data/substances/l_proline__sub_22bf1dfae0.yaml
+    substance_id: sub_22bf1dfae0
+    field: knowledge.effect[0]
+    value: collagen_matrix_support
+  disposition: typed_destination
+- atom_id: 45051c772d534610b50b937d9404cefe26fff6c139c5d6fc5b66c43da8b51913:004
+  span_id: 45051c772d534610b50b937d9404cefe26fff6c139c5d6fc5b66c43da8b51913
+  source:
+    path: data/substances/l_proline__sub_22bf1dfae0.yaml
+    field: notes
+    substance_id: sub_22bf1dfae0
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: e697b08f6fc3b02e1d2a47384ae0d5ccfcab1cc01a6e8bed387aaf3dc218ff1d:001
+  span_id: e697b08f6fc3b02e1d2a47384ae0d5ccfcab1cc01a6e8bed387aaf3dc218ff1d
+  source:
+    path: data/substances/l_theanine__sub_vkp4f3tqf0.yaml
+    field: notes
+    substance_id: sub_vkp4f3tqf0
+  destination:
+    kind: identity
+    path: data/substances/l_theanine__sub_vkp4f3tqf0.yaml
+    substance_id: sub_vkp4f3tqf0
+    field: name
+  disposition: typed_destination
+- atom_id: a69bff453d220db6ebcf4b79eb27e9ca805918a279cf7b91feab331646cf4c05:001
+  span_id: a69bff453d220db6ebcf4b79eb27e9ca805918a279cf7b91feab331646cf4c05
+  source:
+    path: data/substances/l_threonine__sub_wfchftnx7i.yaml
+    field: notes
+    substance_id: sub_wfchftnx7i
+  destination:
+    kind: identity
+    path: data/substances/l_threonine__sub_wfchftnx7i.yaml
+    substance_id: sub_wfchftnx7i
+    field: name
+  disposition: typed_destination
+- atom_id: a69bff453d220db6ebcf4b79eb27e9ca805918a279cf7b91feab331646cf4c05:002
+  span_id: a69bff453d220db6ebcf4b79eb27e9ca805918a279cf7b91feab331646cf4c05
+  source:
+    path: data/substances/l_threonine__sub_wfchftnx7i.yaml
+    field: notes
+    substance_id: sub_wfchftnx7i
+  destination:
+    kind: knowledge
+    path: data/substances/l_threonine__sub_wfchftnx7i.yaml
+    substance_id: sub_wfchftnx7i
+    field: knowledge.kind[0]
+    value: amino
+  disposition: typed_destination
+- atom_id: a69bff453d220db6ebcf4b79eb27e9ca805918a279cf7b91feab331646cf4c05:003
+  span_id: a69bff453d220db6ebcf4b79eb27e9ca805918a279cf7b91feab331646cf4c05
+  source:
+    path: data/substances/l_threonine__sub_wfchftnx7i.yaml
+    field: notes
+    substance_id: sub_wfchftnx7i
+  destination:
+    kind: knowledge
+    path: data/substances/l_threonine__sub_wfchftnx7i.yaml
+    substance_id: sub_wfchftnx7i
+    field: knowledge.effect[0]
+    value: protein_synthesis_support
+  disposition: typed_destination
+- atom_id: a69bff453d220db6ebcf4b79eb27e9ca805918a279cf7b91feab331646cf4c05:004
+  span_id: a69bff453d220db6ebcf4b79eb27e9ca805918a279cf7b91feab331646cf4c05
+  source:
+    path: data/substances/l_threonine__sub_wfchftnx7i.yaml
+    field: notes
+    substance_id: sub_wfchftnx7i
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 8bfaa43dda4063c9750db5dde4d430ef2facea9888fd23f8b5a59cb8f9c801f5:001
+  span_id: 8bfaa43dda4063c9750db5dde4d430ef2facea9888fd23f8b5a59cb8f9c801f5
+  source:
+    path: data/substances/l_tryptophan__sub_zl8evocn9h.yaml
+    field: notes
+    substance_id: sub_zl8evocn9h
+  destination:
+    kind: knowledge
+    path: data/substances/l_tryptophan__sub_zl8evocn9h.yaml
+    substance_id: sub_zl8evocn9h
+    field: knowledge.kind[0]
+    value: amino
+  disposition: typed_destination
+- atom_id: 8bfaa43dda4063c9750db5dde4d430ef2facea9888fd23f8b5a59cb8f9c801f5:002
+  span_id: 8bfaa43dda4063c9750db5dde4d430ef2facea9888fd23f8b5a59cb8f9c801f5
+  source:
+    path: data/substances/l_tryptophan__sub_zl8evocn9h.yaml
+    field: notes
+    substance_id: sub_zl8evocn9h
+  destination:
+    kind: knowledge
+    path: data/substances/l_tryptophan__sub_zl8evocn9h.yaml
+    substance_id: sub_zl8evocn9h
+    field: knowledge.kind[0]
+    value: amino
+  disposition: typed_destination
+- atom_id: 8bfaa43dda4063c9750db5dde4d430ef2facea9888fd23f8b5a59cb8f9c801f5:003
+  span_id: 8bfaa43dda4063c9750db5dde4d430ef2facea9888fd23f8b5a59cb8f9c801f5
+  source:
+    path: data/substances/l_tryptophan__sub_zl8evocn9h.yaml
+    field: notes
+    substance_id: sub_zl8evocn9h
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: fa47f42de2cef85a5d4204cf5d6d5ba8ab79f20fadd47dc742022d9468453d67:001
+  span_id: fa47f42de2cef85a5d4204cf5d6d5ba8ab79f20fadd47dc742022d9468453d67
+  source:
+    path: data/substances/l_tyrosine__sub_h3ko8001ym.yaml
+    field: notes
+    substance_id: sub_h3ko8001ym
+  destination:
+    kind: composition
+    path: data/products/the_genius_brand__genius_pre__prd_a6y3uidgfk.yaml
+    component_id: cmp_prd_a6y3uidgfk__sub_h3ko8001ym
+    product_id: prd_a6y3uidgfk
+    substance_id: sub_h3ko8001ym
+  disposition: typed_destination
+- atom_id: fa47f42de2cef85a5d4204cf5d6d5ba8ab79f20fadd47dc742022d9468453d67:002
+  span_id: fa47f42de2cef85a5d4204cf5d6d5ba8ab79f20fadd47dc742022d9468453d67
+  source:
+    path: data/substances/l_tyrosine__sub_h3ko8001ym.yaml
+    field: notes
+    substance_id: sub_h3ko8001ym
+  destination:
+    kind: identity
+    path: data/substances/l_tyrosine__sub_h3ko8001ym.yaml
+    substance_id: sub_h3ko8001ym
+    field: name
+  disposition: typed_destination
+- atom_id: ac96cdfe5c96edc80dc35d2f294c9ab2260cc4050f75d5f56910521b0c075f53:001
+  span_id: ac96cdfe5c96edc80dc35d2f294c9ab2260cc4050f75d5f56910521b0c075f53
+  source:
+    path: data/substances/l_valine__sub_k4zt3gdjpu.yaml
+    field: notes
+    substance_id: sub_k4zt3gdjpu
+  destination:
+    kind: identity
+    path: data/substances/l_valine__sub_k4zt3gdjpu.yaml
+    substance_id: sub_k4zt3gdjpu
+    field: name
+  disposition: typed_destination
+- atom_id: ac96cdfe5c96edc80dc35d2f294c9ab2260cc4050f75d5f56910521b0c075f53:002
+  span_id: ac96cdfe5c96edc80dc35d2f294c9ab2260cc4050f75d5f56910521b0c075f53
+  source:
+    path: data/substances/l_valine__sub_k4zt3gdjpu.yaml
+    field: notes
+    substance_id: sub_k4zt3gdjpu
+  destination:
+    kind: knowledge
+    path: data/substances/l_valine__sub_k4zt3gdjpu.yaml
+    substance_id: sub_k4zt3gdjpu
+    field: knowledge.kind[0]
+    value: amino
+  disposition: typed_destination
+- atom_id: ac96cdfe5c96edc80dc35d2f294c9ab2260cc4050f75d5f56910521b0c075f53:003
+  span_id: ac96cdfe5c96edc80dc35d2f294c9ab2260cc4050f75d5f56910521b0c075f53
+  source:
+    path: data/substances/l_valine__sub_k4zt3gdjpu.yaml
+    field: notes
+    substance_id: sub_k4zt3gdjpu
+  destination:
+    kind: knowledge
+    path: data/substances/l_valine__sub_k4zt3gdjpu.yaml
+    substance_id: sub_k4zt3gdjpu
+    field: knowledge.effect[0]
+    value: protein_synthesis_support
+  disposition: typed_destination
+- atom_id: ac96cdfe5c96edc80dc35d2f294c9ab2260cc4050f75d5f56910521b0c075f53:004
+  span_id: ac96cdfe5c96edc80dc35d2f294c9ab2260cc4050f75d5f56910521b0c075f53
+  source:
+    path: data/substances/l_valine__sub_k4zt3gdjpu.yaml
+    field: notes
+    substance_id: sub_k4zt3gdjpu
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 0d569c8e71c2898c9e1e28ba883c5d2d8cdf3599e98f95b4927e233735de9a74:001
+  span_id: 0d569c8e71c2898c9e1e28ba883c5d2d8cdf3599e98f95b4927e233735de9a74
+  source:
+    path: data/substances/lactase__sub_bwatu3taud.yaml
+    field: notes
+    substance_id: sub_bwatu3taud
+  destination:
+    kind: identity
+    path: data/substances/lactase__sub_bwatu3taud.yaml
+    substance_id: sub_bwatu3taud
+    field: name
+  disposition: typed_destination
+- atom_id: 0d569c8e71c2898c9e1e28ba883c5d2d8cdf3599e98f95b4927e233735de9a74:002
+  span_id: 0d569c8e71c2898c9e1e28ba883c5d2d8cdf3599e98f95b4927e233735de9a74
+  source:
+    path: data/substances/lactase__sub_bwatu3taud.yaml
+    field: notes
+    substance_id: sub_bwatu3taud
+  destination:
+    kind: identity
+    path: data/substances/lactase__sub_bwatu3taud.yaml
+    substance_id: sub_bwatu3taud
+    field: name
+  disposition: typed_destination
+- atom_id: 0d569c8e71c2898c9e1e28ba883c5d2d8cdf3599e98f95b4927e233735de9a74:003
+  span_id: 0d569c8e71c2898c9e1e28ba883c5d2d8cdf3599e98f95b4927e233735de9a74
+  source:
+    path: data/substances/lactase__sub_bwatu3taud.yaml
+    field: notes
+    substance_id: sub_bwatu3taud
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: 0d569c8e71c2898c9e1e28ba883c5d2d8cdf3599e98f95b4927e233735de9a74:004
+  span_id: 0d569c8e71c2898c9e1e28ba883c5d2d8cdf3599e98f95b4927e233735de9a74
+  source:
+    path: data/substances/lactase__sub_bwatu3taud.yaml
+    field: notes
+    substance_id: sub_bwatu3taud
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: 0d569c8e71c2898c9e1e28ba883c5d2d8cdf3599e98f95b4927e233735de9a74:005
+  span_id: 0d569c8e71c2898c9e1e28ba883c5d2d8cdf3599e98f95b4927e233735de9a74
+  source:
+    path: data/substances/lactase__sub_bwatu3taud.yaml
+    field: notes
+    substance_id: sub_bwatu3taud
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 7314f8a3df584af88a85e1a10134ef1887ee652188d9847bf446c11338346126:001
+  span_id: 7314f8a3df584af88a85e1a10134ef1887ee652188d9847bf446c11338346126
+  source:
+    path: data/substances/lansoprazole__sub_2mn1uwrzi6.yaml
+    field: notes
+    substance_id: sub_2mn1uwrzi6
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 7314f8a3df584af88a85e1a10134ef1887ee652188d9847bf446c11338346126:002
+  span_id: 7314f8a3df584af88a85e1a10134ef1887ee652188d9847bf446c11338346126
+  source:
+    path: data/substances/lansoprazole__sub_2mn1uwrzi6.yaml
+    field: notes
+    substance_id: sub_2mn1uwrzi6
+  destination:
+    kind: knowledge
+    path: data/substances/lansoprazole__sub_2mn1uwrzi6.yaml
+    substance_id: sub_2mn1uwrzi6
+    field: knowledge.effect[0]
+    value: gastric_acid_suppressing_drug_context
+  disposition: typed_destination
+- atom_id: 7314f8a3df584af88a85e1a10134ef1887ee652188d9847bf446c11338346126:003
+  span_id: 7314f8a3df584af88a85e1a10134ef1887ee652188d9847bf446c11338346126
+  source:
+    path: data/substances/lansoprazole__sub_2mn1uwrzi6.yaml
+    field: notes
+    substance_id: sub_2mn1uwrzi6
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: ae81319555faddb26d65882b1229847024b73f64e0838ee11eedcaf598b1fd4e:001
+  span_id: ae81319555faddb26d65882b1229847024b73f64e0838ee11eedcaf598b1fd4e
+  source:
+    path: data/substances/lavender_flower__sub_8wi86qpvwi.yaml
+    field: notes
+    substance_id: sub_8wi86qpvwi
+  destination:
+    kind: knowledge
+    path: data/substances/lavender_flower__sub_8wi86qpvwi.yaml
+    substance_id: sub_8wi86qpvwi
+    field: knowledge.context[0]
+    value: sleep_recovery
+  disposition: typed_destination
+- atom_id: ae81319555faddb26d65882b1229847024b73f64e0838ee11eedcaf598b1fd4e:002
+  span_id: ae81319555faddb26d65882b1229847024b73f64e0838ee11eedcaf598b1fd4e
+  source:
+    path: data/substances/lavender_flower__sub_8wi86qpvwi.yaml
+    field: notes
+    substance_id: sub_8wi86qpvwi
+  destination:
+    kind: knowledge
+    path: data/substances/lavender_flower__sub_8wi86qpvwi.yaml
+    substance_id: sub_8wi86qpvwi
+    field: knowledge.effect[0]
+    value: calming_context
+  disposition: typed_destination
+- atom_id: ae81319555faddb26d65882b1229847024b73f64e0838ee11eedcaf598b1fd4e:003
+  span_id: ae81319555faddb26d65882b1229847024b73f64e0838ee11eedcaf598b1fd4e
+  source:
+    path: data/substances/lavender_flower__sub_8wi86qpvwi.yaml
+    field: notes
+    substance_id: sub_8wi86qpvwi
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 85eeda5676726c97e367a24a5d8d20329c53ede1a1b6b78e237f5ae12e771e60:001
+  span_id: 85eeda5676726c97e367a24a5d8d20329c53ede1a1b6b78e237f5ae12e771e60
+  source:
+    path: data/substances/lemon_balm_herb__sub_qxek07gry7.yaml
+    field: notes
+    substance_id: sub_qxek07gry7
+  destination:
+    kind: knowledge
+    path: data/substances/lemon_balm_herb__sub_qxek07gry7.yaml
+    substance_id: sub_qxek07gry7
+    field: knowledge.context[0]
+    value: sleep_recovery
+  disposition: typed_destination
+- atom_id: 85eeda5676726c97e367a24a5d8d20329c53ede1a1b6b78e237f5ae12e771e60:002
+  span_id: 85eeda5676726c97e367a24a5d8d20329c53ede1a1b6b78e237f5ae12e771e60
+  source:
+    path: data/substances/lemon_balm_herb__sub_qxek07gry7.yaml
+    field: notes
+    substance_id: sub_qxek07gry7
+  destination:
+    kind: identity
+    path: data/substances/lemon_balm_herb__sub_qxek07gry7.yaml
+    substance_id: sub_qxek07gry7
+    field: name
+  disposition: typed_destination
+- atom_id: 10521e715ceaf9b5571aceb6acea2e78f3c3da1ac106ce19c0c0659205d55d8b:001
+  span_id: 10521e715ceaf9b5571aceb6acea2e78f3c3da1ac106ce19c0c0659205d55d8b
+  source:
+    path: data/substances/levodopa__sub_7c38pzz3wa.yaml
+    field: notes
+    substance_id: sub_7c38pzz3wa
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 10521e715ceaf9b5571aceb6acea2e78f3c3da1ac106ce19c0c0659205d55d8b:002
+  span_id: 10521e715ceaf9b5571aceb6acea2e78f3c3da1ac106ce19c0c0659205d55d8b
+  source:
+    path: data/substances/levodopa__sub_7c38pzz3wa.yaml
+    field: notes
+    substance_id: sub_7c38pzz3wa
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 10521e715ceaf9b5571aceb6acea2e78f3c3da1ac106ce19c0c0659205d55d8b:003
+  span_id: 10521e715ceaf9b5571aceb6acea2e78f3c3da1ac106ce19c0c0659205d55d8b
+  source:
+    path: data/substances/levodopa__sub_7c38pzz3wa.yaml
+    field: notes
+    substance_id: sub_7c38pzz3wa
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 30f21b13146e0edf9bd81987ea8840f26522d2fef8bba70c26a1a621d07cf466:001
+  span_id: 30f21b13146e0edf9bd81987ea8840f26522d2fef8bba70c26a1a621d07cf466
+  source:
+    path: data/substances/lions_mane__sub_e3af6f78d9.yaml
+    field: notes
+    substance_id: sub_e3af6f78d9
+  destination:
+    kind: composition
+    path: data/products/real_mushrooms__lions_mane_mushroom_extract__prd_a6342d7725.yaml
+    component_id: cmp_prd_a6342d7725__sub_e3af6f78d9
+    product_id: prd_a6342d7725
+    substance_id: sub_e3af6f78d9
+  disposition: typed_destination
+- atom_id: 30f21b13146e0edf9bd81987ea8840f26522d2fef8bba70c26a1a621d07cf466:002
+  span_id: 30f21b13146e0edf9bd81987ea8840f26522d2fef8bba70c26a1a621d07cf466
+  source:
+    path: data/substances/lions_mane__sub_e3af6f78d9.yaml
+    field: notes
+    substance_id: sub_e3af6f78d9
+  destination:
+    kind: identity
+    path: data/substances/lions_mane__sub_e3af6f78d9.yaml
+    substance_id: sub_e3af6f78d9
+    field: name
+  disposition: typed_destination
+- atom_id: da157d4c41387780ad02d1dcd5a3b6d703a37f2a9140d04e85bd9db352848e5b:001
+  span_id: da157d4c41387780ad02d1dcd5a3b6d703a37f2a9140d04e85bd9db352848e5b
+  source:
+    path: data/substances/lipase__sub_51p30t3o4j.yaml
+    field: notes
+    substance_id: sub_51p30t3o4j
+  destination:
+    kind: identity
+    path: data/substances/lipase__sub_51p30t3o4j.yaml
+    substance_id: sub_51p30t3o4j
+    field: name
+  disposition: typed_destination
+- atom_id: da157d4c41387780ad02d1dcd5a3b6d703a37f2a9140d04e85bd9db352848e5b:002
+  span_id: da157d4c41387780ad02d1dcd5a3b6d703a37f2a9140d04e85bd9db352848e5b
+  source:
+    path: data/substances/lipase__sub_51p30t3o4j.yaml
+    field: notes
+    substance_id: sub_51p30t3o4j
+  destination:
+    kind: identity
+    path: data/substances/lipase__sub_51p30t3o4j.yaml
+    substance_id: sub_51p30t3o4j
+    field: name
+  disposition: typed_destination
+- atom_id: da157d4c41387780ad02d1dcd5a3b6d703a37f2a9140d04e85bd9db352848e5b:003
+  span_id: da157d4c41387780ad02d1dcd5a3b6d703a37f2a9140d04e85bd9db352848e5b
+  source:
+    path: data/substances/lipase__sub_51p30t3o4j.yaml
+    field: notes
+    substance_id: sub_51p30t3o4j
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: fd890ad6c77d95c44c29c0bf484d755a95a590bb695ff66af485c88a11ba1e0b:001
+  span_id: fd890ad6c77d95c44c29c0bf484d755a95a590bb695ff66af485c88a11ba1e0b
+  source:
+    path: data/substances/liraglutide__sub_m5dua3d9xi.yaml
+    field: notes
+    substance_id: sub_m5dua3d9xi
+  destination:
+    kind: knowledge
+    path: data/substances/liraglutide__sub_m5dua3d9xi.yaml
+    substance_id: sub_m5dua3d9xi
+    field: knowledge.risk[0]
+    value: incretin_drug_medical_review
+  disposition: typed_destination
+- atom_id: fd890ad6c77d95c44c29c0bf484d755a95a590bb695ff66af485c88a11ba1e0b:002
+  span_id: fd890ad6c77d95c44c29c0bf484d755a95a590bb695ff66af485c88a11ba1e0b
+  source:
+    path: data/substances/liraglutide__sub_m5dua3d9xi.yaml
+    field: notes
+    substance_id: sub_m5dua3d9xi
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: fd890ad6c77d95c44c29c0bf484d755a95a590bb695ff66af485c88a11ba1e0b:003
+  span_id: fd890ad6c77d95c44c29c0bf484d755a95a590bb695ff66af485c88a11ba1e0b
+  source:
+    path: data/substances/liraglutide__sub_m5dua3d9xi.yaml
+    field: notes
+    substance_id: sub_m5dua3d9xi
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 4c59d1383112f0c8b3d917bb7299e04fb3de655fd99cf3dd674810602c12dc9e:001
+  span_id: 4c59d1383112f0c8b3d917bb7299e04fb3de655fd99cf3dd674810602c12dc9e
+  source:
+    path: data/substances/lutein__sub_s7tlhuvbd0.yaml
+    field: notes
+    substance_id: sub_s7tlhuvbd0
+  destination:
+    kind: identity
+    path: data/substances/lutein__sub_s7tlhuvbd0.yaml
+    substance_id: sub_s7tlhuvbd0
+    field: name
+  disposition: typed_destination
+- atom_id: 4c59d1383112f0c8b3d917bb7299e04fb3de655fd99cf3dd674810602c12dc9e:002
+  span_id: 4c59d1383112f0c8b3d917bb7299e04fb3de655fd99cf3dd674810602c12dc9e
+  source:
+    path: data/substances/lutein__sub_s7tlhuvbd0.yaml
+    field: notes
+    substance_id: sub_s7tlhuvbd0
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 4c59d1383112f0c8b3d917bb7299e04fb3de655fd99cf3dd674810602c12dc9e:003
+  span_id: 4c59d1383112f0c8b3d917bb7299e04fb3de655fd99cf3dd674810602c12dc9e
+  source:
+    path: data/substances/lutein__sub_s7tlhuvbd0.yaml
+    field: notes
+    substance_id: sub_s7tlhuvbd0
+  destination:
+    kind: composition
+    path: data/products/jarrow_formulas__maculapf_macula_protective_factors__prd_qdy601kwu0.yaml
+    component_id: cmp_prd_qdy601kwu0__sub_s7tlhuvbd0
+    product_id: prd_qdy601kwu0
+    substance_id: sub_s7tlhuvbd0
+  disposition: typed_destination
+- atom_id: 4c59d1383112f0c8b3d917bb7299e04fb3de655fd99cf3dd674810602c12dc9e:004
+  span_id: 4c59d1383112f0c8b3d917bb7299e04fb3de655fd99cf3dd674810602c12dc9e
+  source:
+    path: data/substances/lutein__sub_s7tlhuvbd0.yaml
+    field: notes
+    substance_id: sub_s7tlhuvbd0
+  destination:
+    kind: identity
+    path: data/substances/lutein__sub_s7tlhuvbd0.yaml
+    substance_id: sub_s7tlhuvbd0
+    field: name
+  disposition: typed_destination
+- atom_id: 5175698057f9d98ebb07072e2d64a948632f12384eace35d53a6aefe318242d9:001
+  span_id: 5175698057f9d98ebb07072e2d64a948632f12384eace35d53a6aefe318242d9
+  source:
+    path: data/substances/lycopene__sub_96owcg92uf.yaml
+    field: notes
+    substance_id: sub_96owcg92uf
+  destination:
+    kind: identity
+    path: data/substances/lycopene__sub_96owcg92uf.yaml
+    substance_id: sub_96owcg92uf
+    field: name
+  disposition: typed_destination
+- atom_id: 5175698057f9d98ebb07072e2d64a948632f12384eace35d53a6aefe318242d9:002
+  span_id: 5175698057f9d98ebb07072e2d64a948632f12384eace35d53a6aefe318242d9
+  source:
+    path: data/substances/lycopene__sub_96owcg92uf.yaml
+    field: notes
+    substance_id: sub_96owcg92uf
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: 5175698057f9d98ebb07072e2d64a948632f12384eace35d53a6aefe318242d9:003
+  span_id: 5175698057f9d98ebb07072e2d64a948632f12384eace35d53a6aefe318242d9
+  source:
+    path: data/substances/lycopene__sub_96owcg92uf.yaml
+    field: notes
+    substance_id: sub_96owcg92uf
+  destination:
+    kind: identity
+    path: data/substances/lycopene__sub_96owcg92uf.yaml
+    substance_id: sub_96owcg92uf
+    field: name
+  disposition: typed_destination
+- atom_id: c334c9a0c769b7f02c926d3623e6b74a9f94e71f840853a036e7534e2176fe00:001
+  span_id: c334c9a0c769b7f02c926d3623e6b74a9f94e71f840853a036e7534e2176fe00
+  source:
+    path: data/substances/maca_root__sub_q0ydljt7j7.yaml
+    field: notes
+    substance_id: sub_q0ydljt7j7
+  destination:
+    kind: identity
+    path: data/substances/maca_root__sub_q0ydljt7j7.yaml
+    substance_id: sub_q0ydljt7j7
+    field: name
+  disposition: typed_destination
+- atom_id: c334c9a0c769b7f02c926d3623e6b74a9f94e71f840853a036e7534e2176fe00:002
+  span_id: c334c9a0c769b7f02c926d3623e6b74a9f94e71f840853a036e7534e2176fe00
+  source:
+    path: data/substances/maca_root__sub_q0ydljt7j7.yaml
+    field: notes
+    substance_id: sub_q0ydljt7j7
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: c334c9a0c769b7f02c926d3623e6b74a9f94e71f840853a036e7534e2176fe00:003
+  span_id: c334c9a0c769b7f02c926d3623e6b74a9f94e71f840853a036e7534e2176fe00
+  source:
+    path: data/substances/maca_root__sub_q0ydljt7j7.yaml
+    field: notes
+    substance_id: sub_q0ydljt7j7
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: c334c9a0c769b7f02c926d3623e6b74a9f94e71f840853a036e7534e2176fe00:004
+  span_id: c334c9a0c769b7f02c926d3623e6b74a9f94e71f840853a036e7534e2176fe00
+  source:
+    path: data/substances/maca_root__sub_q0ydljt7j7.yaml
+    field: notes
+    substance_id: sub_q0ydljt7j7
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: fd33be241d3cc373de47bf11dd4f45b486280923f8af0c6d41fdb6143ea43f50:001
+  span_id: fd33be241d3cc373de47bf11dd4f45b486280923f8af0c6d41fdb6143ea43f50
+  source:
+    path: data/substances/magnesium_aquamin_red_algae_lithothamnion__sub_uy3dkx8n8f.yaml
+    field: notes
+    substance_id: sub_uy3dkx8n8f
+  destination:
+    kind: composition
+    path: data/products/natures_way__alive_calcium_max_absorption__prd_3at95d1ser.yaml
+    component_id: cmp_prd_3at95d1ser__sub_uy3dkx8n8f
+    product_id: prd_3at95d1ser
+    substance_id: sub_uy3dkx8n8f
+  disposition: typed_destination
+- atom_id: fd33be241d3cc373de47bf11dd4f45b486280923f8af0c6d41fdb6143ea43f50:002
+  span_id: fd33be241d3cc373de47bf11dd4f45b486280923f8af0c6d41fdb6143ea43f50
+  source:
+    path: data/substances/magnesium_aquamin_red_algae_lithothamnion__sub_uy3dkx8n8f.yaml
+    field: notes
+    substance_id: sub_uy3dkx8n8f
+  destination:
+    kind: identity
+    path: data/substances/magnesium_aquamin_red_algae_lithothamnion__sub_uy3dkx8n8f.yaml
+    substance_id: sub_uy3dkx8n8f
+    field: name
+  disposition: typed_destination
+- atom_id: 9053bc0252e1b269af183b69f8813a495add8fceee57ccbf92b4d35c35fa2245:001
+  span_id: 9053bc0252e1b269af183b69f8813a495add8fceee57ccbf92b4d35c35fa2245
+  source:
+    path: data/substances/magnesium_aspartate__sub_ihmqw57tmk.yaml
+    field: notes
+    substance_id: sub_ihmqw57tmk
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 9053bc0252e1b269af183b69f8813a495add8fceee57ccbf92b4d35c35fa2245:002
+  span_id: 9053bc0252e1b269af183b69f8813a495add8fceee57ccbf92b4d35c35fa2245
+  source:
+    path: data/substances/magnesium_aspartate__sub_ihmqw57tmk.yaml
+    field: notes
+    substance_id: sub_ihmqw57tmk
+  destination:
+    kind: composition
+    path: data/products/optimum_nutrition__opti_men_multivitamin_for_active_men__prd_io1peb9syp.yaml
+    component_id: cmp_prd_io1peb9syp__sub_ihmqw57tmk
+    product_id: prd_io1peb9syp
+    substance_id: sub_ihmqw57tmk
+  disposition: typed_destination
+- atom_id: 9053bc0252e1b269af183b69f8813a495add8fceee57ccbf92b4d35c35fa2245:003
+  span_id: 9053bc0252e1b269af183b69f8813a495add8fceee57ccbf92b4d35c35fa2245
+  source:
+    path: data/substances/magnesium_aspartate__sub_ihmqw57tmk.yaml
+    field: notes
+    substance_id: sub_ihmqw57tmk
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 9053bc0252e1b269af183b69f8813a495add8fceee57ccbf92b4d35c35fa2245:004
+  span_id: 9053bc0252e1b269af183b69f8813a495add8fceee57ccbf92b4d35c35fa2245
+  source:
+    path: data/substances/magnesium_aspartate__sub_ihmqw57tmk.yaml
+    field: notes
+    substance_id: sub_ihmqw57tmk
+  destination:
+    kind: identity
+    path: data/substances/magnesium_aspartate__sub_ihmqw57tmk.yaml
+    substance_id: sub_ihmqw57tmk
+    field: name
+  disposition: typed_destination
+- atom_id: 163b57427881dc63f343d4285d88d439e97bee49ee5796380ff401ec68aaf19c:001
+  span_id: 163b57427881dc63f343d4285d88d439e97bee49ee5796380ff401ec68aaf19c
+  source:
+    path: data/substances/magnesium_citrate__sub_fhl7c4skmf.yaml
+    field: notes
+    substance_id: sub_fhl7c4skmf
+  destination:
+    kind: composition
+    path: data/products/tim__electrolyte_caps__prd_20bf2df267.yaml
+    component_id: cmp_prd_20bf2df267__sub_fhl7c4skmf
+    product_id: prd_20bf2df267
+    substance_id: sub_fhl7c4skmf
+  disposition: typed_destination
+- atom_id: 163b57427881dc63f343d4285d88d439e97bee49ee5796380ff401ec68aaf19c:002
+  span_id: 163b57427881dc63f343d4285d88d439e97bee49ee5796380ff401ec68aaf19c
+  source:
+    path: data/substances/magnesium_citrate__sub_fhl7c4skmf.yaml
+    field: notes
+    substance_id: sub_fhl7c4skmf
+  destination:
+    kind: candidate
+    path: data/scheduling-candidates.yaml
+    candidate_id: cand_exercise_electrolyte_magnesium_cmp_prd_20bf2df267__sub_fhl7c4skmf
+  disposition: typed_destination
+- atom_id: 163b57427881dc63f343d4285d88d439e97bee49ee5796380ff401ec68aaf19c:003
+  span_id: 163b57427881dc63f343d4285d88d439e97bee49ee5796380ff401ec68aaf19c
+  source:
+    path: data/substances/magnesium_citrate__sub_fhl7c4skmf.yaml
+    field: notes
+    substance_id: sub_fhl7c4skmf
+  destination:
+    kind: knowledge
+    path: data/substances/magnesium_citrate__sub_fhl7c4skmf.yaml
+    substance_id: sub_fhl7c4skmf
+    field: knowledge.pathway[0]
+    value: vitamin_d_calcium_axis
+  disposition: typed_destination
+- atom_id: 3647805d306d7b8a2fa14f62eeb7ea3bd5ac70d67d33658bd6b332f9b5bc9810:001
+  span_id: 3647805d306d7b8a2fa14f62eeb7ea3bd5ac70d67d33658bd6b332f9b5bc9810
+  source:
+    path: data/substances/magnesium_glycinate__sub_7e02eab0d1.yaml
+    field: notes
+    substance_id: sub_7e02eab0d1
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 3647805d306d7b8a2fa14f62eeb7ea3bd5ac70d67d33658bd6b332f9b5bc9810:002
+  span_id: 3647805d306d7b8a2fa14f62eeb7ea3bd5ac70d67d33658bd6b332f9b5bc9810
+  source:
+    path: data/substances/magnesium_glycinate__sub_7e02eab0d1.yaml
+    field: notes
+    substance_id: sub_7e02eab0d1
+  destination:
+    kind: identity
+    path: data/substances/magnesium_glycinate__sub_7e02eab0d1.yaml
+    substance_id: sub_7e02eab0d1
+    field: name
+  disposition: typed_destination
+- atom_id: 3647805d306d7b8a2fa14f62eeb7ea3bd5ac70d67d33658bd6b332f9b5bc9810:003
+  span_id: 3647805d306d7b8a2fa14f62eeb7ea3bd5ac70d67d33658bd6b332f9b5bc9810
+  source:
+    path: data/substances/magnesium_glycinate__sub_7e02eab0d1.yaml
+    field: notes
+    substance_id: sub_7e02eab0d1
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 3647805d306d7b8a2fa14f62eeb7ea3bd5ac70d67d33658bd6b332f9b5bc9810:004
+  span_id: 3647805d306d7b8a2fa14f62eeb7ea3bd5ac70d67d33658bd6b332f9b5bc9810
+  source:
+    path: data/substances/magnesium_glycinate__sub_7e02eab0d1.yaml
+    field: notes
+    substance_id: sub_7e02eab0d1
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: 3647805d306d7b8a2fa14f62eeb7ea3bd5ac70d67d33658bd6b332f9b5bc9810:005
+  span_id: 3647805d306d7b8a2fa14f62eeb7ea3bd5ac70d67d33658bd6b332f9b5bc9810
+  source:
+    path: data/substances/magnesium_glycinate__sub_7e02eab0d1.yaml
+    field: notes
+    substance_id: sub_7e02eab0d1
+  destination:
+    kind: composition
+    path: data/products/source_naturals__ultra_mag__prd_t6ml86bybn.yaml
+    component_id: cmp_prd_t6ml86bybn__sub_7e02eab0d1
+    product_id: prd_t6ml86bybn
+    substance_id: sub_7e02eab0d1
+  disposition: typed_destination
+- atom_id: 3647805d306d7b8a2fa14f62eeb7ea3bd5ac70d67d33658bd6b332f9b5bc9810:006
+  span_id: 3647805d306d7b8a2fa14f62eeb7ea3bd5ac70d67d33658bd6b332f9b5bc9810
+  source:
+    path: data/substances/magnesium_glycinate__sub_7e02eab0d1.yaml
+    field: notes
+    substance_id: sub_7e02eab0d1
+  destination:
+    kind: knowledge
+    path: data/substances/magnesium_glycinate__sub_7e02eab0d1.yaml
+    substance_id: sub_7e02eab0d1
+    field: knowledge.pathway[0]
+    value: vitamin_d_calcium_axis
+  disposition: typed_destination
+- atom_id: afd3110263e0c16c9aaab1227268e05fb08c6c5b86695092304f5f0fab00824a:001
+  span_id: afd3110263e0c16c9aaab1227268e05fb08c6c5b86695092304f5f0fab00824a
+  source:
+    path: data/substances/magnesium_l_threonate__sub_7aem4hgdmv.yaml
+    field: notes
+    substance_id: sub_7aem4hgdmv
+  destination:
+    kind: identity
+    path: data/substances/magnesium_l_threonate__sub_7aem4hgdmv.yaml
+    substance_id: sub_7aem4hgdmv
+    field: name
+  disposition: typed_destination
+- atom_id: afd3110263e0c16c9aaab1227268e05fb08c6c5b86695092304f5f0fab00824a:002
+  span_id: afd3110263e0c16c9aaab1227268e05fb08c6c5b86695092304f5f0fab00824a
+  source:
+    path: data/substances/magnesium_l_threonate__sub_7aem4hgdmv.yaml
+    field: notes
+    substance_id: sub_7aem4hgdmv
+  destination:
+    kind: identity
+    path: data/substances/magnesium_l_threonate__sub_7aem4hgdmv.yaml
+    substance_id: sub_7aem4hgdmv
+    field: name
+  disposition: typed_destination
+- atom_id: afd3110263e0c16c9aaab1227268e05fb08c6c5b86695092304f5f0fab00824a:003
+  span_id: afd3110263e0c16c9aaab1227268e05fb08c6c5b86695092304f5f0fab00824a
+  source:
+    path: data/substances/magnesium_l_threonate__sub_7aem4hgdmv.yaml
+    field: notes
+    substance_id: sub_7aem4hgdmv
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: afd3110263e0c16c9aaab1227268e05fb08c6c5b86695092304f5f0fab00824a:004
+  span_id: afd3110263e0c16c9aaab1227268e05fb08c6c5b86695092304f5f0fab00824a
+  source:
+    path: data/substances/magnesium_l_threonate__sub_7aem4hgdmv.yaml
+    field: notes
+    substance_id: sub_7aem4hgdmv
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: afd3110263e0c16c9aaab1227268e05fb08c6c5b86695092304f5f0fab00824a:005
+  span_id: afd3110263e0c16c9aaab1227268e05fb08c6c5b86695092304f5f0fab00824a
+  source:
+    path: data/substances/magnesium_l_threonate__sub_7aem4hgdmv.yaml
+    field: notes
+    substance_id: sub_7aem4hgdmv
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 70aa332b10dd57fae7aabad6c95a4d40736f7171c1c71a63bf50d204d5438d33:001
+  span_id: 70aa332b10dd57fae7aabad6c95a4d40736f7171c1c71a63bf50d204d5438d33
+  source:
+    path: data/substances/magnesium_malate__sub_32ixdoncs3.yaml
+    field: notes
+    substance_id: sub_32ixdoncs3
+  destination:
+    kind: identity
+    path: data/substances/magnesium_malate__sub_32ixdoncs3.yaml
+    substance_id: sub_32ixdoncs3
+    field: name
+  disposition: typed_destination
+- atom_id: 70aa332b10dd57fae7aabad6c95a4d40736f7171c1c71a63bf50d204d5438d33:002
+  span_id: 70aa332b10dd57fae7aabad6c95a4d40736f7171c1c71a63bf50d204d5438d33
+  source:
+    path: data/substances/magnesium_malate__sub_32ixdoncs3.yaml
+    field: notes
+    substance_id: sub_32ixdoncs3
+  destination:
+    kind: identity
+    path: data/substances/magnesium_malate__sub_32ixdoncs3.yaml
+    substance_id: sub_32ixdoncs3
+    field: name
+  disposition: typed_destination
+- atom_id: 12e5f668e8110812e414cbdfff80a9c8a87728568e428ab0dcad64c071f2dafb:001
+  span_id: 12e5f668e8110812e414cbdfff80a9c8a87728568e428ab0dcad64c071f2dafb
+  source:
+    path: data/substances/magnesium_oxide__sub_1n5gnpnuxb.yaml
+    field: notes
+    substance_id: sub_1n5gnpnuxb
+  destination:
+    kind: identity
+    path: data/substances/magnesium_oxide__sub_1n5gnpnuxb.yaml
+    substance_id: sub_1n5gnpnuxb
+    field: name
+  disposition: typed_destination
+- atom_id: 12e5f668e8110812e414cbdfff80a9c8a87728568e428ab0dcad64c071f2dafb:002
+  span_id: 12e5f668e8110812e414cbdfff80a9c8a87728568e428ab0dcad64c071f2dafb
+  source:
+    path: data/substances/magnesium_oxide__sub_1n5gnpnuxb.yaml
+    field: notes
+    substance_id: sub_1n5gnpnuxb
+  destination:
+    kind: identity
+    path: data/substances/magnesium_oxide__sub_1n5gnpnuxb.yaml
+    substance_id: sub_1n5gnpnuxb
+    field: name
+  disposition: typed_destination
+- atom_id: 22e9eb4013e8f5ecffa7435c65b8bf3588bc70f464ae824f29c55a75bb71113c:001
+  span_id: 22e9eb4013e8f5ecffa7435c65b8bf3588bc70f464ae824f29c55a75bb71113c
+  source:
+    path: data/substances/magnesium_succinate__sub_238kn93qok.yaml
+    field: notes
+    substance_id: sub_238kn93qok
+  destination:
+    kind: identity
+    path: data/substances/magnesium_succinate__sub_238kn93qok.yaml
+    substance_id: sub_238kn93qok
+    field: name
+  disposition: typed_destination
+- atom_id: 22e9eb4013e8f5ecffa7435c65b8bf3588bc70f464ae824f29c55a75bb71113c:002
+  span_id: 22e9eb4013e8f5ecffa7435c65b8bf3588bc70f464ae824f29c55a75bb71113c
+  source:
+    path: data/substances/magnesium_succinate__sub_238kn93qok.yaml
+    field: notes
+    substance_id: sub_238kn93qok
+  destination:
+    kind: identity
+    path: data/substances/magnesium_succinate__sub_238kn93qok.yaml
+    substance_id: sub_238kn93qok
+    field: name
+  disposition: typed_destination
+- atom_id: a3fe41742143cdc168a9ec7b107cf77e2d2a0c3de75091f64be272e011e3884b:001
+  span_id: a3fe41742143cdc168a9ec7b107cf77e2d2a0c3de75091f64be272e011e3884b
+  source:
+    path: data/substances/magnesium_taurinate__sub_3k09vfu199.yaml
+    field: notes
+    substance_id: sub_3k09vfu199
+  destination:
+    kind: identity
+    path: data/substances/magnesium_taurinate__sub_3k09vfu199.yaml
+    substance_id: sub_3k09vfu199
+    field: name
+  disposition: typed_destination
+- atom_id: a3fe41742143cdc168a9ec7b107cf77e2d2a0c3de75091f64be272e011e3884b:002
+  span_id: a3fe41742143cdc168a9ec7b107cf77e2d2a0c3de75091f64be272e011e3884b
+  source:
+    path: data/substances/magnesium_taurinate__sub_3k09vfu199.yaml
+    field: notes
+    substance_id: sub_3k09vfu199
+  destination:
+    kind: identity
+    path: data/substances/magnesium_taurinate__sub_3k09vfu199.yaml
+    substance_id: sub_3k09vfu199
+    field: name
+  disposition: typed_destination
+- atom_id: 453ac8d0f9a99d8ec2fa93fca5cad92386ce950628662908ac41ef4886342f73:001
+  span_id: 453ac8d0f9a99d8ec2fa93fca5cad92386ce950628662908ac41ef4886342f73
+  source:
+    path: data/substances/manganese__sub_7938ea248e.yaml
+    field: notes
+    substance_id: sub_7938ea248e
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 453ac8d0f9a99d8ec2fa93fca5cad92386ce950628662908ac41ef4886342f73:002
+  span_id: 453ac8d0f9a99d8ec2fa93fca5cad92386ce950628662908ac41ef4886342f73
+  source:
+    path: data/substances/manganese__sub_7938ea248e.yaml
+    field: notes
+    substance_id: sub_7938ea248e
+  destination:
+    kind: composition
+    path: data/products/life_extension__only_trace_minerals__prd_932319251f.yaml
+    component_id: cmp_prd_932319251f__sub_7938ea248e
+    product_id: prd_932319251f
+    substance_id: sub_7938ea248e
+  disposition: typed_destination
+- atom_id: 453ac8d0f9a99d8ec2fa93fca5cad92386ce950628662908ac41ef4886342f73:003
+  span_id: 453ac8d0f9a99d8ec2fa93fca5cad92386ce950628662908ac41ef4886342f73
+  source:
+    path: data/substances/manganese__sub_7938ea248e.yaml
+    field: notes
+    substance_id: sub_7938ea248e
+  destination:
+    kind: identity
+    path: data/substances/manganese__sub_7938ea248e.yaml
+    substance_id: sub_7938ea248e
+    field: name
+  disposition: typed_destination
+- atom_id: 453ac8d0f9a99d8ec2fa93fca5cad92386ce950628662908ac41ef4886342f73:004
+  span_id: 453ac8d0f9a99d8ec2fa93fca5cad92386ce950628662908ac41ef4886342f73
+  source:
+    path: data/substances/manganese__sub_7938ea248e.yaml
+    field: notes
+    substance_id: sub_7938ea248e
+  destination:
+    kind: knowledge
+    path: data/substances/manganese__sub_7938ea248e.yaml
+    substance_id: sub_7938ea248e
+    field: knowledge.effect[0]
+    value: antioxidant_enzyme_cofactor
+  disposition: typed_destination
+- atom_id: 453ac8d0f9a99d8ec2fa93fca5cad92386ce950628662908ac41ef4886342f73:005
+  span_id: 453ac8d0f9a99d8ec2fa93fca5cad92386ce950628662908ac41ef4886342f73
+  source:
+    path: data/substances/manganese__sub_7938ea248e.yaml
+    field: notes
+    substance_id: sub_7938ea248e
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 453ac8d0f9a99d8ec2fa93fca5cad92386ce950628662908ac41ef4886342f73:006
+  span_id: 453ac8d0f9a99d8ec2fa93fca5cad92386ce950628662908ac41ef4886342f73
+  source:
+    path: data/substances/manganese__sub_7938ea248e.yaml
+    field: notes
+    substance_id: sub_7938ea248e
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: 453ac8d0f9a99d8ec2fa93fca5cad92386ce950628662908ac41ef4886342f73:007
+  span_id: 453ac8d0f9a99d8ec2fa93fca5cad92386ce950628662908ac41ef4886342f73
+  source:
+    path: data/substances/manganese__sub_7938ea248e.yaml
+    field: notes
+    substance_id: sub_7938ea248e
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: 453ac8d0f9a99d8ec2fa93fca5cad92386ce950628662908ac41ef4886342f73:008
+  span_id: 453ac8d0f9a99d8ec2fa93fca5cad92386ce950628662908ac41ef4886342f73
+  source:
+    path: data/substances/manganese__sub_7938ea248e.yaml
+    field: notes
+    substance_id: sub_7938ea248e
+  destination:
+    kind: composition
+    path: data/products/animal__animal_flex_comprehensive_joint_care__prd_do96zy85ny.yaml
+    component_id: cmp_prd_do96zy85ny__sub_7938ea248e
+    product_id: prd_do96zy85ny
+    substance_id: sub_7938ea248e
+  disposition: typed_destination
+- atom_id: 81752e452d1255fa58792ff08722d61063420ae342dead34aad30f492b6fb591:001
+  span_id: 81752e452d1255fa58792ff08722d61063420ae342dead34aad30f492b6fb591
+  source:
+    path: data/substances/mastic_gum__sub_mzmh95u6ak.yaml
+    field: notes
+    substance_id: sub_mzmh95u6ak
+  destination:
+    kind: identity
+    path: data/substances/mastic_gum__sub_mzmh95u6ak.yaml
+    substance_id: sub_mzmh95u6ak
+    field: name
+  disposition: typed_destination
+- atom_id: 81752e452d1255fa58792ff08722d61063420ae342dead34aad30f492b6fb591:002
+  span_id: 81752e452d1255fa58792ff08722d61063420ae342dead34aad30f492b6fb591
+  source:
+    path: data/substances/mastic_gum__sub_mzmh95u6ak.yaml
+    field: notes
+    substance_id: sub_mzmh95u6ak
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 81752e452d1255fa58792ff08722d61063420ae342dead34aad30f492b6fb591:003
+  span_id: 81752e452d1255fa58792ff08722d61063420ae342dead34aad30f492b6fb591
+  source:
+    path: data/substances/mastic_gum__sub_mzmh95u6ak.yaml
+    field: notes
+    substance_id: sub_mzmh95u6ak
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 81752e452d1255fa58792ff08722d61063420ae342dead34aad30f492b6fb591:004
+  span_id: 81752e452d1255fa58792ff08722d61063420ae342dead34aad30f492b6fb591
+  source:
+    path: data/substances/mastic_gum__sub_mzmh95u6ak.yaml
+    field: notes
+    substance_id: sub_mzmh95u6ak
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 6313c34f35a201d9a7b4c6989d20affdea92b702f828a4444d9b0d8224273a0c:001
+  span_id: 6313c34f35a201d9a7b4c6989d20affdea92b702f828a4444d9b0d8224273a0c
+  source:
+    path: data/substances/medium_chain_triglycerides__sub_l512lczi25.yaml
+    field: notes
+    substance_id: sub_l512lczi25
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 6313c34f35a201d9a7b4c6989d20affdea92b702f828a4444d9b0d8224273a0c:002
+  span_id: 6313c34f35a201d9a7b4c6989d20affdea92b702f828a4444d9b0d8224273a0c
+  source:
+    path: data/substances/medium_chain_triglycerides__sub_l512lczi25.yaml
+    field: notes
+    substance_id: sub_l512lczi25
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: 6313c34f35a201d9a7b4c6989d20affdea92b702f828a4444d9b0d8224273a0c:003
+  span_id: 6313c34f35a201d9a7b4c6989d20affdea92b702f828a4444d9b0d8224273a0c
+  source:
+    path: data/substances/medium_chain_triglycerides__sub_l512lczi25.yaml
+    field: notes
+    substance_id: sub_l512lczi25
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: 6313c34f35a201d9a7b4c6989d20affdea92b702f828a4444d9b0d8224273a0c:004
+  span_id: 6313c34f35a201d9a7b4c6989d20affdea92b702f828a4444d9b0d8224273a0c
+  source:
+    path: data/substances/medium_chain_triglycerides__sub_l512lczi25.yaml
+    field: notes
+    substance_id: sub_l512lczi25
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 54c92a537d3decd047c8fbecb1ed49dd493fef88002d645a3746db180025ae07:001
+  span_id: 54c92a537d3decd047c8fbecb1ed49dd493fef88002d645a3746db180025ae07
+  source:
+    path: data/substances/melatonin__sub_6z3m3zbxgb.yaml
+    field: notes
+    substance_id: sub_6z3m3zbxgb
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: 54c92a537d3decd047c8fbecb1ed49dd493fef88002d645a3746db180025ae07:002
+  span_id: 54c92a537d3decd047c8fbecb1ed49dd493fef88002d645a3746db180025ae07
+  source:
+    path: data/substances/melatonin__sub_6z3m3zbxgb.yaml
+    field: notes
+    substance_id: sub_6z3m3zbxgb
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: 54c92a537d3decd047c8fbecb1ed49dd493fef88002d645a3746db180025ae07:003
+  span_id: 54c92a537d3decd047c8fbecb1ed49dd493fef88002d645a3746db180025ae07
+  source:
+    path: data/substances/melatonin__sub_6z3m3zbxgb.yaml
+    field: notes
+    substance_id: sub_6z3m3zbxgb
+  destination:
+    kind: knowledge
+    path: data/substances/melatonin__sub_6z3m3zbxgb.yaml
+    substance_id: sub_6z3m3zbxgb
+    field: knowledge.context[0]
+    value: sleep_recovery
+  disposition: typed_destination
+- atom_id: 54c92a537d3decd047c8fbecb1ed49dd493fef88002d645a3746db180025ae07:004
+  span_id: 54c92a537d3decd047c8fbecb1ed49dd493fef88002d645a3746db180025ae07
+  source:
+    path: data/substances/melatonin__sub_6z3m3zbxgb.yaml
+    field: notes
+    substance_id: sub_6z3m3zbxgb
+  destination:
+    kind: knowledge
+    path: data/substances/melatonin__sub_6z3m3zbxgb.yaml
+    substance_id: sub_6z3m3zbxgb
+    field: knowledge.context[0]
+    value: sleep_recovery
+  disposition: typed_destination
+- atom_id: 076a0d06b1e2ca3fa49a72fef6ff7869cba73347c72930e136eb207a6a0b754d:001
+  span_id: 076a0d06b1e2ca3fa49a72fef6ff7869cba73347c72930e136eb207a6a0b754d
+  source:
+    path: data/substances/metformin__sub_605u9zvqt2.yaml
+    field: notes
+    substance_id: sub_605u9zvqt2
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: 076a0d06b1e2ca3fa49a72fef6ff7869cba73347c72930e136eb207a6a0b754d:002
+  span_id: 076a0d06b1e2ca3fa49a72fef6ff7869cba73347c72930e136eb207a6a0b754d
+  source:
+    path: data/substances/metformin__sub_605u9zvqt2.yaml
+    field: notes
+    substance_id: sub_605u9zvqt2
+  destination:
+    kind: identity
+    path: data/substances/metformin__sub_605u9zvqt2.yaml
+    substance_id: sub_605u9zvqt2
+    field: name
+  disposition: typed_destination
+- atom_id: 076a0d06b1e2ca3fa49a72fef6ff7869cba73347c72930e136eb207a6a0b754d:003
+  span_id: 076a0d06b1e2ca3fa49a72fef6ff7869cba73347c72930e136eb207a6a0b754d
+  source:
+    path: data/substances/metformin__sub_605u9zvqt2.yaml
+    field: notes
+    substance_id: sub_605u9zvqt2
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 2b2d5281f8375dee92594dd2f429f3e5abb411a1ed446f55ba24a9b95ed44e1a:001
+  span_id: 2b2d5281f8375dee92594dd2f429f3e5abb411a1ed446f55ba24a9b95ed44e1a
+  source:
+    path: data/substances/methotrexate__sub_zqfp9n314s.yaml
+    field: notes
+    substance_id: sub_zqfp9n314s
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: 2b2d5281f8375dee92594dd2f429f3e5abb411a1ed446f55ba24a9b95ed44e1a:002
+  span_id: 2b2d5281f8375dee92594dd2f429f3e5abb411a1ed446f55ba24a9b95ed44e1a
+  source:
+    path: data/substances/methotrexate__sub_zqfp9n314s.yaml
+    field: notes
+    substance_id: sub_zqfp9n314s
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 2b2d5281f8375dee92594dd2f429f3e5abb411a1ed446f55ba24a9b95ed44e1a:003
+  span_id: 2b2d5281f8375dee92594dd2f429f3e5abb411a1ed446f55ba24a9b95ed44e1a
+  source:
+    path: data/substances/methotrexate__sub_zqfp9n314s.yaml
+    field: notes
+    substance_id: sub_zqfp9n314s
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: f4c4e84a302da24c834af7ad6fa1976ba613d873123117d6fef3560d8fd7d189:001
+  span_id: f4c4e84a302da24c834af7ad6fa1976ba613d873123117d6fef3560d8fd7d189
+  source:
+    path: data/substances/midazolam__sub_ug92bkq5dh.yaml
+    field: notes
+    substance_id: sub_ug92bkq5dh
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: f4c4e84a302da24c834af7ad6fa1976ba613d873123117d6fef3560d8fd7d189:002
+  span_id: f4c4e84a302da24c834af7ad6fa1976ba613d873123117d6fef3560d8fd7d189
+  source:
+    path: data/substances/midazolam__sub_ug92bkq5dh.yaml
+    field: notes
+    substance_id: sub_ug92bkq5dh
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: 1e675f0393e5a95649f660f903b4730c47674a759b1a0915deba7627b5bc2e4d:001
+  span_id: 1e675f0393e5a95649f660f903b4730c47674a759b1a0915deba7627b5bc2e4d
+  source:
+    path: data/substances/milk_thistle_seed_extract__sub_i7eawy9wte.yaml
+    field: notes
+    substance_id: sub_i7eawy9wte
+  destination:
+    kind: identity
+    path: data/substances/milk_thistle_seed_extract__sub_i7eawy9wte.yaml
+    substance_id: sub_i7eawy9wte
+    field: name
+  disposition: typed_destination
+- atom_id: 1e675f0393e5a95649f660f903b4730c47674a759b1a0915deba7627b5bc2e4d:002
+  span_id: 1e675f0393e5a95649f660f903b4730c47674a759b1a0915deba7627b5bc2e4d
+  source:
+    path: data/substances/milk_thistle_seed_extract__sub_i7eawy9wte.yaml
+    field: notes
+    substance_id: sub_i7eawy9wte
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 1e675f0393e5a95649f660f903b4730c47674a759b1a0915deba7627b5bc2e4d:003
+  span_id: 1e675f0393e5a95649f660f903b4730c47674a759b1a0915deba7627b5bc2e4d
+  source:
+    path: data/substances/milk_thistle_seed_extract__sub_i7eawy9wte.yaml
+    field: notes
+    substance_id: sub_i7eawy9wte
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 1e675f0393e5a95649f660f903b4730c47674a759b1a0915deba7627b5bc2e4d:004
+  span_id: 1e675f0393e5a95649f660f903b4730c47674a759b1a0915deba7627b5bc2e4d
+  source:
+    path: data/substances/milk_thistle_seed_extract__sub_i7eawy9wte.yaml
+    field: notes
+    substance_id: sub_i7eawy9wte
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 3a316f33b3c3d7b99867b4488825773ff2ba054f93e5c7fa3d4ec96bfa7486f7:001
+  span_id: 3a316f33b3c3d7b99867b4488825773ff2ba054f93e5c7fa3d4ec96bfa7486f7
+  source:
+    path: data/substances/modafinil__sub_w6o6xv877y.yaml
+    field: notes
+    substance_id: sub_w6o6xv877y
+  destination:
+    kind: knowledge
+    path: data/substances/modafinil__sub_w6o6xv877y.yaml
+    substance_id: sub_w6o6xv877y
+    field: knowledge.role[0]
+    value: pharmaceutical
+  disposition: typed_destination
+- atom_id: 3a316f33b3c3d7b99867b4488825773ff2ba054f93e5c7fa3d4ec96bfa7486f7:002
+  span_id: 3a316f33b3c3d7b99867b4488825773ff2ba054f93e5c7fa3d4ec96bfa7486f7
+  source:
+    path: data/substances/modafinil__sub_w6o6xv877y.yaml
+    field: notes
+    substance_id: sub_w6o6xv877y
+  destination:
+    kind: knowledge
+    path: data/substances/modafinil__sub_w6o6xv877y.yaml
+    substance_id: sub_w6o6xv877y
+    field: knowledge.role[1]
+    value: nootropic
+  disposition: typed_destination
+- atom_id: 3a316f33b3c3d7b99867b4488825773ff2ba054f93e5c7fa3d4ec96bfa7486f7:003
+  span_id: 3a316f33b3c3d7b99867b4488825773ff2ba054f93e5c7fa3d4ec96bfa7486f7
+  source:
+    path: data/substances/modafinil__sub_w6o6xv877y.yaml
+    field: notes
+    substance_id: sub_w6o6xv877y
+  destination:
+    kind: identity
+    path: data/substances/modafinil__sub_w6o6xv877y.yaml
+    substance_id: sub_w6o6xv877y
+    field: name
+  disposition: typed_destination
+- atom_id: 3a316f33b3c3d7b99867b4488825773ff2ba054f93e5c7fa3d4ec96bfa7486f7:004
+  span_id: 3a316f33b3c3d7b99867b4488825773ff2ba054f93e5c7fa3d4ec96bfa7486f7
+  source:
+    path: data/substances/modafinil__sub_w6o6xv877y.yaml
+    field: notes
+    substance_id: sub_w6o6xv877y
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 3a316f33b3c3d7b99867b4488825773ff2ba054f93e5c7fa3d4ec96bfa7486f7:005
+  span_id: 3a316f33b3c3d7b99867b4488825773ff2ba054f93e5c7fa3d4ec96bfa7486f7
+  source:
+    path: data/substances/modafinil__sub_w6o6xv877y.yaml
+    field: notes
+    substance_id: sub_w6o6xv877y
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 08a5c71f7156cb24fd50101cce0a44a960f9568893483fe0ce3de33fd1e1b471:001
+  span_id: 08a5c71f7156cb24fd50101cce0a44a960f9568893483fe0ce3de33fd1e1b471
+  source:
+    path: data/substances/molybdenum__sub_c55378389c.yaml
+    field: notes
+    substance_id: sub_c55378389c
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 08a5c71f7156cb24fd50101cce0a44a960f9568893483fe0ce3de33fd1e1b471:002
+  span_id: 08a5c71f7156cb24fd50101cce0a44a960f9568893483fe0ce3de33fd1e1b471
+  source:
+    path: data/substances/molybdenum__sub_c55378389c.yaml
+    field: notes
+    substance_id: sub_c55378389c
+  destination:
+    kind: identity
+    path: data/substances/molybdenum__sub_c55378389c.yaml
+    substance_id: sub_c55378389c
+    field: name
+  disposition: typed_destination
+- atom_id: 08a5c71f7156cb24fd50101cce0a44a960f9568893483fe0ce3de33fd1e1b471:003
+  span_id: 08a5c71f7156cb24fd50101cce0a44a960f9568893483fe0ce3de33fd1e1b471
+  source:
+    path: data/substances/molybdenum__sub_c55378389c.yaml
+    field: notes
+    substance_id: sub_c55378389c
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 08a5c71f7156cb24fd50101cce0a44a960f9568893483fe0ce3de33fd1e1b471:004
+  span_id: 08a5c71f7156cb24fd50101cce0a44a960f9568893483fe0ce3de33fd1e1b471
+  source:
+    path: data/substances/molybdenum__sub_c55378389c.yaml
+    field: notes
+    substance_id: sub_c55378389c
+  destination:
+    kind: identity
+    path: data/substances/molybdenum__sub_c55378389c.yaml
+    substance_id: sub_c55378389c
+    field: name
+  disposition: typed_destination
+- atom_id: 08a5c71f7156cb24fd50101cce0a44a960f9568893483fe0ce3de33fd1e1b471:005
+  span_id: 08a5c71f7156cb24fd50101cce0a44a960f9568893483fe0ce3de33fd1e1b471
+  source:
+    path: data/substances/molybdenum__sub_c55378389c.yaml
+    field: notes
+    substance_id: sub_c55378389c
+  destination:
+    kind: knowledge
+    path: data/substances/molybdenum__sub_c55378389c.yaml
+    substance_id: sub_c55378389c
+    field: knowledge.effect[0]
+    value: sulfur_amino_acid_metabolism
+  disposition: typed_destination
+- atom_id: 08a5c71f7156cb24fd50101cce0a44a960f9568893483fe0ce3de33fd1e1b471:006
+  span_id: 08a5c71f7156cb24fd50101cce0a44a960f9568893483fe0ce3de33fd1e1b471
+  source:
+    path: data/substances/molybdenum__sub_c55378389c.yaml
+    field: notes
+    substance_id: sub_c55378389c
+  destination:
+    kind: identity
+    path: data/substances/molybdenum__sub_c55378389c.yaml
+    substance_id: sub_c55378389c
+    field: name
+  disposition: typed_destination
+- atom_id: 08a5c71f7156cb24fd50101cce0a44a960f9568893483fe0ce3de33fd1e1b471:007
+  span_id: 08a5c71f7156cb24fd50101cce0a44a960f9568893483fe0ce3de33fd1e1b471
+  source:
+    path: data/substances/molybdenum__sub_c55378389c.yaml
+    field: notes
+    substance_id: sub_c55378389c
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 4279b85b15287366c2464e6d7d6ad6035ba9c6eb3336b1f60bc29003dff3fea1:001
+  span_id: 4279b85b15287366c2464e6d7d6ad6035ba9c6eb3336b1f60bc29003dff3fea1
+  source:
+    path: data/substances/msm_optimsm__sub_embbhu7fia.yaml
+    field: notes
+    substance_id: sub_embbhu7fia
+  destination:
+    kind: composition
+    path: data/products/solgar__skin_nails_and_hair_advanced_msm_formula__prd_nuicads5ns.yaml
+    component_id: cmp_prd_nuicads5ns__sub_embbhu7fia
+    product_id: prd_nuicads5ns
+    substance_id: sub_embbhu7fia
+  disposition: typed_destination
+- atom_id: 4279b85b15287366c2464e6d7d6ad6035ba9c6eb3336b1f60bc29003dff3fea1:002
+  span_id: 4279b85b15287366c2464e6d7d6ad6035ba9c6eb3336b1f60bc29003dff3fea1
+  source:
+    path: data/substances/msm_optimsm__sub_embbhu7fia.yaml
+    field: notes
+    substance_id: sub_embbhu7fia
+  destination:
+    kind: knowledge
+    path: data/substances/msm_optimsm__sub_embbhu7fia.yaml
+    substance_id: sub_embbhu7fia
+    field: knowledge.context[0]
+    value: connective_tissue_support
+  disposition: typed_destination
+- atom_id: c08bb97f12fc67ed70b42d974f0131e8ccff97fa0ca3ff8cd04656713c54b4ea:001
+  span_id: c08bb97f12fc67ed70b42d974f0131e8ccff97fa0ca3ff8cd04656713c54b4ea
+  source:
+    path: data/substances/mucuna_pruriens__sub_t1ieixrwpb.yaml
+    field: notes
+    substance_id: sub_t1ieixrwpb
+  destination:
+    kind: identity
+    path: data/substances/mucuna_pruriens__sub_t1ieixrwpb.yaml
+    substance_id: sub_t1ieixrwpb
+    field: name
+  disposition: typed_destination
+- atom_id: c08bb97f12fc67ed70b42d974f0131e8ccff97fa0ca3ff8cd04656713c54b4ea:002
+  span_id: c08bb97f12fc67ed70b42d974f0131e8ccff97fa0ca3ff8cd04656713c54b4ea
+  source:
+    path: data/substances/mucuna_pruriens__sub_t1ieixrwpb.yaml
+    field: notes
+    substance_id: sub_t1ieixrwpb
+  destination:
+    kind: identity
+    path: data/substances/mucuna_pruriens__sub_t1ieixrwpb.yaml
+    substance_id: sub_t1ieixrwpb
+    field: name
+  disposition: typed_destination
+- atom_id: c08bb97f12fc67ed70b42d974f0131e8ccff97fa0ca3ff8cd04656713c54b4ea:003
+  span_id: c08bb97f12fc67ed70b42d974f0131e8ccff97fa0ca3ff8cd04656713c54b4ea
+  source:
+    path: data/substances/mucuna_pruriens__sub_t1ieixrwpb.yaml
+    field: notes
+    substance_id: sub_t1ieixrwpb
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97:001
+  span_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97
+  source:
+    path: data/substances/n_acetyl_cysteine__sub_d997f98e03.yaml
+    field: notes
+    substance_id: sub_d997f98e03
+  destination:
+    kind: knowledge
+    path: data/substances/n_acetyl_cysteine__sub_d997f98e03.yaml
+    substance_id: sub_d997f98e03
+    field: knowledge.effect[0]
+    value: glutathione_precursor_support
+  disposition: typed_destination
+- atom_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97:002
+  span_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97
+  source:
+    path: data/substances/n_acetyl_cysteine__sub_d997f98e03.yaml
+    field: notes
+    substance_id: sub_d997f98e03
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97:003
+  span_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97
+  source:
+    path: data/substances/n_acetyl_cysteine__sub_d997f98e03.yaml
+    field: notes
+    substance_id: sub_d997f98e03
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97:004
+  span_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97
+  source:
+    path: data/substances/n_acetyl_cysteine__sub_d997f98e03.yaml
+    field: notes
+    substance_id: sub_d997f98e03
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97:005
+  span_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97
+  source:
+    path: data/substances/n_acetyl_cysteine__sub_d997f98e03.yaml
+    field: notes
+    substance_id: sub_d997f98e03
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97:006
+  span_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97
+  source:
+    path: data/substances/n_acetyl_cysteine__sub_d997f98e03.yaml
+    field: notes
+    substance_id: sub_d997f98e03
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97:007
+  span_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97
+  source:
+    path: data/substances/n_acetyl_cysteine__sub_d997f98e03.yaml
+    field: notes
+    substance_id: sub_d997f98e03
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97:008
+  span_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97
+  source:
+    path: data/substances/n_acetyl_cysteine__sub_d997f98e03.yaml
+    field: notes
+    substance_id: sub_d997f98e03
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97:009
+  span_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97
+  source:
+    path: data/substances/n_acetyl_cysteine__sub_d997f98e03.yaml
+    field: notes
+    substance_id: sub_d997f98e03
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97:010
+  span_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97
+  source:
+    path: data/substances/n_acetyl_cysteine__sub_d997f98e03.yaml
+    field: notes
+    substance_id: sub_d997f98e03
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97:011
+  span_id: c0acb9d01e489eeeb7d615adaf835081157f9598e67d5d1abeac96b4daea8e97
+  source:
+    path: data/substances/n_acetyl_cysteine__sub_d997f98e03.yaml
+    field: notes
+    substance_id: sub_d997f98e03
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d:001
+  span_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d
+  source:
+    path: data/substances/nattokinase__sub_877c24aad4.yaml
+    field: notes
+    substance_id: sub_877c24aad4
+  destination:
+    kind: identity
+    path: data/substances/nattokinase__sub_877c24aad4.yaml
+    substance_id: sub_877c24aad4
+    field: name
+  disposition: typed_destination
+- atom_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d:002
+  span_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d
+  source:
+    path: data/substances/nattokinase__sub_877c24aad4.yaml
+    field: notes
+    substance_id: sub_877c24aad4
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d:003
+  span_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d
+  source:
+    path: data/substances/nattokinase__sub_877c24aad4.yaml
+    field: notes
+    substance_id: sub_877c24aad4
+  destination:
+    kind: identity
+    path: data/substances/nattokinase__sub_877c24aad4.yaml
+    substance_id: sub_877c24aad4
+    field: name
+  disposition: typed_destination
+- atom_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d:004
+  span_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d
+  source:
+    path: data/substances/nattokinase__sub_877c24aad4.yaml
+    field: notes
+    substance_id: sub_877c24aad4
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d:005
+  span_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d
+  source:
+    path: data/substances/nattokinase__sub_877c24aad4.yaml
+    field: notes
+    substance_id: sub_877c24aad4
+  destination:
+    kind: knowledge
+    path: data/substances/nattokinase__sub_877c24aad4.yaml
+    substance_id: sub_877c24aad4
+    field: knowledge.effect[0]
+    value: fibrinolytic
+  disposition: typed_destination
+- atom_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d:006
+  span_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d
+  source:
+    path: data/substances/nattokinase__sub_877c24aad4.yaml
+    field: notes
+    substance_id: sub_877c24aad4
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d:007
+  span_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d
+  source:
+    path: data/substances/nattokinase__sub_877c24aad4.yaml
+    field: notes
+    substance_id: sub_877c24aad4
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d:008
+  span_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d
+  source:
+    path: data/substances/nattokinase__sub_877c24aad4.yaml
+    field: notes
+    substance_id: sub_877c24aad4
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d:009
+  span_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d
+  source:
+    path: data/substances/nattokinase__sub_877c24aad4.yaml
+    field: notes
+    substance_id: sub_877c24aad4
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d:010
+  span_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d
+  source:
+    path: data/substances/nattokinase__sub_877c24aad4.yaml
+    field: notes
+    substance_id: sub_877c24aad4
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d:011
+  span_id: 76a1e92011f0bade821c2e3ed09402829916d230a1ed6c7539fc0e30707f591d
+  source:
+    path: data/substances/nattokinase__sub_877c24aad4.yaml
+    field: notes
+    substance_id: sub_877c24aad4
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: b48cde948421044a609058cf458fb85e6854eab3984b3bed6fe7ba77fdb8f073:001
+  span_id: b48cde948421044a609058cf458fb85e6854eab3984b3bed6fe7ba77fdb8f073
+  source:
+    path: data/substances/nicotinamide_mononucleotide__sub_7ozks6pos5.yaml
+    field: notes
+    substance_id: sub_7ozks6pos5
+  destination:
+    kind: knowledge
+    path: data/substances/nicotinamide_mononucleotide__sub_7ozks6pos5.yaml
+    substance_id: sub_7ozks6pos5
+    field: knowledge.effect[0]
+    value: nad_precursor_support
+  disposition: typed_destination
+- atom_id: b48cde948421044a609058cf458fb85e6854eab3984b3bed6fe7ba77fdb8f073:002
+  span_id: b48cde948421044a609058cf458fb85e6854eab3984b3bed6fe7ba77fdb8f073
+  source:
+    path: data/substances/nicotinamide_mononucleotide__sub_7ozks6pos5.yaml
+    field: notes
+    substance_id: sub_7ozks6pos5
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: b48cde948421044a609058cf458fb85e6854eab3984b3bed6fe7ba77fdb8f073:003
+  span_id: b48cde948421044a609058cf458fb85e6854eab3984b3bed6fe7ba77fdb8f073
+  source:
+    path: data/substances/nicotinamide_mononucleotide__sub_7ozks6pos5.yaml
+    field: notes
+    substance_id: sub_7ozks6pos5
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: b48cde948421044a609058cf458fb85e6854eab3984b3bed6fe7ba77fdb8f073:004
+  span_id: b48cde948421044a609058cf458fb85e6854eab3984b3bed6fe7ba77fdb8f073
+  source:
+    path: data/substances/nicotinamide_mononucleotide__sub_7ozks6pos5.yaml
+    field: notes
+    substance_id: sub_7ozks6pos5
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: b48cde948421044a609058cf458fb85e6854eab3984b3bed6fe7ba77fdb8f073:005
+  span_id: b48cde948421044a609058cf458fb85e6854eab3984b3bed6fe7ba77fdb8f073
+  source:
+    path: data/substances/nicotinamide_mononucleotide__sub_7ozks6pos5.yaml
+    field: notes
+    substance_id: sub_7ozks6pos5
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 18f9ed1d19bdfc4f14fc8ca486239c777889c5eff405a3f3bca9870c65807172:001
+  span_id: 18f9ed1d19bdfc4f14fc8ca486239c777889c5eff405a3f3bca9870c65807172
+  source:
+    path: data/substances/nicotinamide_riboside_tartrate__sub_rdmq4xiw07.yaml
+    field: notes
+    substance_id: sub_rdmq4xiw07
+  destination:
+    kind: composition
+    path: data/products/california_gold_nutrition__nicotinamide_riboside_tartrate_nrt_complex__prd_ecl277i8db.yaml
+    component_id: cmp_prd_ecl277i8db__sub_rdmq4xiw07
+    product_id: prd_ecl277i8db
+    substance_id: sub_rdmq4xiw07
+  disposition: typed_destination
+- atom_id: 18f9ed1d19bdfc4f14fc8ca486239c777889c5eff405a3f3bca9870c65807172:002
+  span_id: 18f9ed1d19bdfc4f14fc8ca486239c777889c5eff405a3f3bca9870c65807172
+  source:
+    path: data/substances/nicotinamide_riboside_tartrate__sub_rdmq4xiw07.yaml
+    field: notes
+    substance_id: sub_rdmq4xiw07
+  destination:
+    kind: identity
+    path: data/substances/nicotinamide_riboside_tartrate__sub_rdmq4xiw07.yaml
+    substance_id: sub_rdmq4xiw07
+    field: name
+  disposition: typed_destination
+- atom_id: 18f9ed1d19bdfc4f14fc8ca486239c777889c5eff405a3f3bca9870c65807172:003
+  span_id: 18f9ed1d19bdfc4f14fc8ca486239c777889c5eff405a3f3bca9870c65807172
+  source:
+    path: data/substances/nicotinamide_riboside_tartrate__sub_rdmq4xiw07.yaml
+    field: notes
+    substance_id: sub_rdmq4xiw07
+  destination:
+    kind: knowledge
+    path: data/substances/nicotinamide_riboside_tartrate__sub_rdmq4xiw07.yaml
+    substance_id: sub_rdmq4xiw07
+    field: knowledge.context[0]
+    value: mitochondrial_health
+  disposition: typed_destination
+- atom_id: f2a711803006950d3aa016968e168da41d83d860edf4d675fcd3a864899c5fe6:001
+  span_id: f2a711803006950d3aa016968e168da41d83d860edf4d675fcd3a864899c5fe6
+  source:
+    path: data/substances/noopept__sub_gb00nd9n9h.yaml
+    field: notes
+    substance_id: sub_gb00nd9n9h
+  destination:
+    kind: knowledge
+    path: data/substances/noopept__sub_gb00nd9n9h.yaml
+    substance_id: sub_gb00nd9n9h
+    field: knowledge.role[0]
+    value: nootropic
+  disposition: typed_destination
+- atom_id: f2a711803006950d3aa016968e168da41d83d860edf4d675fcd3a864899c5fe6:002
+  span_id: f2a711803006950d3aa016968e168da41d83d860edf4d675fcd3a864899c5fe6
+  source:
+    path: data/substances/noopept__sub_gb00nd9n9h.yaml
+    field: notes
+    substance_id: sub_gb00nd9n9h
+  destination:
+    kind: knowledge
+    path: data/substances/noopept__sub_gb00nd9n9h.yaml
+    substance_id: sub_gb00nd9n9h
+    field: knowledge.risk[0]
+    value: manual_review
+  disposition: typed_destination
+- atom_id: f2a711803006950d3aa016968e168da41d83d860edf4d675fcd3a864899c5fe6:003
+  span_id: f2a711803006950d3aa016968e168da41d83d860edf4d675fcd3a864899c5fe6
+  source:
+    path: data/substances/noopept__sub_gb00nd9n9h.yaml
+    field: notes
+    substance_id: sub_gb00nd9n9h
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: f98f14d5744d963f7fd1908485033bf59034392d357c85944ba9f6ffcbf535b4:001
+  span_id: f98f14d5744d963f7fd1908485033bf59034392d357c85944ba9f6ffcbf535b4
+  source:
+    path: data/substances/oat_beta_glucan__sub_oatbg00001.yaml
+    field: notes
+    substance_id: sub_oatbg00001
+  destination:
+    kind: identity
+    path: data/substances/oat_beta_glucan__sub_oatbg00001.yaml
+    substance_id: sub_oatbg00001
+    field: name
+  disposition: typed_destination
+- atom_id: f98f14d5744d963f7fd1908485033bf59034392d357c85944ba9f6ffcbf535b4:002
+  span_id: f98f14d5744d963f7fd1908485033bf59034392d357c85944ba9f6ffcbf535b4
+  source:
+    path: data/substances/oat_beta_glucan__sub_oatbg00001.yaml
+    field: notes
+    substance_id: sub_oatbg00001
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: f98f14d5744d963f7fd1908485033bf59034392d357c85944ba9f6ffcbf535b4:003
+  span_id: f98f14d5744d963f7fd1908485033bf59034392d357c85944ba9f6ffcbf535b4
+  source:
+    path: data/substances/oat_beta_glucan__sub_oatbg00001.yaml
+    field: notes
+    substance_id: sub_oatbg00001
+  destination:
+    kind: identity
+    path: data/substances/oat_beta_glucan__sub_oatbg00001.yaml
+    substance_id: sub_oatbg00001
+    field: name
+  disposition: typed_destination
+- atom_id: 409fb3715517f0562113e9be555053687f6a39ec3c13d19348e5edaa78654c3f:001
+  span_id: 409fb3715517f0562113e9be555053687f6a39ec3c13d19348e5edaa78654c3f
+  source:
+    path: data/substances/omeprazole__sub_0jmfcyanzv.yaml
+    field: notes
+    substance_id: sub_0jmfcyanzv
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 409fb3715517f0562113e9be555053687f6a39ec3c13d19348e5edaa78654c3f:002
+  span_id: 409fb3715517f0562113e9be555053687f6a39ec3c13d19348e5edaa78654c3f
+  source:
+    path: data/substances/omeprazole__sub_0jmfcyanzv.yaml
+    field: notes
+    substance_id: sub_0jmfcyanzv
+  destination:
+    kind: knowledge
+    path: data/substances/omeprazole__sub_0jmfcyanzv.yaml
+    substance_id: sub_0jmfcyanzv
+    field: knowledge.effect[0]
+    value: gastric_acid_suppressing_drug_context
+  disposition: typed_destination
+- atom_id: 409fb3715517f0562113e9be555053687f6a39ec3c13d19348e5edaa78654c3f:003
+  span_id: 409fb3715517f0562113e9be555053687f6a39ec3c13d19348e5edaa78654c3f
+  source:
+    path: data/substances/omeprazole__sub_0jmfcyanzv.yaml
+    field: notes
+    substance_id: sub_0jmfcyanzv
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: c7bd7e973068420dd4e52992ccca637125182c9c86c790fd26e0e250b4e98593:001
+  span_id: c7bd7e973068420dd4e52992ccca637125182c9c86c790fd26e0e250b4e98593
+  source:
+    path: data/substances/oxiracetam__sub_98vs3l645g.yaml
+    field: notes
+    substance_id: sub_98vs3l645g
+  destination:
+    kind: knowledge
+    path: data/substances/oxiracetam__sub_98vs3l645g.yaml
+    substance_id: sub_98vs3l645g
+    field: knowledge.role[0]
+    value: nootropic
+  disposition: typed_destination
+- atom_id: c7bd7e973068420dd4e52992ccca637125182c9c86c790fd26e0e250b4e98593:002
+  span_id: c7bd7e973068420dd4e52992ccca637125182c9c86c790fd26e0e250b4e98593
+  source:
+    path: data/substances/oxiracetam__sub_98vs3l645g.yaml
+    field: notes
+    substance_id: sub_98vs3l645g
+  destination:
+    kind: knowledge
+    path: data/substances/oxiracetam__sub_98vs3l645g.yaml
+    substance_id: sub_98vs3l645g
+    field: knowledge.effect[1]
+    value: learning_context
+  disposition: typed_destination
+- atom_id: c7bd7e973068420dd4e52992ccca637125182c9c86c790fd26e0e250b4e98593:003
+  span_id: c7bd7e973068420dd4e52992ccca637125182c9c86c790fd26e0e250b4e98593
+  source:
+    path: data/substances/oxiracetam__sub_98vs3l645g.yaml
+    field: notes
+    substance_id: sub_98vs3l645g
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: b3014afea43453ca58b7b49f8e877d80c2a38bf9e6256f30cf100d9485545d11:001
+  span_id: b3014afea43453ca58b7b49f8e877d80c2a38bf9e6256f30cf100d9485545d11
+  source:
+    path: data/substances/panax_ginseng__sub_4hnr2u8j89.yaml
+    field: notes
+    substance_id: sub_4hnr2u8j89
+  destination:
+    kind: knowledge
+    path: data/substances/panax_ginseng__sub_4hnr2u8j89.yaml
+    substance_id: sub_4hnr2u8j89
+    field: knowledge.role[0]
+    value: adaptogen
+  disposition: typed_destination
+- atom_id: b3014afea43453ca58b7b49f8e877d80c2a38bf9e6256f30cf100d9485545d11:002
+  span_id: b3014afea43453ca58b7b49f8e877d80c2a38bf9e6256f30cf100d9485545d11
+  source:
+    path: data/substances/panax_ginseng__sub_4hnr2u8j89.yaml
+    field: notes
+    substance_id: sub_4hnr2u8j89
+  destination:
+    kind: knowledge
+    path: data/substances/panax_ginseng__sub_4hnr2u8j89.yaml
+    substance_id: sub_4hnr2u8j89
+    field: knowledge.effect[0]
+    value: stress_resilience_context
+  disposition: typed_destination
+- atom_id: b3014afea43453ca58b7b49f8e877d80c2a38bf9e6256f30cf100d9485545d11:003
+  span_id: b3014afea43453ca58b7b49f8e877d80c2a38bf9e6256f30cf100d9485545d11
+  source:
+    path: data/substances/panax_ginseng__sub_4hnr2u8j89.yaml
+    field: notes
+    substance_id: sub_4hnr2u8j89
+  destination:
+    kind: knowledge
+    path: data/substances/panax_ginseng__sub_4hnr2u8j89.yaml
+    substance_id: sub_4hnr2u8j89
+    field: knowledge.effect[0]
+    value: stress_resilience_context
+  disposition: typed_destination
+- atom_id: c351176c6b7178a0fec294379306f58ff455bf6fb10c2805d97135bde32853d7:001
+  span_id: c351176c6b7178a0fec294379306f58ff455bf6fb10c2805d97135bde32853d7
+  source:
+    path: data/substances/pancreatin__sub_winwtayogk.yaml
+    field: notes
+    substance_id: sub_winwtayogk
+  destination:
+    kind: identity
+    path: data/substances/pancreatin__sub_winwtayogk.yaml
+    substance_id: sub_winwtayogk
+    field: name
+  disposition: typed_destination
+- atom_id: c351176c6b7178a0fec294379306f58ff455bf6fb10c2805d97135bde32853d7:002
+  span_id: c351176c6b7178a0fec294379306f58ff455bf6fb10c2805d97135bde32853d7
+  source:
+    path: data/substances/pancreatin__sub_winwtayogk.yaml
+    field: notes
+    substance_id: sub_winwtayogk
+  destination:
+    kind: identity
+    path: data/substances/pancreatin__sub_winwtayogk.yaml
+    substance_id: sub_winwtayogk
+    field: name
+  disposition: typed_destination
+- atom_id: c351176c6b7178a0fec294379306f58ff455bf6fb10c2805d97135bde32853d7:003
+  span_id: c351176c6b7178a0fec294379306f58ff455bf6fb10c2805d97135bde32853d7
+  source:
+    path: data/substances/pancreatin__sub_winwtayogk.yaml
+    field: notes
+    substance_id: sub_winwtayogk
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: c351176c6b7178a0fec294379306f58ff455bf6fb10c2805d97135bde32853d7:004
+  span_id: c351176c6b7178a0fec294379306f58ff455bf6fb10c2805d97135bde32853d7
+  source:
+    path: data/substances/pancreatin__sub_winwtayogk.yaml
+    field: notes
+    substance_id: sub_winwtayogk
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: c351176c6b7178a0fec294379306f58ff455bf6fb10c2805d97135bde32853d7:005
+  span_id: c351176c6b7178a0fec294379306f58ff455bf6fb10c2805d97135bde32853d7
+  source:
+    path: data/substances/pancreatin__sub_winwtayogk.yaml
+    field: notes
+    substance_id: sub_winwtayogk
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: c351176c6b7178a0fec294379306f58ff455bf6fb10c2805d97135bde32853d7:006
+  span_id: c351176c6b7178a0fec294379306f58ff455bf6fb10c2805d97135bde32853d7
+  source:
+    path: data/substances/pancreatin__sub_winwtayogk.yaml
+    field: notes
+    substance_id: sub_winwtayogk
+  destination:
+    kind: identity
+    path: data/substances/pancreatin__sub_winwtayogk.yaml
+    substance_id: sub_winwtayogk
+    field: name
+  disposition: typed_destination
+- atom_id: c351176c6b7178a0fec294379306f58ff455bf6fb10c2805d97135bde32853d7:007
+  span_id: c351176c6b7178a0fec294379306f58ff455bf6fb10c2805d97135bde32853d7
+  source:
+    path: data/substances/pancreatin__sub_winwtayogk.yaml
+    field: notes
+    substance_id: sub_winwtayogk
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: ec86cf4bbec5cacdd01a7705d82df8e56067267a72f944204abb3990a41ef551:001
+  span_id: ec86cf4bbec5cacdd01a7705d82df8e56067267a72f944204abb3990a41ef551
+  source:
+    path: data/substances/papain__sub_mw9uw4se1u.yaml
+    field: notes
+    substance_id: sub_mw9uw4se1u
+  destination:
+    kind: identity
+    path: data/substances/papain__sub_mw9uw4se1u.yaml
+    substance_id: sub_mw9uw4se1u
+    field: name
+  disposition: typed_destination
+- atom_id: ec86cf4bbec5cacdd01a7705d82df8e56067267a72f944204abb3990a41ef551:002
+  span_id: ec86cf4bbec5cacdd01a7705d82df8e56067267a72f944204abb3990a41ef551
+  source:
+    path: data/substances/papain__sub_mw9uw4se1u.yaml
+    field: notes
+    substance_id: sub_mw9uw4se1u
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: ec86cf4bbec5cacdd01a7705d82df8e56067267a72f944204abb3990a41ef551:003
+  span_id: ec86cf4bbec5cacdd01a7705d82df8e56067267a72f944204abb3990a41ef551
+  source:
+    path: data/substances/papain__sub_mw9uw4se1u.yaml
+    field: notes
+    substance_id: sub_mw9uw4se1u
+  destination:
+    kind: knowledge
+    path: data/substances/papain__sub_mw9uw4se1u.yaml
+    substance_id: sub_mw9uw4se1u
+    field: knowledge.risk[0]
+    value: bleeding_med_interaction
+  disposition: typed_destination
+- atom_id: ec86cf4bbec5cacdd01a7705d82df8e56067267a72f944204abb3990a41ef551:004
+  span_id: ec86cf4bbec5cacdd01a7705d82df8e56067267a72f944204abb3990a41ef551
+  source:
+    path: data/substances/papain__sub_mw9uw4se1u.yaml
+    field: notes
+    substance_id: sub_mw9uw4se1u
+  destination:
+    kind: identity
+    path: data/substances/papain__sub_mw9uw4se1u.yaml
+    substance_id: sub_mw9uw4se1u
+    field: name
+  disposition: typed_destination
+- atom_id: 652e705030fd07b30ac2884091e1d152dea25bd8b5647936446e4646b580769e:001
+  span_id: 652e705030fd07b30ac2884091e1d152dea25bd8b5647936446e4646b580769e
+  source:
+    path: data/substances/passionflower_flowering_tops_extract__sub_ege1asrt50.yaml
+    field: notes
+    substance_id: sub_ege1asrt50
+  destination:
+    kind: identity
+    path: data/substances/passionflower_flowering_tops_extract__sub_ege1asrt50.yaml
+    substance_id: sub_ege1asrt50
+    field: name
+  disposition: typed_destination
+- atom_id: 652e705030fd07b30ac2884091e1d152dea25bd8b5647936446e4646b580769e:002
+  span_id: 652e705030fd07b30ac2884091e1d152dea25bd8b5647936446e4646b580769e
+  source:
+    path: data/substances/passionflower_flowering_tops_extract__sub_ege1asrt50.yaml
+    field: notes
+    substance_id: sub_ege1asrt50
+  destination:
+    kind: knowledge
+    path: data/substances/passionflower_flowering_tops_extract__sub_ege1asrt50.yaml
+    substance_id: sub_ege1asrt50
+    field: knowledge.effect[0]
+    value: calming_context
+  disposition: typed_destination
+- atom_id: b33eb5e822981f2ddbb99c4dde5b1a9260fa9ed117e4f2cdd53306db219eef30:001
+  span_id: b33eb5e822981f2ddbb99c4dde5b1a9260fa9ed117e4f2cdd53306db219eef30
+  source:
+    path: data/substances/peppermint_oil__sub_hpqw0esbgo.yaml
+    field: notes
+    substance_id: sub_hpqw0esbgo
+  destination:
+    kind: knowledge
+    path: data/substances/peppermint_oil__sub_hpqw0esbgo.yaml
+    substance_id: sub_hpqw0esbgo
+    field: knowledge.effect[0]
+    value: digestive_comfort_context
+  disposition: typed_destination
+- atom_id: b33eb5e822981f2ddbb99c4dde5b1a9260fa9ed117e4f2cdd53306db219eef30:002
+  span_id: b33eb5e822981f2ddbb99c4dde5b1a9260fa9ed117e4f2cdd53306db219eef30
+  source:
+    path: data/substances/peppermint_oil__sub_hpqw0esbgo.yaml
+    field: notes
+    substance_id: sub_hpqw0esbgo
+  destination:
+    kind: knowledge
+    path: data/substances/peppermint_oil__sub_hpqw0esbgo.yaml
+    substance_id: sub_hpqw0esbgo
+    field: knowledge.effect[0]
+    value: digestive_comfort_context
+  disposition: typed_destination
+- atom_id: b33eb5e822981f2ddbb99c4dde5b1a9260fa9ed117e4f2cdd53306db219eef30:003
+  span_id: b33eb5e822981f2ddbb99c4dde5b1a9260fa9ed117e4f2cdd53306db219eef30
+  source:
+    path: data/substances/peppermint_oil__sub_hpqw0esbgo.yaml
+    field: notes
+    substance_id: sub_hpqw0esbgo
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: 6fdae0a1dbaae3cd4ebd45de57fb8d097c18c0864589de954357667a6a379729:001
+  span_id: 6fdae0a1dbaae3cd4ebd45de57fb8d097c18c0864589de954357667a6a379729
+  source:
+    path: data/substances/phenibut__sub_17rihwnl5n.yaml
+    field: notes
+    substance_id: sub_17rihwnl5n
+  destination:
+    kind: knowledge
+    path: data/substances/phenibut__sub_17rihwnl5n.yaml
+    substance_id: sub_17rihwnl5n
+    field: knowledge.role[0]
+    value: nootropic
+  disposition: typed_destination
+- atom_id: 6fdae0a1dbaae3cd4ebd45de57fb8d097c18c0864589de954357667a6a379729:002
+  span_id: 6fdae0a1dbaae3cd4ebd45de57fb8d097c18c0864589de954357667a6a379729
+  source:
+    path: data/substances/phenibut__sub_17rihwnl5n.yaml
+    field: notes
+    substance_id: sub_17rihwnl5n
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 6fdae0a1dbaae3cd4ebd45de57fb8d097c18c0864589de954357667a6a379729:003
+  span_id: 6fdae0a1dbaae3cd4ebd45de57fb8d097c18c0864589de954357667a6a379729
+  source:
+    path: data/substances/phenibut__sub_17rihwnl5n.yaml
+    field: notes
+    substance_id: sub_17rihwnl5n
+  destination:
+    kind: knowledge
+    path: data/substances/phenibut__sub_17rihwnl5n.yaml
+    substance_id: sub_17rihwnl5n
+    field: knowledge.effect[0]
+    value: calming_context
+  disposition: typed_destination
+- atom_id: 6fdae0a1dbaae3cd4ebd45de57fb8d097c18c0864589de954357667a6a379729:004
+  span_id: 6fdae0a1dbaae3cd4ebd45de57fb8d097c18c0864589de954357667a6a379729
+  source:
+    path: data/substances/phenibut__sub_17rihwnl5n.yaml
+    field: notes
+    substance_id: sub_17rihwnl5n
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 6fdae0a1dbaae3cd4ebd45de57fb8d097c18c0864589de954357667a6a379729:005
+  span_id: 6fdae0a1dbaae3cd4ebd45de57fb8d097c18c0864589de954357667a6a379729
+  source:
+    path: data/substances/phenibut__sub_17rihwnl5n.yaml
+    field: notes
+    substance_id: sub_17rihwnl5n
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 06837f91fde9359ed48d978509d8a5882aec4ce81c9c816e6e68db89ca12b4d8:001
+  span_id: 06837f91fde9359ed48d978509d8a5882aec4ce81c9c816e6e68db89ca12b4d8
+  source:
+    path: data/substances/phenylpiracetam__sub_wx4uag2gjl.yaml
+    field: notes
+    substance_id: sub_wx4uag2gjl
+  destination:
+    kind: knowledge
+    path: data/substances/phenylpiracetam__sub_wx4uag2gjl.yaml
+    substance_id: sub_wx4uag2gjl
+    field: knowledge.role[0]
+    value: nootropic
+  disposition: typed_destination
+- atom_id: 06837f91fde9359ed48d978509d8a5882aec4ce81c9c816e6e68db89ca12b4d8:002
+  span_id: 06837f91fde9359ed48d978509d8a5882aec4ce81c9c816e6e68db89ca12b4d8
+  source:
+    path: data/substances/phenylpiracetam__sub_wx4uag2gjl.yaml
+    field: notes
+    substance_id: sub_wx4uag2gjl
+  destination:
+    kind: identity
+    path: data/substances/phenylpiracetam__sub_wx4uag2gjl.yaml
+    substance_id: sub_wx4uag2gjl
+    field: name
+  disposition: typed_destination
+- atom_id: 06837f91fde9359ed48d978509d8a5882aec4ce81c9c816e6e68db89ca12b4d8:003
+  span_id: 06837f91fde9359ed48d978509d8a5882aec4ce81c9c816e6e68db89ca12b4d8
+  source:
+    path: data/substances/phenylpiracetam__sub_wx4uag2gjl.yaml
+    field: notes
+    substance_id: sub_wx4uag2gjl
+  destination:
+    kind: knowledge
+    path: data/substances/phenylpiracetam__sub_wx4uag2gjl.yaml
+    substance_id: sub_wx4uag2gjl
+    field: knowledge.effect[0]
+    value: stimulant_context
+  disposition: typed_destination
+- atom_id: 06837f91fde9359ed48d978509d8a5882aec4ce81c9c816e6e68db89ca12b4d8:004
+  span_id: 06837f91fde9359ed48d978509d8a5882aec4ce81c9c816e6e68db89ca12b4d8
+  source:
+    path: data/substances/phenylpiracetam__sub_wx4uag2gjl.yaml
+    field: notes
+    substance_id: sub_wx4uag2gjl
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 3ba69862c02ed8eb81abf630f16cfda54eeb5b4fbf7f5d90281e38fd7f15e928:001
+  span_id: 3ba69862c02ed8eb81abf630f16cfda54eeb5b4fbf7f5d90281e38fd7f15e928
+  source:
+    path: data/substances/phosphatidylcholine__sub_dcxfwd4udf.yaml
+    field: notes
+    substance_id: sub_dcxfwd4udf
+  destination:
+    kind: composition
+    path: data/products/swanson__100_pure_krill_oil__prd_y57omgja5w.yaml
+    component_id: cmp_prd_y57omgja5w__sub_dcxfwd4udf
+    product_id: prd_y57omgja5w
+    substance_id: sub_dcxfwd4udf
+  disposition: typed_destination
+- atom_id: 3ba69862c02ed8eb81abf630f16cfda54eeb5b4fbf7f5d90281e38fd7f15e928:002
+  span_id: 3ba69862c02ed8eb81abf630f16cfda54eeb5b4fbf7f5d90281e38fd7f15e928
+  source:
+    path: data/substances/phosphatidylcholine__sub_dcxfwd4udf.yaml
+    field: notes
+    substance_id: sub_dcxfwd4udf
+  destination:
+    kind: identity
+    path: data/substances/phosphatidylcholine__sub_dcxfwd4udf.yaml
+    substance_id: sub_dcxfwd4udf
+    field: name
+  disposition: typed_destination
+- atom_id: 6061646cddcb511898566731ad238756f6df6e5ff1a95dfa9d47c0f30a00b9d3:001
+  span_id: 6061646cddcb511898566731ad238756f6df6e5ff1a95dfa9d47c0f30a00b9d3
+  source:
+    path: data/substances/phosphatidylserine__sub_3rko0nen14.yaml
+    field: notes
+    substance_id: sub_3rko0nen14
+  destination:
+    kind: identity
+    path: data/substances/phosphatidylserine__sub_3rko0nen14.yaml
+    substance_id: sub_3rko0nen14
+    field: name
+  disposition: typed_destination
+- atom_id: 6061646cddcb511898566731ad238756f6df6e5ff1a95dfa9d47c0f30a00b9d3:002
+  span_id: 6061646cddcb511898566731ad238756f6df6e5ff1a95dfa9d47c0f30a00b9d3
+  source:
+    path: data/substances/phosphatidylserine__sub_3rko0nen14.yaml
+    field: notes
+    substance_id: sub_3rko0nen14
+  destination:
+    kind: identity
+    path: data/substances/phosphatidylserine__sub_3rko0nen14.yaml
+    substance_id: sub_3rko0nen14
+    field: name
+  disposition: typed_destination
+- atom_id: 6061646cddcb511898566731ad238756f6df6e5ff1a95dfa9d47c0f30a00b9d3:003
+  span_id: 6061646cddcb511898566731ad238756f6df6e5ff1a95dfa9d47c0f30a00b9d3
+  source:
+    path: data/substances/phosphatidylserine__sub_3rko0nen14.yaml
+    field: notes
+    substance_id: sub_3rko0nen14
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 91994b859d3440b863a51f3d78fd5f28649858610d172a426253a0d0028aa936:001
+  span_id: 91994b859d3440b863a51f3d78fd5f28649858610d172a426253a0d0028aa936
+  source:
+    path: data/substances/phospholipids__sub_t8sx7e49j7.yaml
+    field: notes
+    substance_id: sub_t8sx7e49j7
+  destination:
+    kind: composition
+    path: data/products/psalae__antarctiv_krill_oil__prd_w2s970gps4.yaml
+    component_id: cmp_prd_w2s970gps4__sub_t8sx7e49j7
+    product_id: prd_w2s970gps4
+    substance_id: sub_t8sx7e49j7
+  disposition: typed_destination
+- atom_id: 91994b859d3440b863a51f3d78fd5f28649858610d172a426253a0d0028aa936:002
+  span_id: 91994b859d3440b863a51f3d78fd5f28649858610d172a426253a0d0028aa936
+  source:
+    path: data/substances/phospholipids__sub_t8sx7e49j7.yaml
+    field: notes
+    substance_id: sub_t8sx7e49j7
+  destination:
+    kind: identity
+    path: data/substances/phospholipids__sub_t8sx7e49j7.yaml
+    substance_id: sub_t8sx7e49j7
+    field: name
+  disposition: typed_destination
+- atom_id: 91994b859d3440b863a51f3d78fd5f28649858610d172a426253a0d0028aa936:003
+  span_id: 91994b859d3440b863a51f3d78fd5f28649858610d172a426253a0d0028aa936
+  source:
+    path: data/substances/phospholipids__sub_t8sx7e49j7.yaml
+    field: notes
+    substance_id: sub_t8sx7e49j7
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 8c0f912f90c254da2bfcc03edaf1cc4b14628a605cddd041c29ab18efcc08697:001
+  span_id: 8c0f912f90c254da2bfcc03edaf1cc4b14628a605cddd041c29ab18efcc08697
+  source:
+    path: data/substances/phosphorus__sub_vtbzgqylmd.yaml
+    field: notes
+    substance_id: sub_vtbzgqylmd
+  destination:
+    kind: composition
+    path: data/products/source_naturals__calcium_hydroxyapatite__prd_py5nr1nl9r.yaml
+    component_id: cmp_prd_py5nr1nl9r__sub_vtbzgqylmd
+    product_id: prd_py5nr1nl9r
+    substance_id: sub_vtbzgqylmd
+  disposition: typed_destination
+- atom_id: 8c0f912f90c254da2bfcc03edaf1cc4b14628a605cddd041c29ab18efcc08697:002
+  span_id: 8c0f912f90c254da2bfcc03edaf1cc4b14628a605cddd041c29ab18efcc08697
+  source:
+    path: data/substances/phosphorus__sub_vtbzgqylmd.yaml
+    field: notes
+    substance_id: sub_vtbzgqylmd
+  destination:
+    kind: identity
+    path: data/substances/phosphorus__sub_vtbzgqylmd.yaml
+    substance_id: sub_vtbzgqylmd
+    field: name
+  disposition: typed_destination
+- atom_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907:001
+  span_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907
+  source:
+    path: data/substances/picamilon_sodium_nicotinoyl_gamma_aminobutyrate__sub_396c221c31.yaml
+    field: notes
+    substance_id: sub_396c221c31
+  destination:
+    kind: identity
+    path: data/substances/picamilon_sodium_nicotinoyl_gamma_aminobutyrate__sub_396c221c31.yaml
+    substance_id: sub_396c221c31
+    field: name
+  disposition: typed_destination
+- atom_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907:002
+  span_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907
+  source:
+    path: data/substances/picamilon_sodium_nicotinoyl_gamma_aminobutyrate__sub_396c221c31.yaml
+    field: notes
+    substance_id: sub_396c221c31
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907:003
+  span_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907
+  source:
+    path: data/substances/picamilon_sodium_nicotinoyl_gamma_aminobutyrate__sub_396c221c31.yaml
+    field: notes
+    substance_id: sub_396c221c31
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907:004
+  span_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907
+  source:
+    path: data/substances/picamilon_sodium_nicotinoyl_gamma_aminobutyrate__sub_396c221c31.yaml
+    field: notes
+    substance_id: sub_396c221c31
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907:005
+  span_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907
+  source:
+    path: data/substances/picamilon_sodium_nicotinoyl_gamma_aminobutyrate__sub_396c221c31.yaml
+    field: notes
+    substance_id: sub_396c221c31
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907:006
+  span_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907
+  source:
+    path: data/substances/picamilon_sodium_nicotinoyl_gamma_aminobutyrate__sub_396c221c31.yaml
+    field: notes
+    substance_id: sub_396c221c31
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907:007
+  span_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907
+  source:
+    path: data/substances/picamilon_sodium_nicotinoyl_gamma_aminobutyrate__sub_396c221c31.yaml
+    field: notes
+    substance_id: sub_396c221c31
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907:008
+  span_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907
+  source:
+    path: data/substances/picamilon_sodium_nicotinoyl_gamma_aminobutyrate__sub_396c221c31.yaml
+    field: notes
+    substance_id: sub_396c221c31
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907:009
+  span_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907
+  source:
+    path: data/substances/picamilon_sodium_nicotinoyl_gamma_aminobutyrate__sub_396c221c31.yaml
+    field: notes
+    substance_id: sub_396c221c31
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907:010
+  span_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907
+  source:
+    path: data/substances/picamilon_sodium_nicotinoyl_gamma_aminobutyrate__sub_396c221c31.yaml
+    field: notes
+    substance_id: sub_396c221c31
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907:011
+  span_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907
+  source:
+    path: data/substances/picamilon_sodium_nicotinoyl_gamma_aminobutyrate__sub_396c221c31.yaml
+    field: notes
+    substance_id: sub_396c221c31
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907:012
+  span_id: 34526e5fbab7880cebfaae14179cc9d757dd5583a930ef91da88ce15ddfe2907
+  source:
+    path: data/substances/picamilon_sodium_nicotinoyl_gamma_aminobutyrate__sub_396c221c31.yaml
+    field: notes
+    substance_id: sub_396c221c31
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 2c8fe82fe1b319cb594324d48a11af341378c424200c53e32a3127358f2374b7:001
+  span_id: 2c8fe82fe1b319cb594324d48a11af341378c424200c53e32a3127358f2374b7
+  source:
+    path: data/substances/piracetam__sub_myk9ogtz49.yaml
+    field: notes
+    substance_id: sub_myk9ogtz49
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 2c8fe82fe1b319cb594324d48a11af341378c424200c53e32a3127358f2374b7:002
+  span_id: 2c8fe82fe1b319cb594324d48a11af341378c424200c53e32a3127358f2374b7
+  source:
+    path: data/substances/piracetam__sub_myk9ogtz49.yaml
+    field: notes
+    substance_id: sub_myk9ogtz49
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 2c8fe82fe1b319cb594324d48a11af341378c424200c53e32a3127358f2374b7:003
+  span_id: 2c8fe82fe1b319cb594324d48a11af341378c424200c53e32a3127358f2374b7
+  source:
+    path: data/substances/piracetam__sub_myk9ogtz49.yaml
+    field: notes
+    substance_id: sub_myk9ogtz49
+  disposition: discarded
+  discard_reason: clinical_or_safety_scope
+- atom_id: 2c8fe82fe1b319cb594324d48a11af341378c424200c53e32a3127358f2374b7:004
+  span_id: 2c8fe82fe1b319cb594324d48a11af341378c424200c53e32a3127358f2374b7
+  source:
+    path: data/substances/piracetam__sub_myk9ogtz49.yaml
+    field: notes
+    substance_id: sub_myk9ogtz49
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 2c8fe82fe1b319cb594324d48a11af341378c424200c53e32a3127358f2374b7:005
+  span_id: 2c8fe82fe1b319cb594324d48a11af341378c424200c53e32a3127358f2374b7
+  source:
+    path: data/substances/piracetam__sub_myk9ogtz49.yaml
+    field: notes
+    substance_id: sub_myk9ogtz49
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 2c8fe82fe1b319cb594324d48a11af341378c424200c53e32a3127358f2374b7:006
+  span_id: 2c8fe82fe1b319cb594324d48a11af341378c424200c53e32a3127358f2374b7
+  source:
+    path: data/substances/piracetam__sub_myk9ogtz49.yaml
+    field: notes
+    substance_id: sub_myk9ogtz49
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 134c17529162f427c9c33b5b2653de680ebb1ff19d74b3b0376e273d88a17f8c:001
+  span_id: 134c17529162f427c9c33b5b2653de680ebb1ff19d74b3b0376e273d88a17f8c
+  source:
+    path: data/substances/plant_sterols_stanols__sub_sterol0001.yaml
+    field: notes
+    substance_id: sub_sterol0001
+  destination:
+    kind: knowledge
+    path: data/substances/plant_sterols_stanols__sub_sterol0001.yaml
+    substance_id: sub_sterol0001
+    field: knowledge.kind[0]
+    value: phytosterol
+  disposition: typed_destination
+- atom_id: 134c17529162f427c9c33b5b2653de680ebb1ff19d74b3b0376e273d88a17f8c:002
+  span_id: 134c17529162f427c9c33b5b2653de680ebb1ff19d74b3b0376e273d88a17f8c
+  source:
+    path: data/substances/plant_sterols_stanols__sub_sterol0001.yaml
+    field: notes
+    substance_id: sub_sterol0001
+  disposition: discarded
+  discard_reason: no_exact_scheduling_direction
+- atom_id: 1bd7b5cd1a537d6534b4ff743de6142a7950ea9a4c1dcd5b5a34f8f6fa75f465:001
+  span_id: 1bd7b5cd1a537d6534b4ff743de6142a7950ea9a4c1dcd5b5a34f8f6fa75f465
+  source:
+    path: data/substances/pomegranate__sub_hgcwehsc12.yaml
+    field: notes
+    substance_id: sub_hgcwehsc12
+  destination:
+    kind: identity
+    path: data/substances/pomegranate__sub_hgcwehsc12.yaml
+    substance_id: sub_hgcwehsc12
+    field: name
+  disposition: typed_destination
+- atom_id: 1bd7b5cd1a537d6534b4ff743de6142a7950ea9a4c1dcd5b5a34f8f6fa75f465:002
+  span_id: 1bd7b5cd1a537d6534b4ff743de6142a7950ea9a4c1dcd5b5a34f8f6fa75f465
+  source:
+    path: data/substances/pomegranate__sub_hgcwehsc12.yaml
+    field: notes
+    substance_id: sub_hgcwehsc12
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: d1c5811b83f09bbb19002240c8a5ea3805a5fd10c320ab608ce51432ec208d6a:001
+  span_id: d1c5811b83f09bbb19002240c8a5ea3805a5fd10c320ab608ce51432ec208d6a
+  source:
+    path: data/substances/potassium_citrate__sub_f7780f899b.yaml
+    field: notes
+    substance_id: sub_f7780f899b
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: d1c5811b83f09bbb19002240c8a5ea3805a5fd10c320ab608ce51432ec208d6a:002
+  span_id: d1c5811b83f09bbb19002240c8a5ea3805a5fd10c320ab608ce51432ec208d6a
+  source:
+    path: data/substances/potassium_citrate__sub_f7780f899b.yaml
+    field: notes
+    substance_id: sub_f7780f899b
+  destination:
+    kind: composition
+    path: data/products/now_foods__potassium_citrate_99_mg__prd_97fc03c4c0.yaml
+    component_id: cmp_prd_97fc03c4c0__sub_f7780f899b
+    product_id: prd_97fc03c4c0
+    substance_id: sub_f7780f899b
+  disposition: typed_destination
+- atom_id: d1c5811b83f09bbb19002240c8a5ea3805a5fd10c320ab608ce51432ec208d6a:003
+  span_id: d1c5811b83f09bbb19002240c8a5ea3805a5fd10c320ab608ce51432ec208d6a
+  source:
+    path: data/substances/potassium_citrate__sub_f7780f899b.yaml
+    field: notes
+    substance_id: sub_f7780f899b
+  destination:
+    kind: candidate
+    path: data/scheduling-candidates.yaml
+    candidate_id: cand_exercise_electrolyte_potassium_cmp_prd_20bf2df267__sub_f7780f899b
+  disposition: typed_destination
+- atom_id: d1c5811b83f09bbb19002240c8a5ea3805a5fd10c320ab608ce51432ec208d6a:004
+  span_id: d1c5811b83f09bbb19002240c8a5ea3805a5fd10c320ab608ce51432ec208d6a
+  source:
+    path: data/substances/potassium_citrate__sub_f7780f899b.yaml
+    field: notes
+    substance_id: sub_f7780f899b
+  destination:
+    kind: knowledge
+    path: data/substances/potassium_citrate__sub_f7780f899b.yaml
+    substance_id: sub_f7780f899b
+    field: knowledge.risk[0]
+    value: hyperkalemia_med_interaction
+  disposition: typed_destination
+- atom_id: d1c5811b83f09bbb19002240c8a5ea3805a5fd10c320ab608ce51432ec208d6a:005
+  span_id: d1c5811b83f09bbb19002240c8a5ea3805a5fd10c320ab608ce51432ec208d6a
+  source:
+    path: data/substances/potassium_citrate__sub_f7780f899b.yaml
+    field: notes
+    substance_id: sub_f7780f899b
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: ceec9292cfe9c78bd6575f36e2a090813930c363697c0e16f8ab62707ca7a0ee:001
+  span_id: ceec9292cfe9c78bd6575f36e2a090813930c363697c0e16f8ab62707ca7a0ee
+  source:
+    path: data/substances/pramiracetam__sub_fg8cmza0q0.yaml
+    field: notes
+    substance_id: sub_fg8cmza0q0
+  destination:
+    kind: knowledge
+    path: data/substances/pramiracetam__sub_fg8cmza0q0.yaml
+    substance_id: sub_fg8cmza0q0
+    field: knowledge.role[0]
+    value: nootropic
+  disposition: typed_destination
+- atom_id: ceec9292cfe9c78bd6575f36e2a090813930c363697c0e16f8ab62707ca7a0ee:002
+  span_id: ceec9292cfe9c78bd6575f36e2a090813930c363697c0e16f8ab62707ca7a0ee
+  source:
+    path: data/substances/pramiracetam__sub_fg8cmza0q0.yaml
+    field: notes
+    substance_id: sub_fg8cmza0q0
+  destination:
+    kind: knowledge
+    path: data/substances/pramiracetam__sub_fg8cmza0q0.yaml
+    substance_id: sub_fg8cmza0q0
+    field: knowledge.effect[0]
+    value: cholinergic_support
+  disposition: typed_destination
+- atom_id: ceec9292cfe9c78bd6575f36e2a090813930c363697c0e16f8ab62707ca7a0ee:003
+  span_id: ceec9292cfe9c78bd6575f36e2a090813930c363697c0e16f8ab62707ca7a0ee
+  source:
+    path: data/substances/pramiracetam__sub_fg8cmza0q0.yaml
+    field: notes
+    substance_id: sub_fg8cmza0q0
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: f3278a5a7b61914ce8beb320bcf2792af54d58b78b0c92757d61a69b7a0af91f:001
+  span_id: f3278a5a7b61914ce8beb320bcf2792af54d58b78b0c92757d61a69b7a0af91f
+  source:
+    path: data/substances/probiotic_blend__sub_knwnyl1a9i.yaml
+    field: notes
+    substance_id: sub_knwnyl1a9i
+  destination:
+    kind: identity
+    path: data/substances/probiotic_blend__sub_knwnyl1a9i.yaml
+    substance_id: sub_knwnyl1a9i
+    field: name
+  disposition: typed_destination
+- atom_id: f3278a5a7b61914ce8beb320bcf2792af54d58b78b0c92757d61a69b7a0af91f:002
+  span_id: f3278a5a7b61914ce8beb320bcf2792af54d58b78b0c92757d61a69b7a0af91f
+  source:
+    path: data/substances/probiotic_blend__sub_knwnyl1a9i.yaml
+    field: notes
+    substance_id: sub_knwnyl1a9i
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: f3278a5a7b61914ce8beb320bcf2792af54d58b78b0c92757d61a69b7a0af91f:003
+  span_id: f3278a5a7b61914ce8beb320bcf2792af54d58b78b0c92757d61a69b7a0af91f
+  source:
+    path: data/substances/probiotic_blend__sub_knwnyl1a9i.yaml
+    field: notes
+    substance_id: sub_knwnyl1a9i
+  destination:
+    kind: knowledge
+    path: data/substances/probiotic_blend__sub_knwnyl1a9i.yaml
+    substance_id: sub_knwnyl1a9i
+    field: knowledge.effect[0]
+    value: gut_microbiome_context
+  disposition: typed_destination
+- atom_id: f3278a5a7b61914ce8beb320bcf2792af54d58b78b0c92757d61a69b7a0af91f:004
+  span_id: f3278a5a7b61914ce8beb320bcf2792af54d58b78b0c92757d61a69b7a0af91f
+  source:
+    path: data/substances/probiotic_blend__sub_knwnyl1a9i.yaml
+    field: notes
+    substance_id: sub_knwnyl1a9i
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 1a066c84563ee69c9717a222326a8da3f917e388b8099d8232347c6a705836e8:001
+  span_id: 1a066c84563ee69c9717a222326a8da3f917e388b8099d8232347c6a705836e8
+  source:
+    path: data/substances/psyllium_husk__sub_psyllium01.yaml
+    field: notes
+    substance_id: sub_psyllium01
+  destination:
+    kind: identity
+    path: data/substances/psyllium_husk__sub_psyllium01.yaml
+    substance_id: sub_psyllium01
+    field: name
+  disposition: typed_destination
+- atom_id: 1a066c84563ee69c9717a222326a8da3f917e388b8099d8232347c6a705836e8:002
+  span_id: 1a066c84563ee69c9717a222326a8da3f917e388b8099d8232347c6a705836e8
+  source:
+    path: data/substances/psyllium_husk__sub_psyllium01.yaml
+    field: notes
+    substance_id: sub_psyllium01
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 1a066c84563ee69c9717a222326a8da3f917e388b8099d8232347c6a705836e8:003
+  span_id: 1a066c84563ee69c9717a222326a8da3f917e388b8099d8232347c6a705836e8
+  source:
+    path: data/substances/psyllium_husk__sub_psyllium01.yaml
+    field: notes
+    substance_id: sub_psyllium01
+  destination:
+    kind: identity
+    path: data/substances/psyllium_husk__sub_psyllium01.yaml
+    substance_id: sub_psyllium01
+    field: name
+  disposition: typed_destination
+- atom_id: faaf4d0ac77294ab54dba3aa20b5aea5d1494054fb292684d69d263bdb8b1b74:001
+  span_id: faaf4d0ac77294ab54dba3aa20b5aea5d1494054fb292684d69d263bdb8b1b74
+  source:
+    path: data/substances/pycnogenol__sub_cowvco2tzs.yaml
+    field: notes
+    substance_id: sub_cowvco2tzs
+  destination:
+    kind: identity
+    path: data/substances/pycnogenol__sub_cowvco2tzs.yaml
+    substance_id: sub_cowvco2tzs
+    field: name
+  disposition: typed_destination
+- atom_id: faaf4d0ac77294ab54dba3aa20b5aea5d1494054fb292684d69d263bdb8b1b74:002
+  span_id: faaf4d0ac77294ab54dba3aa20b5aea5d1494054fb292684d69d263bdb8b1b74
+  source:
+    path: data/substances/pycnogenol__sub_cowvco2tzs.yaml
+    field: notes
+    substance_id: sub_cowvco2tzs
+  destination:
+    kind: identity
+    path: data/substances/pycnogenol__sub_cowvco2tzs.yaml
+    substance_id: sub_cowvco2tzs
+    field: name
+  disposition: typed_destination
+- atom_id: faaf4d0ac77294ab54dba3aa20b5aea5d1494054fb292684d69d263bdb8b1b74:003
+  span_id: faaf4d0ac77294ab54dba3aa20b5aea5d1494054fb292684d69d263bdb8b1b74
+  source:
+    path: data/substances/pycnogenol__sub_cowvco2tzs.yaml
+    field: notes
+    substance_id: sub_cowvco2tzs
+  disposition: discarded
+  discard_reason: receipt_only_metadata
+- atom_id: 99e76a2f05c3eec9c4e9ccfd5fece117562aa592eeb8f28dee98e9fc695c376e:001
+  span_id: 99e76a2f05c3eec9c4e9ccfd5fece117562aa592eeb8f28dee98e9fc695c376e
+  source:
+    path: data/substances/pyrroloquinoline_quinone_disodium_salt__sub_voq9sum2hq.yaml
+    field: notes
+    substance_id: sub_voq9sum2hq
+  destination:
+    kind: composition
+    path: data/products/california_gold_nutrition__nicotinamide_riboside_tartrate_nrt_complex__prd_ecl277i8db.yaml
+    component_id: cmp_prd_ecl277i8db__sub_voq9sum2hq
+    product_id: prd_ecl277i8db
+    substance_id: sub_voq9sum2hq
+  disposition: typed_destination
+- atom_id: 99e76a2f05c3eec9c4e9ccfd5fece117562aa592eeb8f28dee98e9fc695c376e:002
+  span_id: 99e76a2f05c3eec9c4e9ccfd5fece117562aa592eeb8f28dee98e9fc695c376e
+  source:
+    path: data/substances/pyrroloquinoline_quinone_disodium_salt__sub_voq9sum2hq.yaml
+    field: notes
+    substance_id: sub_voq9sum2hq
+  destination:
+    kind: knowledge
+    path: data/substances/pyrroloquinoline_quinone_disodium_salt__sub_voq9sum2hq.yaml
+    substance_id: sub_voq9sum2hq
+    field: knowledge.context[0]
+    value: mitochondrial_health
+  disposition: typed_destination
+- atom_id: 99e76a2f05c3eec9c4e9ccfd5fece117562aa592eeb8f28dee98e9fc695c376e:003
+  span_id: 99e76a2f05c3eec9c4e9ccfd5fece117562aa592eeb8f28dee98e9fc695c376e
+  source:
+    path: data/substances/pyrroloquinoline_quinone_disodium_salt__sub_voq9sum2hq.yaml
+    field: notes
+    substance_id: sub_voq9sum2hq
+  destination:
+    kind: knowledge
+    path: data/substances/pyrroloquinoline_quinone_disodium_salt__sub_voq9sum2hq.yaml
+    substance_id: sub_voq9sum2hq
+    field: knowledge.effect[0]
+    value: mitochondrial_biogenesis_context
+  disposition: typed_destination
+- atom_id: 6ccafd0ed3157293c0cbe5d87d526cd0d27b75de58b506e05f5207be45d288fc:001
+  span_id: 6ccafd0ed3157293c0cbe5d87d526cd0d27b75de58b506e05f5207be45d288fc
+  source:
+    path: data/substances/quercetin_dihydrate__sub_tgw6yhz9u9.yaml
+    field: notes
+    substance_id: sub_tgw6yhz9u9
+  destination:
+    kind: knowledge
+    path: data/substances/quercetin_dihydrate__sub_tgw6yhz9u9.yaml
+    substance_id: sub_tgw6yhz9u9
+    field: knowledge.effect[0]
+    value: anti_inflammatory_context
+  disposition: typed_destination
+- atom_id: 6ccafd0ed3157293c0cbe5d87d526cd0d27b75de58b506e05f5207be45d288fc:002
+  span_id: 6ccafd0ed3157293c0cbe5d87d526cd0d27b75de58b506e05f5207be45d288fc
+  source:
+    path: data/substances/quercetin_dihydrate__sub_tgw6yhz9u9.yaml
+    field: notes
+    substance_id: sub_tgw6yhz9u9
+  destination:
+    kind: knowledge
+    path: data/substances/quercetin_dihydrate__sub_tgw6yhz9u9.yaml
+    substance_id: sub_tgw6yhz9u9
+    field: knowledge.risk[1]
+    value: bleeding_med_interaction
+  disposition: typed_destination
+- atom_id: 6ccafd0ed3157293c0cbe5d87d526cd0d27b75de58b506e05f5207be45d288fc:003
+  span_id: 6ccafd0ed3157293c0cbe5d87d526cd0d27b75de58b506e05f5207be45d288fc
+  source:
+    path: data/substances/quercetin_dihydrate__sub_tgw6yhz9u9.yaml
+    field: notes
+    substance_id: sub_tgw6yhz9u9
+  disposition: discarded
+  discard_reason: receipt_only_metadata

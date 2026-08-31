@@ -1,7 +1,6 @@
 id: sub_157418854b
 name: Vitamin B12
 form: methylcobalamin
-notes: 'Coenzyme B-Complex component: methylcobalamin active B12 form. Physiological and deficiency context: vitamin B12 is required for central nervous system development and function, DNA synthesis, and healthy red blood cell formation; these functions and deficiency-repletion contexts do not establish cognitive or performance enhancement in people who are replete. NIH ODS does not establish methylcobalamin superiority over other supplemental B12 forms; preserve product formulation disclosure.'
 knowledge:
   context:
   - value: neurocognitive_support

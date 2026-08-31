@@ -1,8 +1,6 @@
 id: sub_49c7531eaf
 name: Vitamin C
 form: ascorbic acid
-notes: Water-soluble vitamin C form. Reviewer context includes antioxidant support and collagen-hydroxylation cofactor role;
-  product cards retain dose/form details.
 knowledge:
   context:
   - value: connective_tissue_support

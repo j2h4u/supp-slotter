@@ -3,9 +3,6 @@ form: extract
 aliases:
 - Crocus sativus
 - Saffron stigma extract
-notes: 'Knowledge-only popular mood/cognitive-adjacent botanical reference card. Added because saffron is a common supplement
-  category and should be visible to expert panels without implying it belongs in the active stack. Sources checked: NCCIH
-  depression complementary-health summary; Drugs.com saffron monograph.'
 knowledge:
   effect:
   - value: stress_reactivity_context

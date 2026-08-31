@@ -3,8 +3,6 @@ form: extract
 aliases:
 - Sambucus nigra
 - Black elderberry
-notes: 'Knowledge-only popular immune botanical reference card. Added because elderberry is a common cold/flu-season supplement
-  category. Source checked: NCCIH elderberry usefulness and safety page.'
 knowledge:
   context:
   - value: antioxidant_protection

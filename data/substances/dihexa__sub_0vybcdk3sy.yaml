@@ -3,9 +3,6 @@ aliases:
 - PNB-0408
 - N-hexanoic-Tyr-Ile-(6)-aminohexanoic amide
 - Hexanoyl-Tyr-Ile-Ahx-NH2
-notes: Knowledge-only experimental nootropic peptide reference card. Published preclinical literature describes Dihexa as
-  an angiotensin-IV-derived HGF/c-Met potentiator with synaptogenic/procognitive effects in animal models; it is not a routine
-  supplement or approved human therapy. Sources checked - PubMed 25187433; PubChem CID 129010512.
 concerns:
 - kind: model_gap
   text: The ontology does not yet have a dedicated HGF/c-Met or growth-factor-pathway trait; neurotrophic_support plus manual_review

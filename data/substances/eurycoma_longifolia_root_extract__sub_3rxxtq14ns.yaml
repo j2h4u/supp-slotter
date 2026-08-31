@@ -4,9 +4,6 @@ aliases:
 - Tongkat Ali
 - Longjack
 - Malaysian ginseng
-notes: Knowledge-only men's-health/adaptogen reference card. Added because Tongkat Ali is a mainstream testosterone/libido/stress
-  supplement category, but safety, standardization, and regulatory conclusions are mixed. Sources checked - NCBI LiverTox
-  Tongkat Ali monograph; PubMed EFSA novel-food safety opinion; PubMed systematic review on erectile-function outcomes.
 concerns:
 - kind: data_quality
   text: Product cards should capture extract ratio, eurycomanone or other marker standardization, dose, country/regulatory

@@ -85,9 +85,6 @@ components:
 - substance: sub_699a985e61
   id: cmp_prd_io1peb9syp__sub_699a985e61
   label: Amino Men Blend — L-Arginine
-  notes: Per-component amount not disclosed; Amino Men Blend totals 1 g (1000 mg)
-    per 3-tablet serving and contains L-arginine, L-glutamine, L-lysine, L-cystine,
-    L-isoleucine, L-leucine, L-valine, and L-threonine.
 - substance: sub_85w45nbob4
   id: cmp_prd_io1peb9syp__sub_85w45nbob4
   label: Amino Men Blend — L-Glutamine
@@ -112,10 +109,6 @@ components:
 - substance: sub_473g9ayhsx
   id: cmp_prd_io1peb9syp__sub_473g9ayhsx
   label: Phyto Men Blend — green tea extract
-  notes: Per-component amount not disclosed; Phyto Men Blend totals 100 mg per serving
-    and additionally contains generic fruit/vegetable powders (bilberry, black currant,
-    blueberry, cranberry, elderberry, kiwi, papaya, and related botanicals) which
-    are not encoded as separate substance cards per intake policy.
 - substance: sub_qlkk9ibms6
   id: cmp_prd_io1peb9syp__sub_qlkk9ibms6
   label: Phyto Men Blend — hesperidin
@@ -128,9 +121,6 @@ components:
 - substance: sub_4hnr2u8j89
   id: cmp_prd_io1peb9syp__sub_4hnr2u8j89
   label: Viri Men Blend — Panax ginseng
-  notes: Per-component amount not disclosed; Viri Men Blend totals 50 mg per serving
-    and additionally contains gum arabic (excipient), oyster extract, and pumpkin
-    seed which are not encoded as separate substance cards per intake policy.
 - substance: sub_fcu3pm6l13
   id: cmp_prd_io1peb9syp__sub_fcu3pm6l13
   label: Viri Men Blend — stinging nettle
@@ -143,8 +133,6 @@ components:
 - substance: sub_mw9uw4se1u
   id: cmp_prd_io1peb9syp__sub_mw9uw4se1u
   label: Enzyme Blend — papain
-  notes: Per-component amount not disclosed; Enzyme Blend totals 50 mg per serving
-    and contains papain, bromelain, alpha amylase, and lipase.
 - substance: sub_6tk5moz0wh
   id: cmp_prd_io1peb9syp__sub_6tk5moz0wh
   label: Enzyme Blend — bromelain
@@ -174,11 +162,4 @@ components:
   id: cmp_prd_io1peb9syp__sub_262gmd1vf1
   label: Zeaxanthin
   amount: 28 mcg
-notes: 'Serving size: 3 tablets. Package: 150 tablets. Servings per container: 50.
-  Suggested use: consume 3 tablets with food; limit 1 serving per day. Other ingredients:
-  microcrystalline cellulose, stearic acid, HPMC, croscarmellose sodium, magnesium
-  stearate, silica, glycerine, sunflower oil, carnauba wax. Sodium content (incidental
-  from various salts) is reported on the label but not encoded as a separate substance
-  component. Generic fruit/vegetable powders within proprietary blends are noted but
-  not split into separate substance cards.'
 id: prd_io1peb9syp
