@@ -110,6 +110,7 @@ class CanonicalPressureMatch(TypedDict):
     fact_ids: list[str]
     law_ids: list[str]
     applicability_role_ids: list[str]
+    applicability_product_ids: list[str]
     provenance_refs: list[CanonicalProvenanceRef]
 
 

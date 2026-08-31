@@ -96,6 +96,7 @@ def _pressure_match(
         "fact_ids": sorted({derivation.fact_id for derivation in pressure.derivations}),
         "law_ids": sorted({derivation.law_id for derivation in pressure.derivations}),
         "applicability_role_ids": sorted({derivation.path.role_id for derivation in pressure.derivations}),
+        "applicability_product_ids": sorted({derivation.path.product for derivation in pressure.derivations}),
         "provenance_refs": [provenance[key] for key in sorted(provenance)],
     }
 
