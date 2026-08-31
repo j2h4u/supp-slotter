@@ -61,6 +61,39 @@
         },
         {
           "id": "src_card_sub_iu7b8h87g2_notes"
+        },
+        {
+          "id": "src_pubmed_19734684"
+        },
+        {
+          "id": "src_pubmed_12885395"
+        },
+        {
+          "id": "src_card_sub_249199f726_notes"
+        },
+        {
+          "id": "src_card_prd_8mvv1w128a"
+        },
+        {
+          "id": "src_card_prd_e5cc3b4e7c"
+        },
+        {
+          "id": "src_card_prd_w2s970gps4"
+        },
+        {
+          "id": "src_pubmed_25884846"
+        },
+        {
+          "id": "src_pubmed_26328782"
+        },
+        {
+          "id": "src_nih_ods_omega3"
+        },
+        {
+          "id": "src_nccih_omega3"
+        },
+        {
+          "id": "src_life_extension_only_trace_minerals"
         }
       ],
       "facts": [
@@ -169,6 +202,118 @@
         },
         {
           "applicability": {
+            "composition_role": "cmp_prd_e5cc3b4e7c__sub_249199f726"
+          },
+          "family": "FoodEffect",
+          "id": "fact_food_prd_e5cc3b4e7c_sub_249199f726",
+          "provenance": [
+            {
+              "locator": "https://pubmed.ncbi.nlm.nih.gov/19734684/",
+              "source": "src_pubmed_19734684"
+            },
+            {
+              "locator": "https://pubmed.ncbi.nlm.nih.gov/12885395/",
+              "source": "src_pubmed_12885395"
+            },
+            {
+              "locator": "data/substances/astaxanthin__sub_249199f726.yaml#/notes",
+              "source": "src_card_sub_249199f726_notes"
+            }
+          ],
+          "subject": {
+            "composition_role": "cmp_prd_e5cc3b4e7c__sub_249199f726"
+          },
+          "value": "bioavailability_increases"
+        },
+        {
+          "applicability": {
+            "composition_role": "cmp_prd_8mvv1w128a__sub_249199f726"
+          },
+          "family": "FoodEffect",
+          "id": "fact_food_prd_8mvv1w128a_sub_249199f726",
+          "provenance": [
+            {
+              "locator": "https://pubmed.ncbi.nlm.nih.gov/19734684/",
+              "source": "src_pubmed_19734684"
+            },
+            {
+              "locator": "https://pubmed.ncbi.nlm.nih.gov/12885395/",
+              "source": "src_pubmed_12885395"
+            },
+            {
+              "locator": "data/products/psalae__astaxanthin__prd_8mvv1w128a.yaml",
+              "source": "src_card_prd_8mvv1w128a"
+            }
+          ],
+          "subject": {
+            "composition_role": "cmp_prd_8mvv1w128a__sub_249199f726"
+          },
+          "value": "bioavailability_increases"
+        },
+        {
+          "applicability": {
+            "composition_role": "cmp_prd_w2s970gps4__sub_249199f726"
+          },
+          "family": "FoodEffect",
+          "id": "fact_food_prd_w2s970gps4_sub_249199f726",
+          "provenance": [
+            {
+              "locator": "https://pubmed.ncbi.nlm.nih.gov/19734684/",
+              "source": "src_pubmed_19734684"
+            },
+            {
+              "locator": "https://pubmed.ncbi.nlm.nih.gov/12885395/",
+              "source": "src_pubmed_12885395"
+            },
+            {
+              "locator": "data/products/psalae__antarctiv_krill_oil__prd_w2s970gps4.yaml",
+              "source": "src_card_prd_w2s970gps4"
+            }
+          ],
+          "subject": {
+            "composition_role": "cmp_prd_w2s970gps4__sub_249199f726"
+          },
+          "value": "bioavailability_increases"
+        },
+        {
+          "applicability": {
+            "composition_role": "cmp_prd_w2s970gps4__sub_646e568f61"
+          },
+          "family": "FoodEffect",
+          "id": "fact_food_prd_w2s970gps4_sub_646e568f61",
+          "provenance": [
+            {
+              "locator": "https://pubmed.ncbi.nlm.nih.gov/30799231/",
+              "source": "src_pubmed_30799231"
+            },
+            {
+              "locator": "https://pubmed.ncbi.nlm.nih.gov/25884846/",
+              "source": "src_pubmed_25884846"
+            },
+            {
+              "locator": "https://pubmed.ncbi.nlm.nih.gov/26328782/",
+              "source": "src_pubmed_26328782"
+            },
+            {
+              "locator": "https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/",
+              "source": "src_nih_ods_omega3"
+            },
+            {
+              "locator": "https://www.nccih.nih.gov/health/omega3-supplements-in-depth",
+              "source": "src_nccih_omega3"
+            },
+            {
+              "locator": "data/products/psalae__antarctiv_krill_oil__prd_w2s970gps4.yaml",
+              "source": "src_card_prd_w2s970gps4"
+            }
+          ],
+          "subject": {
+            "composition_role": "cmp_prd_w2s970gps4__sub_646e568f61"
+          },
+          "value": "bioavailability_increases"
+        },
+        {
+          "applicability": {
             "composition_role": "cmp_prd_cfce0b36b6__sub_3918fe347e"
           },
           "family": "PreExercisePerformanceEffect",
@@ -191,6 +336,24 @@
             "composition_role": "cmp_prd_cfce0b36b6__sub_3918fe347e"
           },
           "value": "performance_improves"
+        },
+        {
+          "applicability": {
+            "product": "prd_932319251f"
+          },
+          "family": "ProductFoodInstruction",
+          "id": "fact_product_food_prd_932319251f",
+          "provenance": [
+            {
+              "locator": "https://www.lifeextension.com/vitamins-supplements/item01328/only-trace-minerals",
+              "quotation": "Take one capsule daily with food.",
+              "source": "src_life_extension_only_trace_minerals"
+            }
+          ],
+          "subject": {
+            "product": "prd_932319251f"
+          },
+          "value": "take_with_food"
         }
       ],
       "families": [
@@ -199,7 +362,8 @@
           "fact_values": [
             "acute_alertness_increases"
           ],
-          "id": "AcuteAlertnessEffect"
+          "id": "AcuteAlertnessEffect",
+          "target_kind": "fact_subject"
         },
         {
           "dimension": "circadian_anchor",
@@ -207,7 +371,8 @@
             "continuity_improves",
             "onset_latency_decreases"
           ],
-          "id": "AcuteSleepEffect"
+          "id": "AcuteSleepEffect",
+          "target_kind": "fact_subject"
         },
         {
           "dimension": "meal_context",
@@ -217,21 +382,32 @@
             "tolerability_improves",
             "tolerability_worsens"
           ],
-          "id": "FoodEffect"
+          "id": "FoodEffect",
+          "target_kind": "fact_subject"
         },
         {
           "dimension": "exercise_anchor",
           "fact_values": [
             "recovery_improves"
           ],
-          "id": "PostExerciseRecoveryEffect"
+          "id": "PostExerciseRecoveryEffect",
+          "target_kind": "fact_subject"
         },
         {
           "dimension": "exercise_anchor",
           "fact_values": [
             "performance_improves"
           ],
-          "id": "PreExercisePerformanceEffect"
+          "id": "PreExercisePerformanceEffect",
+          "target_kind": "fact_subject"
+        },
+        {
+          "dimension": "meal_context",
+          "fact_values": [
+            "take_with_food"
+          ],
+          "id": "ProductFoodInstruction",
+          "target_kind": "product"
         }
       ],
       "laws": [
@@ -297,6 +473,13 @@
           "family": "PreExercisePerformanceEffect",
           "id": "law_pre_exercise_performance_improves",
           "pressure_value": "before"
+        },
+        {
+          "dimension": "meal_context",
+          "fact_value": "take_with_food",
+          "family": "ProductFoodInstruction",
+          "id": "law_product_food_take_with_food",
+          "pressure_value": "with_food"
         }
       ]
     },
@@ -516,11 +699,11 @@
     ]
   },
   "provenance": {
-    "compiler_sha256": "ce8b3ef0a1b698a1e8c037e5b0f3b6c9ab53f1cd8363a196a8f93821c30b0406",
+    "compiler_sha256": "c9fbab7309a0862d92277b07b6d02a15c368fdeaa4d8da1da7c53054dc65d3a9",
     "manifest_schema_version": "2",
     "source": "ontology/runtime-policy.yaml",
     "source_sha256": "09669cccb6e9d100d96299cd7bb3a6f42d47acd61931d90d6422f9fd1401c066"
   },
   "schema_version": "2",
-  "source_hash": "8a46d04ee965da6222db1871d650d0b5c8a9511b6bbb144dec7bccde0eeaadf6"
+  "source_hash": "c193760c0e05c8a0b7c2706e9346cb5522c900c145afa37d77186d18c9398921"
 }

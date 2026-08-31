@@ -1903,7 +1903,9 @@ def _canonical_scheduling(
 
     fact_ranges = _catalog_root_ranges(schema_view, manifest, "canonical_facts")
     law_ranges = _catalog_root_ranges(schema_view, manifest, "canonical_laws")
-    families: dict[str, tuple[str, str, str]] = {}
+    # Compiler metadata tells the generic projection whether a family uses
+    # ordinary substance/role selectors or an exact product target.
+    families: dict[str, tuple[str, str, str, str]] = {}
     law_families: dict[str, tuple[str, str, str, str, str]] = {}
     evidence_collection: str | None = None
     for collection, class_name in fact_ranges.items():
@@ -1923,7 +1925,17 @@ def _canonical_scheduling(
             )
         if family in families:
             raise OntologyInfrastructureError(f"Canonical fact family {family!r} is declared more than once")
-        families[family] = (collection, value_slot, _class_slot_range(schema_view, class_name, value_slot))
+        target_kind = _annotation_value(definition, "canonical_fact_target_kind") or "fact_subject"
+        if target_kind not in {"fact_subject", "product"}:
+            raise OntologyInfrastructureError(
+                f"Canonical fact class {class_name} has an unsupported target kind {target_kind!r}"
+            )
+        families[family] = (
+            collection,
+            value_slot,
+            _class_slot_range(schema_view, class_name, value_slot),
+            target_kind,
+        )
     for collection, class_name in law_ranges.items():
         definition = schema_view.get_class(class_name)
         family = _annotation_value(definition, "canonical_fact_family")
@@ -1954,13 +1966,17 @@ def _canonical_scheduling(
         raise OntologyInfrastructureError("Canonical fact and law families must use the same value enum")
     facts: list[dict[str, object]] = []
     fact_ids: set[str] = set()
-    for family, (collection, value_slot, value_enum) in sorted(families.items()):
+    for family, (collection, value_slot, value_enum, target_kind) in sorted(families.items()):
         rows = fact_catalog.get(collection, [])
         admitted = set(_enum_values(schema_view, value_enum))
         if not isinstance(rows, list):
             raise OntologyInfrastructureError(f"Canonical fact collection {collection!r} must be a list")
         for index, raw in enumerate(rows):
-            expected = {"id", "subject", "applicability", "provenance", value_slot}
+            expected = (
+                {"id", "product", "provenance", value_slot}
+                if target_kind == "product"
+                else {"id", "subject", "applicability", "provenance", value_slot}
+            )
             if not isinstance(raw, Mapping) or set(raw) != expected:
                 raise OntologyInfrastructureError(f"Canonical fact {collection}[{index}] has an invalid closed shape")
             identifier, value = raw["id"], raw[value_slot]
@@ -1969,12 +1985,25 @@ def _canonical_scheduling(
             if not isinstance(value, str) or value not in admitted:
                 raise OntologyInfrastructureError(f"Canonical fact {identifier!r} has an unadmitted value")
             fact_ids.add(identifier)
-            facts.append({
-                "id": identifier,
-                "family": family,
-                **{key: raw[key] for key in ("subject", "applicability", "provenance")},
-                "value": value,
-            })
+            if target_kind == "product":
+                if not isinstance(raw["product"], str) or not raw["product"]:
+                    raise OntologyInfrastructureError(f"Canonical fact {identifier!r} has an invalid product target")
+                target = {"product": raw["product"]}
+                facts.append({
+                    "id": identifier,
+                    "family": family,
+                    "subject": target,
+                    "applicability": target,
+                    "provenance": raw["provenance"],
+                    "value": value,
+                })
+            else:
+                facts.append({
+                    "id": identifier,
+                    "family": family,
+                    **{key: raw[key] for key in ("subject", "applicability", "provenance")},
+                    "value": value,
+                })
     laws: list[dict[str, object]] = []
     law_ids: set[str] = set()
     for family, (collection, value_slot, dimension, pressure_slot, value_enum) in sorted(law_families.items()):
@@ -2017,8 +2046,9 @@ def _canonical_scheduling(
                 "id": family,
                 "fact_values": list(_enum_values(schema_view, value_enum)),
                 "dimension": law_families[family][2],
+                "target_kind": families[family][3],
             }
-            for family, (_, _, value_enum) in sorted(families.items())
+            for family, (_, _, value_enum, _) in sorted(families.items())
         ],
         "evidence_sources": sources,
         "facts": facts,

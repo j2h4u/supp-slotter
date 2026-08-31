@@ -13,6 +13,17 @@ evidence_sources:
   - id: src_pmc_13304508
   - id: src_card_sub_85w45nbob4_notes
   - id: src_card_sub_iu7b8h87g2_notes
+  - id: src_pubmed_19734684
+  - id: src_pubmed_12885395
+  - id: src_card_sub_249199f726_notes
+  - id: src_card_prd_8mvv1w128a
+  - id: src_card_prd_e5cc3b4e7c
+  - id: src_card_prd_w2s970gps4
+  - id: src_pubmed_25884846
+  - id: src_pubmed_26328782
+  - id: src_nih_ods_omega3
+  - id: src_nccih_omega3
+  - id: src_life_extension_only_trace_minerals
 food_effects:
   - id: fact_food_prd_eb6337a6dc_sub_2476bf9d4b
     subject:
@@ -69,6 +80,72 @@ food_effects:
         locator: data/substances/alpha_lipoic_acid__sub_iu7b8h87g2.yaml#/notes
         quotation: food may reduce absorption.
     value: bioavailability_decreases
+  - id: fact_food_prd_e5cc3b4e7c_sub_249199f726
+    subject:
+      composition_role: cmp_prd_e5cc3b4e7c__sub_249199f726
+    applicability:
+      composition_role: cmp_prd_e5cc3b4e7c__sub_249199f726
+    provenance:
+      - source: src_pubmed_19734684
+        locator: https://pubmed.ncbi.nlm.nih.gov/19734684/
+      - source: src_pubmed_12885395
+        locator: https://pubmed.ncbi.nlm.nih.gov/12885395/
+      - source: src_card_sub_249199f726_notes
+        locator: data/substances/astaxanthin__sub_249199f726.yaml#/notes
+    value: bioavailability_increases
+  - id: fact_food_prd_8mvv1w128a_sub_249199f726
+    subject:
+      composition_role: cmp_prd_8mvv1w128a__sub_249199f726
+    applicability:
+      composition_role: cmp_prd_8mvv1w128a__sub_249199f726
+    provenance:
+      - source: src_pubmed_19734684
+        locator: https://pubmed.ncbi.nlm.nih.gov/19734684/
+      - source: src_pubmed_12885395
+        locator: https://pubmed.ncbi.nlm.nih.gov/12885395/
+      - source: src_card_prd_8mvv1w128a
+        locator: data/products/psalae__astaxanthin__prd_8mvv1w128a.yaml
+    value: bioavailability_increases
+  - id: fact_food_prd_w2s970gps4_sub_249199f726
+    subject:
+      composition_role: cmp_prd_w2s970gps4__sub_249199f726
+    applicability:
+      composition_role: cmp_prd_w2s970gps4__sub_249199f726
+    provenance:
+      - source: src_pubmed_19734684
+        locator: https://pubmed.ncbi.nlm.nih.gov/19734684/
+      - source: src_pubmed_12885395
+        locator: https://pubmed.ncbi.nlm.nih.gov/12885395/
+      - source: src_card_prd_w2s970gps4
+        locator: data/products/psalae__antarctiv_krill_oil__prd_w2s970gps4.yaml
+    value: bioavailability_increases
+  - id: fact_food_prd_w2s970gps4_sub_646e568f61
+    subject:
+      composition_role: cmp_prd_w2s970gps4__sub_646e568f61
+    applicability:
+      composition_role: cmp_prd_w2s970gps4__sub_646e568f61
+    provenance:
+      - source: src_pubmed_30799231
+        locator: https://pubmed.ncbi.nlm.nih.gov/30799231/
+      - source: src_pubmed_25884846
+        locator: https://pubmed.ncbi.nlm.nih.gov/25884846/
+      - source: src_pubmed_26328782
+        locator: https://pubmed.ncbi.nlm.nih.gov/26328782/
+      - source: src_nih_ods_omega3
+        locator: https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/
+      - source: src_nccih_omega3
+        locator: https://www.nccih.nih.gov/health/omega3-supplements-in-depth
+      - source: src_card_prd_w2s970gps4
+        locator: data/products/psalae__antarctiv_krill_oil__prd_w2s970gps4.yaml
+    value: bioavailability_increases
+product_food_instructions:
+  - id: fact_product_food_prd_932319251f
+    product: prd_932319251f
+    provenance:
+      - source: src_life_extension_only_trace_minerals
+        locator: https://www.lifeextension.com/vitamins-supplements/item01328/only-trace-minerals
+        quotation: Take one capsule daily with food.
+    value: take_with_food
 acute_alertness_effects: []
 acute_sleep_effects: []
 pre_exercise_performance_effects:

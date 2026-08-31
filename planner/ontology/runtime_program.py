@@ -303,26 +303,48 @@ class RuntimeEvidenceSource:
 
 @dataclass(frozen=True, slots=True)
 class RuntimeFactSubject:
-    """Exactly one typed subject selector for a canonical fact."""
+    """Exactly one typed subject selector for a canonical fact.
 
-    substance: str | None
-    composition_role: str | None
+    ``product`` is reserved for the product-scoped instruction family.  It is
+    intentionally decoded as a target in its own right so inference can route
+    directly to the product intake item without expanding composition roles.
+    """
+
+    substance: str | None = None
+    composition_role: str | None = None
+    product: str | None = None
+
+    @property
+    def target_kind(self) -> str:
+        if self.product is not None:
+            return "product"
+        return "substance" if self.substance is not None else "composition_role"
+
+    @property
+    def target_id(self) -> str:
+        target = self.product or self.substance or self.composition_role
+        if target is None:  # pragma: no cover - decoding establishes the XOR invariant.
+            raise ValueError("fact subject has no target")
+        return target
 
 
 @dataclass(frozen=True, slots=True)
 class RuntimeFactApplicability:
     """Exactly one declared target selector for a canonical fact."""
 
-    substance: str | None
-    composition_role: str | None
+    substance: str | None = None
+    composition_role: str | None = None
+    product: str | None = None
 
     @property
     def target_kind(self) -> str:
+        if self.product is not None:
+            return "product"
         return "substance" if self.substance is not None else "composition_role"
 
     @property
     def target_id(self) -> str:
-        target = self.substance if self.substance is not None else self.composition_role
+        target = self.product or self.substance or self.composition_role
         if target is None:  # pragma: no cover - decoding establishes the XOR invariant.
             raise ValueError("fact applicability has no target")
         return target
@@ -372,6 +394,7 @@ class RuntimeCanonicalFactFamily:
     id: str
     fact_values: tuple[str, ...]
     dimension: str
+    target_kind: str = "fact_subject"
 
 
 @dataclass(frozen=True, slots=True)
@@ -457,6 +480,7 @@ def _canonical_fact_families(
         or not row.fact_values
         or len(set(row.fact_values)) != len(row.fact_values)
         or row.dimension not in dimensions
+        or row.target_kind not in {"fact_subject", "product"}
         for row in rows
     ):
         raise _error("canonical_scheduling.families", "has an incomplete dimension or fact-value graph")
@@ -489,6 +513,8 @@ def _validate_canonical_facts(
             family is None
             or fact.value not in family.fact_values
             or any(provenance.source not in sources for provenance in fact.provenance)
+            or (family.target_kind == "product") != (fact.applicability.product is not None)
+            or (family.target_kind == "product" and fact.subject.product != fact.applicability.product)
         ):
             raise _error("canonical_scheduling.facts", "references an unknown family, value, or evidence source")
 
@@ -684,32 +710,36 @@ def _evidence_source(row: Mapping[str, object], label: str) -> RuntimeEvidenceSo
 
 def _fact_subject(value: object, label: str) -> RuntimeFactSubject:
     raw = _map(value, label)
-    allowed = {"substance", "composition_role"}
+    allowed = {"substance", "composition_role", "product"}
     unknown = set(raw) - allowed
     if unknown:
         raise _error(label, "has an invalid closed shape (unknown " + ", ".join(sorted(unknown)) + ")")
     has_substance = "substance" in raw
     has_role = "composition_role" in raw
-    if has_substance == has_role:
-        raise _error(label, "must contain exactly one of substance or composition_role")
+    has_product = "product" in raw
+    if sum((has_substance, has_role, has_product)) != 1:
+        raise _error(label, "must contain exactly one of substance, composition_role, or product")
     substance = _str(raw["substance"], f"{label}.substance") if has_substance else None
     composition_role = _str(raw["composition_role"], f"{label}.composition_role") if has_role else None
-    return RuntimeFactSubject(substance, composition_role)
+    product = _str(raw["product"], f"{label}.product") if has_product else None
+    return RuntimeFactSubject(substance, composition_role, product)
 
 
 def _fact_applicability(value: object, label: str) -> RuntimeFactApplicability:
     raw = _map(value, label)
-    allowed = {"substance", "composition_role"}
+    allowed = {"substance", "composition_role", "product"}
     unknown = set(raw) - allowed
     if unknown:
         raise _error(label, "has an invalid closed shape (unknown " + ", ".join(sorted(unknown)) + ")")
     has_substance = "substance" in raw
     has_role = "composition_role" in raw
-    if has_substance == has_role:
-        raise _error(label, "must contain exactly one of substance or composition_role")
+    has_product = "product" in raw
+    if sum((has_substance, has_role, has_product)) != 1:
+        raise _error(label, "must contain exactly one of substance, composition_role, or product")
     substance = _str(raw["substance"], f"{label}.substance") if has_substance else None
     composition_role = _str(raw["composition_role"], f"{label}.composition_role") if has_role else None
-    return RuntimeFactApplicability(substance, composition_role)
+    product = _str(raw["product"], f"{label}.product") if has_product else None
+    return RuntimeFactApplicability(substance, composition_role, product)
 
 
 def _fact_provenance(value: object, label: str) -> tuple[RuntimeEvidenceProvenance, ...]:
@@ -768,6 +798,7 @@ def _fact_family(row: Mapping[str, object], label: str) -> RuntimeCanonicalFactF
         _str(row["id"], f"{label}.id"),
         _strings(row["fact_values"], f"{label}.fact_values"),
         _str(row["dimension"], f"{label}.dimension"),
+        _closed_value(row["target_kind"], f"{label}.target_kind", frozenset({"fact_subject", "product"})),
     )
 
 

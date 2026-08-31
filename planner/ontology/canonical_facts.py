@@ -34,9 +34,16 @@ def _applicability_errors(
     label: str,
     roles: Mapping[str, RuntimeCompositionRole],
     substances: Mapping[str, Substance],
+    products: Mapping[str, Product],
 ) -> list[str]:
     applicability = fact.applicability
     errors: list[str] = []
+    if applicability.product is not None:
+        if applicability.product not in products:
+            errors.append(f"{label} references unknown applicability product {applicability.product!r}")
+        if fact.subject.product != applicability.product:
+            errors.append(f"{label} product subject must match applicability product")
+        return errors
     if applicability.substance is not None:
         if applicability.substance not in substances:
             errors.append(f"{label} references unknown applicability substance {applicability.substance!r}")
@@ -55,8 +62,15 @@ def _subject_errors(
     label: str,
     roles: Mapping[str, RuntimeCompositionRole],
     substances: Mapping[str, Substance],
+    products: Mapping[str, Product],
 ) -> list[str]:
     subject = fact.subject
+    if subject.product is not None:
+        return (
+            []
+            if subject.product in products
+            else [f"{label} references unknown subject product {subject.product!r}"]
+        )
     if subject.substance is not None:
         return (
             []
@@ -77,11 +91,12 @@ def _fact_reference_errors(
     label: str,
     roles: Mapping[str, RuntimeCompositionRole],
     substances: Mapping[str, Substance],
+    products: Mapping[str, Product],
     sources: set[str],
 ) -> list[str]:
-    errors = _applicability_errors(fact, label, roles, substances)
-    errors.extend(_subject_errors(fact, label, roles, substances))
-    if fact.subject.substance is None and fact.subject.composition_role is None:
+    errors = _applicability_errors(fact, label, roles, substances, products)
+    errors.extend(_subject_errors(fact, label, roles, substances, products))
+    if fact.subject.substance is None and fact.subject.composition_role is None and fact.subject.product is None:
         return errors
     errors.extend(
         f"{label} references unknown evidence source {provenance.source!r}"
@@ -109,7 +124,14 @@ def validate_canonical_scheduling(
     sources = {source.id for source in scheduling.evidence_sources}
 
     for fact in scheduling.facts:
-        errors.extend(_fact_reference_errors(fact, f"{fact.family}.{fact.id}", roles, substances, sources))
+        family = scheduling.families_by_id.get(fact.family)
+        if family is not None:
+            product_target = fact.applicability.product is not None
+            if (family.target_kind == "product") != product_target:
+                errors.append(
+                    f"{fact.family}.{fact.id} target kind does not match its canonical fact family"
+                )
+        errors.extend(_fact_reference_errors(fact, f"{fact.family}.{fact.id}", roles, substances, products, sources))
 
     if errors:
         raise CardLoadError(path, f"{path}: canonical fact catalog reference validation failed:\n" + "\n".join(errors))

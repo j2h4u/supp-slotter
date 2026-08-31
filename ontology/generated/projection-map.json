@@ -252,6 +252,14 @@
           "name": "pre_exercise_performance_effects",
           "range": "PreExercisePerformanceEffect",
           "required": false
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "product_food_instructions",
+          "range": "ProductFoodInstruction",
+          "required": false
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/CanonicalFactCatalog"
@@ -297,6 +305,14 @@
           "multivalued": true,
           "name": "pre_exercise_performance_effect_laws",
           "range": "PreExercisePerformanceEffectLaw",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "product_food_instruction_laws",
+          "range": "ProductFoodInstructionLaw",
           "required": true
         }
       ],
@@ -1493,6 +1509,74 @@
         }
       ],
       "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/ProductComponent"
+    },
+    {
+      "name": "ProductFoodInstruction",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "product",
+          "range": "Product",
+          "required": true
+        },
+        {
+          "inlined": true,
+          "inlined_as_list": true,
+          "multivalued": true,
+          "name": "provenance",
+          "range": "EvidenceProvenance",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "value",
+          "range": "ProductFoodInstructionValue",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/ProductFoodInstruction"
+    },
+    {
+      "name": "ProductFoodInstructionLaw",
+      "slots": [
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "fact_value",
+          "range": "ProductFoodInstructionValue",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "id",
+          "range": "string",
+          "required": true
+        },
+        {
+          "inlined": false,
+          "inlined_as_list": false,
+          "multivalued": false,
+          "name": "meal_context",
+          "range": "MealContext",
+          "required": true
+        }
+      ],
+      "uri": "https://j2h4u.github.io/supp-slotter/ontology/v1/ProductFoodInstructionLaw"
     },
     {
       "name": "RelationAssertionCatalog",

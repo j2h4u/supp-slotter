@@ -3,7 +3,7 @@
   "outputs": [
     {
       "path": "card.schema.json",
-      "sha256": "9f02951893645e2e32d3905f708c5bd82131b687a7d67cbf8cd5f56b082dc0d6"
+      "sha256": "5f5163c26c8f31a092621ba5da09af5d7e38a1498f3616e674003e22e91f7054"
     },
     {
       "path": "dashboard.schema.json",
@@ -15,23 +15,23 @@
     },
     {
       "path": "product.schema.json",
-      "sha256": "7fd32ede84c65d98f9be4fccb4b06b6809e1bdd0eea5af375d40e5ea69df3d89"
+      "sha256": "dbe8efaa27847a80f23285ddf20f1b4f19f959efd9e62fdd80d2d7e7d29d3fad"
     },
     {
       "path": "relations.schema.json",
-      "sha256": "a1f9cf46a7afa779203c8e3d6e7341a2bb5cd8ddfbea3d7a124f6d498fca5797"
+      "sha256": "d765d0168020068f60fd5b20024e1b08e2337cd5368a05412a08a621226d566d"
     },
     {
       "path": "runtime-program.json",
-      "sha256": "60f704072eee10e288e12820b6b5977c9c042238138f96c942e1972169a75aa3"
+      "sha256": "4f3a5cfb42399d5b402201965bab5eb401db4be78db0ededa9c1b0cce085fbc4"
     },
     {
       "path": "runtime-vocabulary.yaml",
-      "sha256": "3c400bc58b44dc62eb9ca29a522c09792d4b409a46414a7b840b3373205048bb"
+      "sha256": "261a3c9fce718e83ea3af96ad322ff98abc2927e698e32def190e765050ef5b6"
     },
     {
       "path": "schema.json",
-      "sha256": "3d964c168d329a70a3883c4af53e4ae405d57f5a6f1e36721a798aec480a3cee"
+      "sha256": "fe86131d09682c3866140874f03b833a1cad743ff8a26ad387ed7c1619d10dec"
     },
     {
       "path": "stacks.schema.json",

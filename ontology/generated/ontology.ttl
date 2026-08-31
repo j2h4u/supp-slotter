@@ -1,6 +1,6 @@
 # generated-by: scripts/generate_ontology.py
 # schema-version: 2
-# source-hash: 8a46d04ee965da6222db1871d650d0b5c8a9511b6bbb144dec7bccde0eeaadf6
+# source-hash: c193760c0e05c8a0b7c2706e9346cb5522c900c145afa37d77186d18c9398921
 @prefix ss: <https://j2h4u.github.io/supp-slotter/ontology/v1/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
@@ -120,6 +120,12 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/ProductComponent> a ss:SchemaClass ;
   ss:name "ProductComponent" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ProductFoodInstruction> a ss:SchemaClass ;
+  ss:name "ProductFoodInstruction" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/ProductFoodInstructionLaw> a ss:SchemaClass ;
+  ss:name "ProductFoodInstructionLaw" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/RelationAssertionCatalog> a ss:SchemaClass ;
   ss:name "RelationAssertionCatalog" .
@@ -423,6 +429,12 @@
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/product> a ss:SchemaSlot ;
   ss:name "product" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/product_food_instruction_laws> a ss:SchemaSlot ;
+  ss:name "product_food_instruction_laws" .
+
+<https://j2h4u.github.io/supp-slotter/ontology/v1/product_food_instructions> a ss:SchemaSlot ;
+  ss:name "product_food_instructions" .
 
 <https://j2h4u.github.io/supp-slotter/ontology/v1/product_tracking_states> a ss:SchemaSlot ;
   ss:name "product_tracking_states" .

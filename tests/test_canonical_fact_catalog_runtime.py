@@ -40,7 +40,7 @@ def test_compiler_emits_one_generic_scheduling_projection_without_retired_catalo
     assert set(scheduling) == {"dimensions", "families", "evidence_sources", "facts", "laws"}
     assert "canonical_fact_catalog" not in projection
     assert all("effects" not in key for key in scheduling)
-    assert len(cast(list[object], scheduling["facts"])) == 6
+    assert len(cast(list[object], scheduling["facts"])) == 11
 
 
 def test_decoder_types_facts_once_with_family_as_data() -> None:

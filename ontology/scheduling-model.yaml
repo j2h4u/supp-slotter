@@ -13,6 +13,12 @@ imports:
   - runtime-protocol
   - vocabulary-model
 
+enums:
+  ProductFoodInstructionValue:
+    description: Sole closed value for an exact product food instruction.
+    permissible_values:
+      take_with_food:
+
 classes:
   # Universal inference laws are authored separately from evidence facts.  A
   # law is deliberately tiny: its closed typed fact value and the one anchor
@@ -22,13 +28,27 @@ classes:
     description: Closed universal law catalog for canonical pressure inference.
     annotations:
       closed_universal_laws: true
-    slots: [food_effect_laws, acute_alertness_effect_laws, acute_sleep_effect_laws, pre_exercise_performance_effect_laws, post_exercise_recovery_effect_laws]
+    slots: [food_effect_laws, acute_alertness_effect_laws, acute_sleep_effect_laws, pre_exercise_performance_effect_laws, post_exercise_recovery_effect_laws, product_food_instruction_laws]
     slot_usage:
       food_effect_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: FoodEffectLaw, inlined: true, inlined_as_list: true}
       acute_alertness_effect_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: AcuteAlertnessEffectLaw, inlined: true, inlined_as_list: true}
       acute_sleep_effect_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: AcuteSleepEffectLaw, inlined: true, inlined_as_list: true}
       pre_exercise_performance_effect_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: PreExercisePerformanceEffectLaw, inlined: true, inlined_as_list: true}
       post_exercise_recovery_effect_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: PostExerciseRecoveryEffectLaw, inlined: true, inlined_as_list: true}
+      product_food_instruction_laws: {required: true, minimum_cardinality: 1, multivalued: true, range: ProductFoodInstructionLaw, inlined: true, inlined_as_list: true}
+
+  ProductFoodInstructionLaw:
+    description: Universal product-only food instruction to meal-context law.
+    slots: [id, fact_value, meal_context]
+    annotations:
+      canonical_fact_family: ProductFoodInstruction
+      canonical_fact_value_slot: fact_value
+      canonical_pressure_dimension: meal_context
+      canonical_pressure_value_slot: meal_context
+    slot_usage:
+      id: {required: true, pattern: '^law_[a-z][a-z0-9_:-]*$'}
+      fact_value: {required: true, range: ProductFoodInstructionValue, multivalued: false}
+      meal_context: {required: true, range: MealContext, multivalued: false}
 
   FoodEffectLaw:
     description: Universal FoodEffect to meal-context pressure law.
@@ -100,7 +120,7 @@ classes:
     annotations:
       source_reference_resolution: runtime_validation_required
       composition_role_reference_resolution: runtime_validation_required
-    slots: [evidence_sources, food_effects, acute_alertness_effects, acute_sleep_effects, pre_exercise_performance_effects, post_exercise_recovery_effects]
+    slots: [evidence_sources, food_effects, acute_alertness_effects, acute_sleep_effects, pre_exercise_performance_effects, post_exercise_recovery_effects, product_food_instructions]
     slot_usage:
       evidence_sources: {required: false, multivalued: true, range: EvidenceSource, inlined: true, inlined_as_list: true}
       food_effects: {required: false, multivalued: true, range: FoodEffect, inlined: true, inlined_as_list: true}
@@ -108,6 +128,7 @@ classes:
       acute_sleep_effects: {required: false, multivalued: true, range: AcuteSleepEffect, inlined: true, inlined_as_list: true}
       pre_exercise_performance_effects: {required: false, multivalued: true, range: PreExercisePerformanceEffect, inlined: true, inlined_as_list: true}
       post_exercise_recovery_effects: {required: false, multivalued: true, range: PostExerciseRecoveryEffect, inlined: true, inlined_as_list: true}
+      product_food_instructions: {required: false, multivalued: true, range: ProductFoodInstruction, inlined: true, inlined_as_list: true}
 
   CanonicalSchedulingFact:
     abstract: true
@@ -177,6 +198,19 @@ classes:
     slot_usage:
       value: {required: true, range: PostExerciseRecoveryEffectValue, multivalued: false}
 
+  ProductFoodInstruction:
+    description: Closed product-scoped instruction; it never targets components.
+    slots: [id, product, provenance, value]
+    annotations:
+      canonical_fact_family: ProductFoodInstruction
+      canonical_fact_value_slot: value
+      canonical_fact_target_kind: product
+    slot_usage:
+      id: {required: true, pattern: '^[a-z][a-z0-9_:-]*$'}
+      product: {required: true, range: Product, inlined: false, multivalued: false}
+      provenance: {required: true, minimum_cardinality: 1, multivalued: true, range: EvidenceProvenance, inlined: true, inlined_as_list: true}
+      value: {required: true, range: ProductFoodInstructionValue, multivalued: false}
+
   FactSubject:
     description: >-
       Typed subject role for a canonical fact. The role points to the stable
@@ -238,6 +272,7 @@ slots:
   acute_sleep_effect_laws: {multivalued: true, range: AcuteSleepEffectLaw, inlined: true, inlined_as_list: true}
   pre_exercise_performance_effect_laws: {multivalued: true, range: PreExercisePerformanceEffectLaw, inlined: true, inlined_as_list: true}
   post_exercise_recovery_effect_laws: {multivalued: true, range: PostExerciseRecoveryEffectLaw, inlined: true, inlined_as_list: true}
+  product_food_instruction_laws: {multivalued: true, range: ProductFoodInstructionLaw, inlined: true, inlined_as_list: true}
   fact_value:
   evidence_sources: {multivalued: true, range: EvidenceSource, inlined: true, inlined_as_list: true}
   food_effects: {multivalued: true, range: FoodEffect, inlined: true, inlined_as_list: true}
@@ -245,6 +280,7 @@ slots:
   acute_sleep_effects: {multivalued: true, range: AcuteSleepEffect, inlined: true, inlined_as_list: true}
   pre_exercise_performance_effects: {multivalued: true, range: PreExercisePerformanceEffect, inlined: true, inlined_as_list: true}
   post_exercise_recovery_effects: {multivalued: true, range: PostExerciseRecoveryEffect, inlined: true, inlined_as_list: true}
+  product_food_instructions: {multivalued: true, range: ProductFoodInstruction, inlined: true, inlined_as_list: true}
   applicability: {range: FactApplicability, inlined: true, multivalued: false}
   provenance: {multivalued: true, range: EvidenceProvenance, inlined: true, inlined_as_list: true}
   composition_role: {range: CompositionRole, inlined: false, multivalued: false}

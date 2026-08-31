@@ -89,6 +89,9 @@ def _fact(
     applicability: RuntimeFactApplicability | None = None,
     fact_id: str = "fact_demo",
 ) -> RuntimeCanonicalSchedulingFact:
+    if family == "ProductFoodInstruction":
+        subject = RuntimeFactSubject(None, None, "prd_demo")
+        applicability = RuntimeFactApplicability(None, None, "prd_demo")
     return RuntimeCanonicalSchedulingFact(
         fact_id,
         family,
@@ -132,7 +135,7 @@ def test_every_admitted_value_maps_to_one_pressure() -> None:
     assert sum(len(cast(list[object], rows)) for rows in authored.values()) == len(compiled_laws)
 
     runtime_laws = decode_runtime_program(generated_payload).canonical_scheduling.laws
-    assert len(runtime_laws) == len(compiled_laws) == 9
+    assert len(runtime_laws) == len(compiled_laws) == 10
     for law in runtime_laws:
         result = _execute(_catalog(_fact(law.family, law.fact_value)), ("prd_demo",))
         assert isinstance(result, Success)

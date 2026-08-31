@@ -22,7 +22,11 @@ def test_current_repository_facts_are_validated_through_one_generic_catalog() ->
         load_substance_registry(paths, bundle),
         load_product_registry(paths, bundle),
     )
-    assert len(scheduling.facts) == 6
-    assert len(scheduling.laws) == 9
-    assert len(scheduling.evidence_sources) == 12
-    assert {fact.family for fact in scheduling.facts} == {"FoodEffect", "PreExercisePerformanceEffect"}
+    assert len(scheduling.facts) == 11
+    assert len(scheduling.laws) == 10
+    assert len(scheduling.evidence_sources) == 23
+    assert {fact.family for fact in scheduling.facts} == {
+        "FoodEffect",
+        "PreExercisePerformanceEffect",
+        "ProductFoodInstruction",
+    }

@@ -190,6 +190,15 @@
             "array",
             "null"
           ]
+        },
+        "product_food_instructions": {
+          "items": {
+            "$ref": "#/$defs/ProductFoodInstruction"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
         }
       },
       "title": "CanonicalFactCatalog",
@@ -233,6 +242,13 @@
           },
           "minItems": 1,
           "type": "array"
+        },
+        "product_food_instruction_laws": {
+          "items": {
+            "$ref": "#/$defs/ProductFoodInstructionLaw"
+          },
+          "minItems": 1,
+          "type": "array"
         }
       },
       "required": [
@@ -240,7 +256,8 @@
         "acute_alertness_effect_laws",
         "acute_sleep_effect_laws",
         "pre_exercise_performance_effect_laws",
-        "post_exercise_recovery_effect_laws"
+        "post_exercise_recovery_effect_laws",
+        "product_food_instruction_laws"
       ],
       "title": "CanonicalLawCatalog",
       "type": "object"
@@ -1601,6 +1618,68 @@
       ],
       "title": "ProductComponent",
       "type": "object"
+    },
+    "ProductFoodInstruction": {
+      "additionalProperties": false,
+      "description": "Closed product-scoped instruction; it never targets components.",
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9_:-]*$",
+          "type": "string"
+        },
+        "product": {
+          "type": "string"
+        },
+        "provenance": {
+          "items": {
+            "$ref": "#/$defs/EvidenceProvenance"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "value": {
+          "$ref": "#/$defs/ProductFoodInstructionValue"
+        }
+      },
+      "required": [
+        "id",
+        "product",
+        "provenance",
+        "value"
+      ],
+      "title": "ProductFoodInstruction",
+      "type": "object"
+    },
+    "ProductFoodInstructionLaw": {
+      "additionalProperties": false,
+      "description": "Universal product-only food instruction to meal-context law.",
+      "properties": {
+        "fact_value": {
+          "$ref": "#/$defs/ProductFoodInstructionValue"
+        },
+        "id": {
+          "pattern": "^law_[a-z][a-z0-9_:-]*$",
+          "type": "string"
+        },
+        "meal_context": {
+          "$ref": "#/$defs/MealContext"
+        }
+      },
+      "required": [
+        "id",
+        "fact_value",
+        "meal_context"
+      ],
+      "title": "ProductFoodInstructionLaw",
+      "type": "object"
+    },
+    "ProductFoodInstructionValue": {
+      "description": "Sole closed value for an exact product food instruction.",
+      "enum": [
+        "take_with_food"
+      ],
+      "title": "ProductFoodInstructionValue",
+      "type": "string"
     },
     "ProductUsePattern": {
       "description": "",

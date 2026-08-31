@@ -35,3 +35,7 @@ post_exercise_recovery_effect_laws:
   - id: law_post_exercise_recovery_improves
     fact_value: recovery_improves
     exercise_anchor: after
+product_food_instruction_laws:
+  - id: law_product_food_take_with_food
+    fact_value: take_with_food
+    meal_context: with_food

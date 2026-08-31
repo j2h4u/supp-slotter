@@ -115,6 +115,12 @@
     "ProductComponent": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/ProductComponent"
     },
+    "ProductFoodInstruction": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/ProductFoodInstruction"
+    },
+    "ProductFoodInstructionLaw": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/ProductFoodInstructionLaw"
+    },
     "RelationAssertionCatalog": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/RelationAssertionCatalog"
     },
@@ -417,6 +423,12 @@
     },
     "product": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/product"
+    },
+    "product_food_instruction_laws": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/product_food_instruction_laws"
+    },
+    "product_food_instructions": {
+      "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/product_food_instructions"
     },
     "product_tracking_states": {
       "@id": "https://j2h4u.github.io/supp-slotter/ontology/v1/slot/product_tracking_states"

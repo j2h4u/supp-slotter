@@ -173,6 +173,8 @@ def _roles_for_fact(
     if applicability_expansion_strategy != IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY:
         raise OntologyInfrastructureError("canonical inference has an unsupported applicability expansion strategy")
     target = fact.applicability
+    if target.product is not None:
+        return () if fact.subject.product != target.product else ()
     if target.substance is not None:
         if fact.subject.substance != target.substance:
             return ()
@@ -196,6 +198,34 @@ def _derivations_for_fact(
     if law is None:
         raise OntologyInfrastructureError(f"canonical law missing for family={family!r}, fact_value={fact_value!r}")
     derivations: list[tuple[UnaryPressureIdentity, PressureDerivation]] = []
+    if fact.applicability.product is not None:
+        # Product-scoped instructions target the intake item directly.  There
+        # is deliberately no role traversal here: the product's components
+        # must never inherit a product instruction.
+        if fact.subject.product != fact.applicability.product:
+            return ()
+        product_id = fact.applicability.product
+        for item_id in selected_by_product.get(product_id, ()):
+            identity = UnaryPressureIdentity(item_id, law.dimension, law.pressure_value)
+            derivations.append((
+                identity,
+                PressureDerivation(
+                    law=law,
+                    family=family,
+                    fact=fact,
+                    value=fact_value,
+                    subject=fact.subject,
+                    path=CompositionApplicabilityPath(
+                        target_kind="product",
+                        target_id=product_id,
+                        resolved_role=product_id,
+                        product=product_id,
+                        substance="",
+                    ),
+                    provenance=_unique_provenance(fact.provenance),
+                ),
+            ))
+        return tuple(derivations)
     for role in _roles_for_fact(fact, roles, applicability_expansion_strategy):
         for item_id in selected_by_product.get(role.product, ()):
             identity = UnaryPressureIdentity(item_id, law.dimension, law.pressure_value)
