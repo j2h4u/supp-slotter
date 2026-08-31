@@ -149,20 +149,22 @@ review and do not silently satisfy an unchecked item below.
   - Evidence required: exact-head release receipt, stage results,
   corpus/quality output, and clean checkout.
 
-- [ ] Obtain an independent product/ontology review of the simplified
+- [x] Obtain an independent product/ontology review of the simplified
   architecture: formal directed facts, pressure-before-balance, exact
   global-optimum proof, contradiction fail-closed behavior, notes rejection,
   and the less-than-14 real-shelf witness. It must not reintroduce a review
   requirement for catalog coverage, certificates, grooming, candidate output,
   or passive-relation output.
   - Evidence required: exact-head verdict with zero actionable Critical, High,
-  or Medium findings and explicit disposition of every finding.
+    or Medium findings and explicit disposition of every finding.
+  - Evidence: [independent product/ontology SOL rereview](../evidence/actionable-scheduling-product-ontology-sol-rereview-20260831.md)
 
-- [ ] Obtain an independent Kaizen/YAGNI review that the deletion remains the
+- [x] Obtain an independent Kaizen/YAGNI review that the deletion remains the
   smallest valid architecture: no migration, compatibility, parser/heuristic,
   general engine, or replacement workflow has returned.
   - Evidence required: exact-head verdict with the rejected surfaces checked
-  for absence.
+    for absence.
+  - Evidence: [independent Kaizen/YAGNI SOL rereview](../evidence/actionable-scheduling-kaizen-yagni-sol-rereview-20260831.md)
 
 - [ ] Have a fresh-context auditor verify every checked item against commits,
   receipts, and current source, then mark the recovery complete only if no
