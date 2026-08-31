@@ -7,7 +7,6 @@ from shutil import copytree
 from typing import cast
 
 import yaml
-
 from planner.engine import cmd_plan
 
 ROOT = Path(__file__).resolve().parents[1]

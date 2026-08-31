@@ -86,12 +86,12 @@ def _subject_errors(
 
 def _fact_reference_errors(
     fact: RuntimeCanonicalSchedulingFact,
-    label: str,
     roles: Mapping[str, RuntimeCompositionRole],
     substances: Mapping[str, Substance],
     products: Mapping[str, Product],
     sources: set[str],
 ) -> list[str]:
+    label = f"{fact.family}.{fact.id}"
     errors = _applicability_errors(fact, label, roles, substances, products)
     errors.extend(_subject_errors(fact, label, roles, substances, products))
     if fact.subject.substance is None and fact.subject.composition_role is None and fact.subject.product is None:
@@ -127,7 +127,7 @@ def validate_canonical_scheduling(
             product_target = fact.applicability.product is not None
             if (family.target_kind == "product") != product_target:
                 errors.append(f"{fact.family}.{fact.id} target kind does not match its canonical fact family")
-        errors.extend(_fact_reference_errors(fact, f"{fact.family}.{fact.id}", roles, substances, products, sources))
+        errors.extend(_fact_reference_errors(fact, roles, substances, products, sources))
 
     if errors:
         raise CardLoadError(path, f"{path}: canonical fact catalog reference validation failed:\n" + "\n".join(errors))

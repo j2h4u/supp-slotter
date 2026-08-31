@@ -509,9 +509,10 @@ def _validate_canonical_facts(
 ) -> None:
     for fact in facts:
         family = families.get(fact.family)
+        if family is None:
+            raise _error("canonical_scheduling.facts", "references an unknown family, value, or evidence source")
         if (
-            family is None
-            or fact.value not in family.fact_values
+            fact.value not in family.fact_values
             or any(provenance.source not in sources for provenance in fact.provenance)
             or (family.target_kind == "product") != (fact.applicability.product is not None)
             or (family.target_kind == "product" and fact.subject.product != fact.applicability.product)

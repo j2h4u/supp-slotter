@@ -174,7 +174,7 @@ def _roles_for_fact(
         raise OntologyInfrastructureError("canonical inference has an unsupported applicability expansion strategy")
     target = fact.applicability
     if target.product is not None:
-        return () if fact.subject.product != target.product else ()
+        return ()
     if target.substance is not None:
         if fact.subject.substance != target.substance:
             return ()
