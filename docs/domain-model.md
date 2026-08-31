@@ -6,15 +6,13 @@ Every published layout is the globally optimal result of the canonical fact
 model. A result is either `Optimal`, with a proved layout, or `Indeterminate`,
 with no layout.
 
-For the active shelf, global optimality is necessary but not sufficient:
-published scheduling must also be semantically covered. Each active composition
-role and applicable scheduling dimension must have a closed, reviewable
-disposition before a layout can claim to be materially guided by knowledge. An
-incomplete coverage record is `Indeterminate`, never an apparently neutral or
-balance-only layout. This recovery contract is governed by the
-[actionable-knowledge coverage decision](decisions/actionable-scheduling-knowledge-coverage-boundary-20260831.md)
-and supplements, without weakening, the
-[canonical instance and inference boundary](decisions/canonical-instance-inference-boundary-20260822.md).
+The canonical result is determined by typed world facts and universal laws.
+Absence of a fact means absence of a derived pressure, not a runtime
+completeness failure. A balance-and-tie-break-only placement is therefore valid
+when no admitted pressure applies. This contract is governed by the
+[canonical instance and inference boundary](decisions/canonical-instance-inference-boundary-20260822.md)
+and the accepted
+[runtime simplification decision](decisions/actionable-scheduling-runtime-simplification-20260831.md).
 
 ## Canonical inputs
 
@@ -58,91 +56,40 @@ generic predicate/value extension.
 The laws are complete, universal, and identity-free. They never encode an item,
 product, slot, desired placement, weight, action, or explanation.
 
-## Actionable knowledge coverage boundary
+## Inference boundary
 
-This is a V-left contract for the recovery; it does not itself adjudicate or
-admit any current candidate, change the five currently admitted fact families,
-or authorize a data/runtime change. Before any lower-level implementation, the
-closed candidate catalog and its universal laws must be accepted with the
-paired evidence in the matrix below.
+Every admitted directed claim is a typed world fact with exact subject and
+applicability, an evidence/provenance path, and one matching universal law.
+The law derives a normalized pressure `(item_id, dimension, value)`. Historical
+semantic adjudications and migration receipts may document why a fact was
+admitted, but they are offline provenance only and are never runtime inputs.
 
-### Candidate and disposition vocabulary
+An admitted pressure, including one supported by weak or anecdotal evidence,
+outranks balance. Evidence has no numeric weight and cannot multiply, cancel,
+average, or weaken a pressure. A future fact family or law requires a new
+accepted V-left contract; no generic relation or open-vocabulary inference is
+implied here.
 
-A **scheduling candidate** is a source-indexed claim discovered while covering
-an active daily, episodic, or training composition role. Every candidate has
-exactly one of these closed dispositions:
-
-| Disposition | Meaning | Scheduler effect |
-| --- | --- | --- |
-| `pressure` | An individually adjudicated directed hypothesis with typed subject/applicability, provenance/research state, a closed fact or pairwise world-fact mechanism, and a universal-law path. | One derivable normalized pressure; it is never an authored placement. |
-| `neutral` | An assessed in-model candidate with no directed scheduling outcome. | None; it remains accountable in coverage. |
-| `unresolved_without_direction` | Evidence is incomplete and does not justify a directed hypothesis. | None; it remains visibly research-open rather than silently neutral, but closes coverage for this exact candidate once its scope, provenance, and disposition validate. |
-| `outside_model` | A candidate excluded by one explicit closed reason. | None; it does not close unrelated candidates or dimensions. |
-
-Duplicate, missing, or mutually inconsistent dispositions are invalid. A valid
-`unresolved_without_direction` disposition is coverage-closed for its exact
-candidate, not neutral: later evidence may reopen research, but it does not
-make the current active shelf incomplete. Missing, unassessed, malformed, or
-stale candidate coverage remains incomplete. A
-directed hypothesis—including an anecdotal, mechanistic, or otherwise weak
-one—is not made a lower-weight signal: after individual semantic adjudication,
-it is one formal soft pressure through a typed fact and a universal law.
-Research state, source count, quotations, witnesses, components, and proof
-paths remain provenance and explanation metadata; none changes pressure
-identity or objective value. Therefore every admitted pressure outranks
-balance, exactly as specified by the existing optimizer.
-
-### Contradiction and pairwise boundary
+### Contradiction and passive-relation boundary
 
 Opposing derived values for the same item and dimension are a direct
-contradiction, including values derived from pairwise mechanisms. The canonical
-boundary returns layout-free `Indeterminate` and routes the record to
-adjudication; it must not choose, cancel, average, weight, or balance around
-the conflict.
+contradiction. The canonical boundary returns layout-free `Indeterminate`; it
+must not choose, cancel, average, weight, or balance around the conflict.
 
-Pairwise scheduling behavior is admissible only when a minimal typed
-**world fact or relation** plus a universal law entails co-location or
-separation. `same_slot`, `different_slot`, pair preferences, placements, and
-their UI prose are stored answers and cannot be canonical inputs. Passive
-supports, balance, and contextual relations remain non-scheduling evidence
-unless a separately accepted typed mechanism and law make their consequence
-derivable.
+Pairwise, supports, balance, contextual, and other passive relations have no
+scheduling effect unless a future accepted typed world fact and universal law
+derive a pressure. Desired co-location or separation, preferences, placements,
+actions, and their UI prose are stored answers and cannot be canonical inputs.
+The published trace does not enumerate passive-relation non-effects.
 
 ### Generic-note removal boundary
 
 Generic authored `notes` are not a canonical product, substance, or component
-surface. A one-time stable source-span inventory may map each existing span to
-typed identity, composition, source/provenance, candidate/evidence material, or
-an explicit discard reason. After cutover, the canonical schema rejects `notes`;
-there is no notes parser, NLP/keyword heuristic, compatibility field, migration
-runtime, or legacy museum. Only the closed typed candidate/disposition catalog
-may carry a scheduling candidate.
-
-### Coverage certificates and publication
-
-A coverage certificate is derived verification metadata, never an optimizer
-input or stored answer. For one active composition role it records the role,
-applicable dimensions, exhaustive evaluated candidate IDs, exactly-one
-dispositions, each disposition's required evidence path, and exact input
-hashes. A valid `unresolved_without_direction` entry is shown explicitly as
-research-open and coverage-closed; it never becomes neutral or a pressure.
-The certificate proves that no unadjudicated directional candidate was omitted,
-not that no admitted pressure exists. A balance-and-tie-break-only explanation
-must also expose any unsatisfied admitted pressure rather than claiming that no
-direction exists. A balance-only item may publish only with its complete current
-certificate; missing, unassessed, stale, malformed, or incomplete coverage
-makes the whole result layout-free `Indeterminate`.
-
-### Why the earlier V-model missed semantic coverage
-
-The prior V-model proved mechanism correctness: closed facts compiled, laws
-normalized them, exact optimization found the global result, and publication
-failed closed. It did not impose an upper V-left obligation that every active
-role and discovered candidate be semantically assessed. Useful prose,
-structured memberships, and passive relations could therefore remain outside
-the scheduler while all lower inference and optimizer checks passed. Semantic
-coverage is now a product invariant with deterministic right-side evidence,
-not a documentation aspiration.
+surface. The one-time migration mapped existing spans to typed identity,
+composition, provenance, or an explicit discard reason. After cutover, the
+canonical schema rejects `notes`; there is no notes parser, NLP/keyword
+heuristic, compatibility field, or migration runtime. Migration receipts remain
+historical provenance and do not restore a runtime input.
 
 ### V-left to V-right acceptance matrix
 
@@ -151,12 +98,11 @@ implementation, acceptance ascends through the paired evidence in this order.
 
 | V level | V-left contract | V-right acceptance evidence |
 | --- | --- | --- |
-| 1. Product invariant | A real active-shelf layout materially follows formal world facts. | Real active-shelf trace proves every placement and every balance-only certificate. |
-| 2. Knowledge coverage | Every active composition role and discovered scheduling candidate has exactly one formal disposition; generic notes no longer exist in canonical cards. | Deterministic coverage manifest has zero orphan/prose-only claims and zero unassessed active candidates; schema and corpus prove zero generic notes, and the one-time source-span receipt proves no data loss. |
-| 3. Ontology/admission | Every directed hypothesis, including anecdotal and mechanistic claims, compiles only through a typed fact or minimal pairwise world-fact mechanism and a universal-law path. | Compiler and inference proofs establish applicability, provenance, dimension, value, and law; passive relations have negative admission evidence. |
-| 4. Objective | Every admitted pressure outranks balance while the exact global optimum and stable tie-break are unchanged. | Metamorphic and exhaustive optimizer witnesses prove pressure-before-balance and exactness. |
-| 5. Publication | Incomplete coverage cannot masquerade as neutral or balance-only; direct contradictions cannot yield a layout. | Fail-closed `Indeterminate` witnesses reject absent/stale certificates and contradictions; explanations expose certified balance-only outcomes. |
-| 6. Agent workflow | Grooming cannot be closed by prose, generic notes, or passive relations alone. | Workflow smoke and schema rejection prove that a candidate stays open until its typed disposition and evidence are present. |
+| 1. Product invariant | A real active-shelf layout materially follows formal world facts. | Real active-shelf trace proves every placement and the exact objective. |
+| 2. Ontology/admission | Every directed claim compiles only through a typed fact and universal-law path. | Compiler and inference proofs establish applicability, provenance, dimension, value, and law; passive relations have no admission path. |
+| 3. Objective | Every admitted pressure outranks balance while exact global optimum and stable tie-break remain unchanged. | Metamorphic and exhaustive optimizer witnesses prove pressure-before-balance and exactness. |
+| 4. Publication | Contradictions and any inability to prove the exact result produce layout-free `Indeterminate`; absent facts do not. | Fail-closed contradiction/resource/proof witnesses and derived balance-only explanations. |
+| 5. Canonical schema | Generic notes and stored scheduling answers cannot enter canonical inputs. | Closed schemas and migration receipt prove typed destinations or explicit discard, with no notes compatibility surface. |
 
 ## Exact optimizer
 

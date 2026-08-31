@@ -118,11 +118,17 @@ review and do not silently satisfy an unchecked item below.
   - Evidence required: exact commands, exit statuses, HEAD, and bounded output.
   - Evidence: [targeted witness receipt](../evidence/actionable-scheduling-targeted-witnesses-20260831.yaml)
 
-- [ ] Perform an exact-head data and architecture audit: every currently
+- [x] Perform an exact-head data and architecture audit: every currently
   admitted directed input is a typed fact/law path; no stored preference,
   placement, action, numeric evidence weight, candidate catalog, coverage
   certificate, grooming receipt, or notes field reaches planning or output.
   - Evidence required: reviewed input/output map and negative-boundary receipt.
+  - Evidence: [architecture audit](../evidence/actionable-scheduling-architecture-audit-20260831.md).
+    M-1 is eliminated by reconciling the living domain contract to the accepted
+    runtime simplification. M-2 is rejected as a non-requirement: canonical
+    publication is an internal path fed only by the validated project loader,
+    so direct construction of an invalid publication object is outside the
+    product boundary and requires no runtime change or test.
 
 - [ ] Run `just release` once only after the focused simplified-boundary
   witnesses are green.
