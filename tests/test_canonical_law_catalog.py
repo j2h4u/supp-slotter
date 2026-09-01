@@ -2,21 +2,17 @@
 
 from __future__ import annotations
 
-import json
-from pathlib import Path
 from typing import cast
 
 import pytest
 from planner.ontology.errors import OntologyInfrastructureError
 from planner.ontology.runtime_program import decode_runtime_program
-from scripts.ontology_compiler import compile_ontology
 
-ROOT = Path(__file__).resolve().parents[1]
-ONTOLOGY = ROOT / "ontology"
+from tests.compiled_ontology import compiled_runtime_payload
 
 
 def _payload() -> dict[str, object]:
-    return cast(dict[str, object], json.loads(compile_ontology(ONTOLOGY)[Path("runtime-program.json")]))
+    return compiled_runtime_payload()
 
 
 def test_every_annotated_family_value_has_exactly_one_generic_law() -> None:
