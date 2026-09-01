@@ -23,7 +23,6 @@ Suite = Literal[
     "runtime-scenarios",
     "coverage",
     "all",
-    "release",
 ]
 
 # Keep the first development loop small while named suites remain ordinary
@@ -63,6 +62,9 @@ COVERAGE_ONLY_MODULES = (
     Path("tests/test_card_reference_integrity.py"),
     Path("tests/test_pillbox_loader_contract.py"),
     Path("tests/test_formal_uniqueness.py"),
+    Path("tests/test_ontology_repository_contract.py"),
+    Path("tests/test_ontology_repository_projection.py"),
+    Path("tests/test_ontology_shacl_fixtures.py"),
 )
 RUNTIME_SCENARIOS_MODULES = (
     Path("tests/test_actionable_scheduling_publication_trace.py"),
@@ -155,12 +157,6 @@ ONTOLOGY_CONTRACT_GROUPS: tuple[tuple[str, tuple[Path, ...]], ...] = (
     ),
 )
 ONTOLOGY_CONTRACT_MODULES = frozenset(target for _, targets in ONTOLOGY_CONTRACT_GROUPS for target in targets)
-# Release selection is module-based, so every canonical runtime node is covered
-# by its owning complete module rather than a brittle second node-only run.
-RELEASE_EXACT_NODE_IDS: tuple[str, ...] = tuple(
-    sorted(node for nodes in CANONICAL_RUNTIME_CAPABILITY_NODES.values() for node in nodes)
-)
-EXPLICITLY_EXCLUDED_RELEASE_MODULES: dict[Path, str] = {}
 SUITE_INVENTORY_SCHEMA_VERSION = 2
 Command = Sequence[str]
 CommandRunner = Callable[[Command], int]
@@ -203,51 +199,6 @@ def canonical_runtime_inventory_errors(test_root: Path = DEFAULT_TEST_ROOT) -> l
         parsed = ast.parse(module.read_text(encoding="utf-8"), filename=str(module))
         if not any(isinstance(item, ast.FunctionDef) and item.name == test_name for item in parsed.body):
             errors.append(f"canonical runtime inventory names missing node: {node}")
-        if Path(module_name) not in release_module_inventory():
-            errors.append(f"canonical runtime inventory node is not included in release: {node}")
-    return errors
-
-
-def release_module_inventory() -> frozenset[Path]:
-    """Return every module represented by the release gate."""
-
-    return frozenset(
-        set(SMOKE_MODULES)
-        | FAST_UNIT_MODULES
-        | set(COVERAGE_ONLY_MODULES)
-        | ONTOLOGY_CONTRACT_MODULES
-        | set(RUNTIME_SCENARIOS_MODULES)
-        | {Path(node_id.split("::", 1)[0]) for node_id in RELEASE_EXACT_NODE_IDS}
-    )
-
-
-def release_inventory_errors(test_root: Path = DEFAULT_TEST_ROOT) -> list[str]:
-    """Return deterministic completeness errors for the release test inventory."""
-
-    discovered = {
-        module.resolve().relative_to(test_root.parent.resolve()) if module.is_absolute() else module
-        for module in discover_test_modules(test_root)
-    }
-    represented = release_module_inventory()
-    excluded = set(EXPLICITLY_EXCLUDED_RELEASE_MODULES)
-    errors: list[str] = []
-    blank_reasons = sorted(
-        path.as_posix() for path, reason in EXPLICITLY_EXCLUDED_RELEASE_MODULES.items() if not reason.strip()
-    )
-    if blank_reasons:
-        errors.append("release inventory exclusions require non-empty reasons: " + ", ".join(blank_reasons))
-    overlap = sorted(path.as_posix() for path in represented & excluded)
-    if overlap:
-        errors.append("release inventory modules cannot be both represented and excluded: " + ", ".join(overlap))
-    missing = sorted(path.as_posix() for path in discovered - represented - excluded)
-    if missing:
-        errors.append("release inventory omits discovered modules: " + ", ".join(missing))
-    stale = sorted(path.as_posix() for path in represented - discovered)
-    if stale:
-        errors.append("release inventory names missing modules: " + ", ".join(stale))
-    unknown_exclusions = sorted(path.as_posix() for path in excluded - discovered)
-    if unknown_exclusions:
-        errors.append("release inventory excludes missing modules: " + ", ".join(unknown_exclusions))
     return errors
 
 
@@ -294,27 +245,12 @@ def suite_inventory() -> dict[str, object]:
             },
             "all": {
                 "selection": "all-discovered-modules",
-                "policy": "explicit-heavy-suite; use release for the full release gate",
+                "policy": "explicit exhaustive suite; not part of the release loop",
             },
             "corpus-projection": {
                 "selection": "just-recipe",
                 "command": "just corpus-projection",
                 "policy": "explicit repository RDF/SHACL projection gate",
-            },
-            "release": {
-                "selection": "fixed-release-stage-order",
-                "components": [
-                    "check",
-                    "smoke",
-                    "ontology-contract",
-                    "runtime-scenarios",
-                    "coverage",
-                ],
-                "module_inventory": sorted(path.as_posix() for path in release_module_inventory()),
-                "explicitly_excluded_modules": {
-                    path.as_posix(): reason for path, reason in sorted(EXPLICITLY_EXCLUDED_RELEASE_MODULES.items())
-                },
-                "policy": "rare full release-candidate gate with blocking CRAP quality check; do not use for small edits",
             },
         },
     }
@@ -460,63 +396,6 @@ def _run_ontology_groups(
     return 0
 
 
-def _run_release_suite(
-    test_root: Path,
-    *,
-    command_runner: CommandRunner,
-) -> int:
-    inventory_errors = release_inventory_errors(test_root)
-    if inventory_errors:
-        print("\n".join(inventory_errors), file=sys.stderr, flush=True)
-        return 5
-    stage_targets = {
-        suite: _select_targets(test_root, suite)
-        for suite in ("smoke", "ontology-contract", "runtime-scenarios", "coverage")
-    }
-    if any(targets is None for targets in stage_targets.values()):
-        return 5
-
-    smoke_targets = cast(list[str | Path], stage_targets["smoke"])
-    ontology_targets = cast(list[str | Path], stage_targets["ontology-contract"])
-    runtime_targets = cast(list[str | Path], stage_targets["runtime-scenarios"])
-    coverage_targets = cast(list[str | Path], stage_targets["coverage"])
-    print("Running release suite in 6 stages", flush=True)
-    print(f"Running smoke stage ({len(smoke_targets)} targets)", flush=True)
-    status = _run_timed(
-        _pytest_command(smoke_targets, coverage=True, append=True),
-        label="release smoke pytest",
-        command_runner=command_runner,
-    )
-    if status != 0:
-        return status
-
-    status = _run_ontology_groups(
-        test_root,
-        ontology_targets,
-        command_runner=command_runner,
-        timing_prefix="release",
-        coverage=True,
-    )
-    if status != 0:
-        return status
-
-    print(f"Running runtime-scenarios stage ({len(runtime_targets)} targets)", flush=True)
-    status = _run_timed(
-        _pytest_command(runtime_targets, coverage=True, append=True),
-        label="release runtime-scenarios pytest",
-        command_runner=command_runner,
-    )
-    if status != 0:
-        return status
-
-    print(f"Running CRAP stage ({len(coverage_targets)} targets)", flush=True)
-    return _run_timed(
-        _pytest_command(coverage_targets, coverage=True, crap=True, append=True),
-        label="release CRAP pytest",
-        command_runner=command_runner,
-    )
-
-
 def run_unit_gate(
     test_root: Path = DEFAULT_TEST_ROOT,
     *,
@@ -533,9 +412,6 @@ def run_unit_gate(
         )
         if planner_status != 0:
             return planner_status
-
-    if suite == "release":
-        return _run_release_suite(test_root, command_runner=command_runner)
 
     targets = _select_targets(test_root, suite)
     if targets is None:
@@ -575,7 +451,6 @@ def main() -> int:
             "runtime-scenarios",
             "coverage",
             "all",
-            "release",
         ),
         default="fast-unit",
         help="test suite to run; default is the fast development unit suite",

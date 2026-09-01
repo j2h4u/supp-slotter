@@ -23,6 +23,7 @@ from scripts.ontology_compiler import (
     compile_ontology,
 )
 
+from tests.compiled_ontology import compiled_runtime_payload
 from tests.test_ontology_artifacts import _copy_repository_shape
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,7 +31,7 @@ ONTOLOGY = ROOT / "ontology"
 
 
 def _payload() -> dict[str, object]:
-    return cast(dict[str, object], json.loads(compile_ontology(ONTOLOGY)[Path("runtime-program.json")]))
+    return compiled_runtime_payload()
 
 
 def test_compiler_emits_one_generic_scheduling_projection_without_retired_catalog_keys() -> None:

@@ -29,7 +29,8 @@ from planner.ontology.runtime_program import (
     RuntimeFactSubject,
     decode_runtime_program,
 )
-from scripts.ontology_compiler import compile_ontology
+
+from tests.compiled_ontology import compiled_runtime_payload
 
 ROOT = Path(__file__).resolve().parents[1]
 ONTOLOGY = ROOT / "ontology"
@@ -121,7 +122,7 @@ def test_every_admitted_value_maps_to_one_pressure() -> None:
     """Execute the authored/compiled law table and reject generated drift."""
 
     authored = cast(dict[str, object], yaml.safe_load((ONTOLOGY / "canonical-laws.yaml").read_text(encoding="utf-8")))
-    compiled_payload = cast(dict[str, Any], json.loads(compile_ontology(ONTOLOGY)[Path("runtime-program.json")]))
+    compiled_payload = cast(dict[str, Any], compiled_runtime_payload())
     generated_payload = cast(
         dict[str, Any], json.loads((ONTOLOGY / "generated/runtime-program.json").read_text(encoding="utf-8"))
     )

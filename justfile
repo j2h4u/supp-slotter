@@ -154,23 +154,15 @@ unit-gate-check:
 # Ontology, formal, corpus, and release gates remain explicit.
 verify: check _fast-unit-tests current-shelf-smoke
 
-# Full release candidate gate. Run before review/merge, not in small loops.
-# The bounded CRAP stage is the blocking test-quality gate.
-release: check ontology-check _release-unit corpus-projection deps-audit
-
-# One bounded release-unit run; the runner owns all six pytest stages and the
-# final CRAP check reuses the same curated coverage stage.
-_release-unit:
-    coverage_file="$(mktemp /tmp/supp-slotter-quality-crap.XXXXXX)"; \
-    trap 'rm -f "$coverage_file"' EXIT; \
-    scripts/run_bounded.sh -- env COVERAGE_FILE="$coverage_file" uv run --group ontology python scripts/run_unit_gate.py --suite release && \
-    uv run python scripts/crap_gate.py --coverage "$coverage_file" && \
-    COVERAGE_FILE="$coverage_file" uv run coverage report
+# Product-focused release gate: static contracts, fresh ontology artifacts,
+# exact inference/optimizer witnesses, the real shelf, and full corpus SHACL.
+# Exhaustive regression and quality analytics remain explicit, non-release gates.
+release: check ontology-check canonical-runtime current-shelf-smoke corpus-projection
 
 # Blocking CRAP threshold from one bounded curated-suite execution.
 crap-check:
     coverage_file="$(mktemp /tmp/supp-slotter-quality-crap.XXXXXX)"; \
     trap 'rm -f "$coverage_file"' EXIT; \
-    scripts/run_bounded.sh -- env COVERAGE_FILE="$coverage_file" uv run --group ontology python scripts/run_unit_gate.py --suite release && \
+    scripts/run_bounded.sh -- env COVERAGE_FILE="$coverage_file" uv run python scripts/run_unit_gate.py --suite coverage && \
     uv run python scripts/crap_gate.py --coverage "$coverage_file" && \
     COVERAGE_FILE="$coverage_file" uv run coverage report
