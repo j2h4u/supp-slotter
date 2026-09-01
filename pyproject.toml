@@ -18,6 +18,8 @@ dev = [
     "basedpyright>=1.39.9",
     "deptry>=0.25.1",
     "import-linter>=2.13",
+    "pip-audit>=2.10.1",
+    "tach>=0.35.0",
     "vulture>=2.14",
     "actionlint-py>=1.7.12.24",
     "coverage>=7.15.2",
@@ -110,6 +112,8 @@ tmp_path_retention_policy = "failed"
 tmp_path_retention_count = 1
 testpaths = ["tests"]
 addopts = [
+    "-p",
+    "no:tach",
     "--strict-config",
     "--strict-markers",
     "-W",

@@ -17,6 +17,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Submit uv.lock dependency graph
         uses: rmuir/uv-dependency-submission@v1.1.1
