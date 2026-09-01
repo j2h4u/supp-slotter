@@ -26,7 +26,7 @@ def main(data_root: Path | None = None) -> None:
         epilog=(
             "Usage:\n"
             "Commands:\n"
-            "  (bare invocation)              — print the schedule\n"
+            "  (bare invocation) or show      — print the schedule\n"
             "  check                          — validate all YAML data files without rewriting\n"
             "  normalize                      — explicitly rewrite card IDs, filenames, and refs\n"
             "  find WORDS...                  — search cards\n"
@@ -36,6 +36,7 @@ def main(data_root: Path | None = None) -> None:
     )
     sub = parser.add_subparsers(dest="cmd", required=False)
 
+    sub.add_parser("show", help="regenerate and print the schedule")
     check_parser = sub.add_parser("check", help="validate all YAML data files without rewriting")
     check_parser.epilog = "check validates canonical inputs and reports inconsistencies without rewriting them."
     sub.add_parser("normalize", help="explicitly rewrite card IDs, filenames, and references")
@@ -56,6 +57,7 @@ def main(data_root: Path | None = None) -> None:
     args = parser.parse_args()
     command = cast(str | None, args.cmd)
     handlers: dict[str, CommandHandler] = {
+        "show": _run_show,
         "check": _run_check,
         "normalize": _run_normalize,
         "find": _run_find,
@@ -67,6 +69,10 @@ def main(data_root: Path | None = None) -> None:
     handler = handlers.get(command)
     if handler is not None:
         sys.exit(handler(args, data_root))
+
+
+def _run_show(_args: argparse.Namespace, data_root: Path | None) -> int:
+    return _print_result(cmd_show(data_root=data_root))
 
 
 def _run_check(_args: argparse.Namespace, data_root: Path | None) -> int:
