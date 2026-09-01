@@ -49,6 +49,10 @@ ontology-full-check-benchmark:
 _import-contracts:
     uv run lint-imports
 
+# Check the declared module dependency graph independently of named import contracts.
+_module-boundaries:
+    uv run tach check
+
 # Check GitHub Actions workflow syntax and expressions.
 _actionlint:
     uv run actionlint
@@ -56,6 +60,15 @@ _actionlint:
 # Guard obvious supply-chain drift in workflows and container image references.
 _supply-chain-pins:
     uv run python scripts/check_supply_chain_pins.py
+
+# Audit the exact locked Python dependency set for known vulnerabilities.
+deps-audit:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    tmp="$(mktemp)"
+    trap 'rm -f "$tmp"' EXIT
+    uv export --locked --all-groups --no-emit-project --no-emit-workspace --no-emit-local --no-header --no-annotate --no-editable > "$tmp"
+    uv run pip-audit -r "$tmp" --strict --no-deps
 
 # Check declared Python dependencies against imports.
 _deptry:
@@ -75,7 +88,7 @@ fix:
     uv run ruff format .
 
 # Static quality gate: format, lint, types, imports, workflows, compile, dead code.
-check: _fmt-check _lint _preview-complexity-lint _lock-check _typecheck _import-contracts _actionlint _supply-chain-pins _deptry _compile _dead-code
+check: _fmt-check _lint _preview-complexity-lint _lock-check _typecheck _import-contracts _module-boundaries _actionlint _supply-chain-pins _deptry _compile _dead-code
 
 # Self-test the bounded runner without invoking the project test suite.
 bounded-runner-test:
@@ -143,7 +156,7 @@ verify: check _fast-unit-tests current-shelf-smoke
 
 # Full release candidate gate. Run before review/merge, not in small loops.
 # The bounded CRAP stage is the blocking test-quality gate.
-release: check ontology-check _release-unit corpus-projection
+release: check ontology-check _release-unit corpus-projection deps-audit
 
 # One bounded release-unit run; the runner owns all six pytest stages and the
 # final CRAP check reuses the same curated coverage stage.

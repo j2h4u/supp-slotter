@@ -1,0 +1,36 @@
+# Full Python module graph. This complements the named architecture contracts
+# in pyproject.toml by rejecting undeclared or stale dependencies between the
+# selected runtime, tooling, and test boundaries.
+
+source_roots = ["."]
+root_module = "forbid"
+exact = true
+ignore_type_checking_imports = false
+
+[[modules]]
+path = "planner"
+depends_on = ["planner.engine", "planner.ontology", "planner.cards"]
+
+[[modules]]
+path = "planner.cards"
+depends_on = ["planner.ontology", "planner"]
+
+[[modules]]
+path = "planner.engine"
+depends_on = ["planner.cards", "planner.query_model", "planner.ontology", "planner"]
+
+[[modules]]
+path = "planner.ontology"
+depends_on = ["planner"]
+
+[[modules]]
+path = "planner.query_model"
+depends_on = ["planner.cards", "planner", "planner.ontology"]
+
+[[modules]]
+path = "scripts"
+depends_on = ["planner", "planner.ontology"]
+
+[[modules]]
+path = "tests"
+depends_on = ["planner", "scripts", "planner.ontology", "planner.cards", "planner.engine", "planner.query_model"]
