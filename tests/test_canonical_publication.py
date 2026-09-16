@@ -47,15 +47,21 @@ def _source(*, anchors: tuple[str | None, str | None] = (None, None)) -> Canonic
     )
 
 
-def _pressure(item_id: str, dimension: str, value: str) -> NormalizedUnaryPressure:
+def _pressure(
+    item_id: str,
+    dimension: str,
+    value: str,
+    provenance: tuple[RuntimeEvidenceProvenance, ...] | None = None,
+) -> NormalizedUnaryPressure:
     subject = RuntimeFactSubject("sub_a", None)
     law = RuntimeCanonicalLaw(f"law_{dimension}", "FoodEffect", "effect", dimension, value)
+    evidence = provenance or (RuntimeEvidenceProvenance("source", f"locator#{dimension}", None),)
     fact = RuntimeCanonicalSchedulingFact(
         f"fact_{dimension}",
         "FoodEffect",
         subject,
         RuntimeFactApplicability("sub_a", None),
-        (RuntimeEvidenceProvenance("source", f"locator#{dimension}", None),),
+        evidence,
         "effect",
     )
     derivation = PressureDerivation(
@@ -161,6 +167,34 @@ def test_any_satisfied_match_makes_mixed_evidence_pressure_basis(tmp_path: Path)
     matches = published.document["canonical_explanations"]["item_a"]["pressure_matches"]
     assert published.document["canonical_explanations"]["item_a"]["placement_basis"] == "pressure_evidence"
     assert [match["satisfied"] for match in matches] == [True, False]
+
+
+def test_writer_preserves_provenance_with_mixed_quotation_values(tmp_path: Path) -> None:
+    source = _single_item_pressure_source(
+        (
+            _pressure(
+                "item_a",
+                "meal",
+                "wanted",
+                (
+                    RuntimeEvidenceProvenance("source", "same-locator", "quoted evidence"),
+                    RuntimeEvidenceProvenance("source", "same-locator", None),
+                ),
+            ),
+        ),
+        {"meal": "wanted"},
+    )
+
+    target = tmp_path / "schedule.yaml"
+    published = write_schedule_file(target, source)
+
+    assert isinstance(published, schedule_writer.PublishedSchedule)
+    assert target.exists()
+    assert published.document["status"] == "Optimal"
+    assert published.document["pressure_matches"][0]["provenance_refs"] == [
+        {"source": "source", "locator": "same-locator", "quotation": None},
+        {"source": "source", "locator": "same-locator", "quotation": "quoted evidence"},
+    ]
 
 
 @pytest.mark.parametrize(

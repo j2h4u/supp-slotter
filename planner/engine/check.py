@@ -41,8 +41,7 @@ def _cmd_check_inner(paths: Paths, bundle: OntologyBundle) -> CheckResult:
 
     required_error = _missing_required_file_error(paths)
     if required_error is not None:
-        report([required_error], [])
-        return CheckResult(exit_code=1, errors=[required_error], info=[])
+        return _check_failure([required_error], info)
 
     schema_preflight = _schema_preflight_errors(paths, info, bundle)
     if schema_preflight is not None:
@@ -74,25 +73,22 @@ def _schema_preflight_errors(paths: Paths, info: list[str], bundle: OntologyBund
     try:
         slots_data = load_yaml(slots_path)
     except CardLoadError as e:
-        report([e.message], info)
-        return CheckResult(exit_code=1, errors=[e.message], info=info)
+        return _check_failure([e.message], info)
 
     if not isinstance(slots_data, dict):
         msg = f"{slots_path}: top-level must be a mapping"
-        report([msg], [])
-        return CheckResult(exit_code=1, errors=[msg], info=[])
+        return _check_failure([msg], info)
 
     try:
         stacks_data = load_yaml(paths.stacks_file)
-    except CardLoadError:
-        stacks_data = None
+    except CardLoadError as e:
+        return _check_failure([e.message], info)
     references = (
         {"Stack": {key for key in stacks_data if isinstance(key, str)}} if isinstance(stacks_data, dict) else {}
     )
     errors = schema_errors(slots_data, "pillboxes", slots_path, bundle, reference_values=references)
     if errors:
-        report(errors, info)
-        return CheckResult(exit_code=1, errors=errors, info=info)
+        return _check_failure(errors, info)
     return None
 
 
@@ -101,12 +97,11 @@ def _load_domain_validators(paths: Paths, info: list[str], bundle: OntologyBundl
     try:
         load_pillboxes(paths.data / "pillboxes.yaml", bundle)
     except CardLoadError as e:
-        report([e.message], info)
-        return CheckResult(exit_code=1, errors=[e.message], info=info)
+        return _check_failure([e.message], info)
     return CheckResult(exit_code=0, errors=errors, info=info)
 
 
-def _extend_card_validation_errors(
+def _extend_card_validation_errors(  # noqa: PLR0911, PLR0914
     paths: Paths,
     errors: list[str],
     info: list[str],
@@ -116,30 +111,53 @@ def _extend_card_validation_errors(
     s_errors, s_info, substance_ids = check_substances(all_substance_files, bundle)
     errors.extend(s_errors)
     info.extend(s_info)
-    substances = load_substance_registry(paths, bundle)
+    if s_errors:
+        return _check_failure(errors, info)
+    try:
+        substances = load_substance_registry(paths, bundle)
+    except CardLoadError as e:
+        errors.append(e.message)
+        return _check_failure(errors, info)
     try:
         relations_data = load_yaml(paths.relations_file)
     except CardLoadError as e:
-        report([e.message], info)
-        return CheckResult(exit_code=1, errors=[e.message], info=info)
-    errors.extend(check_global_relations(relations_data, substances, paths, bundle))
+        errors.append(e.message)
+        return _check_failure(errors, info)
+    relation_errors = check_global_relations(relations_data, substances, paths, bundle)
+    errors.extend(relation_errors)
+    if relation_errors:
+        return _check_failure(errors, info)
 
     all_product_files = sorted(paths.products.glob("*.yaml"))
     p_errors, p_info, product_ids = check_product_formulas(all_product_files, substance_ids, bundle)
     errors.extend(p_errors)
     info.extend(p_info)
+    if p_errors:
+        return _check_failure(errors, info)
     try:
         products = load_product_registry(paths, bundle)
         validate_canonical_scheduling(bundle.runtime_program.canonical_scheduling, substances, products)
     except CardLoadError as e:
         errors.append(e.message)
+        return _check_failure(errors, info)
 
     stacks_errors, stacks_info = validate_stacks(paths, product_ids, bundle)
     errors.extend(stacks_errors)
     _append_stack_diagnostics(paths, bundle, stacks_info, info)
+    if stacks_errors:
+        return _check_failure(errors, info)
     dashboard_files = sorted(paths.dashboards.glob("*.yaml")) if paths.dashboards.exists() else []
-    errors.extend(check_dashboards(dashboard_files, set(), paths, bundle, substances, info))
+    dashboard_errors = check_dashboards(dashboard_files, set(), paths, bundle, substances, info)
+    errors.extend(dashboard_errors)
+    if dashboard_errors:
+        return _check_failure(errors, info)
     return None
+
+
+def _check_failure(errors: list[str], info: list[str]) -> CheckResult:
+    """Report one failed validation boundary and stop downstream work."""
+    report(errors, info)
+    return CheckResult(exit_code=1, errors=errors, info=info)
 
 
 def _append_stack_diagnostics(paths: Paths, bundle: OntologyBundle, stacks_info: list[str], info: list[str]) -> None:

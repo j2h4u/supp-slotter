@@ -146,7 +146,7 @@ def normalize_stack_entries(stacks_data: Mapping[str, object], runtime: RuntimeP
     return normalized
 
 
-def validate_stacks(
+def validate_stacks(  # noqa: PLR0911
     paths: Paths,
     product_ids: dict[str, Path],
     bundle: OntologyBundle,
@@ -167,23 +167,22 @@ def validate_stacks(
         stacks_path,
         bundle.runtime_program,
     )
-    errors = list(alignment_errors)
+    if alignment_errors:
+        return list(alignment_errors), alignment_info
     pillboxes_path = paths.data / "pillboxes.yaml"
     try:
         pillboxes = load_yaml(pillboxes_path)
-        if not isinstance(pillboxes, dict):
-            pillboxes = {}
-        pillbox_mapping = cast(dict[str, object], pillboxes)
-        errors.extend(
-            check_routable_topologies(
-                stacks_path,
-                _pillbox_stack_counts(pillbox_mapping),
-                bundle.runtime_program,
-            )
-        )
-    except CardLoadError:
-        pass
-    return errors, alignment_info
+    except CardLoadError as e:
+        return [e.message], alignment_info
+    if not isinstance(pillboxes, dict):
+        return [f"{pillboxes_path}: top-level must be a mapping"], alignment_info
+    pillbox_mapping = cast(dict[str, object], pillboxes)
+    topology_errors = check_routable_topologies(
+        stacks_path,
+        _pillbox_stack_counts(pillbox_mapping),
+        bundle.runtime_program,
+    )
+    return topology_errors, alignment_info
 
 
 def check_routable_topologies(

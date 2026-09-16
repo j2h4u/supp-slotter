@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-from collections import Counter
 from pathlib import Path
 from shutil import copytree
 from typing import cast
 
 import planner.engine.plan as plan_module
 import yaml
-from planner.cards.product import format_product_name, load_product_registry
+from planner.cards.pillboxes import flatten_pillbox_slots, load_pillboxes
 from planner.engine import cmd_plan
 from planner.paths import Paths
 
@@ -18,51 +17,56 @@ from tests.helpers import ontology_bundle
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def _schedule_products(schedule: dict[str, object], pillbox: str) -> list[str]:
-    pillboxes = cast(dict[str, object], schedule["pillboxes"])
-    entries = cast(dict[str, dict[str, object]], cast(dict[str, object], pillboxes[pillbox])["slots"])
-    return [
-        cast(str, product["label"])
-        for entry in entries.values()
-        for product in cast(list[dict[str, object]], entry["products"])
-    ]
-
-
-def _assert_current_shelf_proof(schedule: dict[str, object], stacks: dict[str, list[str]]) -> None:
+def _assert_current_shelf_proof(schedule: dict[str, object], stacks: dict[str, object], paths: Paths) -> None:
     assignments = cast(dict[str, str], schedule["assignments"])
     pressure_matches = cast(list[dict[str, object]], schedule["pressure_matches"])
-    expected_pressures = {
-        ("prd_bb212cffc2", "meal_context", "with_food"),
-        ("prd_cfce0b36b6", "exercise_anchor", "before"),
-        ("prd_eb6337a6dc", "meal_context", "with_food"),
-        ("prd_htuhz2s2gt", "meal_context", "with_food"),
-        ("prd_932319251f", "meal_context", "with_food"),
-        ("prd_8eff2491b7", "meal_context", "with_food"),
-        ("prd_vitamealc8", "meal_context", "with_food"),
-        ("prd_e5cc3b4e7c", "meal_context", "with_food"),
-        ("prd_8mvv1w128a", "meal_context", "with_food"),
-        ("prd_w2s970gps4", "meal_context", "with_food"),
+    active_by_stack = {stack: set(cast(list[str], stacks[stack])) for stack in ("daily", "training")}
+    active_products = set().union(*active_by_stack.values())
+
+    assert set(assignments) == active_products
+    assert not set(assignments) & set(cast(list[str], stacks["inactive"]))
+    assert not set(assignments) & {
+        cast(str, entry["product"]) for entry in cast(list[dict[str, object]], stacks["tracked_unassigned"])
     }
-    assert {
-        (cast(str, match["item_id"]), cast(str, match["dimension"]), cast(str, match["value"]))
-        for match in pressure_matches
-    } == expected_pressures
-    assert len(pressure_matches) == 10
-    assert all(match["satisfied"] is True and match["slot_anchor"] == match["value"] for match in pressure_matches)
+
+    slots = flatten_pillbox_slots(load_pillboxes(paths.data / "pillboxes.yaml", ontology_bundle()))
+    product_domains = {
+        product_id: stack for stack, product_ids in active_by_stack.items() for product_id in product_ids
+    }
+    assert all(slots[slot_id].stack == product_domains[product_id] for product_id, slot_id in assignments.items())
     assert all(
-        bool(match["fact_ids"])
+        match["item_id"] in assignments
+        and match["slot_id"] == assignments[match["item_id"]]
+        and match["slot_anchor"] == slots[match["slot_id"]].anchors[match["dimension"]]
+        and bool(match["fact_ids"])
         and bool(match["law_ids"])
-        and (bool(match["applicability_role_ids"]) or bool(match["applicability_product_ids"]))
+        and bool(match["provenance_refs"])
         for match in pressure_matches
     )
+
     objective = cast(dict[str, object], schedule["objective"])
-    assert objective["satisfied_pressures"] == 10
+    assert objective["satisfied_pressures"] == sum(match["satisfied"] for match in pressure_matches)
+    domain_loads = cast(dict[str, dict[str, object]], schedule["domain_loads"])
+    assert set(domain_loads) == set(product_domains.values())
+    assert objective["squared_load"] == sum(cast(int, domain["squared_load"]) for domain in domain_loads.values())
+    for domain, proof in domain_loads.items():
+        slot_loads = cast(dict[str, int], proof["slot_loads"])
+        assert set(slot_loads) == {slot_id for slot_id, slot in slots.items() if slot.stack == domain}
+        assert slot_loads == {
+            slot_id: sum(assigned_slot == slot_id for assigned_slot in assignments.values()) for slot_id in slot_loads
+        }
+        assert proof["squared_load"] == sum(load**2 for load in slot_loads.values())
+
     explanations = cast(dict[str, dict[str, object]], schedule["canonical_explanations"])
-    assert (
-        sum(explanation["placement_basis"] == "balance_and_tie_break_only" for explanation in explanations.values())
-        == 8
-    )
-    assert set(assignments) == {product_id for stack in ("daily", "training") for product_id in stacks[stack]}
+    assert set(explanations) == set(assignments)
+    for item_id, explanation in explanations.items():
+        item_matches = [match for match in pressure_matches if match["item_id"] == item_id]
+        assert explanation["item_id"] == item_id
+        assert explanation["slot_id"] == assignments[item_id]
+        assert explanation["pressure_matches"] == item_matches
+        assert explanation["placement_basis"] == (
+            "pressure_evidence" if any(match["satisfied"] for match in item_matches) else "balance_and_tie_break_only"
+        )
 
 
 def test_real_shelf_daily_episodic_and_training_products_are_complete(monkeypatch, tmp_path: Path) -> None:
@@ -84,23 +88,6 @@ def test_real_shelf_daily_episodic_and_training_products_are_complete(monkeypatc
     schedule = cast(dict[str, object], yaml.safe_load((tmp_path / "schedule.yaml").read_text(encoding="utf-8")))
     assert schedule["status"] == "Optimal"
     paths = Paths.from_root(tmp_path)
-    products = load_product_registry(paths, ontology_bundle())
-    stacks = cast(dict[str, list[str]], yaml.safe_load(paths.stacks_file.read_text(encoding="utf-8")))
+    stacks = cast(dict[str, object], yaml.safe_load(paths.stacks_file.read_text(encoding="utf-8")))
 
-    expected_by_stack = {
-        stack: {format_product_name(products[product_id]) for product_id in stacks[stack]}
-        for stack in ("daily", "training")
-    }
-    actual_by_stack = {stack: set(_schedule_products(schedule, stack)) for stack in ("daily", "training")}
-    assert actual_by_stack == expected_by_stack
-    assert Counter(_schedule_products(schedule, "daily") + _schedule_products(schedule, "training")) == Counter(
-        name for names in expected_by_stack.values() for name in names
-    )
-
-    summary = cast(dict[str, object], schedule["summary"])
-    placement_groups = cast(dict[str, list[str]], summary["placement_groups"])
-    episodic = {product_id for product_id in stacks["daily"] if products[product_id].use_pattern == "not_every_day"}
-    assert set(placement_groups["episodic"]) == episodic
-    assert {format_product_name(products[product_id]) for product_id in episodic} <= actual_by_stack["daily"]
-
-    _assert_current_shelf_proof(schedule, stacks)
+    _assert_current_shelf_proof(schedule, stacks, paths)

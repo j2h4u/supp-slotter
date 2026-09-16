@@ -99,7 +99,10 @@ def _pressure_match(
             derivation.path.role_id for derivation in pressure.derivations if derivation.path.role_id is not None
         }),
         "applicability_product_ids": sorted({derivation.path.product for derivation in pressure.derivations}),
-        "provenance_refs": [provenance[key] for key in sorted(provenance)],
+        "provenance_refs": [
+            provenance[key]
+            for key in sorted(provenance, key=lambda row: (row[0], row[1], row[2] is not None, row[2] or ""))
+        ],
     }
 
 
