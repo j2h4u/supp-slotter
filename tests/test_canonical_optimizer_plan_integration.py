@@ -6,7 +6,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import planner.engine.plan as plan_module
-from planner.canonical_optimizer_result import CanonicalObjective, Optimal
+from planner.canonical_optimizer_result import CanonicalObjective, Diagnostic, Indeterminate, Optimal
 from planner.contracts import Product, Slot
 from planner.engine._plan_types import ActiveIndex
 from planner.ontology.artifacts import load_ontology
@@ -53,3 +53,14 @@ def test_plan_hands_only_answer_free_source_to_writer(monkeypatch, tmp_path: Pat
 
 def test_plan_result_has_no_dead_warning_field() -> None:
     assert "warnings" not in plan_module.PlanResult.__dataclass_fields__
+
+
+def test_writer_indeterminate_is_reported_to_stderr(monkeypatch, tmp_path: Path, capsys) -> None:
+    failure = Indeterminate(Diagnostic("proof_failed", "proof incomplete"))
+    monkeypatch.setattr(plan_module, "write_schedule_file", lambda *_args: failure)
+
+    result = plan_module._publish_plan(Paths.from_root(tmp_path), [], _runtime())
+
+    assert result.status == "Indeterminate"
+    assert result.diagnostic == failure.diagnostic
+    assert capsys.readouterr().err == "plan: proof incomplete\n"

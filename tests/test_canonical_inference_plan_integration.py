@@ -10,7 +10,7 @@ from planner.engine.results import PlanResult
 from planner.ontology.canonical_inference import Conflict, SameDimensionPressureConflict
 
 
-def test_same_dimension_conflict_is_layout_free_and_never_reaches_writer(monkeypatch) -> None:
+def test_same_dimension_conflict_is_layout_free_and_never_reaches_writer(monkeypatch, capsys) -> None:
     conflict = Conflict((SameDimensionPressureConflict("item", "meal", ("with_food", "without_food"), ()),))
     active = ActiveIndex({"item": "prd"}, {"item": "daily"}, conflict)
     monkeypatch.setattr(plan_module, "build_active_index", lambda *_args, **_kwargs: active)
@@ -26,3 +26,4 @@ def test_same_dimension_conflict_is_layout_free_and_never_reaches_writer(monkeyp
     assert result.status == "Indeterminate"
     assert result.diagnostic is not None and result.diagnostic.code == "contradiction"
     assert not hasattr(plan_module, "optimize_canonical_layout")
+    assert "plan: canonical_inference_conflict" in capsys.readouterr().err

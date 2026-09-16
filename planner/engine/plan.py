@@ -93,13 +93,16 @@ def _build_plan_runtime(paths: Paths, errors: list[str], inputs: PlanInputs) -> 
         errors.append(message)
         return _failed_plan_result(1, errors, Diagnostic("invalid_input", message))
     if isinstance(active.canonical_inference, Conflict):
-        errors.extend(
+        conflict_diagnostics = [
             _canonical_inference_conflict_diagnostic(conflict)
             for conflict in sorted(
                 active.canonical_inference.conflicts,
                 key=lambda item: (item.item_id, item.dimension, item.values),
             )
-        )
+        ]
+        errors.extend(conflict_diagnostics)
+        for diagnostic in conflict_diagnostics:
+            print(diagnostic, file=sys.stderr)
         return _failed_plan_result(
             1,
             errors,
@@ -127,6 +130,7 @@ def _publish_plan(
     if not isinstance(inference, Success):
         message = "plan: canonical publication requires successful inference"
         errors.append(message)
+        print(message, file=sys.stderr)
         return _failed_plan_result(1, errors, Diagnostic("proof_failed", message))
     try:
         source = CanonicalPublicationSource(
@@ -146,7 +150,9 @@ def _publish_plan(
         )
         published = write_schedule_file(paths.schedule_file, source)
         if isinstance(published, Indeterminate):
-            errors.append(f"plan: {published.diagnostic.message}")
+            message = f"plan: {published.diagnostic.message}"
+            errors.append(message)
+            print(message, file=sys.stderr)
             return _failed_plan_result(1, errors, published.diagnostic)
         slot_loads = schedule_slot_loads(published.document)
         return PlanResult(
