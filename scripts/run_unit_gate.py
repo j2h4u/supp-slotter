@@ -86,6 +86,7 @@ CANONICAL_RUNTIME_REQUIRED_CAPABILITIES = frozenset({
     "exhaustive_oracle",
     "finite_law_table",
     "no_publication_failures",
+    "fail_fast_command_boundary",
     "normalization",
     "stable_tie_break",
 })
@@ -119,6 +120,9 @@ CANONICAL_RUNTIME_CAPABILITY_NODES: dict[str, tuple[str, ...]] = {
         "tests/test_canonical_optimizer.py::test_abort_during_final_expansion_or_pre_return_cannot_publish",
         "tests/test_canonical_publication.py::test_invalid_source_mapping_product_domain_or_slot_publishes_nothing",
         "tests/test_canonical_publication.py::test_failed_or_interrupted_write_removes_stale_lease",
+    ),
+    "fail_fast_command_boundary": (
+        "tests/test_command_fail_fast.py::test_show_invalidates_stale_schedule_and_does_not_render_or_write",
     ),
 }
 ONTOLOGY_CONTRACT_GROUPS: tuple[tuple[str, tuple[Path, ...]], ...] = (

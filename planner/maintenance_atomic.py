@@ -69,19 +69,8 @@ class EditPlan:
             if entry.obsolete_path is not None and entry.obsolete_path != entry.final_path:
                 obsolete[entry.final_path] = entry.obsolete_path
 
-        for tmp_path, final_path in self._staged:
-            try:
-                tmp_path.replace(final_path)
-            except OSError as e:
-                self.abort()
-                print(
-                    f"normalize: CRITICAL: commit failed for "
-                    f"{strip_root_prefix(str(final_path))}: {e}. "
-                    f"Some files may be in a partially-renamed state; "
-                    f"reconcile data/ manually.",
-                    file=sys.stderr,
-                )
-                raise
+        suffix = f".bak.{os.getpid():x}.{os.urandom(4).hex()}"
+        backups = self._replace_staged_files(suffix)
 
         for old_path in obsolete.values():
             if not old_path.exists():
@@ -93,6 +82,48 @@ class EditPlan:
                     f"warning: could not remove obsolete card {strip_root_prefix(str(old_path))}: {e}",
                     file=sys.stderr,
                 )
+
+        for backup_path, _final_path in backups:
+            try:
+                backup_path.unlink(missing_ok=True)
+            except OSError as e:
+                print(
+                    f"warning: could not remove temporary backup {strip_root_prefix(str(backup_path))}: {e}",
+                    file=sys.stderr,
+                )
+        self._staged.clear()
+
+    def _replace_staged_files(self, suffix: str) -> list[tuple[Path, Path]]:
+        backups: list[tuple[Path, Path]] = []
+        replaced: list[Path] = []
+        final_path: Path | None = None
+        try:
+            for tmp_path, final_path in self._staged:
+                backup_path = final_path.with_name(final_path.name + suffix)
+                if final_path.exists() or final_path.is_symlink():
+                    final_path.replace(backup_path)
+                    backups.append((backup_path, final_path))
+                tmp_path.replace(final_path)
+                replaced.append(final_path)
+        except OSError as e:
+            self._rollback_replacements(backups, replaced)
+            self.abort()
+            print(
+                f"normalize: CRITICAL: commit failed while replacing "
+                f"{strip_root_prefix(str(final_path)) if final_path is not None else '<unknown target>'}: {e}",
+                file=sys.stderr,
+            )
+            raise
+        return backups
+
+    def _rollback_replacements(self, backups: list[tuple[Path, Path]], replaced: list[Path]) -> None:
+        """Restore final paths that were replaced before a later replacement failed."""
+        for final_path in reversed(replaced):
+            with contextlib.suppress(OSError):
+                final_path.unlink(missing_ok=True)
+        for backup_path, final_path in reversed(backups):
+            with contextlib.suppress(OSError):
+                backup_path.replace(final_path)
 
     def abort(self) -> None:
         """Remove leftover staged .tmp files."""

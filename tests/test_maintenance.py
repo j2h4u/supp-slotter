@@ -21,7 +21,7 @@ from planner.maintenance import (
     maintenance_needed,
     run_maintenance,
 )
-from planner.maintenance_atomic import EditPlan
+from planner.maintenance_atomic import EditPlan, EditPlanEntry
 from planner.maintenance_card_plan import plan_card_dir
 from planner.maintenance_substance_resolution import (
     load_maintenance_contract,
@@ -215,6 +215,47 @@ def test_plan_card_dir_rejects_duplicate_canonical_destination(tmp_path: Path) -
     result = plan_card_dir(cards_dir, lambda _card: "same.yaml", "sub", EditPlan())
 
     assert result is None
+
+
+def test_edit_plan_commit_rolls_back_when_later_replace_fails(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    existing = tmp_path / "existing.yaml"
+    missing = tmp_path / "missing.yaml"
+    existing.write_text("before", encoding="utf-8")
+    plan = EditPlan()
+    plan.upsert(EditPlanEntry(existing, "after", None))
+    plan.upsert(EditPlanEntry(missing, "new", None))
+    assert plan.stage()
+
+    original_replace = Path.replace
+
+    def fail_missing(source: Path, target: Path) -> Path:
+        if target == missing:
+            raise OSError("injected second replacement failure")
+        return original_replace(source, target)
+
+    monkeypatch.setattr(Path, "replace", fail_missing)
+    with pytest.raises(OSError, match="injected second replacement failure"):
+        plan.commit()
+
+    assert existing.read_text(encoding="utf-8") == "before"
+    assert not missing.exists()
+    assert not list(tmp_path.glob("*.tmp.*"))
+    assert not list(tmp_path.glob("*.bak.*"))
+
+
+def test_edit_plan_commit_clears_staged_entries_after_success(tmp_path: Path) -> None:
+    final = tmp_path / "final.yaml"
+    plan = EditPlan()
+    plan.upsert(EditPlanEntry(final, "content", None))
+    assert plan.stage()
+
+    plan.commit()
+
+    assert final.read_text(encoding="utf-8") == "content"
+    assert plan._staged == []
 
 
 def test_check_reports_product_component_name_without_rewriting(tmp_path: Path) -> None:

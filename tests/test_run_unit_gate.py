@@ -416,6 +416,7 @@ def test_canonical_runtime_inventory_is_exact_and_stable() -> None:
         "stable_tie_break",
         "exhaustive_oracle",
         "no_publication_failures",
+        "fail_fast_command_boundary",
     }
     assert set(run_unit_gate.CANONICAL_RUNTIME_CAPABILITY_NODES) == expected_capabilities
     nodes = run_unit_gate.canonical_runtime_nodes()

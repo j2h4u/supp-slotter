@@ -170,44 +170,6 @@ def _print_relation_match_line(label: str, names: list[str]) -> None:
     )
 
 
-def _print_index_section(
-    title: str,
-    entries: dict[str, list[str]],
-    empty_message: str,
-) -> None:
-    total = sum(len(v) for v in entries.values())
-    print()
-    print(f"{title} ({total})")
-    print(SEPARATOR)
-    if not entries:
-        print(f"  {empty_message}")
-        return
-
-    for slug in sorted(entries):
-        names = entries[slug]
-        print(f"  {slug} ({len(names)})")
-        for name in names:
-            print(f"    - {name}")
-
-
-def _print_knowledge_index(model: ReviewModel) -> None:
-    for namespace in model.knowledge_index_order:
-        entries = model.knowledge_index.get(namespace, {})
-        title = _knowledge_namespace_label(model, namespace)
-        _print_index_section(
-            title,
-            entries,
-            f"No {title.casefold()} on active substances.",
-        )
-
-
-def _knowledge_namespace_label(model: ReviewModel, namespace: str) -> str:
-    label = model.knowledge_namespace_labels.get(namespace)
-    if not isinstance(label, str) or not label.strip():
-        raise ValueError(f"ontology knowledge namespace {namespace!r} has no authored presentation label")
-    return label
-
-
 def _concern_sort_key(entry: ConcernEntry) -> tuple[str, str]:
     return (entry.name.casefold(), entry.text.casefold())
 
@@ -243,10 +205,6 @@ def _count_members_by_usage(members: list[DashboardMember], state: str) -> int:
     return sum(1 for member in members if _member_usage_state(member) == state)
 
 
-def _count_members_by_tracking(members: list[DashboardMember], state: str) -> int:
-    return sum(1 for member in members if _member_product_tracking_state(member) == state)
-
-
 def _dashboard_views_with_usage_state(model: ReviewModel, state: str) -> int:
     count = 0
     for entry in model.dashboard_summary.values():
@@ -257,7 +215,3 @@ def _dashboard_views_with_usage_state(model: ReviewModel, state: str) -> int:
 
 def _member_usage_state(member: DashboardMember) -> str | None:
     return member["usage"]["state"]
-
-
-def _member_product_tracking_state(member: DashboardMember) -> str | None:
-    return member["product_tracking"]["state"]
