@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import inspect
+from collections.abc import Callable
+from os import PathLike
 from pathlib import Path
+from typing import TextIO, cast
 
 import planner.canonical_optimizer as optimizer_module
 import planner.schedule_writer as schedule_writer
@@ -262,6 +265,124 @@ def test_writer_does_not_accept_forged_projection_or_precomputed_optimal(tmp_pat
         "canonical publication failed closed: write_schedule_file requires a CanonicalPublicationSource"
     )
     assert not target.exists()
+
+
+def test_writer_renders_the_document_to_the_installed_file(tmp_path: Path) -> None:
+    target = tmp_path / "schedule.yaml"
+
+    published = write_schedule_file(target, _source())
+
+    assert not isinstance(published, Indeterminate)
+    assert "status: Optimal" in target.read_text(encoding="utf-8")
+
+
+def test_writer_keeps_the_temporary_file_in_the_target_directory(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    real_mkstemp = cast(
+        Callable[[str | None, str | None, str | PathLike[str] | None, bool], tuple[int, str]],
+        schedule_writer.tempfile.mkstemp,
+    )
+    directories: list[object] = []
+
+    def checked_mkstemp(
+        suffix: str | None = None,
+        prefix: str | None = None,
+        dir: str | PathLike[str] | None = None,
+        text: bool = False,
+    ) -> tuple[int, str]:
+        directories.append(dir)
+        return real_mkstemp(suffix, prefix, dir, text)
+
+    monkeypatch.setattr(schedule_writer.tempfile, "mkstemp", checked_mkstemp)
+    published = write_schedule_file(tmp_path / "schedule.yaml", _source())
+
+    assert not isinstance(published, Indeterminate)
+    assert directories == [tmp_path]
+
+
+def test_writer_removes_an_old_lease_after_an_early_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    target = tmp_path / "schedule.yaml"
+    target.write_text("stale", encoding="utf-8")
+    calls = 0
+
+    def invalidate(path: Path) -> None:
+        nonlocal calls
+        calls += 1
+        if calls > 1:
+            path.unlink(missing_ok=True)
+
+    def fail_fsync(_fd: int) -> None:
+        raise OSError("fsync failed")
+
+    monkeypatch.setattr(schedule_writer, "invalidate_schedule_file", invalidate)
+    monkeypatch.setattr(schedule_writer.os, "fsync", fail_fsync)
+
+    failed = write_schedule_file(target, _source())
+
+    assert isinstance(failed, Indeterminate)
+    assert calls == 2
+    assert not target.exists()
+
+
+def test_writer_uses_utf8_for_the_temporary_stream(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    real_fdopen = cast(Callable[..., TextIO], schedule_writer.os.fdopen)
+    encodings: list[object] = []
+
+    def checked_fdopen(fd: int, mode: str = "r", *, encoding: str | None = None) -> TextIO:
+        encodings.append(encoding)
+        return real_fdopen(fd, mode, encoding=encoding)
+
+    monkeypatch.setattr(schedule_writer.os, "fdopen", checked_fdopen)
+    published = write_schedule_file(tmp_path / "schedule.yaml", _source())
+
+    assert not isinstance(published, Indeterminate)
+    assert [value.lower() if isinstance(value, str) else value for value in encodings] == ["utf-8"]
+
+
+def test_writer_suppresses_temporary_cleanup_oserror(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    real_unlink = Path.unlink
+    raised = False
+
+    def checked_unlink(path: Path, *args: object, **kwargs: object) -> None:
+        nonlocal raised
+        if path.name.startswith("schedule.yaml.tmp.") and not raised:
+            raised = True
+            raise OSError("cleanup failed")
+        real_unlink(path, *args, **kwargs)
+
+    def fail_fsync(_fd: int) -> None:
+        raise OSError("fsync failed")
+
+    monkeypatch.setattr(Path, "unlink", checked_unlink)
+    monkeypatch.setattr(schedule_writer.os, "fsync", fail_fsync)
+
+    failed = write_schedule_file(tmp_path / "schedule.yaml", _source())
+
+    assert isinstance(failed, Indeterminate)
+    assert raised
+
+
+def test_writer_suppresses_lease_invalidation_oserror(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    target = tmp_path / "schedule.yaml"
+    calls = 0
+
+    def invalidate(_path: Path) -> None:
+        nonlocal calls
+        calls += 1
+        if calls > 1:
+            raise OSError("invalidation failed")
+
+    def fail_fsync(_fd: int) -> None:
+        raise OSError("fsync failed")
+
+    monkeypatch.setattr(schedule_writer, "invalidate_schedule_file", invalidate)
+    monkeypatch.setattr(schedule_writer.os, "fsync", fail_fsync)
+
+    failed = write_schedule_file(target, _source())
+
+    assert isinstance(failed, Indeterminate)
+    assert calls == 2
 
 
 @pytest.mark.parametrize("error", [OSError("fsync failed"), KeyboardInterrupt()])
