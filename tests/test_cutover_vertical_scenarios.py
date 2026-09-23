@@ -45,7 +45,7 @@ def _assert_current_shelf_proof(schedule: dict[str, object], stacks: dict[str, o
     )
 
     objective = cast(dict[str, object], schedule["objective"])
-    assert objective["satisfied_pressures"] == sum(match["satisfied"] for match in pressure_matches)
+    assert objective["satisfied_pressures"] == sum(bool(match["satisfied"]) for match in pressure_matches)
     domain_loads = cast(dict[str, dict[str, object]], schedule["domain_loads"])
     assert set(domain_loads) == set(product_domains.values())
     assert objective["squared_load"] == sum(cast(int, domain["squared_load"]) for domain in domain_loads.values())

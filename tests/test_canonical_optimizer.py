@@ -138,6 +138,7 @@ def test_conflicts_and_invalid_inputs_are_layout_free_indeterminate() -> None:
     )
     assert isinstance(result, Indeterminate)
     assert result.diagnostic.code == "contradiction"
+    assert result.diagnostic.message == "same-dimension pressure conflict"
     assert isinstance(
         optimize_canonical_layout({}, slots, (UnaryPressureIdentity("item", "meal_context", "with_food"),)),
         Indeterminate,
@@ -161,9 +162,134 @@ def test_deadline_interruption_and_state_bound_never_publish_incumbents() -> Non
     for result in (expired, interrupted, bounded):
         assert isinstance(result, Indeterminate)
 
+    assert isinstance(expired, Indeterminate)
+    assert isinstance(interrupted, Indeterminate)
+    assert isinstance(bounded, Indeterminate)
     assert expired.diagnostic.code == "timeout"
     assert interrupted.diagnostic.code == "interrupted"
     assert bounded.diagnostic.code == "resource_exhausted"
+
+
+def test_state_bound_allows_the_exact_boundary() -> None:
+    result = optimize_canonical_layout(
+        {"item": "daily"},
+        {"early": _slot("early", 1), "late": _slot("late", 2)},
+        (),
+        state_bound=2,
+    )
+
+    assert isinstance(result, Optimal)
+    assert result.assignments == {"item": "early"}
+
+
+@pytest.mark.parametrize(
+    "item_domains",
+    ({1: "daily"}, {"": "daily"}, {"item": 1}, {"item": ""}),
+)
+def test_malformed_item_domains_fail_closed(item_domains: object) -> None:
+    result = _optimize_canonical_layout(
+        CanonicalOptimizerInput(
+            item_domains,  # type: ignore[arg-type]
+            {"slot": _slot("slot", 1)},
+            (),
+            PRESSURE_VALUES,
+            IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY,
+        )
+    )
+
+    assert isinstance(result, Indeterminate)
+    assert result.diagnostic.code == "invalid_input"
+    assert result.diagnostic.message == "item and domain IDs must be non-empty strings"
+
+
+@pytest.mark.parametrize(
+    "dimensions",
+    ({}, [], {"meal": set()}, {"meal": frozenset()}, {"meal": frozenset({1})}, {1: frozenset({"x"})}),
+)
+def test_malformed_pressure_dimensions_fail_closed(dimensions: object) -> None:
+    result = _optimize_canonical_layout(
+        CanonicalOptimizerInput(
+            {},
+            {},
+            (),
+            dimensions,  # type: ignore[arg-type]
+            IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY,
+        )
+    )
+
+    assert isinstance(result, Indeterminate)
+    assert result.diagnostic.code == "invalid_input"
+    assert result.diagnostic.message in {
+        "pressure dimensions must be a non-empty mapping",
+        "pressure dimensions contain invalid values",
+    }
+
+
+@pytest.mark.parametrize(
+    "slots",
+    (
+        {"slot": object()},
+        {"wrong": _slot("slot", 1)},
+        {"slot": _slot("other", 1)},
+        {"slot": _slot("slot", 1, domain="")},
+        {"slot": Slot("slot", "slot", True, "daily", "daily", "daily", dict(_slot("slot", 1).anchors))},
+    ),
+)
+def test_malformed_slots_fail_closed(slots: object) -> None:
+    result = _optimize_canonical_layout(
+        CanonicalOptimizerInput(
+            {},
+            slots,  # type: ignore[arg-type]
+            (),
+            PRESSURE_VALUES,
+            IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY,
+        )
+    )
+
+    assert isinstance(result, Indeterminate)
+    assert result.diagnostic.code == "invalid_input"
+
+
+@pytest.mark.parametrize(
+    "pressure",
+    (
+        UnaryPressureIdentity("", "meal_context", "with_food"),
+        UnaryPressureIdentity("missing", "meal_context", "with_food"),
+        UnaryPressureIdentity("item", "missing", "with_food"),
+        UnaryPressureIdentity("item", "meal_context", "missing"),
+        object(),
+    ),
+)
+def test_malformed_pressure_identities_fail_closed(pressure: object) -> None:
+    result = _optimize_canonical_layout(
+        CanonicalOptimizerInput(
+            {"item": "daily"},
+            {"slot": _slot("slot", 1)},
+            (pressure,),  # type: ignore[arg-type]
+            PRESSURE_VALUES,
+            IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY,
+        )
+    )
+
+    assert isinstance(result, Indeterminate)
+    assert result.diagnostic.code == "invalid_input"
+    assert result.diagnostic.message in {
+        "invalid or unselected pressure identity",
+        "pressures must contain normalized pressure identities",
+    }
+
+
+def test_negative_deadline_fails_closed() -> None:
+    result = optimize_canonical_layout(
+        {"item": "daily"},
+        {"slot": _slot("slot", 1)},
+        (),
+        deadline_monotonic_ns=-1,
+    )
+
+    assert isinstance(result, Indeterminate)
+    assert result.diagnostic.code == "invalid_input"
+    assert result.diagnostic.message == "invalid deadline"
 
 
 @pytest.mark.parametrize(

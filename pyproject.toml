@@ -18,6 +18,7 @@ dev = [
     "basedpyright>=1.39.9",
     "deptry>=0.25.1",
     "import-linter>=2.13",
+    "mutmut>=3.8.0",
     "pip-audit>=2.10.1",
     "tach>=0.35.0",
     "vulture>=2.14",
@@ -44,7 +45,7 @@ preview = true
 # bug-catching core, high-signal modernization/tidiness rules, pathlib/datetime
 # discipline and explicit noqa/type-ignore codes.
 explicit-preview-rules = true
-select = ["E4", "E7", "E9", "F", "I", "B", "BLE", "UP", "C4", "PIE", "ISC", "RSE", "FLY", "RUF", "PERF", "SIM", "PTH", "DTZ", "PGH", "PLE", "LOG", "G", "FURB", "RET", "N818", "PLR2004", "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0914", "PLR0915", "PLR0916", "PLR0917", "PLR1702"]
+select = ["E4", "E7", "E9", "F", "I", "B", "BLE", "UP", "C4", "PIE", "ISC", "RSE", "FLY", "RUF", "PERF", "SIM", "PTH", "DTZ", "PGH", "PLE", "LOG", "G", "FURB", "RET", "N818", "ARG", "PLR2004", "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0914", "PLR0915", "PLR0916", "PLR0917", "PLR1702"]
 ignore = [
     "ISC001", # conflicts with ruff format
     "RUF001", # intentional Cyrillic names/notes in ontology data and docs
@@ -99,6 +100,23 @@ sigterm = true
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
+
+[tool.mutmut]
+source_paths = [
+    "planner/canonical_optimizer.py",
+    "planner/ontology/canonical_inference.py",
+    "planner/schedule_writer.py",
+]
+also_copy = ["data/", "ontology/", "planner/", "scripts/"]
+pytest_add_cli_args_test_selection = [
+    "tests/test_canonical_inference.py",
+    "tests/test_canonical_optimizer.py",
+    "tests/test_canonical_optimizer_plan_integration.py",
+    "tests/test_canonical_publication.py",
+]
+pytest_add_cli_args = ["-q", "-p", "no:tach", "-m", "not integration and not slow"]
+on_dependency_change = "rerun"
+mutate_only_covered_lines = true
 
 [tool.vulture]
 paths = ["planner", "scripts", "tests"]

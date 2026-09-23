@@ -43,11 +43,11 @@
     },
     {
       "path": "runtime-lock.json",
-      "sha256": "08711d51433879ef598fafa0a92c05820041974eba6c80297cdc2b0d441916d8"
+      "sha256": "d62fac18eab5f3cafaecd66fe313a9913edd5e5a89e74c79fed5e407fe2687fb"
     },
     {
       "path": "runtime-program.json",
-      "sha256": "37e33803d30f140b05938abcdd30dc3f885149cfa13c11c298d633d58264509c"
+      "sha256": "aeea825bdb73215403e738a3579e120b22b6b51fd91938aae075583fe828a33e"
     },
     {
       "path": "runtime-vocabulary.yaml",

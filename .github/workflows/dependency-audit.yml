@@ -37,7 +37,7 @@ jobs:
         with:
           enable-cache: true
 
-      - uses: taiki-e/install-action@v2
+      - uses: taiki-e/install-action@dfae9bf3d6f6c6f20ef4ebb3486c01a51341ff12 # v2
         with:
           tool: just
 

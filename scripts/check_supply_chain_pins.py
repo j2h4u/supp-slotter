@@ -5,8 +5,9 @@ from pathlib import Path
 
 FLOATING_ACTION_REFS = {"main", "master", "trunk", "HEAD"}
 FLOATING_IMAGE_TAGS = {"latest", "stable", "edge", "main", "master"}
-WORKFLOW_USES_PATTERN = re.compile(r"^\s*uses:\s*([^@\s]+)@([^\s#]+)", re.MULTILINE)
-FROM_PATTERN = re.compile(r"^\s*FROM\s+(?P<image>[^\s]+)", re.MULTILINE)
+QUOTED_VALUE_MIN_LENGTH = 2
+WORKFLOW_USES_PATTERN = re.compile(r"^\s*(?:-\s*)?uses:\s*(?P<value>[^#\n]+)", re.MULTILINE)
+FROM_PATTERN = re.compile(r"^\s*FROM\s+(?P<args>[^#\n]+)", re.MULTILINE)
 COPY_FROM_PATTERN = re.compile(r"^\s*COPY\s+--from=(?P<image>[^\s]+)", re.MULTILINE)
 IMAGE_PATTERN = re.compile(r"^\s*image:\s*(?P<image>[^\s#]+)", re.MULTILINE)
 
@@ -23,10 +24,19 @@ def _check_action_refs(root: Path) -> list[str]:
     for path in _workflow_files(root):
         text = path.read_text(encoding="utf-8")
         for match in WORKFLOW_USES_PATTERN.finditer(text):
-            action, ref = match.groups()
+            value = _strip_quotes(match.group("value").strip())
+            if "@" not in value:
+                continue
+            action, ref = value.rsplit("@", maxsplit=1)
             if ref in FLOATING_ACTION_REFS or re.fullmatch(r"v?\d+", ref) or re.fullmatch(r"v?\d+\.\d+", ref):
                 errors.append(f"{path.relative_to(root)} uses {action}@{ref}; pin actions to a full version or SHA")
     return errors
+
+
+def _strip_quotes(value: str) -> str:
+    if len(value) >= QUOTED_VALUE_MIN_LENGTH and value[0] == value[-1] and value[0] in {"'", '"'}:
+        return value[1:-1]
+    return value
 
 
 def _is_local_image(image: str) -> bool:
@@ -59,10 +69,9 @@ def _check_container_refs(root: Path) -> list[str]:
     if dockerfile.exists():
         text = dockerfile.read_text(encoding="utf-8")
         for match in FROM_PATTERN.finditer(text):
-            image = match.group("image")
-            if image.startswith("--"):
-                continue
-            errors.extend(_check_image_ref(image, str(dockerfile.relative_to(root))))
+            image = _docker_from_image(match.group("args"))
+            if image is not None:
+                errors.extend(_check_image_ref(image, str(dockerfile.relative_to(root))))
         for match in COPY_FROM_PATTERN.finditer(text):
             image = match.group("image")
             if image.isidentifier():
@@ -75,6 +84,16 @@ def _check_container_refs(root: Path) -> list[str]:
         for match in IMAGE_PATTERN.finditer(text):
             errors.extend(_check_image_ref(match.group("image").strip('"').strip("'"), str(compose.relative_to(root))))
     return errors
+
+
+def _docker_from_image(args: str) -> str | None:
+    for token in args.split():
+        if token.startswith("--"):
+            continue
+        if token.upper() == "AS":
+            return None
+        return _strip_quotes(token)
+    return None
 
 
 def main() -> int:

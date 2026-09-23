@@ -182,7 +182,9 @@ def test_authored_vertical_fixture_compiles_loads_and_routes_all_runtime_anchors
     }.items():
         assert assignments[_fixture_product_id(key)] == slot_id
     matches = cast(list[dict[str, object]], schedule["pressure_matches"])
-    assert {match["fact_ids"][0] for match in matches} == {f"fact_vertical_{key}" for key in FIXTURE_ID_SUFFIXES}
+    assert {cast(list[object], match["fact_ids"])[0] for match in matches} == {
+        f"fact_vertical_{key}" for key in FIXTURE_ID_SUFFIXES
+    }
     assert all(match["satisfied"] is True and match["applicability_role_ids"] for match in matches)
     groups = cast(dict[str, list[str]], cast(dict[str, object], schedule["summary"])["placement_groups"])
     assert groups["episodic"] == [_fixture_product_id("food")]

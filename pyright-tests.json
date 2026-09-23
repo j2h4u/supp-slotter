@@ -1,0 +1,20 @@
+{
+  "include": ["tests"],
+  "extraPaths": ["."],
+  "pythonVersion": "3.14",
+  "typeCheckingMode": "standard",
+  "reportAny": "none",
+  "reportExplicitAny": "none",
+  "reportUnknownVariableType": "none",
+  "reportArgumentType": "none",
+  "reportUnknownArgumentType": "none",
+  "reportUnknownMemberType": "none",
+  "reportUnknownParameterType": "none",
+  "reportUnknownLambdaType": "none",
+  "reportMissingParameterType": "none",
+  "reportMissingTypeArgument": "none",
+  "reportUnannotatedClassAttribute": "none",
+  "reportUnusedCallResult": "none",
+  "reportImplicitStringConcatenation": "none",
+  "reportPrivateUsage": "none"
+}

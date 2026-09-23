@@ -68,10 +68,8 @@ def test_ontoclean_profiles_reject_anti_rigid_identity_supply(tmp_path: Path) ->
     profiles["anti_rigid_dependent"]["supplies_identity"] = True
     path.write_text(yaml.safe_dump(source, sort_keys=False), encoding="utf-8")
     manifest = cast(dict[str, object], yaml.safe_load((root / "manifest.yaml").read_text(encoding="utf-8")))
-    schema_view = SchemaView(str(root / "supp_slotter.yaml"))
-
     with pytest.raises(OntologyInfrastructureError, match="anti-rigid but supplies identity"):
-        _load_ontoclean_profiles(root, manifest, schema_view)
+        _load_ontoclean_profiles(root, manifest)
 
 
 def test_current_ontoclean_catalog_is_executable_and_projected(tmp_path: Path) -> None:
