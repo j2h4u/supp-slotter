@@ -298,15 +298,14 @@ def test_name_selector_resolves_new_same_name_form_in_runtime_record(tmp_path: P
 
 
 @pytest.mark.parametrize(
-    ("selector", "expected_form", "expected_kind", "expected_details"),
+    ("expected_form", "expected_kind", "expected_details"),
     [
-        (RelationSelector(entity_id="sub_known000"), "entity_id", "entity", False),
-        (RelationSelector(entity_name="Known"), "name", "entity", True),
-        (RelationSelector(category="kind", term="mineral"), "term", "term", True),
+        ("entity_id", "entity", False),
+        ("name", "entity", True),
+        ("term", "term", True),
     ],
 )
 def test_selector_form_capabilities_are_semantic_not_cardinality(
-    selector: RelationSelector,
     expected_form: str,
     expected_kind: str,
     expected_details: bool,

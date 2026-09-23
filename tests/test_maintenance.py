@@ -711,13 +711,13 @@ def _metadata_bundle(
     return SimpleNamespace(projection_map=projection, decoded={schema_artifact: schema})
 
 
-def test_reference_resolution_rejects_unverified_bundle(tmp_path: Path) -> None:
+def test_reference_resolution_rejects_unverified_bundle() -> None:
     bundle = _metadata_bundle(collection_path="data/alternate_entries", identity_pattern=r"^ent_[0-9]{3}$")
     with pytest.raises(OntologyInfrastructureError, match="verified OntologyBundle"):
         load_reference_resolution(bundle)  # type: ignore[arg-type]
 
 
-def test_reference_resolution_identity_pattern_requires_verified_bundle(tmp_path: Path) -> None:
+def test_reference_resolution_identity_pattern_requires_verified_bundle() -> None:
     with pytest.raises(OntologyInfrastructureError, match="verified OntologyBundle"):
         load_reference_resolution(
             _metadata_bundle(collection_path="data/entries", identity_pattern=r"^item_[0-9]{3}$")  # type: ignore[arg-type]
@@ -755,6 +755,7 @@ def test_reference_resolution_fails_on_missing_or_ambiguous_projection_metadata(
 
     monkeypatch.setattr(resolution_module, "_is_verified_bundle", lambda _bundle: True)
     missing = _metadata_bundle(collection_path="data/entries", identity_pattern=r"^ent_[0-9]{3}$")
+    assert isinstance(missing, SimpleNamespace)
     missing_projection = cast(dict[str, object], missing.projection_map)
     repository = cast(dict[str, object], missing_projection["repository_projection"])
     missing_source = cast(dict[str, object], cast(list[object], repository["sources"])[1])
@@ -763,6 +764,7 @@ def test_reference_resolution_fails_on_missing_or_ambiguous_projection_metadata(
         load_reference_resolution(missing)  # type: ignore[arg-type]
 
     ambiguous = _metadata_bundle(collection_path="data/entries", identity_pattern=r"^ent_[0-9]{3}$")
+    assert isinstance(ambiguous, SimpleNamespace)
     ambiguous_projection = cast(dict[str, object], ambiguous.projection_map)
     ambiguous_repository = cast(dict[str, object], ambiguous_projection["repository_projection"])
     sources = cast(list[dict[str, object]], ambiguous_repository["sources"])

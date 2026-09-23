@@ -78,6 +78,10 @@ _deptry:
 _typecheck:
     scripts/run_bounded.sh -- uv run basedpyright planner scripts
 
+# Type-check the complete test suite separately from production code.
+_typecheck-tests:
+    scripts/run_bounded.sh -- uv run basedpyright --project pyright-tests.json --warnings
+
 # Scan for dead code with vulture.
 _dead-code:
     uv run vulture --ignore-names selector_kinds
@@ -88,7 +92,7 @@ fix:
     uv run ruff format .
 
 # Static quality gate: format, lint, types, imports, workflows, compile, dead code.
-check: _fmt-check _lint _preview-complexity-lint _lock-check _typecheck _import-contracts _module-boundaries _actionlint _supply-chain-pins _deptry _compile _dead-code
+check: _fmt-check _lint _preview-complexity-lint _lock-check _typecheck _typecheck-tests _import-contracts _module-boundaries _actionlint _supply-chain-pins _deptry _compile _dead-code
 
 # Self-test the bounded runner without invoking the project test suite.
 bounded-runner-test:
@@ -144,10 +148,10 @@ unit-gate-test:
 
 # Lint, type-check, and compile the isolated unit gate implementation.
 unit-gate-check:
-    uv run ruff check scripts/crap_gate.py scripts/run_unit_gate.py tests/test_crap_gate.py tests/test_run_unit_gate.py
-    uv run ruff format --check scripts/crap_gate.py scripts/run_unit_gate.py tests/test_crap_gate.py tests/test_run_unit_gate.py
-    scripts/run_bounded.sh -- uv run basedpyright scripts/crap_gate.py scripts/run_unit_gate.py tests/test_crap_gate.py tests/test_run_unit_gate.py --warnings
-    uv run python -m compileall -q scripts/crap_gate.py scripts/run_unit_gate.py tests/test_crap_gate.py tests/test_run_unit_gate.py
+    uv run ruff check scripts/check_mutation_gate.py scripts/crap_gate.py scripts/run_unit_gate.py tests/test_crap_gate.py tests/test_run_unit_gate.py
+    uv run ruff format --check scripts/check_mutation_gate.py scripts/crap_gate.py scripts/run_unit_gate.py tests/test_crap_gate.py tests/test_run_unit_gate.py
+    scripts/run_bounded.sh -- uv run basedpyright scripts/check_mutation_gate.py scripts/crap_gate.py scripts/run_unit_gate.py tests/test_crap_gate.py tests/test_run_unit_gate.py --warnings
+    uv run python -m compileall -q scripts/check_mutation_gate.py scripts/crap_gate.py scripts/run_unit_gate.py tests/test_crap_gate.py tests/test_run_unit_gate.py
 
 # Default local development confidence gate. The private unit suite does not
 # validate; `current-shelf-smoke` calls cmd_plan, which owns exactly one check.
@@ -166,3 +170,10 @@ crap-check:
     scripts/run_bounded.sh -- env COVERAGE_FILE="$coverage_file" uv run python scripts/run_unit_gate.py --suite coverage && \
     uv run python scripts/crap_gate.py --coverage "$coverage_file" && \
     COVERAGE_FILE="$coverage_file" uv run coverage report
+
+# Focused mutation gate over scheduling inference, optimization, and publication.
+mutation-check children="4":
+    scripts/run_bounded.sh -- uv run mutmut run --max-children {{children}}
+    uv run mutmut export-cicd-stats
+    uv run mutmut results > mutants/mutmut-results.txt
+    uv run python scripts/check_mutation_gate.py mutants/mutmut-cicd-stats.json --results mutants/mutmut-results.txt --baseline scripts/mutation-survivor-baseline.txt

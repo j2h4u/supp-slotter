@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 import pytest
 import yaml
@@ -73,13 +74,14 @@ def test_marked_daily_product_is_an_episodic_current_plan_placement(tmp_path: Pa
     write_yaml(product_path, card)
 
     schedule = plan_in_temp_dir(tmp_path)
-    summary = schedule["summary"]
+    summary = cast(dict[str, object], schedule["summary"])
     assert isinstance(summary, dict)
     assert summary["placement_groups"] == {"routine": [], "episodic": [fixture_id("prd", "marked")]}
+    pillboxes = cast(dict[str, dict[str, object]], schedule["pillboxes"])
     assert any(
-        any(product["label"] == "Marked" for product in slot["products"])
-        for pillbox in schedule["pillboxes"].values()
-        for slot in pillbox["slots"].values()
+        any(product["label"] == "Marked" for product in cast(list[dict[str, object]], slot["products"]))
+        for pillbox in pillboxes.values()
+        for slot in cast(dict[str, dict[str, object]], pillbox["slots"]).values()
     )
 
     shown = run_planner(root=tmp_path)

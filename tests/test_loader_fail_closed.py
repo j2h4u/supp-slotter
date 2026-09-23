@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 from pathlib import Path
+from typing import cast
 
 import pytest
 import yaml
@@ -181,7 +182,8 @@ def test_relation_loader_rejects_malformed_top_level(tmp_path: Path, document: o
 def test_relation_loader_rejects_non_list_and_invalid_selector_entry(tmp_path: Path) -> None:
     path = tmp_path / "data" / "relations.yaml"
     path.parent.mkdir()
-    relation_type = next(iter(ontology_bundle().runtime_vocabulary["relation_types"]))
+    relation_types = cast(dict[str, object], ontology_bundle().runtime_vocabulary["relation_types"])
+    relation_type = next(iter(relation_types))
     path.write_text(
         yaml.safe_dump({
             "relations": [

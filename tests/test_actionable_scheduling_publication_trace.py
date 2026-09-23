@@ -50,7 +50,7 @@ def test_real_shelf_pressure_trace_retains_normalized_shape_and_proof(tmp_path: 
     )
     assert all(cast(list[object], match["applicability_product_ids"]) for match in matches)
     assert all(cast(list[object], match["provenance_refs"]) for match in matches)
-    assert all(match["item_id"] in match["applicability_product_ids"] for match in matches)
+    assert all(match["item_id"] in cast(list[object], match["applicability_product_ids"]) for match in matches)
     for match in matches:
         provenance = cast(list[dict[str, str | None]], match["provenance_refs"])
         assert provenance == sorted(
@@ -68,7 +68,7 @@ def test_real_shelf_publication_trace_is_self_consistent(tmp_path: Path) -> None
     explanations = cast(dict[str, dict[str, object]], schedule["canonical_explanations"])
 
     assert schedule["status"] == "Optimal"
-    assert objective["satisfied_pressures"] == sum(match["satisfied"] for match in matches)
+    assert objective["satisfied_pressures"] == sum(bool(match["satisfied"]) for match in matches)
     assert set(explanations) == set(assignments)
     for item_id, explanation in explanations.items():
         item_matches = [match for match in matches if match["item_id"] == item_id]

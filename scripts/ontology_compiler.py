@@ -235,12 +235,10 @@ def _validate_manifest_paths(ontology_root: Path, manifest: Mapping[str, object]
     seen_resolved: set[Path] = set()
     root_value = _required_string(manifest, "linkml_root")
     _record_manifest_source(
-        root_value, _resolve_manifest_source(ontology_root, root_value, repository_root), seen_logical, seen_resolved
+        root_value, _resolve_manifest_source(root_value, repository_root), seen_logical, seen_resolved
     )
     for value in _required_string_list(manifest, "linkml_modules"):
-        _record_manifest_source(
-            value, _resolve_manifest_source(ontology_root, value, repository_root), seen_logical, seen_resolved
-        )
+        _record_manifest_source(value, _resolve_manifest_source(value, repository_root), seen_logical, seen_resolved)
     catalogs = manifest.get("catalogs", [])
     if not isinstance(catalogs, list):
         raise OntologyInfrastructureError("Manifest catalogs must be a list")
@@ -255,9 +253,7 @@ def _validate_manifest_paths(ontology_root: Path, manifest: Mapping[str, object]
         value = cast(str, catalog_mapping["path"])
         if catalog_mapping["id"] in ids or catalog_mapping["role"] in roles:
             raise OntologyInfrastructureError(f"Unsafe or missing catalog path {value!r}")
-        _record_manifest_source(
-            value, _resolve_manifest_source(ontology_root, value, repository_root), seen_logical, seen_resolved
-        )
+        _record_manifest_source(value, _resolve_manifest_source(value, repository_root), seen_logical, seen_resolved)
         ids.add(cast(str, catalog_mapping["id"]))
         roles.add(cast(str, catalog_mapping["role"]))
     _validate_repository_projection(ontology_root, manifest, cast(list[dict[str, object]], catalogs))
@@ -321,8 +317,7 @@ def _validate_repository_projection(
     normalized_sources: list[dict[str, object]] = []
     repository_root = ontology_root.parent.resolve()
     catalog_source_paths = {
-        str(item["path"]): _resolve_manifest_source(ontology_root, str(item["path"]), repository_root)
-        for item in catalog_records
+        str(item["path"]): _resolve_manifest_source(str(item["path"]), repository_root) for item in catalog_records
     }
     for raw_source in cast(list[object], raw_sources):
         if not isinstance(raw_source, dict):
@@ -652,7 +647,7 @@ def _safe_repository_path(repository_root: Path, relative: str, *, directory: bo
     return path
 
 
-def _resolve_manifest_source(ontology_root: Path, value: str, repository_root: Path) -> Path:
+def _resolve_manifest_source(value: str, repository_root: Path) -> Path:
     path = Path(value)
     if (
         not value
@@ -842,7 +837,7 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
     canonical_law_catalog = _load_yaml_mapping(_catalog_path(ontology_root, manifest, "canonical_laws"))
     _validate_linkml_instance(schema_view, "CanonicalLawCatalog", canonical_law_catalog)
     canonical_scheduling = _canonical_scheduling(schema_view, manifest, canonical_fact_catalog, canonical_law_catalog)
-    ontoclean_profiles = _load_ontoclean_profiles(ontology_root, manifest, schema_view)
+    ontoclean_profiles = _load_ontoclean_profiles(ontology_root, manifest)
     categories = _required_mapping(vocabulary, "semantic_categories")
     _validate_semantic_categories(categories, ontoclean_profiles)
     terms = _normalized_terms(vocabulary, ontoclean_profiles)
@@ -853,7 +848,6 @@ def _render_artifacts(ontology_root: Path, manifest: Mapping[str, object]) -> di
         manifest,
         terms,
         schema_view,
-        set(IMPLEMENTED_RELATION_ENDPOINT_SELECTOR_KINDS),
         relation_types,
         _load_substance_identity_registry(ontology_root),
     )
@@ -1627,7 +1621,7 @@ def _projection_map(schema_view: SchemaView, manifest: Mapping[str, object], bas
         for item in cast(list[dict[str, object]], manifest["catalogs"])
     ]
     catalogs.sort(key=lambda item: str(item["id"]))
-    repository = _repository_projection_map(manifest, base_iri)
+    repository = _repository_projection_map(manifest)
     return {
         "format_version": _PROJECTION_MAP_FORMAT,
         "schema_version": str(manifest["schema_version"]),
@@ -1638,7 +1632,7 @@ def _projection_map(schema_view: SchemaView, manifest: Mapping[str, object], bas
     }
 
 
-def _repository_projection_map(manifest: Mapping[str, object], base_iri: str) -> dict[str, object]:
+def _repository_projection_map(manifest: Mapping[str, object]) -> dict[str, object]:
     """Render the manifest-authored generic repository projection."""
     projection = cast(Mapping[str, object], manifest["repository_projection"])
     mappings = _validate_repository_mappings(projection["mappings"])
@@ -2668,9 +2662,7 @@ def _source_hash(ontology_root: Path, manifest: Mapping[str, object]) -> str:
     return digest.hexdigest()
 
 
-def _load_ontoclean_profiles(
-    ontology_root: Path, manifest: Mapping[str, object], schema_view: SchemaView
-) -> dict[str, dict[str, object]]:
+def _load_ontoclean_profiles(ontology_root: Path, manifest: Mapping[str, object]) -> dict[str, dict[str, object]]:
     """Load and execute the OntoClean profile catalog.
 
     Profiles are keyed records: the map key is their only canonical identity.
@@ -2881,7 +2873,6 @@ def _load_ontology_assertions(  # noqa: PLR0917
     manifest: Mapping[str, object],
     terms: Sequence[Mapping[str, object]],
     schema_view: SchemaView,
-    selector_kinds: set[str],
     relation_types: Mapping[str, Mapping[str, object]],
     substance_registry: Mapping[str, str],
 ) -> dict[str, dict[str, object]]:

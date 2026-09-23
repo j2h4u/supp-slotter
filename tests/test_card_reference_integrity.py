@@ -27,7 +27,7 @@ def test_check_substances_uses_explicit_ontology_bundle(tmp_path: Path) -> None:
     assert set(seen) == {f"sub_zz{index:04d}zzzz" for index in range(3)}
 
 
-def test_check_substances_accepts_empty_batch(tmp_path: Path) -> None:
+def test_check_substances_accepts_empty_batch() -> None:
     result = check_substances([], ontology_bundle())
 
     assert result == ([], [], {})

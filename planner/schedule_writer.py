@@ -26,7 +26,7 @@ SCHEDULE_COMMENTS = {
 
 
 class NoAliasSafeDumper(yaml.SafeDumper):
-    def ignore_aliases(self, data: object) -> bool:
+    def ignore_aliases(self, data: object) -> bool:  # noqa: ARG002
         return True
 
 

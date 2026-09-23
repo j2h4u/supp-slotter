@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import replace
 from functools import cache
 from pathlib import Path
@@ -11,6 +12,7 @@ from typing import Any, cast
 import pytest
 import yaml
 from planner.ontology.canonical_inference import (
+    CompositionApplicabilityPath,
     Conflict,
     Success,
     UnaryPressureIdentity,
@@ -76,7 +78,7 @@ def _catalog(*facts: RuntimeCanonicalSchedulingFact) -> RuntimeCanonicalScheduli
     return RuntimeCanonicalScheduling(
         compiled.dimensions,
         compiled.families,
-        (SOURCE,),
+        (SOURCE, RuntimeEvidenceSource("src_other")),
         facts,
         compiled.laws,
     )
@@ -143,6 +145,10 @@ def test_every_admitted_value_maps_to_one_pressure() -> None:
         assert result.pressures[0].identity == UnaryPressureIdentity("prd_demo", law.dimension, law.pressure_value)
         assert result.pressures[0].derivations[0].family == law.family
         assert result.pressures[0].derivations[0].fact.value == law.fact_value  # type: ignore[attr-defined]
+        proof = result.pressures[0].derivations[0]
+        assert proof.value == law.fact_value
+        if law.family == "ProductFoodInstruction":
+            assert proof.path == CompositionApplicabilityPath("product", "prd_demo", None, "prd_demo", "")
 
 
 def test_wrong_or_unselected_applicability_does_not_emit_pressure() -> None:
@@ -276,9 +282,18 @@ def test_inference_rejects_duck_typed_runtime_programs() -> None:
         )
 
 
-@pytest.mark.parametrize("selected", (("",), (42,), {"item": ""}, {"": "prd_demo"}, ("prd_unknown",)))
-def test_malformed_or_unknown_selected_items_fail_closed(selected: object) -> None:
-    with pytest.raises(OntologyInfrastructureError):
+@pytest.mark.parametrize(
+    ("selected", "message"),
+    (
+        (("",), "canonical inference selected items must contain non-empty strings"),
+        ((42,), "canonical inference selected items must contain non-empty strings"),
+        ({"item": ""}, "canonical inference selected item mapping must contain non-empty strings"),
+        ({"": "prd_demo"}, "canonical inference selected item mapping must contain non-empty strings"),
+        (("prd_unknown",), "canonical inference selected unknown products: prd_unknown"),
+    ),
+)
+def test_malformed_or_unknown_selected_items_fail_closed(selected: object, message: str) -> None:
+    with pytest.raises(OntologyInfrastructureError, match=f"^{re.escape(message)}$"):
         _execute(_catalog(), selected)
 
 
@@ -296,11 +311,11 @@ def test_valid_neutral_product_yields_no_pressures() -> None:
 def test_provenance_sort_is_deterministic_for_optional_quotations() -> None:
     law = _primary_law()
     provenance = (
-        RuntimeEvidenceProvenance("src_demo", "paper#demo", "quoted"),
+        RuntimeEvidenceProvenance("src_demo", "z-locator", "quoted"),
         RuntimeEvidenceProvenance("src_demo", "paper#demo", None),
-        RuntimeEvidenceProvenance("src_demo", "paper#demo", "quoted"),
+        RuntimeEvidenceProvenance("src_other", "a-locator", "other"),
     )
     fact = replace(_fact(law.family, law.fact_value), provenance=provenance)
     result = _execute(_catalog(fact), ("prd_demo",))
     assert isinstance(result, Success)
-    assert result.pressures[0].derivations[0].provenance == (provenance[1], provenance[0])
+    assert result.pressures[0].derivations[0].provenance == (provenance[1], provenance[0], provenance[2])

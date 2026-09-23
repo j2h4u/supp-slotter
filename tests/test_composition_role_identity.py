@@ -65,7 +65,9 @@ def _write_product(path: Path, components: str) -> None:
 
 def _component_nodes(result: ProjectionResult) -> set[URIRef]:
     graph = result.graph
-    return set(graph.objects(URIRef(BASE + "product/prd_demo"), URIRef(BASE + "components")))
+    nodes = set(graph.objects(URIRef(BASE + "product/prd_demo"), URIRef(BASE + "components")))
+    assert all(isinstance(node, URIRef) for node in nodes)
+    return {node for node in nodes if isinstance(node, URIRef)}
 
 
 def test_authored_component_identity_survives_reorder(tmp_path: Path) -> None:
