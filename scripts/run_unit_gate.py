@@ -153,7 +153,6 @@ ONTOLOGY_CONTRACT_GROUPS: tuple[tuple[str, tuple[Path, ...]], ...] = (
             Path("tests/test_ontology_artifacts.py"),
             Path("tests/test_ontology_repository_projection.py"),
             Path("tests/test_ontology_runtime_loader.py"),
-            Path("tests/test_ontology_presentation_cache.py"),
             Path("tests/test_ontology_shacl_fixtures.py"),
             Path("tests/test_runtime_contract_v2.py"),
             Path("tests/test_yaml_duplicate_keys.py"),

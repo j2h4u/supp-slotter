@@ -130,16 +130,6 @@ def find_product_results(query: str, paths: Paths, bundle: OntologyBundle) -> li
     return sorted(results, key=lambda item: (-item[0], item[2].casefold(), item[1]))
 
 
-def collect_product_substance_refs(products: dict[str, Product], product_ids: set[str]) -> set[str]:
-    refs: set[str] = set()
-    for product_id in product_ids:
-        product = products.get(product_id)
-        if product is None:
-            continue
-        refs.update(product_component_substances(product))
-    return refs
-
-
 def load_product_registry(paths: Paths, bundle: OntologyBundle) -> dict[str, Product]:
     products: dict[str, Product] = {}
     product_files = sorted(paths.products.glob("*.yaml"))
@@ -174,15 +164,3 @@ def format_product_name(product: Product) -> str:
     if product.brand and product.brand != "unknown":
         return f"{product.brand} - {name}"
     return name
-
-
-def format_item_product_name(
-    item_id: str,
-    item_products: dict[str, str],
-    products: dict[str, Product],
-) -> str:
-    product_id = item_products[item_id]
-    product = products.get(product_id)
-    if product is None:
-        return product_id
-    return format_product_name(product)

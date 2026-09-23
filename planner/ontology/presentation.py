@@ -3,16 +3,13 @@
 from __future__ import annotations
 
 import re
-import threading
-import weakref
-from collections.abc import Callable, Mapping
+from collections.abc import Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
 from typing import cast
 
 from planner.ontology.bundle_view import OntologyBundleView
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
-from planner.ontology.verification import is_registered_bundle
 
 _CANONICAL_NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
 _TERM_FIELDS = frozenset({
@@ -28,41 +25,6 @@ _CATEGORY_PREDICATE_NAMESPACES = frozenset({"knowledge"})
 _ONTOCLEAN_PROFILE_FIELDS = frozenset({"id", "rigidity", "supplies_identity", "dependence"})
 _ONTOCLEAN_RIGIDITY_VALUES = frozenset({"rigid", "anti_rigid"})
 _ONTOCLEAN_DEPENDENCE_VALUES = frozenset({"independent", "dependent"})
-
-
-class _VerifiedBundleCache[T]:
-    """Reuse one immutable decoder result for one live verified bundle."""
-
-    def __init__(self) -> None:
-        self._entries: dict[int, tuple[weakref.ReferenceType[OntologyBundleView], T]] = {}
-        self._lock: threading.Lock = threading.Lock()
-
-    def get(self, bundle: OntologyBundleView, decoder: Callable[[OntologyBundleView], T]) -> T:
-        if not is_registered_bundle(bundle):
-            return decoder(bundle)
-        identity = id(bundle)
-        with self._lock:
-            entry = self._entries.get(identity)
-            if entry is not None and entry[0]() is bundle:
-                return entry[1]
-            if entry is not None:
-                del self._entries[identity]
-
-        value = decoder(bundle)
-
-        def discard(reference: weakref.ReferenceType[OntologyBundleView]) -> None:
-            with self._lock:
-                current = self._entries.get(identity)
-                if current is not None and current[0] is reference:
-                    del self._entries[identity]
-
-        reference = weakref.ref(bundle, discard)
-        with self._lock:
-            current = self._entries.get(identity)
-            if current is not None and current[0]() is bundle:
-                return current[1]
-            self._entries[identity] = (reference, value)
-        return value
 
 
 @dataclass(frozen=True, slots=True)
@@ -95,7 +57,7 @@ class _TermContext:
 def load_ontoclean_profiles(bundle: OntologyBundleView) -> Mapping[str, OntoCleanProfile]:
     """Strictly decode the complete profile catalog without fallback records."""
 
-    return _PROFILE_CACHE.get(bundle, _decode_ontoclean_profiles)
+    return _decode_ontoclean_profiles(bundle)
 
 
 def _decode_ontoclean_profiles(bundle: OntologyBundleView) -> Mapping[str, OntoCleanProfile]:
@@ -148,13 +110,6 @@ def _validate_profile_semantics(
         raise _error(f"ontoclean_profiles.{profile_id} anti-rigid semantics require dependence", source)
 
 
-_PROFILE_CACHE = _VerifiedBundleCache[Mapping[str, OntoCleanProfile]]()
-_CATEGORY_CACHE = _VerifiedBundleCache[Mapping[str, tuple[str, ...]]]()
-_TERM_CACHE = _VerifiedBundleCache[tuple[Mapping[str, object], ...]]()
-_TERM_LABEL_CACHE = _VerifiedBundleCache[Mapping[tuple[str, str], str]]()
-_RELATION_PRESENTATION_CACHE = _VerifiedBundleCache[Mapping[str, RelationPresentation]]()
-
-
 def load_term_labels(bundle: OntologyBundleView) -> Mapping[tuple[str, str], str]:
     """Return the complete authored term-label catalog after strict decoding.
 
@@ -164,7 +119,7 @@ def load_term_labels(bundle: OntologyBundleView) -> Mapping[tuple[str, str], str
     hide a broken ontology artifact as valid data.
     """
 
-    return _TERM_LABEL_CACHE.get(bundle, _decode_term_labels)
+    return _decode_term_labels(bundle)
 
 
 def authored_term_label(term_id: str, bundle: OntologyBundleView) -> str:
@@ -178,11 +133,6 @@ def authored_term_label(term_id: str, bundle: OntologyBundleView) -> str:
         raise ValueError(f"ontology term {term_id!r} has no authored label; raw id is diagnostic only") from error
 
 
-def authored_relation_label(relation_type: str, bundle: OntologyBundleView) -> str:
-    """Resolve a relation type through its authored presentation catalog."""
-    return authored_relation_presentation(relation_type, bundle).label
-
-
 def authored_relation_presentation(relation_type: str, bundle: OntologyBundleView) -> RelationPresentation:
     """Resolve closed relation presentation metadata from the verified catalog."""
     try:
@@ -192,7 +142,7 @@ def authored_relation_presentation(relation_type: str, bundle: OntologyBundleVie
 
 
 def load_relation_presentations(bundle: OntologyBundleView) -> Mapping[str, RelationPresentation]:
-    return _RELATION_PRESENTATION_CACHE.get(bundle, _decode_relation_presentations)
+    return _decode_relation_presentations(bundle)
 
 
 def _decode_relation_presentations(bundle: OntologyBundleView) -> Mapping[str, RelationPresentation]:
@@ -235,7 +185,7 @@ def load_term_catalog(
 ) -> tuple[Mapping[str, object], ...]:
     """Return the canonical generated term registry after strict decoding."""
 
-    return _TERM_CACHE.get(bundle, _decode_term_catalog)
+    return _decode_term_catalog(bundle)
 
 
 def _decode_term_catalog(
@@ -330,7 +280,7 @@ def load_category_predicates(
 ) -> Mapping[str, tuple[str, ...]]:
     """Return category predicates after strict structural identity validation."""
 
-    return _CATEGORY_CACHE.get(bundle, _decode_category_predicates)
+    return _decode_category_predicates(bundle)
 
 
 def _decode_category_predicates(

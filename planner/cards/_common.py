@@ -28,33 +28,6 @@ def load_card_mapping(path: Path, kind: str) -> dict[str, YamlValue]:
         raise CardLoadError(path, f"{path}: {kind} top-level must be a mapping, {e.message}") from e
 
 
-def as_mapping(value: YamlValue) -> dict[str, YamlValue] | None:
-    if isinstance(value, dict):
-        return value
-    return None
-
-
-def as_list(value: YamlValue) -> list[YamlValue] | None:
-    if isinstance(value, list):
-        return value
-    return None
-
-
-def as_tuple(value: YamlValue) -> tuple[YamlValue, ...] | None:
-    if isinstance(value, list):
-        return tuple(value)
-    if isinstance(value, tuple):
-        return value
-    return None
-
-
-def string_tuple(value: YamlValue) -> tuple[str, ...] | None:
-    sequence = as_tuple(value)
-    if sequence is None:
-        return None
-    return tuple(str(item) for item in sequence if isinstance(item, str))
-
-
 def normalize_filename_part(value: str) -> str:
     normalized = value.lower().replace("&", " and ").replace("'", "").replace("’", "")
     chars = [char if char.isascii() and char.isalnum() else "_" for char in normalized]
