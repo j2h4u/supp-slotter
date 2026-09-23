@@ -10,17 +10,13 @@ from planner.contracts import Substance
 from planner.ontology.bundle_view import OntologyBundleView
 from planner.ontology.errors import MALFORMED, OntologyInfrastructureError
 from planner.ontology.glue_capabilities import IMPLEMENTED_PREDICATE_NAMESPACES
-from planner.ontology.presentation import _VerifiedBundleCache, load_category_predicates, load_term_catalog
-
-_KNOWLEDGE_FIELDS_CACHE = _VerifiedBundleCache[tuple[str, ...]]()
-_CANONICAL_TERMS_CACHE = _VerifiedBundleCache[Mapping[str, frozenset[str]]]()
-_SUBSTANCE_TRAIT_FIELDS_CACHE = _VerifiedBundleCache[tuple[tuple[str, str], ...]]()
+from planner.ontology.presentation import load_category_predicates, load_term_catalog
 
 
 def knowledge_category_fields(bundle: OntologyBundleView) -> tuple[str, ...]:
     """Return substance ``knowledge`` fields declared by ontology categories."""
 
-    return _KNOWLEDGE_FIELDS_CACHE.get(bundle, _decode_knowledge_category_fields)
+    return _decode_knowledge_category_fields(bundle)
 
 
 def _decode_knowledge_category_fields(bundle: OntologyBundleView) -> tuple[str, ...]:
@@ -42,7 +38,7 @@ def canonical_terms_by_predicate(bundle: OntologyBundleView) -> Mapping[str, fro
     malformed records are ignored, which makes the resolver fail closed.
     """
 
-    return _CANONICAL_TERMS_CACHE.get(bundle, _decode_canonical_terms_by_predicate)
+    return _decode_canonical_terms_by_predicate(bundle)
 
 
 def _decode_canonical_terms_by_predicate(bundle: OntologyBundleView) -> Mapping[str, frozenset[str]]:
@@ -68,7 +64,7 @@ def substance_trait_fields(bundle: OntologyBundleView) -> tuple[tuple[str, str],
     treating an ontology category as a Python attribute.
     """
 
-    return _SUBSTANCE_TRAIT_FIELDS_CACHE.get(bundle, _decode_substance_trait_fields)
+    return _decode_substance_trait_fields(bundle)
 
 
 def _decode_substance_trait_fields(bundle: OntologyBundleView) -> tuple[tuple[str, str], ...]:

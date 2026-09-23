@@ -264,7 +264,6 @@ def test_ontology_contract_suite_runs_three_curated_groups_in_order(tmp_path: Pa
         tmp_path,
         [
             "test_ontology_artifacts.py",
-            "test_ontology_presentation_cache.py",
             "test_ontology_compiler_outputs.py",
             "test_composition_role_identity.py",
             "test_canonical_fact_catalog_runtime.py",
@@ -315,7 +314,6 @@ def test_ontology_contract_suite_runs_three_curated_groups_in_order(tmp_path: Pa
             "test_ontology_artifacts.py",
             "test_ontology_repository_projection.py",
             "test_ontology_runtime_loader.py",
-            "test_ontology_presentation_cache.py",
             "test_ontology_shacl_fixtures.py",
             "test_runtime_contract_v2.py",
             "test_yaml_duplicate_keys.py",
