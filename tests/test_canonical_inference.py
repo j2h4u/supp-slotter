@@ -211,7 +211,26 @@ def test_proof_contains_law_fact_subject_path_and_provenance() -> None:
     assert proof.path.role_id == ROLE.id
     assert (proof.path.target_kind, proof.path.target_id) == ("substance", "sub_demo")
     assert proof.path.product == ROLE.product
+    assert proof.path.substance == ROLE.substance
     assert proof.provenance == PROVENANCE
+
+
+def test_product_scoped_proof_retains_subject_and_provenance() -> None:
+    law = next(law for law in _laws() if law.family == "ProductFoodInstruction")
+    fact = _fact(law.family, law.fact_value)
+    result = _execute(_catalog(fact), ("prd_demo",))
+    assert isinstance(result, Success)
+    proof = result.pressures[0].derivations[0]
+    assert proof.subject == fact.subject
+    assert proof.provenance == PROVENANCE
+
+
+def test_product_scoped_fact_for_unselected_product_is_ignored() -> None:
+    law = next(law for law in _laws() if law.family == "ProductFoodInstruction")
+    fact = _fact(law.family, law.fact_value)
+    result = _execute(_catalog(fact), ("prd_other",), roles=(OTHER_ROLE,))
+    assert isinstance(result, Success)
+    assert result.pressures == ()
 
 
 def test_duplicate_witnesses_facts_components_and_paths_normalize_to_one_pressure() -> None:
@@ -228,6 +247,59 @@ def test_duplicate_witnesses_facts_components_and_paths_normalize_to_one_pressur
     assert result.pressures[0].derivations[1].provenance == PROVENANCE
 
 
+def test_same_law_derivations_are_sorted_by_fact_id() -> None:
+    law = _primary_law()
+    result = _execute(
+        _catalog(
+            _fact(law.family, law.fact_value, fact_id="z_fact"),
+            _fact(law.family, law.fact_value, fact_id="a_fact"),
+        ),
+        ("prd_demo",),
+    )
+    assert isinstance(result, Success)
+    assert tuple(derivation.fact.id for derivation in result.pressures[0].derivations) == ("a_fact", "z_fact")
+
+
+def test_same_pressure_derivations_are_sorted_by_law_id_before_fact_id() -> None:
+    onset = next(law for law in _laws() if law.family == "AcuteSleepEffect" and law.pressure_value == "sleep")
+    continuity = next(
+        law
+        for law in _laws()
+        if law.family == "AcuteSleepEffect" and law.pressure_value == "sleep" and law.id != onset.id
+    )
+    result = _execute(
+        _catalog(
+            _fact(continuity.family, continuity.fact_value, fact_id="z_fact"),
+            _fact(onset.family, onset.fact_value, fact_id="a_fact"),
+        ),
+        ("prd_demo",),
+    )
+    assert isinstance(result, Success)
+    assert tuple(derivation.law.id for derivation in result.pressures[0].derivations) == tuple(
+        sorted((onset.id, continuity.id))
+    )
+
+
+def test_one_fact_with_multiple_roles_has_stable_path_order() -> None:
+    law = _primary_law()
+    role_a = RuntimeCompositionRole("cmp_a", "prd_demo", "sub_demo")
+    role_b = RuntimeCompositionRole("cmp_b", "prd_demo", "sub_demo")
+    result = _execute(_catalog(_fact(law.family, law.fact_value)), ("prd_demo",), roles=(role_b, role_a))
+    assert isinstance(result, Success)
+    assert tuple(derivation.path.role_id for derivation in result.pressures[0].derivations) == ("cmp_a", "cmp_b")
+
+
+def test_substance_fact_with_unselected_role_still_reaches_selected_role() -> None:
+    law = _primary_law()
+    result = _execute(
+        _catalog(_fact(law.family, law.fact_value)),
+        {"item_other": OTHER_ROLE.product},
+        roles=(ROLE, OTHER_ROLE),
+    )
+    assert isinstance(result, Success)
+    assert tuple(pressure.item_id for pressure in result.pressures) == ("item_other",)
+
+
 def test_same_dimension_values_are_layout_free_conflict() -> None:
     first, second = _conflicting_laws()
     result = _execute(
@@ -241,6 +313,7 @@ def test_same_dimension_values_are_layout_free_conflict() -> None:
     assert result.conflicts[0].item_id == "prd_demo"
     assert result.conflicts[0].dimension == first.dimension
     assert result.conflicts[0].values == tuple(sorted({first.pressure_value, second.pressure_value}))
+    assert {derivation.fact.id for derivation in result.conflicts[0].derivations} == {"fact_demo", "fact_other"}
 
 
 def test_cross_dimension_pressures_coexist() -> None:
@@ -273,7 +346,7 @@ def test_incomplete_law_graph_fails_closed_at_runtime_catalog_boundary() -> None
 
 
 def test_inference_rejects_duck_typed_runtime_programs() -> None:
-    with pytest.raises(TypeError, match="RuntimeCanonicalScheduling"):
+    with pytest.raises(TypeError, match=r"^canonical inference requires RuntimeCanonicalScheduling$"):
         execute_canonical_inference(  # type: ignore[arg-type]
             object(),
             ("prd_demo",),
@@ -319,3 +392,101 @@ def test_provenance_sort_is_deterministic_for_optional_quotations() -> None:
     result = _execute(_catalog(fact), ("prd_demo",))
     assert isinstance(result, Success)
     assert result.pressures[0].derivations[0].provenance == (provenance[1], provenance[0], provenance[2])
+
+
+def test_provenance_sort_handles_same_locator_with_and_without_quotation() -> None:
+    law = _primary_law()
+    provenance = (
+        RuntimeEvidenceProvenance("src_demo", "same-locator", "z-quoted"),
+        RuntimeEvidenceProvenance("src_demo", "same-locator", "a-quoted"),
+        RuntimeEvidenceProvenance("src_demo", "same-locator", None),
+    )
+    fact = replace(_fact(law.family, law.fact_value), provenance=provenance)
+    result = _execute(_catalog(fact), ("prd_demo",))
+    assert isinstance(result, Success)
+    assert result.pressures[0].derivations[0].provenance == (provenance[2], provenance[1], provenance[0])
+
+
+def test_unknown_composition_role_is_ignored() -> None:
+    law = _primary_law()
+    fact = _fact(
+        law.family,
+        law.fact_value,
+        subject=RuntimeFactSubject(None, "cmp_missing"),
+        applicability=RuntimeFactApplicability(None, "cmp_missing"),
+    )
+    result = _execute(_catalog(fact), ("prd_demo",))
+    assert isinstance(result, Success)
+    assert result.pressures == ()
+
+
+def test_invalid_composition_role_is_rejected() -> None:
+    with pytest.raises(
+        OntologyInfrastructureError,
+        match=r"^canonical inference composition roles must be complete runtime roles$",
+    ):
+        execute_canonical_inference(
+            _catalog(),
+            ("prd_demo",),
+            applicability_expansion_strategy=IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY,
+            composition_roles=(RuntimeCompositionRole("cmp_bad", "prd_demo", ""),),
+        )
+
+
+def test_non_runtime_composition_role_is_rejected() -> None:
+    with pytest.raises(
+        OntologyInfrastructureError,
+        match=r"^canonical inference composition roles must be complete runtime roles$",
+    ):
+        execute_canonical_inference(
+            _catalog(),
+            ("prd_demo",),
+            applicability_expansion_strategy=IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY,
+            composition_roles=(object(),),  # type: ignore[arg-type]
+        )
+
+
+def test_known_products_must_be_non_empty_strings() -> None:
+    with pytest.raises(
+        OntologyInfrastructureError,
+        match=r"^canonical inference known products must be non-empty strings$",
+    ):
+        execute_canonical_inference(
+            _catalog(),
+            ("prd_demo",),
+            applicability_expansion_strategy=IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY,
+            known_products=(42,),  # type: ignore[arg-type]
+        )
+
+
+@pytest.mark.parametrize(
+    "role",
+    (
+        RuntimeCompositionRole("", "prd_demo", "sub_demo"),
+        RuntimeCompositionRole("cmp_bad", "", "sub_demo"),
+    ),
+)
+def test_composition_role_identity_and_product_are_required(role: RuntimeCompositionRole) -> None:
+    with pytest.raises(
+        OntologyInfrastructureError,
+        match=r"^canonical inference composition roles must be complete runtime roles$",
+    ):
+        execute_canonical_inference(
+            _catalog(),
+            ("prd_demo",),
+            applicability_expansion_strategy=IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY,
+            composition_roles=(role,),
+        )
+
+
+def test_unknown_product_error_lists_all_products_in_order() -> None:
+    with pytest.raises(
+        OntologyInfrastructureError,
+        match=r"^canonical inference selected unknown products: prd_missing_a, prd_missing_b$",
+    ):
+        execute_canonical_inference(
+            _catalog(),
+            {"item_b": "prd_missing_b", "item_a": "prd_missing_a"},
+            applicability_expansion_strategy=IMPLEMENTED_APPLICABILITY_EXPANSION_STRATEGY,
+            known_products=("prd_demo",),
+        )

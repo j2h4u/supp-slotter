@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import random
 
+import planner.canonical_optimizer as canonical_optimizer
 import pytest
 from planner.canonical_optimizer import (
     CanonicalOptimizerInput,
@@ -166,8 +167,11 @@ def test_deadline_interruption_and_state_bound_never_publish_incumbents() -> Non
     assert isinstance(interrupted, Indeterminate)
     assert isinstance(bounded, Indeterminate)
     assert expired.diagnostic.code == "timeout"
+    assert expired.diagnostic.message == "deadline expired"
     assert interrupted.diagnostic.code == "interrupted"
+    assert interrupted.diagnostic.message == "optimization interrupted"
     assert bounded.diagnostic.code == "resource_exhausted"
+    assert bounded.diagnostic.message == "state bound exhausted"
 
 
 def test_state_bound_allows_the_exact_boundary() -> None:
@@ -225,6 +229,21 @@ def test_malformed_pressure_dimensions_fail_closed(dimensions: object) -> None:
     }
 
 
+def test_empty_pressure_dimension_id_fails_closed() -> None:
+    result = _optimize_canonical_layout(
+        CanonicalOptimizerInput(
+            {},
+            {},
+            (),
+            {"": frozenset({"value"})},
+            IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY,
+        )
+    )
+
+    assert isinstance(result, Indeterminate)
+    assert result.diagnostic.message == "pressure dimensions contain invalid values"
+
+
 @pytest.mark.parametrize(
     "slots",
     (
@@ -248,6 +267,71 @@ def test_malformed_slots_fail_closed(slots: object) -> None:
 
     assert isinstance(result, Indeterminate)
     assert result.diagnostic.code == "invalid_input"
+
+
+@pytest.mark.parametrize(
+    ("slots", "message"),
+    (
+        ({"slot": object()}, "slots must be keyed by non-empty IDs and contain Slot values"),
+        ({1: _slot("slot", 1)}, "slots must be keyed by non-empty IDs and contain Slot values"),
+        ({"slot": _slot("other", 1)}, "slot identity/domain is invalid for 'slot'"),
+        (
+            {"slot": Slot("slot", "slot", 1, "daily", "daily", 1, dict(_slot("slot", 1).anchors))},
+            "slot identity/domain is invalid for 'slot'",
+        ),
+        (
+            {"slot": Slot("slot", "slot", True, "daily", "daily", "daily", dict(_slot("slot", 1).anchors))},
+            "slot order is invalid for 'slot'",
+        ),
+        (
+            {"slot": _slot("slot", 1, meal="invalid")},
+            "slot 'slot' has invalid anchors",
+        ),
+    ),
+)
+def test_slot_validation_diagnostics_are_stable(slots: object, message: str) -> None:
+    result = _optimize_canonical_layout(
+        CanonicalOptimizerInput(
+            {},
+            slots,  # type: ignore[arg-type]
+            (),
+            PRESSURE_VALUES,
+            IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY,
+        )
+    )
+
+    assert isinstance(result, Indeterminate)
+    assert result.diagnostic.code == "invalid_input"
+    assert result.diagnostic.message == message
+
+
+def test_assignment_loads_rejects_missing_slot_as_proof_failure() -> None:
+    optimizer_input = CanonicalOptimizerInput(
+        {"item": "daily"},
+        {"slot": _slot("slot", 1)},
+        (),
+        PRESSURE_VALUES,
+        IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY,
+    )
+
+    with pytest.raises(canonical_optimizer._IndeterminateError) as error:
+        canonical_optimizer._assignment_loads(optimizer_input, {"item": "missing"})
+    assert error.value.diagnostic.code == "proof_failed"
+    assert error.value.diagnostic.message == "proof_incomplete: assignment domain mismatch"
+
+
+def test_assignment_loads_counts_each_item_once() -> None:
+    optimizer_input = CanonicalOptimizerInput(
+        {"first": "daily", "second": "daily"},
+        {"slot": _slot("slot", 1)},
+        (),
+        PRESSURE_VALUES,
+        IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY,
+    )
+
+    assert canonical_optimizer._assignment_loads(optimizer_input, {"first": "slot", "second": "slot"}) == {
+        "daily": {"slot": 2}
+    }
 
 
 @pytest.mark.parametrize(
@@ -277,6 +361,23 @@ def test_malformed_pressure_identities_fail_closed(pressure: object) -> None:
         "invalid or unselected pressure identity",
         "pressures must contain normalized pressure identities",
     }
+
+
+def test_truthy_unhashable_pressure_item_id_fails_closed() -> None:
+    pressure = UnaryPressureIdentity(["bad"], "meal_context", "with_food")  # type: ignore[arg-type]
+    result = _optimize_canonical_layout(
+        CanonicalOptimizerInput(
+            {"item": "daily"},
+            {"slot": _slot("slot", 1)},
+            (pressure,),
+            PRESSURE_VALUES,
+            IMPLEMENTED_PRESSURE_SATISFACTION_STRATEGY,
+        )
+    )
+
+    assert isinstance(result, Indeterminate)
+    assert result.diagnostic.code == "invalid_input"
+    assert result.diagnostic.message == "invalid or unselected pressure identity"
 
 
 def test_negative_deadline_fails_closed() -> None:
