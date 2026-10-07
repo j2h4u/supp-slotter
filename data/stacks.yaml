@@ -35,7 +35,6 @@
 # =============================================================================
 
 daily:
-- prd_55d65df796
 - prd_eb6337a6dc
 - prd_bb212cffc2
 - prd_9d0fca3201
@@ -53,6 +52,7 @@ training:
 - prd_2ca842627a
 - prd_0e92bc1674
 inactive:
+- prd_55d65df796
 - prd_coglohvmzn
 - prd_io1peb9syp
 - prd_do96zy85ny
